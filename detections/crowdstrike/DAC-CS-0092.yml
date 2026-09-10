@@ -1,0 +1,52 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Finds scheduled tasks registered with a COM handler action (ComHandler), frequently abused
+  for
+
+  stealthy persistence without a visible executable path.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0092
+query:
+  crowdstrike: '#event_simpleName=ScheduledTaskRegistered
+
+    | TaskName!=/^\\?Microsoft\\Windows\\/i
+
+    | TaskXML=/ComHandler/i
+
+    | groupBy([aid, ComputerName, TaskName], function=[count(), collect([TaskXML], limit=1)])
+
+    '
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1053.005
+  - T1546
+title: 'Falcon: Scheduled Task with ComHandler Action'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+- https://attack.mitre.org/techniques/T1546/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/tasks_scheduled_with_ComHandler.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:tasks_scheduled_with_ComHandler.yml
+- esn:ScheduledTaskRegistered
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- TaskName
+- TaskXML
+- aid
