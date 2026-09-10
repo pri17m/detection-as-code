@@ -1,0 +1,31 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1003/002/
+title: 'Falcon: suspicious SAM/SECURITY hive access tools'
+description: reg save SAM/SECURITY or secretsdump-class cmdline
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0017
+status: experimental
+tags:
+- wave-a
+- P0
+query:
+  crowdstrike: 'CommandLine CONTAINS_ANY ["reg save","SAM","SECURITY"] AND ImageFileName="reg.exe"
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.002
