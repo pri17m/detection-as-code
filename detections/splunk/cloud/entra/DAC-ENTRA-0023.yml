@@ -1,0 +1,39 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName IN ("Set DirSyncEnabled feature","Enable Soft Match","Update DirSync soft match")
+    OR ActivityDisplayName="*DirSync*" OR ActivityDisplayName="*seamless SSO*"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0023
+title: 'Entra: Hybrid identity Connect sync or seamless SSO config changed'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-next
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1556/007/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1556.007
+author: Detection Engineer
+status: experimental
+description: Update DirSync / Seamless SSO feature
