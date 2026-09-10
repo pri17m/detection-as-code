@@ -1,137 +1,260 @@
-# Canonical sourcetype allowlist for Detection-as-Code
-# Wave B: Entra + GitHub cloud audit; Wave A: falcon/mde retained
+# Canonical Splunk sourcetype allowlist for Detection-as-Code
+# CI MUST reject detection rules that reference sourcetypes not listed under
+# allowed_sourcetypes (exact string match after macro expansion).
+#
+# Repo path: config/sourcetype_map.yaml
+# Box draft: /workspace/dac-telemetry-windows/config/sourcetype_map.yaml
+#
+# Prefer sourcetype=… in rules. Never hardcode index=.
+# Families: windows + Wave A CS/MDE + Wave B Entra + GitHub audit/cloud.
+
 version: 1
 platform: splunk
-telemetry_family: windows
+telemetry_families:
+  - windows
+  - crowdstrike
+  - defender
+  - github
+  - entra
+
+# ---------------------------------------------------------------------------
+# Canonical allowed sourcetype strings
+# ---------------------------------------------------------------------------
 allowed_sourcetypes:
-- WinEventLog:Security
-- XmlWinEventLog:Security
-- WinEventLog
-- XmlWinEventLog
-- WinEventLog:System
-- XmlWinEventLog:System
-- WinEventLog:Microsoft-Windows-PowerShell/Operational
-- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
-- WinEventLog:Windows PowerShell
-- XmlWinEventLog:Windows PowerShell
-- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
-- WinEventLog:Microsoft-Windows-Sysmon/Operational
-- sysmon
-- sysmon:*
-- azure:monitor:aad
-- azure:aad:signin
-- azure:aad:audit
-- github:cloud:audit
-- github:audit
-- XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
-- WinEventLog:Microsoft-Windows-Windows Defender/Operational
-- XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
-- WinEventLog:Microsoft-Windows-WMI-Activity/Operational
-- falcon:process
-- mde:advanced_hunting
-source_patterns:
-  security:
+  # --- Windows Security ---
   - WinEventLog:Security
   - XmlWinEventLog:Security
-  - WMI:WinEventLog:Security
-  system:
+  - WinEventLog
+  - XmlWinEventLog
+
+  # --- Windows System ---
   - WinEventLog:System
   - XmlWinEventLog:System
-  - WMI:WinEventLog:System
-  powershell_operational:
+
+  # --- PowerShell ---
   - WinEventLog:Microsoft-Windows-PowerShell/Operational
   - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
-  powershell_classic:
   - WinEventLog:Windows PowerShell
   - XmlWinEventLog:Windows PowerShell
-  sysmon:
+
+  # --- Sysmon ---
   - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
   - WinEventLog:Microsoft-Windows-Sysmon/Operational
-  - XmlWinEventLog:WEC-Sysmon
+  - sysmon
+  - "sysmon:*"
+
+  # --- WMI Activity (host) ---
+  - XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
+  - WinEventLog:Microsoft-Windows-WMI-Activity/Operational
+
+  # --- Windows Defender Operational (host channel) ---
+  - XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
+  - WinEventLog:Microsoft-Windows-Windows Defender/Operational
+
+  # --- Wave A: CrowdStrike Falcon (portable stub key) ---
+  - falcon:process
+  # future (not yet allowlisted until Telemetry maps): falcon:identity, falcon:dns, falcon:network
+
+  # --- Wave A: Microsoft Defender / MDE Advanced Hunting ---
+  - mde:advanced_hunting
+  # future table-scoped keys when DE/Telemetry agree: mde:device_process, mde:device_network, …
+
+  # --- GitHub (Splunk) ---
+  - github:audit
+  # --- Wave B: Entra / Azure AD (Splunk) ---
+  - azure:monitor:aad              # preferred (Azure Monitor / AAD)
+  - azure:aad:signin               # legacy alias
+  - azure:aad:audit                # legacy alias
+
+  # --- GitHub aliases ---
+  # github:audit already listed
+  - github:cloud:audit              # alias used by some GH cloud packs
+
+# ---------------------------------------------------------------------------
+# Canonical macro → sourcetype sets (CI / rule authors)
+# ---------------------------------------------------------------------------
+canonical:
+  windows_security:
+    - WinEventLog:Security
+    - XmlWinEventLog:Security
+    - WinEventLog
+    - XmlWinEventLog
+  windows_system:
+    - WinEventLog:System
+    - XmlWinEventLog:System
+  windows_sysmon:
+    - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+    - WinEventLog:Microsoft-Windows-Sysmon/Operational
+    - sysmon
+    - "sysmon:*"
+  windows_powershell_operational:
+    - WinEventLog:Microsoft-Windows-PowerShell/Operational
+    - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+  windows_powershell_classic:
+    - WinEventLog:Windows PowerShell
+    - XmlWinEventLog:Windows PowerShell
+  windows_wmi:
+    - XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
+    - WinEventLog:Microsoft-Windows-WMI-Activity/Operational
+  windows_defender:
+    - XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
+    - WinEventLog:Microsoft-Windows-Windows Defender/Operational
+  crowdstrike_falcon_process:
+    - falcon:process
+  defender_advanced_hunting:
+    - mde:advanced_hunting
+  github_audit:
+    - github:audit
+  entra_azure_ad:
+    - azure:monitor:aad
+    - azure:aad:signin
+    - azure:aad:audit
+  github_cloud_audit:
+    - github:cloud:audit
+    - github:audit
+
+source_patterns:
+  security:
+    - WinEventLog:Security
+    - XmlWinEventLog:Security
+    - WMI:WinEventLog:Security
+  system:
+    - WinEventLog:System
+    - XmlWinEventLog:System
+    - WMI:WinEventLog:System
+  powershell_operational:
+    - WinEventLog:Microsoft-Windows-PowerShell/Operational
+    - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+  powershell_classic:
+    - "WinEventLog:Windows PowerShell"
+    - "XmlWinEventLog:Windows PowerShell"
+  sysmon:
+    - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+    - WinEventLog:Microsoft-Windows-Sysmon/Operational
+    - XmlWinEventLog:WEC-Sysmon
+  defender_operational:
+    - XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
+    - WinEventLog:Microsoft-Windows-Windows Defender/Operational
+  wmi_activity:
+    - XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
+    - WinEventLog:Microsoft-Windows-WMI-Activity/Operational
+
 macros:
   windows_security:
-    description: "Security channel \u2014 classic + XML compound + collapsed XmlWinEventLog/WinEventLog"
-    suggested_definition: "(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security\n OR (sourcetype=WinEventLog\
-      \ source=WinEventLog:Security)\n OR (sourcetype=XmlWinEventLog source=XmlWinEventLog:Security))"
+    description: Security channel — classic + XML compound + collapsed forms
+    suggested_definition: >-
+      (sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security
+       OR (sourcetype=WinEventLog source=WinEventLog:Security)
+       OR (sourcetype=XmlWinEventLog source=XmlWinEventLog:Security))
   windows_system:
     description: System channel variants
-    suggested_definition: "(sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System\n OR (sourcetype=WinEventLog\
-      \ source=WinEventLog:System)\n OR (sourcetype=XmlWinEventLog source=XmlWinEventLog:System))"
+    suggested_definition: >-
+      (sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System
+       OR (sourcetype=WinEventLog source=WinEventLog:System)
+       OR (sourcetype=XmlWinEventLog source=XmlWinEventLog:System))
   windows_powershell_operational:
     description: PowerShell Operational (4103/4104)
-    suggested_definition: "(sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational\n OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational\n\
-      \ OR (sourcetype=XmlWinEventLog source=\"*Microsoft-Windows-PowerShell/Operational\")\n OR (sourcetype=WinEventLog source=\"\
-      *Microsoft-Windows-PowerShell/Operational\"))"
+    suggested_definition: >-
+      (sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational
+       OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+       OR (sourcetype=XmlWinEventLog source="*Microsoft-Windows-PowerShell/Operational")
+       OR (sourcetype=WinEventLog source="*Microsoft-Windows-PowerShell/Operational"))
   windows_powershell_classic:
     description: Classic Windows PowerShell channel (400/403/600)
-    suggested_definition: "(sourcetype=\"WinEventLog:Windows PowerShell\"\n OR sourcetype=\"XmlWinEventLog:Windows PowerShell\"\
-      \n OR (sourcetype=WinEventLog source=\"*Windows PowerShell\")\n OR (sourcetype=XmlWinEventLog source=\"*Windows PowerShell\"\
-      ))"
+    suggested_definition: >-
+      (sourcetype="WinEventLog:Windows PowerShell"
+       OR sourcetype="XmlWinEventLog:Windows PowerShell"
+       OR (sourcetype=WinEventLog source="*Windows PowerShell")
+       OR (sourcetype=XmlWinEventLog source="*Windows PowerShell"))
   windows_sysmon:
     description: Sysmon Operational + legacy sysmon
-    suggested_definition: "(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational\n OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational\n\
-      \ OR (sourcetype=XmlWinEventLog source=\"*Microsoft-Windows-Sysmon/Operational\")\n OR sourcetype=sysmon OR sourcetype=sysmon:*)"
+    suggested_definition: >-
+      (sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+       OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+       OR (sourcetype=XmlWinEventLog source="*Microsoft-Windows-Sysmon/Operational")
+       OR sourcetype=sysmon OR sourcetype=sysmon:*)
+  windows_wmi:
+    description: WMI-Activity/Operational
+    suggested_definition: >-
+      (sourcetype=XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
+       OR sourcetype=WinEventLog:Microsoft-Windows-WMI-Activity/Operational)
+  windows_defender:
+    description: Windows Defender Operational channel
+    suggested_definition: >-
+      (sourcetype="XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational"
+       OR sourcetype="WinEventLog:Microsoft-Windows-Windows Defender/Operational")
+  crowdstrike_falcon_process:
+    description: Wave A Falcon process / Custom IOA portable key
+    suggested_definition: "sourcetype=falcon:process"
+  defender_advanced_hunting:
+    description: Wave A MDE Advanced Hunting portable key (KQL stubs)
+    suggested_definition: "sourcetype=mde:advanced_hunting"
+  github_audit:
+    description: GitHub audit log (Splunk)
+    suggested_definition: "sourcetype=github:audit"
+
+  # Optional INDEX macros — org-specific; NEVER hardcode index= in rule bodies
+  entra_azure_ad:
+    description: Wave B Entra / Azure AD — prefer azure:monitor:aad; legacy signin/audit aliases
+    suggested_definition: >-
+      (sourcetype=azure:monitor:aad OR sourcetype=azure:aad:signin OR sourcetype=azure:aad:audit)
+  github_cloud_audit:
+    description: GitHub audit including cloud alias
+    suggested_definition: >-
+      (sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
   windows_security_index:
     description: Placeholder index constraint for Security events
-    suggested_definition: index=wineventlog
+    suggested_definition: "index=wineventlog"
   windows_system_index:
     description: Placeholder index constraint for System events
-    suggested_definition: index=wineventlog
+    suggested_definition: "index=wineventlog"
   windows_powershell_index:
     description: Placeholder index constraint for PowerShell events
-    suggested_definition: index=wineventlog
+    suggested_definition: "index=wineventlog"
   windows_sysmon_index:
     description: Placeholder index constraint for Sysmon events
-    suggested_definition: index=sysmon
+    suggested_definition: "index=sysmon"
+  falcon_index:
+    description: Placeholder for Falcon/NG-SIEM ingest if routed via Splunk
+    suggested_definition: "index=falcon"
+  mde_index:
+    description: Placeholder for MDE/AH export if routed via Splunk
+    suggested_definition: "index=mde"
+  github_index:
+    description: Placeholder for GitHub audit
+    suggested_definition: "index=github"
+
 aliases:
   WinEventLog:Security:
-  - sourcetype: WinEventLog
-    source: WinEventLog:Security
+    - { sourcetype: WinEventLog, source: WinEventLog:Security }
   XmlWinEventLog:Security:
-  - sourcetype: XmlWinEventLog
-    source: XmlWinEventLog:Security
+    - { sourcetype: XmlWinEventLog, source: XmlWinEventLog:Security }
   WinEventLog:System:
-  - sourcetype: WinEventLog
-    source: WinEventLog:System
+    - { sourcetype: WinEventLog, source: WinEventLog:System }
   XmlWinEventLog:System:
-  - sourcetype: XmlWinEventLog
-    source: XmlWinEventLog:System
+    - { sourcetype: XmlWinEventLog, source: XmlWinEventLog:System }
   XmlWinEventLog:Microsoft-Windows-Sysmon/Operational:
-  - sourcetype: XmlWinEventLog
-    source: XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+    - { sourcetype: XmlWinEventLog, source: XmlWinEventLog:Microsoft-Windows-Sysmon/Operational }
   XmlWinEventLog:Microsoft-Windows-PowerShell/Operational:
-  - sourcetype: XmlWinEventLog
-    source: XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+    - { sourcetype: XmlWinEventLog, source: XmlWinEventLog:Microsoft-Windows-PowerShell/Operational }
+
+allowed_sourcetype_macros:
+  - github_cloud_audit
+  - entra_azure_ad
+  - windows_security
+  - windows_system
+  - windows_powershell_operational
+  - windows_powershell_classic
+  - windows_sysmon
+  - windows_wmi
+  - windows_defender
+  - crowdstrike_falcon_process
+  - defender_advanced_hunting
+  - github_audit
+
 ci:
   enforce: true
   match: exact_or_macro_expanded
   reject_hardcoded_index: true
   require_sourcetype_or_macro: true
-canonical:
-  entra_azure_ad:
-  - azure:monitor:aad
-  - azure:aad:signin
-  - azure:aad:audit
-  github_audit:
-  - github:audit
-  github_cloud_audit:
-  - github:cloud:audit
-  windows_security:
-  - WinEventLog:Security
-  - XmlWinEventLog:Security
-  windows_system:
-  - WinEventLog:System
-  - XmlWinEventLog:System
-  windows_sysmon:
-  - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
-  windows_powershell:
-  - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
-  windows_wmi:
-  - XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
-  windows_defender:
-  - XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
-  - WinEventLog:Microsoft-Windows-Windows Defender/Operational
-  defender_advanced_hunting:
-  - mde:advanced_hunting
-  crowdstrike_falcon_process:
-  - falcon:process
