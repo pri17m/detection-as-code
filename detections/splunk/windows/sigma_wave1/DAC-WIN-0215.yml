@@ -1,0 +1,53 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=8
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/create_remote_thread/create_remote_thread_win_susp_password_dumper_lsass.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/create_remote_thread/create_remote_thread_win_susp_password_dumper_lsass.yml
+- https://attack.mitre.org/techniques/T1003/001/
+- https://attack.mitre.org/techniques/T1055/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/create_remote_thread/create_remote_thread_win_susp_password_dumper_lsass.yml
+title: Password Dumper Remote Thread in LSASS
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0215
+description: 'Detects password dumper activity by monitoring remote thread creation EventID 8 in combination
+  with the lsass.exe process as TargetImage.
+
+  The process in field Process is the malicious program. A single execution can lead to hundreds of events.'
+mitre:
+  tactics:
+  - credential-access
+  - defense-evasion
+  techniques:
+  - T1003.001
+  - T1055
+required_fields:
+- EventCode
+- SourceImage
+- TargetImage
+false_positives:
+- Antivirus products
+status: experimental
