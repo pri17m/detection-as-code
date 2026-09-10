@@ -1,0 +1,51 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=3
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/network_connection/net_connection_win_rdp_outbound_over_non_standard_tools.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/network_connection/net_connection_win_rdp_outbound_over_non_standard_tools.yml
+- https://attack.mitre.org/techniques/T1021/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/network_connection/net_connection_win_rdp_outbound_over_non_standard_tools.yml
+title: Outbound RDP Connections Over Non-Standard Tools
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0295
+description: 'Detects Non-Standard tools initiating a connection over port 3389 indicating possible lateral
+  movement.
+
+  An initial baseline is required before using this utility to exclude third party RDP tooling that you
+  might use.'
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021.001
+required_fields:
+- EventCode
+- Image
+- DestinationIp
+false_positives:
+- Third party RDP tools
+status: experimental
