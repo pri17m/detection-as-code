@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1218/
+title: 'MDE: InstallUtil/Regasm from non-system path'
+description: DeviceProcessEvents
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0037
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-CS-0037
+query:
+  defender: 'DeviceProcessEvents
+
+    | where ProcessCommandLine has "*"
+
+    // Experimental stub: MDE: InstallUtil/Regasm from non-system path
+
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218
