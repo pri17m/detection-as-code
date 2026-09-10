@@ -1,0 +1,49 @@
+id: DAC-WIN-0014
+title: WmiPrvSE / wsmprovhost unusual children
+description: Sysmon 1 Parent WmiPrvSE/wsmprovhost to cmd/powershell/LOLBins
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Execution
+  techniques:
+  - T1047
+  - T1021.006
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+telemetry_validated: false
+false_positives:
+- SCCM/remote management
+references:
+- https://attack.mitre.org/techniques/T1047/
+- https://attack.mitre.org/techniques/T1021/006/
+tags:
+- phase1
+- windows
+- P0
+- process
+query:
+  splunk: '`windows_sysmon` EventCode=1
+
+    | search ParentImage="*\\WmiPrvSE.exe" OR ParentImage="*\\wsmprovhost.exe" OR
+    ParentImage="*\\winrshost.exe"
+
+    | search Image="*\\cmd.exe" OR Image="*\\powershell.exe" OR Image="*\\pwsh.exe"
+    OR Image="*\\certutil.exe" OR Image="*\\mshta.exe"
+
+    | table _time host ParentImage Image CommandLine User
+
+    '
