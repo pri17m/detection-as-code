@@ -1,0 +1,32 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1547/001/
+title: 'Falcon: Winlogon Shell or Userinit modification'
+description: registry Winlogon
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0028
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0181
+query:
+  crowdstrike: 'RegistryPath CONTAINS "\\Winlogon\\" AND RegistryKey CONTAINS_ANY ["Shell","Userinit"]
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1547.001
