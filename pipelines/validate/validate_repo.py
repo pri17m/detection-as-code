@@ -66,6 +66,13 @@ def _load_sourcetype_contract(sourcetype_map_path: Path) -> tuple[list[str], set
     if not isinstance(allowed, list) or not all(isinstance(x, str) for x in allowed):
         raise ValueError(f"{sourcetype_map_path}: missing/invalid 'allowed_sourcetypes' (must be a list of strings)")
 
+    # Optional: some repos also carry a macro->sourcetype expansion map under "canonical".
+    canonical = obj.get("canonical")
+    if isinstance(canonical, dict):
+        for _, v in canonical.items():
+            if isinstance(v, list):
+                allowed.extend([x for x in v if isinstance(x, str)])
+
     macros = obj.get("macros")
     if not isinstance(macros, dict):
         raise ValueError(f"{sourcetype_map_path}: missing/invalid 'macros' map")
@@ -73,11 +80,19 @@ def _load_sourcetype_contract(sourcetype_map_path: Path) -> tuple[list[str], set
     if missing:
         raise ValueError(f"{sourcetype_map_path}: missing required macro(s): {', '.join(missing)}")
 
+    allowed_sourcetype_macros = obj.get("allowed_sourcetype_macros")
+    if allowed_sourcetype_macros is None:
+        allowed_macros = set(REQUIRED_WINDOWS_SOURCETYPE_MACROS)
+    elif isinstance(allowed_sourcetype_macros, list) and all(isinstance(x, str) for x in allowed_sourcetype_macros):
+        allowed_macros = set(allowed_sourcetype_macros)
+    else:
+        raise ValueError(f"{sourcetype_map_path}: invalid 'allowed_sourcetype_macros' (must be a list of strings)")
+
     ci = obj.get("ci")
     if not isinstance(ci, dict) or ci.get("reject_hardcoded_index") is not True:
         raise ValueError(f"{sourcetype_map_path}: ci.reject_hardcoded_index must be true")
 
-    return [x for x in allowed if isinstance(x, str)], set(REQUIRED_WINDOWS_SOURCETYPE_MACROS)
+    return [x for x in allowed if isinstance(x, str)], allowed_macros
 
 
 def _iter_detection_files(detections_root: Path) -> Iterable[Path]:
@@ -131,10 +146,6 @@ def _validate_sourcetypes_allowlist(
 
     for st in sts:
         if not isinstance(st, str):
-            continue
-        # Only enforce the Windows Splunk contract against Windows-family sourcetypes/macros.
-        # Other platform packs may use different telemetry families (e.g., GitHub, MDE, Falcon).
-        if st not in allowed_macros and not _is_windows_splunk_sourcetype(st):
             continue
         if st in allowed_macros:
             continue
