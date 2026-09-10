@@ -1,0 +1,49 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=3
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/network_connection/net_connection_win_certutil_initiated_connection.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/network_connection/net_connection_win_certutil_initiated_connection.yml
+- https://attack.mitre.org/techniques/T1105/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/network_connection/net_connection_win_certutil_initiated_connection.yml
+title: Uncommon Network Connection Initiated By Certutil.EXE
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0294
+description: 'Detects a network connection initiated by the certutil.exe utility.
+
+  Attackers can abuse the utility in order to download malware or additional payloads.'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1105
+required_fields:
+- EventCode
+- Image
+- DestinationIp
+false_positives:
+- Unknown
+status: experimental
