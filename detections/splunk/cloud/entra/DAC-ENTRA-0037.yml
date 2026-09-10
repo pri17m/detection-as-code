@@ -1,0 +1,39 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName="Add eligible member to role" OR ActivityDisplayName="*eligible*"
+
+    | search modifiedProperties{}.newValue="*Global Administrator*"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0037
+title: 'Entra: Privileged role eligible assignment created broadly'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P1
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1098/003/
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1098.003
+author: Detection Engineer
+status: experimental
+description: PIM eligible GA for many users
