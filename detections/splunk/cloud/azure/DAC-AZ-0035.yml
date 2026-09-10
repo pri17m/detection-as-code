@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1484
+id: DAC-AZ-0035
+status: experimental
+title: 'Azure: Subscription transfer or billing ownership change'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName IN ("Microsoft.Subscription/subscriptions/write","Microsoft.Billing/*")
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: medium
+references:
+- https://attack.mitre.org/techniques/T1484/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: subscriptions transfer
+sourcetypes:
+- azure:monitor:activity
