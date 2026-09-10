@@ -1,0 +1,37 @@
+id: DAC-WIN-0123
+title: Kerberos TGS RC4 for privileged SPN
+description: 4769 0x17 high-value SPNs
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1558.003
+severity: high
+false_positives:
+- Legacy service accounts
+references:
+- https://attack.mitre.org/techniques/T1558/003/
+telemetry_validated: false
+required_fields:
+- TargetUserName
+- ServiceName
+- IpAddress
+- TicketEncryptionType
+- Status
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P0
+- ad-auth
+- remapped_from:DAC-WIN-0024
