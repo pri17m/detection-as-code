@@ -1,0 +1,58 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Aggregates NetworkConnectIP4 by RemotePort and surfaces ports representing less than 10
+  percent of
+
+  observed connections.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0110
+query:
+  crowdstrike: '#event_simpleName=NetworkConnectIP4
+
+    | RemotePort=*
+
+    | !in(RemotePort, values=[80,443,53,123])
+
+    | groupBy([RemotePort], function=count(as=count), limit=max)
+
+    | [sum(count, as=total), sort(field=RemotePort, order=ascending, limit=20000)]
+
+    | percent := 100 * (count / total)
+
+    | percent < 10
+
+    | sort(percent, order=asc)
+
+    '
+mitre:
+  tactics:
+  - command-and-control
+  - discovery
+  techniques:
+  - T1571
+  - T1046
+title: 'Falcon: Rare Remote Ports in Network Connections'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1571/
+- https://attack.mitre.org/techniques/T1046/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Bottom_10_Percent_of_NetworkConnct_Port_Values.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Bottom_10_Percent_of_NetworkConnct_Port_Values.yml
+- esn:NetworkConnectIP4
+severity: low
+required_fields:
+- '#event_simpleName'
+- RemotePort
