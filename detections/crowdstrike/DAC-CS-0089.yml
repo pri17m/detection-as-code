@@ -1,0 +1,60 @@
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/techniques/T1490/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/the_gentlemen_raas_custom_backdoors_and_evolving_tactics.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `the_gentlemen_raas_custom_backdoors_and_evolving_tactics.yml`\
+    \ \u2014 experimental sketch; not raw dump\n| HuntLogic := \"Netsh_Trace_Packet_Capture\" | SeverityTier\
+    \ := \"High\" | HuntObject := CommandLine;\n| HuntLogic := \"SharpADWS_AD_Recon\" | SeverityTier :=\
+    \ \"High\" | HuntObject := CommandLine;\n| HuntLogic := \"Network_Scanner_Execution\" | SeverityTier\
+    \ := \"Medium\" | HuntObject := FileName;\n| HuntLogic := \"Defender_Disable_via_SetMpPreference\"\
+    \ | SeverityTier := \"Critical\" | HuntObject := CommandLine;\n| HuntLogic := \"Defender_Exclusion_Added\"\
+    \ | SeverityTier := \"Critical\" | HuntObject := CommandLine;\n| HuntLogic := \"Defender_Disable_via_Registry_RegExe\"\
+    \ | SeverityTier := \"Critical\" | HuntObject := CommandLine;\n| HuntLogic := \"Defender_Disable_RegEvent\"\
+    \ | SeverityTier := \"Critical\" | HuntObject := CommandLine;\n| HuntLogic := \"Kaspersky_Uninstall_kavrmvr\"\
+    \ | SeverityTier := \"High\" | HuntObject := CommandLine;\n| HuntLogic := \"Kernel_Rootkit_EDR_Kill_Tool\"\
+    \ | SeverityTier := \"Critical\" | HuntObject := FileName;\n| HuntLogic := \"BYOVD_Vulnerable_Driver_Dropped\"\
+    \ | SeverityTier := \"Critical\" | HuntObject := TargetFileName;\n| groupBy([aid, ComputerName, ImageFileName,\
+    \ CommandLine], function=count())\n"
+title: 'Falcon: The Gentlemen RaaS - Custom Backdoors and Evolving Tactics'
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+description: Detection logic covering multiple stages of the Gentlemen ransomware attack lifecycle, including
+  reconnaissance, defense impairment (disabling Defender/EDR), persistence, lateral m
+id: DAC-CS-0089
+sourcetypes:
+- falcon:process
+platforms:
+- crowdstrike
+mitre:
+  tactics:
+  - execution
+  - defense-evasion
+  techniques:
+  - T1059.001
+  - T1562.001
+  - T1490
+  - T1070.004
+severity: medium
+author: Detection Engineer
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:the_gentlemen_raas_custom_backdoors_and_evolving_tactics.yml
+telemetry_validated: false
+required_fields:
+- CommandLine
+- ComputerName
+- FileName
+- MD5HashData
+- OriginalFilename
+- ParentBaseFileName
+- UserName
+- ImageFileName
+- aid
+status: experimental
