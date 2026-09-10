@@ -1,0 +1,37 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+title: 'MDE: ProcDump targeting LSASS'
+description: procdump lsass
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0015
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-CS-0015
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName =~ "procdump.exe" and ProcessCommandLine has "lsass"
+
+    | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.001
