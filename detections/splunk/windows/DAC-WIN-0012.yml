@@ -1,0 +1,44 @@
+id: DAC-WIN-0012
+title: Registry Run key persistence (user-writable path)
+description: Sysmon 13 Run/RunOnce; Details Temp/Users
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1547.001
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- TargetObject
+- Details
+telemetry_validated: false
+false_positives:
+- Installer RunOnce
+references:
+- https://attack.mitre.org/techniques/T1547/001/
+tags:
+- phase1
+- windows
+- P0
+- persistence
+query:
+  splunk: '`windows_sysmon` EventCode=13
+
+    | search TargetObject="*\\CurrentVersion\\Run*" OR TargetObject="*\\CurrentVersion\\RunOnce*"
+    OR TargetObject="*\\Winlogon\\*"
+
+    | search Details="*\\Temp\\*" OR Details="*\\Users\\*" OR Details="*\\AppData\\*"
+    OR Details="*\\Downloads\\*"
+
+    | table _time host Image TargetObject Details User
+
+    '
