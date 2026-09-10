@@ -1,0 +1,37 @@
+id: DAC-WIN-0187
+title: Clear PowerShell history via process
+description: Sysmon 1 Remove-Item PSReadLine history
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1070.003
+severity: medium
+false_positives:
+- Admin cleanup
+references:
+- https://attack.mitre.org/techniques/T1070/003/
+telemetry_validated: false
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- defense-evasion
