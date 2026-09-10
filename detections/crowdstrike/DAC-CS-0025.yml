@@ -1,0 +1,33 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+title: 'Falcon: schtasks create with encoded PowerShell'
+description: schtasks /create + -enc/IEX
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0025
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0110
+query:
+  crowdstrike: 'ImageFileName="schtasks.exe" AND CommandLine CONTAINS "/create" AND CommandLine CONTAINS_ANY
+    ["-enc","powershell","cmd.exe"]
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1053.005
