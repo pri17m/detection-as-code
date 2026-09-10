@@ -1,0 +1,54 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=3
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/network_connection/net_connection_win_susp_remote_powershell_session.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/network_connection/net_connection_win_susp_remote_powershell_session.yml
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1021/006/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/network_connection/net_connection_win_susp_remote_powershell_session.yml
+title: Potential Remote PowerShell Session Initiated
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0223
+description: 'Detects a process that initiated a network connection over ports 5985 or 5986 from a non-network
+  service account.
+
+  This could potentially indicates a remote PowerShell connection.'
+mitre:
+  tactics:
+  - execution
+  - lateral-movement
+  techniques:
+  - T1059.001
+  - T1021.006
+required_fields:
+- EventCode
+- Image
+- DestinationIp
+false_positives:
+- Legitimate usage of remote PowerShell, e.g. remote administration and monitoring.
+- Network Service user name of a not-covered localization
+status: experimental
