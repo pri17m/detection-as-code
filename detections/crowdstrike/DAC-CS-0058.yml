@@ -1,0 +1,31 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1105/
+title: 'Falcon: curl or wget download to user-writable path'
+description: curl/wget -o Temp/Downloads
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0058
+status: experimental
+tags:
+- wave-a
+- P0
+query:
+  crowdstrike: 'ImageFileName IN ["curl.exe","wget.exe"] AND CommandLine CONTAINS_ANY ["\\Temp\\","\\Downloads\\","\\AppData\\"]
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1105
