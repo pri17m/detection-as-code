@@ -1,0 +1,13 @@
+{
+  "sourcetype": "WinEventLog:Security",
+  "EventCode": 4625,
+  "host": "WS-001",
+  "TargetUserName": "jdoe",
+  "SubjectUserName": "WS-001$",
+  "IpAddress": "203.0.113.10",
+  "LogonType": 3,
+  "FailureReason": "Unknown user name or bad password",
+  "Status": "0xC000006D",
+  "SubStatus": "0xC000006A"
+}
+

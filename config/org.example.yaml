@@ -1,0 +1,49 @@
+org:
+  name: "example-corp"
+  environment: "dev"
+
+# Optional index scoping tokens (deploy-time).
+# Prefer sourcetype-only searches; if your Splunk deployment requires index scoping,
+# define tokens/macros here and apply them at deploy-time.
+splunk:
+  # Example: a macro name your org maintains (recommended if you must add index constraints)
+  # macro_windows_security_scope: "`org_windows_security_scope`"
+  # Example: token replacement used by your deploy tooling (avoid hardcoding in detections)
+  windows_security_index_token: "$org_windows_security_index$"
+  windows_sysmon_index_token: "$org_windows_sysmon_index$"
+
+crowdstrike:
+  falcon_cid: "FALCON-CID-PLACEHOLDER"
+  cloud:
+    # Optional: Falcon Cloud Security tenant / region identifiers if used
+    tenant_id: "FALCON-TENANT-ID-PLACEHOLDER"
+
+defender:
+  tenant_id: "AAD-TENANT-ID-PLACEHOLDER"
+  workspace_id: "LOG-ANALYTICS-WORKSPACE-ID-PLACEHOLDER"
+  # Optional: if you deploy via Microsoft Sentinel, supply resource identifiers
+  sentinel:
+    subscription_id: "AZURE-SUBSCRIPTION-ID-PLACEHOLDER"
+    resource_group: "RESOURCE-GROUP-PLACEHOLDER"
+    workspace_name: "SENTINEL-WORKSPACE-NAME-PLACEHOLDER"
+
+github:
+  enterprise_slug: "GHE-SLUG-OPTIONAL"
+
+telemetry:
+  # Used by validators to enforce sourcetype portability and help adopters map sources.
+  windows:
+    security_sourcetypes:
+      - "WinEventLog:Security"
+      - "XmlWinEventLog:Security"
+    system_sourcetypes:
+      - "WinEventLog:System"
+      - "XmlWinEventLog:System"
+    sysmon_sourcetypes:
+      - "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+    powershell_sourcetypes:
+      - "XmlWinEventLog:Microsoft-Windows-PowerShell/Operational"
+    wmi_sourcetypes:
+      - "XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational"
+    defender_sourcetypes:
+      - "XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational"

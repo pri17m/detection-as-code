@@ -1,0 +1,36 @@
+# Canonical sourcetype aliases used by detections.
+#
+# Adopters should map their actual sourcetypes (from Splunk TAs, forwarders, add-ons)
+# to these canonical values, or add additional canonical aliases if needed.
+#
+# Detections in this repo should reference ONLY the canonical values below.
+
+canonical:
+  windows_security:
+    - "WinEventLog:Security"
+    - "XmlWinEventLog:Security"
+  windows_system:
+    - "WinEventLog:System"
+    - "XmlWinEventLog:System"
+  windows_sysmon:
+    - "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+  windows_powershell:
+    - "XmlWinEventLog:Microsoft-Windows-PowerShell/Operational"
+  windows_wmi:
+    - "XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational"
+  windows_defender:
+    - "XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational"
+  github_audit:
+    - "github:audit"
+
+# Example org mapping. Copy relevant blocks into your `config/org.yaml` or
+# use these as a reference for your telemetry onboarding playbooks.
+example_org_mapping:
+  splunk_ta_windows:
+    WinEventLog:Security:
+      canonical: "WinEventLog:Security"
+    WinEventLog:System:
+      canonical: "WinEventLog:System"
+  sysmon_addon:
+    Microsoft-Windows-Sysmon/Operational:
+      canonical: "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"

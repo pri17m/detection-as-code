@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/detection.schema.json",
+  "title": "Detection-as-Code unified detection schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "description",
+    "author",
+    "status",
+    "platforms",
+    "sourcetypes",
+    "mitre",
+    "severity",
+    "false_positives",
+    "references",
+    "telemetry_validated",
+    "required_fields"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^DAC-[A-Z0-9]{2,10}-\\d{4}$"
+    },
+    "title": { "type": "string", "minLength": 4 },
+    "description": { "type": "string", "minLength": 12 },
+    "author": { "type": "string", "minLength": 2 },
+    "status": {
+      "type": "string",
+      "enum": ["experimental", "test", "stable"]
+    },
+    "platforms": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "enum": ["splunk", "crowdstrike", "defender"] },
+      "uniqueItems": true
+    },
+    "sourcetypes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 3 },
+      "uniqueItems": true
+    },
+    "mitre": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tactics", "techniques"],
+      "properties": {
+        "tactics": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 3 },
+          "uniqueItems": true
+        },
+        "techniques": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^T\\d{4}(\\.\\d{3})?$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "false_positives": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "references": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 8 }
+    },
+    "telemetry_validated": { "type": "boolean" },
+    "required_fields": {
+      "type": "array",
+      "minItems": 0,
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "query": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "splunk": { "type": "string", "minLength": 8 },
+        "defender": { "type": "string", "minLength": 8 },
+        "crowdstrike": { "type": "string", "minLength": 8 }
+      }
+    },
+    "sigma": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string", "minLength": 5 },
+        "rule_id": { "type": "string", "minLength": 4 }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 2 },
+      "uniqueItems": true
+    }
+  },
+  "allOf": [
+    {
+      "anyOf": [
+        { "required": ["query"] },
+        { "required": ["sigma"] }
+      ]
+    }
+  ]
+}
+
