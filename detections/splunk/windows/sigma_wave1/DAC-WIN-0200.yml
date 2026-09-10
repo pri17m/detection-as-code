@@ -1,0 +1,49 @@
+severity: high
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=4624
+
+    | search LogonType=9
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/account_management/win_security_overpass_the_hash.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/account_management/win_security_overpass_the_hash.yml
+- https://attack.mitre.org/techniques/T1550/002/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_security
+- sigma:rules/windows/builtin/security/account_management/win_security_overpass_the_hash.yml
+title: Successful Overpass the Hash Attempt
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0200
+description: Detects successful logon with logon type 9 (NewCredentials) which matches the Overpass the
+  Hash behavior of e.g Mimikatz's sekurlsa::pth module.
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1550.002
+required_fields:
+- EventCode
+- LogonType
+- TargetUserName
+false_positives:
+- Runas command-line tool using /netonly parameter
+status: experimental
