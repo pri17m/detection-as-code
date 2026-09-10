@@ -1,0 +1,50 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Identifies UserIdentity events with LogonType=10 (RemoteInteractive / RDP) for remote interactive
+
+  session monitoring.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0099
+query:
+  crowdstrike: '#event_simpleName=UserIdentity
+
+    | LogonType=10
+
+    | groupBy([aid, ComputerName, UserName, UserPrincipal, LogonServer], function=count())
+
+    '
+mitre:
+  tactics:
+  - lateral-movement
+  - initial-access
+  techniques:
+  - T1021.001
+title: 'Falcon: Remote Interactive Logons (RDP)'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1021/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/remote_interactive_logons__rdp_.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:remote_interactive_logons__rdp_.yml
+- esn:UserIdentity
+severity: low
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- LogonServer
+- LogonType
+- UserName
+- UserPrincipal
+- aid
