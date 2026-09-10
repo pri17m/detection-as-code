@@ -1,0 +1,53 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=1
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/process_creation/proc_creation_win_autorun_registry_modified_via_wmic.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_autorun_registry_modified_via_wmic.yml
+- https://attack.mitre.org/techniques/T1047/
+- https://attack.mitre.org/techniques/T1547/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/process_creation/proc_creation_win_autorun_registry_modified_via_wmic.yml
+title: Suspicious Autorun Registry Modified via WMI
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0301
+description: Detects suspicious activity where the WMIC process is used to create an autorun registry
+  entry via reg.exe, which is often indicative of persistence mechanisms employed by malware.
+mitre:
+  tactics:
+  - execution
+  - persistence
+  techniques:
+  - T1047
+  - T1547.001
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+false_positives:
+- Legitimate administrative activity or software installations
+status: experimental
