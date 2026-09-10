@@ -1,0 +1,35 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1055/
+title: 'Falcon: remote thread into LSASS'
+description: CreateRemoteThread target lsass if exposed
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0059
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0173
+query:
+  crowdstrike: 'TargetFileName CONTAINS "lsass" OR CommandLine CONTAINS "lsass" OR ImageFileName CONTAINS
+    "lsass"
+
+    # Prefer process-access IOA when available; exclude known EDR SourceImage in tenant
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1055
