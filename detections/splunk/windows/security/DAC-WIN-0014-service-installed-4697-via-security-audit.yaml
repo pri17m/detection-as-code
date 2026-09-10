@@ -1,37 +1,35 @@
 id: DAC-WIN-0014
-title: Service installed (4697) via Security audit
-description: Detects service installation via Security auditing (4697), which can
-  indicate persistence using new or modified services.
-author: DaC
+title: WmiPrvSE / wsmprovhost unusual children (Sysmon 1)
+description: Detects suspicious child processes spawned by WmiPrvSE.exe (WMI) or wsmprovhost.exe (WinRM provider host), common in remote execution and lateral movement. Requires Sysmon ProcessCreate.
+author: Threat Detection Engineering
 status: experimental
 platforms:
-- splunk
+  - splunk
 sourcetypes:
-- WinEventLog:Security
+  - windows_sysmon
 mitre:
   tactics:
-  - persistence
+    - execution
+    - lateral-movement
   techniques:
-  - T1543.003
+    - T1047
+    - T1021.006
 severity: high
 false_positives:
-- Legitimate software installs.
+  - Legitimate remote administration tooling; tune allowlists for known management servers.
 references:
-- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4697
+  - https://learn.microsoft.com/sysinternals/downloads/sysmon
 telemetry_validated: false
 required_fields:
-- EventCode
-- ServiceName
-- ServiceFileName
-- SubjectUserName
+  - Image
+  - CommandLine
+  - ParentImage
+  - User
 query:
-  splunk: 'sourcetype=WinEventLog:Security EventCode=4697
-
-    | eval img=lower(coalesce(ServiceFileName, ImagePath, Message))
-
-    | where match(img, "(\\\\users\\\\|\\\\temp\\\\|\\\\appdata\\\\|cmd\\.exe|powershell\\.exe|wscript\\.exe|cscript\\.exe)")
-
-    | stats count values(ServiceName) as services values(img) as image_paths by host,
-    SubjectUserName
-
-    '
+  splunk: |
+    `windows_sysmon` EventCode=1
+    | eval parent=lower(ParentImage)
+    | where match(parent,"\\\\wmiprvse\\.exe$|\\\\wsmprovhost\\.exe$")
+    | eval child=lower(Image)
+    | where match(child,"\\\\(powershell|cmd|rundll32|mshta|wscript|cscript|regsvr32)\\.exe$")
+    | stats count values(CommandLine) as command_lines values(ParentCommandLine) as parent_command_lines by host, User, parent, child

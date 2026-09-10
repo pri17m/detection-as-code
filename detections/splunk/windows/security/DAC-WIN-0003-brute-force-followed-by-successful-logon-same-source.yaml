@@ -1,47 +1,34 @@
 id: DAC-WIN-0003
-title: Brute force followed by successful logon (same source)
-description: Detects a pattern of multiple 4625 failures followed by a 4624 success
-  from the same source IP to the same host within a short window.
-author: DaC
+title: Kerberoasting RC4 TGS burst (4769 TicketEncryptionType=0x17)
+description: Detects high-volume Kerberos service ticket requests using RC4 (0x17) to many SPNs, a common Kerberoasting pattern. Tune thresholds and maintain an SPN allowlist.
+author: Threat Detection Engineering
 status: experimental
 platforms:
-- splunk
+  - splunk
 sourcetypes:
-- WinEventLog:Security
+  - windows_security
 mitre:
   tactics:
-  - credential-access
+    - credential-access
   techniques:
-  - T1110
+    - T1558.003
 severity: high
 false_positives:
-- Users mistyping then succeeding; shared jump hosts.
+  - Legacy RC4 environments, monitoring accounts, and legitimate service discovery jobs.
 references:
-- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625
-- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624
+  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4769
 telemetry_validated: false
 required_fields:
-- EventCode
-- IpAddress
-- TargetUserName
-- host
+  - TargetUserName
+  - ServiceName
+  - IpAddress
+  - TicketEncryptionType
 query:
-  splunk: 'sourcetype=WinEventLog:Security (EventCode=4625 OR EventCode=4624)
-
-    | eval src_ip=coalesce(IpAddress, src, src_ip)
-
+  splunk: |
+    `windows_security` EventCode=4769
+    | where TicketEncryptionType="0x17" OR TicketEncryptionType=0x17 OR TicketEncryptionType=23
     | eval user=coalesce(TargetUserName, Account_Name, user)
-
-    | eval outcome=if(EventCode=4624,"success","failure")
-
-    | transaction src_ip, user, host maxspan=15m
-
-    | search outcome="failure" outcome="success"
-
-    | eval failures=mvcount(mvfilter(outcome="failure"))
-
-    | eval successes=mvcount(mvfilter(outcome="success"))
-
-    | where failures >= 10 AND successes >= 1
-
-    '
+    | eval spn=coalesce(ServiceName, service)
+    | eval src_ip=coalesce(IpAddress, Source_Network_Address, src, src_ip)
+    | stats count as tgs_requests dc(spn) as distinct_spns values(spn) as spns by user, src_ip
+    | where tgs_requests >= 50 AND distinct_spns >= 20

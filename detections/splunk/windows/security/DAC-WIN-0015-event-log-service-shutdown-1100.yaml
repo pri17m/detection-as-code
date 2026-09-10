@@ -1,30 +1,30 @@
 id: DAC-WIN-0015
-title: Event log service shutdown (1100)
-description: Detects Event ID 1100 indicating the Windows Event Log service was shut
-  down, which can be used to impair logging.
-author: DaC
+title: Security tooling / Sysmon / audit tamper (1102/4719 + Sysmon service events)
+description: Detects common audit and telemetry tampering signals including audit log clear (1102) and audit policy change (4719), plus Sysmon service/config events where available. Investigate quickly on Domain Controllers and high-value hosts.
+author: Threat Detection Engineering
 status: experimental
 platforms:
-- splunk
+  - splunk
 sourcetypes:
-- WinEventLog:Security
+  - windows_security
+  - windows_sysmon
 mitre:
   tactics:
-  - defense-evasion
+    - defense-evasion
   techniques:
-  - T1562.002
-severity: high
+    - T1562.001
+severity: critical
 false_positives:
-- Planned maintenance or reboot sequences; investigate unexpected occurrences.
+  - Planned maintenance, authorized policy changes, EDR updates, or system reboots.
 references:
-- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-1100
+  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-1102
+  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4719
 telemetry_validated: false
 required_fields:
-- EventCode
-- host
+  - SubjectUserName
 query:
-  splunk: 'sourcetype=WinEventLog:Security EventCode=1100
-
-    | stats count by host
-
-    '
+  splunk: |
+    (`windows_security` (EventCode=1102 OR EventCode=4719))
+    OR (`windows_sysmon` (EventCode=4 OR EventCode=16 OR EventCode=255))
+    | eval user=coalesce(SubjectUserName, User, Account_Name, user)
+    | stats count values(Message) as messages by host, user, EventCode

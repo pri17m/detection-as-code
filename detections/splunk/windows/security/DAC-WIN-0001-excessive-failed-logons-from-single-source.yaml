@@ -1,39 +1,32 @@
 id: DAC-WIN-0001
-title: Excessive failed logons from single source
-description: Detects bursts of failed logons (4625) from a single source IP which
-  can indicate password spraying or brute force.
-author: DaC
+title: LSASS process access by non-EDR (Sysmon 10)
+description: Detects Sysmon ProcessAccess events targeting LSASS, a strong signal for credential dumping. Tune with an allowlist of known EDR/AV processes in your environment.
+author: Threat Detection Engineering
 status: experimental
 platforms:
-- splunk
+  - splunk
 sourcetypes:
-- WinEventLog:Security
+  - windows_sysmon
 mitre:
   tactics:
-  - credential-access
+    - credential-access
   techniques:
-  - T1110
-severity: medium
+    - T1003.001
+severity: critical
 false_positives:
-- Misconfigured services or users repeatedly mistyping passwords.
+  - Legitimate AV/EDR/backup agents and authorized diagnostics.
 references:
-- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625
+  - https://learn.microsoft.com/sysinternals/downloads/sysmon
 telemetry_validated: false
 required_fields:
-- EventCode
-- IpAddress
-- TargetUserName
-- host
+  - SourceImage
+  - TargetImage
+  - GrantedAccess
 query:
-  splunk: 'sourcetype=WinEventLog:Security EventCode=4625
-
-    | eval src_ip=coalesce(IpAddress, src, src_ip)
-
-    | eval user=coalesce(TargetUserName, Account_Name, user)
-
-    | stats count as failures dc(user) as users values(user) as user_list by src_ip,
-    host
-
-    | where failures >= 25 AND users >= 10
-
-    '
+  splunk: |
+    `windows_sysmon` EventCode=10
+    | eval target=lower(coalesce(TargetImage, TargetProcessName))
+    | where like(target, "%\\lsass.exe")
+    | eval source=lower(coalesce(SourceImage, Image))
+    | where isnotnull(source)
+    | stats count as access_events values(GrantedAccess) as granted_access values(CallTrace) as call_traces by host, User, source

@@ -1,37 +1,30 @@
 id: DAC-WIN-0008
-title: Kerberos pre-auth failures spike (4771) from source
-description: Detects spikes of Kerberos pre-auth failures that can indicate password
-  guessing or AS-REQ abuse.
-author: DaC
+title: Suspicious PowerShell (encoded/IEX/download cradle)
+description: Detects PowerShell script block activity consistent with download cradles, encoding, or IEX-style execution. Requires PowerShell Script Block logging (4104) for best fidelity.
+author: Threat Detection Engineering
 status: experimental
 platforms:
-- splunk
+  - splunk
 sourcetypes:
-- WinEventLog:Security
+  - windows_powershell_operational
 mitre:
   tactics:
-  - credential-access
+    - execution
   techniques:
-  - T1110
-severity: medium
+    - T1059.001
+severity: high
 false_positives:
-- Time skew; users with expired passwords.
+  - Legitimate automation and admin scripts; tune by signed script baselines and known management hosts.
 references:
-- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4771
+  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4104
 telemetry_validated: false
 required_fields:
-- EventCode
-- IpAddress
-- TargetUserName
+  - ScriptBlockText
+  - SubjectUserName
 query:
-  splunk: 'sourcetype=WinEventLog:Security EventCode=4771
-
-    | eval src_ip=coalesce(IpAddress, src, src_ip)
-
-    | eval user=coalesce(TargetUserName, Account_Name, user)
-
-    | stats count as failures dc(user) as users values(user) as user_list by src_ip
-
-    | where failures >= 30 AND users >= 10
-
-    '
+  splunk: |
+    `windows_powershell_operational` EventCode=4104
+    | eval user=coalesce(User, SubjectUserName, TargetUserName, Account_Name, user)
+    | eval msg=lower(coalesce(ScriptBlockText, Message))
+    | where match(msg,"frombase64string\\(|-enc(odedcommand)?\\b|\\biex\\b|invoke-webrequest|downloadstring\\(|new-object\\s+net\\.webclient|add-mppreference|set-mppreference")
+    | stats count values(msg) as samples by host, user
