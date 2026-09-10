@@ -1,0 +1,38 @@
+id: DAC-WIN-0117
+title: Special privileges assigned to new logon (Tier-0)
+description: Security 4672 with 4624
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Privilege Escalation
+  techniques:
+  - T1078.002
+severity: medium
+false_positives:
+- Admin/service volume
+references:
+- https://attack.mitre.org/techniques/T1078/002/
+telemetry_validated: false
+required_fields:
+- SubjectUserName
+- PrivilegeList
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P0
+- priv-esc
+- remapped_from:DAC-WIN-0018
