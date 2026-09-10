@@ -1,0 +1,54 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Flags ScheduledTaskRegistered events where RemoteAddressIP4 or RemoteAddressIP6 is populated,
+
+  indicating remote task creation (lateral movement / remote persistence).
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0096
+query:
+  crowdstrike: '#event_simpleName=ScheduledTaskRegistered event_platform=Win
+
+    | TaskName!=/^\\?Microsoft\\Windows\\/i
+
+    | (RemoteAddressIP4=* AND RemoteAddressIP4!="0.0.0.0") OR RemoteAddressIP6=*
+
+    | groupBy([aid, ComputerName, TaskName, TaskExecCommand, RemoteAddressIP4, RemoteAddressIP6], function=count())
+
+    '
+mitre:
+  tactics:
+  - lateral-movement
+  - persistence
+  techniques:
+  - T1053.005
+  - T1021
+title: 'Falcon: Remotely Registered Scheduled Task'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+- https://attack.mitre.org/techniques/T1021/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/suspicious_scheduled_task_creation.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:suspicious_scheduled_task_creation.yml
+- esn:ScheduledTaskRegistered
+severity: high
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- RemoteAddressIP4
+- RemoteAddressIP6
+- TaskExecCommand
+- TaskName
+- aid
