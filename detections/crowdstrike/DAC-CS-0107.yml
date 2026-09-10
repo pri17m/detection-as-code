@@ -1,0 +1,51 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: "DNS requests to generative-AI related domains where ContextBaseFileName is not a common\
+  \ browser \u2014\nhighlights scripting/agent usage of AI APIs.\n"
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0107
+query:
+  crowdstrike: '#event_simpleName=DnsRequest event_platform=Win
+
+    | DomainName=/(openai\.com|api\.openai\.com|anthropic\.com|claude\.ai|huggingface\.co|perplexity\.ai|mistral\.ai|cohere\.ai|cursor\.so|copilot\.microsoft\.com)/i
+
+    | !in(field=ContextBaseFileName, values=["msedge.exe","chrome.exe","firefox.exe","brave.exe","opera.exe","iexplore.exe"],
+    ignoreCase=true)
+
+    | groupBy([DomainName, ComputerName, ContextBaseFileName, aid], function=count())
+
+    '
+mitre:
+  tactics:
+  - exfiltration
+  - command-and-control
+  techniques:
+  - T1071.004
+  - T1059
+title: 'Falcon: GenAI DNS from Non-Browser Processes'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1071/004/
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/detection_of_dns_requests_to_ai_related_domains.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:detection_of_dns_requests_to_ai_related_domains.yml
+- esn:DnsRequest
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- ContextBaseFileName
+- DomainName
+- aid
+- event_platform
