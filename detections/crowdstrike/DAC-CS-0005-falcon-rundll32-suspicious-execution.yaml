@@ -1,62 +1,51 @@
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- aid
+- event_platform
+status: experimental
+author: Detection Engineer
+description: Detects rundll32 launched from suspicious parents (Office/script hosts/cmd) or loading a
+  remote UNC DLL by ordinal. Merges Query-Hub LOLBin_Rundll32 and Rundll32_Remote_UNC_DLL_Ordinal_Execution
+  as OR hypotheses.
+tags:
+- enhance-tp
+- tp-quality-v2
+- processrollup2
+- esn:ProcessRollup2
+- esn:ProcessBlocked
+- qh:LOLBin_Rundll32.yml
+- qh:Rundll32_Remote_UNC_DLL_Ordinal_Execution.yml
 mitre:
   tactics:
   - execution
   - defense-evasion
   techniques:
   - T1218.011
-severity: medium
-required_fields:
-- ImageFileName
-- CommandLine
-- ParentBaseFileName
-- aid
-- ComputerName
-- TargetProcessId
+id: DAC-CS-0005
 query:
-  crowdstrike: '#event_simpleName=ProcessRollup2
-
-    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
-
-    // prior: falcon_ioa_pattern: ImageFileName="rundll32.exe" AND CommandLine CONTAINS_ANY ["javascript:","vbscript:","comsvcs.dll",".dll,"]
-
-    // --- src: LOLBin_Rundll32.yml (Falcon: LOLBin Rundll32) ---
-
-    | event_platform=Win and ImageFileName=/rundll32.exe/i
-
-    | in(ParentBaseFileName, values=["cmd.exe","winword.exe","powerpnt.exe","excel.exe","outlook.exe","mshta.exe","cscript.exe","wscript.exe"])
-
-    // --- src: Rundll32_Remote_UNC_DLL_Ordinal_Execution.yml (Falcon: Rundll32 Remote UNC DLL Ordinal
-    Execution) ---
-
-    | FileName=/^rundll32(\.exe)?$/i
-
-    | CommandLine=/\\\\[a-z0-9._\-]+(@[a-z0-9]+)*\\/i
-
-    | CommandLine=/,#[0-9]+/i
-
-    | table([@timestamp, ComputerName, UserName, ParentBaseFileName, CommandLine])
-
-    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
-
-    '
-tags:
-- enhance-01b
-- processrollup2
-- qh:LOLBin_Rundll32.yml
-- qh:Rundll32_Remote_UNC_DLL_Ordinal_Execution.yml
-sourcetypes:
-- falcon:process
-telemetry_validated: false
-references:
-- https://www.crowdstrike.com/
+  crowdstrike: "in(#event_simpleName, values=[\"ProcessRollup2\",\"ProcessBlocked\"])\n| event_platform=Win\n\
+    | ImageFileName=/rundll32\\.exe$/i\n| case {\n    in(ParentBaseFileName, values=[\"cmd.exe\",\"winword.exe\"\
+    ,\"powerpnt.exe\",\"excel.exe\",\"outlook.exe\",\"mshta.exe\",\"cscript.exe\",\"wscript.exe\"], ignoreCase=true)\n\
+    \      | Hypothesis := \"H1_RUNDLL32_SUSPICIOUS_PARENT\";\n    CommandLine=/\\\\\\\\[a-z0-9._\\-]+(@[a-z0-9]+)*\\\
+    \\/i AND CommandLine=/,#[0-9]+/i\n      | Hypothesis := \"H2_RUNDLL32_UNC_ORDINAL\";\n    CommandLine=/(javascript:|vbscript:|comsvcs\\\
+    .dll)/i\n      | Hypothesis := \"H3_RUNDLL32_SCRIPT_OR_COMSVCS\";\n    * | Hypothesis := \"NO_MATCH\"\
+    ;\n  }\n| Hypothesis != \"NO_MATCH\"\n| groupBy([aid, ComputerName, Hypothesis, ImageFileName, CommandLine,\
+    \ ParentBaseFileName], function=count())\n"
+severity: medium
+title: 'Falcon: rundll32 suspicious execution'
+false_positives:
+- "Approved software deployment that loads DLLs from network shares via rundll32 \u2014 allowlist shares/parents."
+- "Rare legitimate Office/cmd\u2192rundll32 helpers; tune ParentBaseFileName allowlists."
 platforms:
 - crowdstrike
-false_positives:
-- Tune to your environment and allowlist known tooling.
-- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
-id: DAC-CS-0005
-title: 'Falcon: rundll32 suspicious execution'
-author: DaC
-status: experimental
-description: Starter Falcon IOA/correlation rule candidate. Enhanced with Query-Hub ProcessRollup2 patterns
-  (LOLBin_Rundll32.yml, Rundll32_Remote_UNC_DLL_Ordinal_Execution.yml).
+references:
+- https://attack.mitre.org/techniques/T1218/011/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/LOLBin_Rundll32.yml
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Rundll32_Remote_UNC_DLL_Ordinal_Execution.yml
