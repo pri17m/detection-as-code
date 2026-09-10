@@ -19,6 +19,10 @@ allowed_sourcetypes:
 - github:audit
 - mde:advanced_hunting
 - falcon:process
+- XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
+- WinEventLog:Microsoft-Windows-Windows Defender/Operational
+- XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
+- WinEventLog:Microsoft-Windows-WMI-Activity/Operational
 canonical:
   windows_security:
   - WinEventLog:Security
@@ -44,6 +48,12 @@ canonical:
   - mde:advanced_hunting
   crowdstrike_falcon_process:
   - falcon:process
+  windows_wmi:
+  - XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
+  - WinEventLog:Microsoft-Windows-WMI-Activity/Operational
+  windows_defender:
+  - XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
+  - WinEventLog:Microsoft-Windows-Windows Defender/Operational
 source_patterns:
   security:
   - WinEventLog:Security
