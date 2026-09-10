@@ -99,8 +99,20 @@ def _validate_sourcetypes_allowlist(det: Dict[str, Any], *, allowlist: set[str],
     sts = det.get("sourcetypes")
     if not isinstance(sts, list):
         return errors
+    exact = {x for x in allowlist if "*" not in x}
+    globs = [x for x in allowlist if "*" in x]
+    glob_res = []
+    for g in globs:
+        # simple glob: * matches any chars
+        pat = "^" + re.escape(g).replace("\\*", ".*") + "$"
+        glob_res.append(re.compile(pat))
+
     for st in sts:
         if not isinstance(st, str):
+            continue
+        if st in exact:
+            continue
+        if any(r.match(st) for r in glob_res):
             continue
         if st not in allowlist:
             errors.append(

@@ -14,6 +14,10 @@ allowed_sourcetypes:
 - XmlWinEventLog:Windows PowerShell
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 - WinEventLog:Microsoft-Windows-Sysmon/Operational
+- XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
+- WinEventLog:Microsoft-Windows-WMI-Activity/Operational
+- XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
+- WinEventLog:Microsoft-Windows-Windows Defender/Operational
 - sysmon
 - sysmon:*
 - github:audit
@@ -44,6 +48,12 @@ canonical:
   - XmlWinEventLog:Windows PowerShell
   github_audit:
   - github:audit
+  windows_wmi:
+  - XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
+  - WinEventLog:Microsoft-Windows-WMI-Activity/Operational
+  windows_defender:
+  - XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
+  - WinEventLog:Microsoft-Windows-Windows Defender/Operational
   defender_advanced_hunting:
   - mde:advanced_hunting
   crowdstrike_falcon_process:
@@ -103,18 +113,6 @@ macros:
       \ OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational\n OR (sourcetype=XmlWinEventLog\
       \ source=\"*Microsoft-Windows-Sysmon/Operational\")\n OR sourcetype=sysmon OR\
       \ sourcetype=sysmon:*)"
-  windows_security_index:
-    description: Placeholder index constraint for Security events
-    suggested_definition: index=wineventlog
-  windows_system_index:
-    description: Placeholder index constraint for System events
-    suggested_definition: index=wineventlog
-  windows_powershell_index:
-    description: Placeholder index constraint for PowerShell events
-    suggested_definition: index=wineventlog
-  windows_sysmon_index:
-    description: Placeholder index constraint for Sysmon events
-    suggested_definition: index=sysmon
 aliases:
   WinEventLog:Security:
   - sourcetype: WinEventLog
