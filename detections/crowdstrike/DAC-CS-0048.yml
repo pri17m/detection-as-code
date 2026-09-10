@@ -1,0 +1,31 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1490/
+title: 'Falcon: wbadmin delete catalog/systemstate'
+description: wbadmin delete
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0048
+status: experimental
+tags:
+- wave-a
+- P0
+query:
+  crowdstrike: 'ImageFileName="wbadmin.exe" AND CommandLine CONTAINS "delete"
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1490
