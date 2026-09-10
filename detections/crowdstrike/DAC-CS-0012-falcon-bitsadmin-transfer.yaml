@@ -1,12 +1,3 @@
-id: DAC-CS-0012
-title: 'Falcon: bitsadmin transfer'
-description: Starter Falcon IOA/correlation rule candidate.
-author: DaC
-status: experimental
-platforms:
-- crowdstrike
-sourcetypes:
-- falcon:process
 mitre:
   tactics:
   - execution
@@ -14,17 +5,58 @@ mitre:
   techniques:
   - T1105
 severity: medium
-false_positives:
-- Tune to your environment and allowlist known tooling.
-references:
-- https://www.crowdstrike.com/
-telemetry_validated: false
 required_fields:
 - ImageFileName
 - CommandLine
 - ParentBaseFileName
+- aid
+- ComputerName
+- TargetProcessId
 query:
-  crowdstrike: 'falcon_ioa_pattern: ImageFileName="bitsadmin.exe" AND CommandLine
-    CONTAINS_ANY ["/transfer","/addfile"]
+  crowdstrike: '#event_simpleName=ProcessRollup2
+
+    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
+
+    // prior: falcon_ioa_pattern: ImageFileName="bitsadmin.exe" AND CommandLine CONTAINS_ANY ["/transfer","/addfile"]
+
+    // --- src: hunting_bitsadmin_usage.yml (Falcon: Hunting Bitsadmin usage) ---
+
+    | AND (ImageFileName=/\\bitsadmin\.exe$/i OR OriginalFilename="bitsadmin.exe")
+
+    | CommandLine=/\/transfer/i
+
+    | OR CommandLine=/\/addfile/i
+
+    | OR CommandLine=/\/download/i
+
+    | OR CommandLine=/\/SetNotifyCmdLine/i
+
+    | OR CommandLine=/\/resume/i
+
+    | OR CommandLine=/https?:\/\//i
+
+    | OR CommandLine=/ftp:\/\//i
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
 
     '
+tags:
+- enhance-01b
+- processrollup2
+- qh:hunting_bitsadmin_usage.yml
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+references:
+- https://www.crowdstrike.com/
+platforms:
+- crowdstrike
+false_positives:
+- Tune to your environment and allowlist known tooling.
+- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
+id: DAC-CS-0012
+title: 'Falcon: bitsadmin transfer'
+author: DaC
+status: experimental
+description: Starter Falcon IOA/correlation rule candidate. Enhanced with Query-Hub ProcessRollup2 patterns
+  (hunting_bitsadmin_usage.yml).
