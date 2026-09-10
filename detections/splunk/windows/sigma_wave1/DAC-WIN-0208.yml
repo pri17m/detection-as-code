@@ -1,0 +1,54 @@
+severity: medium
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=4768
+
+    | search TicketEncryptionType="0x17" OR ServiceName="krbtgt"
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/win_security_kerberos_asrep_roasting.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_kerberos_asrep_roasting.yml
+- https://attack.mitre.org/techniques/T1558/004/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_security
+- sigma:rules/windows/builtin/security/win_security_kerberos_asrep_roasting.yml
+title: Potential AS-REP Roasting via Kerberos TGT Requests
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0208
+description: 'Detects suspicious Kerberos TGT requests with pre-authentication disabled (Pre-Authentication
+  Type = 0) and Ticket Encryption Type (0x17) i.e, RC4-HMAC.
+
+  This may indicate an AS-REP Roasting attack, where attackers request AS-REP messages for accounts without
+  pre-authentication and attempt to crack the encrypted ticket offline to recover user passwords.'
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1558.004
+required_fields:
+- EventCode
+- TargetUserName
+- TicketEncryptionType
+- ServiceName
+false_positives:
+- Legacy systems or applications that legitimately use RC4 encryption
+- Misconfigured accounts with pre-authentication disabled
+status: experimental
