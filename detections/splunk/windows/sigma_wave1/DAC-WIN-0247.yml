@@ -1,0 +1,55 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=10
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/process_access/proc_access_win_lsass_remote_access_trough_winrm.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_access/proc_access_win_lsass_remote_access_trough_winrm.yml
+- https://attack.mitre.org/techniques/T1003/001/
+- https://attack.mitre.org/techniques/T1021/006/
+- https://attack.mitre.org/techniques/T1059/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/process_access/proc_access_win_lsass_remote_access_trough_winrm.yml
+title: Remote LSASS Process Access Through Windows Remote Management
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0247
+description: Detects remote access to the LSASS process via WinRM. This could be a sign of credential
+  dumping from tools like mimikatz.
+mitre:
+  tactics:
+  - credential-access
+  - lateral-movement
+  - execution
+  techniques:
+  - T1003.001
+  - T1021.006
+  - T1059.001
+required_fields:
+- EventCode
+- SourceImage
+- TargetImage
+- GrantedAccess
+false_positives:
+- Unlikely
+status: experimental
