@@ -1,0 +1,39 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098.001
+id: DAC-AZ-0018
+status: experimental
+title: 'Azure: Service principal credential reset via Graph then ARM abuse'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="Microsoft.Authorization/roleAssignments/write"
+
+    | # Correlate with Entra Add service principal credentials (DAC-ENTRA)
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1098/001/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- parity:DAC-ENTRA
+description: correlate Entra cred add + ARM Owner assign
+sourcetypes:
+- azure:monitor:activity
