@@ -1,0 +1,36 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1003/
+title: 'MDE: PowerShell Invoke-Mimikatz or sekurlsa tokens'
+description: DeviceEvents Script or process cmdline
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0019
+status: experimental
+tags:
+- wave-a
+- P1
+query:
+  defender: 'IdentityLogonEvents
+
+    | where LogonType has_any ("Token","OAuth","NonInteractive")
+
+    | project Timestamp, AccountName, Application, IPAddress, LogonType
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003
