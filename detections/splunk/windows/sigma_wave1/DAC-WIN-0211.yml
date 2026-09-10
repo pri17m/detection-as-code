@@ -1,0 +1,49 @@
+severity: high
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=4697
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/win_security_powershell_script_installed_as_service.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_powershell_script_installed_as_service.yml
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1543/003/
+- https://attack.mitre.org/techniques/T1569/002/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_security
+- sigma:rules/windows/builtin/security/win_security_powershell_script_installed_as_service.yml
+title: PowerShell Scripts Installed as Services - Security
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0211
+description: Detects powershell script installed as a Service
+mitre:
+  tactics:
+  - execution
+  - persistence
+  techniques:
+  - T1059.001
+  - T1543.003
+  - T1569.002
+required_fields:
+- EventCode
+false_positives:
+- Unknown
+status: experimental
