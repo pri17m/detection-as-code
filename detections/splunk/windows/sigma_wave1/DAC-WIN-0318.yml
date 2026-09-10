@@ -1,0 +1,66 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=1
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/process_creation/proc_creation_win_kerberos_coercion_via_dns_spn_spoofing.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_kerberos_coercion_via_dns_spn_spoofing.yml
+- https://attack.mitre.org/techniques/T1557/001/
+- https://attack.mitre.org/techniques/T1187/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/process_creation/proc_creation_win_kerberos_coercion_via_dns_spn_spoofing.yml
+title: Attempts of Kerberos Coercion Via DNS SPN Spoofing
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0318
+description: 'Detects the presence of "UWhRC....AAYBAAAA" pattern in command line.
+
+  The pattern "1UWhRCAAAAA..BAAAA" is a base64-encoded signature that corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION
+  structure.
+
+  Attackers can use this technique to coerce authentication from victim systems to attacker-controlled
+  hosts.
+
+  It is one of the strong indicators of a Kerberos coercion attack, where adversaries manipulate DNS records
+
+  to spoof Service Principal Names (SPNs) and redirect authentication requests like in CVE-2025-33073.
+
+  If you see this pattern in the command line, it is likely an attempt to add spoofed Service Principal
+  Names (SPNs) to DNS records,
+
+  or checking for the presence of such records through the `nslookup` command.'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1557.001
+  - T1187
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+false_positives:
+- Unknown
+status: experimental
