@@ -22,6 +22,10 @@ canonical:
     - "XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational"
   github_audit:
     - "github:audit"
+  defender_advanced_hunting:
+    - "mde:advanced_hunting"
+  crowdstrike_falcon_process:
+    - "falcon:process"
 
 # Example org mapping. Copy relevant blocks into your `config/org.yaml` or
 # use these as a reference for your telemetry onboarding playbooks.
