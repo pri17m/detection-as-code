@@ -1,0 +1,44 @@
+references:
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/snowman.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `snowman.yml` \u2014 experimental\
+    \ sketch; not raw dump\n// Multi-ESN source: keep ProcessRollup2 primary; join behaviors via aid+TargetProcessId/ContextProcessId\
+    \ per Telemetry matrix\n| ImageFileName=/\\\\(Acrobat|AcroRd32|AcroRd64)\\.exe$/i\n| rename(field=TargetProcessId,\
+    \ as=AdobePid)\n| ContextBaseFileName=/\\b(Acrobat|AcroRd32|AcroRd64|AdobeCollabSync|Synchronizer)\\\
+    .exe\\b/i\n| table([aid, ComputerName, ImageFileName, CommandLine,\n| groupBy([aid, ComputerName,\
+    \ ImageFileName, CommandLine], function=count())\n"
+title: 'Falcon: Snowman'
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+description: This query detects potential exploitation of the April 2026 Adobe Reader zero-day vulnerability
+  by identifying suspicious network connections originating from Adobe Reader processe
+id: DAC-CS-0087
+sourcetypes:
+- falcon:process
+platforms:
+- crowdstrike
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059
+severity: medium
+author: Detection Engineer
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:snowman.yml
+telemetry_validated: false
+required_fields:
+- CommandLine
+- ComputerName
+- ImageFileName
+- ProcessStartTime
+- TargetProcessId
+- aid
+status: experimental
