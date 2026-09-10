@@ -1,39 +1,52 @@
-references:
-- https://attack.mitre.org/techniques/T1552/
-- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/applications_with_plaintext_passwords.yml
-query:
-  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `applications_with_plaintext_passwords.yml`\
-    \ \u2014 experimental sketch; not raw dump\n| \"#event_simpleName\" = ProcessRollup2 event_platform=\"\
-    Win\" CommandLine=/REDACTED/\n| groupBy([aid, ComputerName, ImageFileName, CommandLine], function=count())\n"
-title: 'Falcon: Applications with plaintext passwords'
+id: DAC-CS-0066
+status: experimental
+severity: medium
+author: Detection Engineer
 false_positives:
 - "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
   \ before promote."
 - Tune ParentBaseFileName allowlists for known management tools.
-description: Table of applications identified as potentially handling plaintext passwords.
-id: DAC-CS-0066
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+description: Table of applications identified as potentially handling plaintext passwords.
 platforms:
 - crowdstrike
+title: 'Falcon: Applications with plaintext passwords'
 mitre:
   tactics:
   - credential-access
   techniques:
   - T1552
-severity: medium
-author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1552/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/applications_with_plaintext_passwords.yml
+query:
+  crowdstrike: '#event_simpleName=ProcessRollup2 event_platform=Win
+
+    | CommandLine=/REDACTED/
+
+    | ImageFileName=/(\\|\/)(?<FileName>[^\\\/]+)$/
+
+    | groupBy([FileName, ImageFileName], function=[count(aid, distinct=true, as=Hosts), collect(CommandLine,
+    limit=5)])
+
+    | sort(Hosts, order=desc)
+
+    '
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- FileName
+- ImageFileName
+- aid
+- event_platform
 tags:
 - cs-query-hub
 - processrollup2
 - wave-cs-qh
 - P1
 - src:applications_with_plaintext_passwords.yml
-telemetry_validated: false
-required_fields:
-- CommandLine
-- ComputerName
-- FileName
-- ImageFileName
-- aid
-status: experimental
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2
