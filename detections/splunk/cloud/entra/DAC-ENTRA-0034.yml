@@ -1,0 +1,42 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search Category="SignInLogs"
+
+    | stats dc(userPrincipalName) as users count as attempts sum(eval(if(Status.errorCode=0,1,0))) as
+    successes by ipAddress, bin(_time,15m)
+
+    | where users>=10 AND successes>=1
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0034
+title: 'Entra: Password spray followed by success from same source'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1110/003/
+mitre:
+  tactics:
+  - initial-access
+  techniques:
+  - T1110.003
+author: Detection Engineer
+status: experimental
+description: spray then success same IP/UA
