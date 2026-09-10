@@ -1,0 +1,43 @@
+id: DAC-WIN-0013
+title: Administrative share access spike (5140) from source
+description: Detects spikes in access to administrative shares (e.g., ADMIN$, C$),
+  which can indicate lateral movement over SMB.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021.002
+severity: medium
+false_positives:
+- Legitimate admin tools, software deployment, patching.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-5140
+telemetry_validated: false
+required_fields:
+- EventCode
+- ShareName
+- IpAddress
+- SubjectUserName
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=5140
+
+    | eval share=lower(coalesce(ShareName, share_name))
+
+    | where match(share, "\\\\(admin\\$|c\\$|d\\$|ipc\\$)$")
+
+    | eval src_ip=coalesce(IpAddress, src, src_ip)
+
+    | eval user=coalesce(SubjectUserName, user)
+
+    | stats count dc(share) as shares values(share) as share_list by src_ip, user,
+    host
+
+    | where count >= 20
+
+    '
