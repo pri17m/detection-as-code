@@ -1,0 +1,57 @@
+references:
+- https://attack.mitre.org/techniques/T1105/
+- https://attack.mitre.org/techniques/T1059/
+- https://attack.mitre.org/techniques/T1071/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Detection_of_External_Direct_IP_Usage_in_CommandLine_Windows_and_Mac.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `Detection_of_External_Direct_IP_Usage_in_CommandLine_Windows_and_Mac.yml`\
+    \ \u2014 experimental sketch; not raw dump\n| CommandLine=*http* event_platform!=\"Lin\"\n| regex(\"\
+    (?<Urlink>\\\\bhttps?://\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}.*\\\\/\\\\b)\", field=CommandLine)\n\
+    | default(field=GrandParentBaseFileName, value=\"Unknown\")\n| ContextId:=ContextProcessId; TargetProcessId=\"\
+    *\"\n| ContextId:=TargetProcessId}\n| format(\"[GraphExplorer]%sgraphs/process-explorer/graph?id=pid:%s:%s\"\
+    , field=[\"rootURL\", \"aid\", \"TargetProcessId\"], as=\"GraphExplorer\")\n| format(format=\"%s\\\
+    n\\t\u21B3 %s[ppid=%s]\\n\\t\\t\u21B3 %s [pid=%s|raw_pid=%s|start=%s]\\n\\t\\t\\t%,.100s[...TRIMMED]\\\
+    n\\t\\t\\t%s\\n\\t\\t\\t%s\\n---\", field=[GrandParentBaseFileName, ParentBaseFileName, ParentProcessId,\
+    \ ImageFileName, TargetProcessId, RawProcessId, processStart, CommandLine, ProcessExplorer, GraphExplorer],\
+    \ as=\"ExecutionSummary\")\n| groupBy([aid, ComputerName, ImageFileName, CommandLine], function=count())\n"
+title: 'Falcon: Detection of External Direct IP Usage in CommandLine Windows and Mac'
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+description: Detection of External Direct IP Usage
+id: DAC-CS-0074
+sourcetypes:
+- falcon:process
+platforms:
+- crowdstrike
+mitre:
+  tactics:
+  - command-and-control
+  - execution
+  techniques:
+  - T1105
+  - T1059
+  - T1071.001
+severity: medium
+author: Detection Engineer
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:Detection_of_External_Direct_IP_Usage_in_CommandLine_Windows_and_Mac.yml
+telemetry_validated: false
+required_fields:
+- CommandLine
+- ComputerName
+- FileName
+- ImageFileName
+- ParentBaseFileName
+- ParentProcessId
+- ProcessStartTime
+- RawProcessId
+- TargetProcessId
+- UserName
+- aid
+status: experimental
