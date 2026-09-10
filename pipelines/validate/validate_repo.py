@@ -26,6 +26,16 @@ REQUIRED_WINDOWS_SOURCETYPE_MACROS = {
 }
 
 
+def _is_windows_splunk_sourcetype(value: str) -> bool:
+    # Windows family sourcetypes per telemetry contract.
+    return (
+        value.startswith("WinEventLog")
+        or value.startswith("XmlWinEventLog")
+        or value == "sysmon"
+        or value.startswith("sysmon:")
+    )
+
+
 @dataclass(frozen=True)
 class DetectionFile:
     path: Path
@@ -120,7 +130,13 @@ def _validate_schema(validator: Draft202012Validator, det: Dict[str, Any], *, pa
     return errors
 
 
-def _validate_sourcetypes_allowlist(det: Dict[str, Any], *, allowed_sourcetypes: list[str], path: Path) -> List[str]:
+def _validate_sourcetypes_allowlist(
+    det: Dict[str, Any],
+    *,
+    allowed_sourcetypes: list[str],
+    allowed_macros: set[str],
+    path: Path,
+) -> List[str]:
     errors: List[str] = []
     sts = det.get("sourcetypes")
     if not isinstance(sts, list):
@@ -136,14 +152,17 @@ def _validate_sourcetypes_allowlist(det: Dict[str, Any], *, allowed_sourcetypes:
     for st in sts:
         if not isinstance(st, str):
             continue
+        # Only enforce the Windows Splunk contract against Windows-family sourcetypes/macros.
+        # Other platform packs may use different telemetry families (e.g., GitHub, MDE, Falcon).
+        if st not in allowed_macros and not _is_windows_splunk_sourcetype(st):
+            continue
+        if st in allowed_macros:
+            continue
         if st in exact:
             continue
         if any(r.match(st) for r in glob_res):
             continue
-        if st not in exact:
-            errors.append(
-                f"{path}: sourcetypes: '{st}' not in allowed_sourcetypes (config/sourcetype_map.yaml)"
-            )
+        errors.append(f"{path}: sourcetypes: '{st}' not in allowed_sourcetypes (config/sourcetype_map.yaml)")
     return errors
 
 
@@ -229,7 +248,7 @@ def main() -> int:
 
     schema = _load_schema(schema_path)
     validator = Draft202012Validator(schema)
-    allowed_sourcetypes, _required_macros = _load_sourcetype_contract(sourcetype_map_path)
+    allowed_sourcetypes, required_macros = _load_sourcetype_contract(sourcetype_map_path)
 
     all_errors: List[str] = []
     flattened: List[Tuple[Path, Dict[str, Any]]] = []
@@ -243,7 +262,14 @@ def main() -> int:
         for det in df.detections:
             flattened.append((path, det))
             all_errors.extend(_validate_schema(validator, det, path=path))
-            all_errors.extend(_validate_sourcetypes_allowlist(det, allowed_sourcetypes=allowed_sourcetypes, path=path))
+            all_errors.extend(
+                _validate_sourcetypes_allowlist(
+                    det,
+                    allowed_sourcetypes=allowed_sourcetypes,
+                    allowed_macros=required_macros,
+                    path=path,
+                )
+            )
             all_errors.extend(_validate_platform_query_match(det, path=path))
             all_errors.extend(_validate_portability(det, path=path))
 

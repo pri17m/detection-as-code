@@ -7,7 +7,8 @@ status: experimental
 platforms:
 - splunk
 sourcetypes:
-- XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
+- XmlWinEventLog
+- WinEventLog
 mitre:
   tactics:
   - execution
@@ -26,7 +27,7 @@ required_fields:
 - ClientMachine
 - host
 query:
-  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational"
+  splunk: '(sourcetype=XmlWinEventLog OR sourcetype=WinEventLog) source="*Microsoft-Windows-WMI-Activity/Operational"
     (EventCode=5857 OR EventCode=5858 OR EventCode=5859 OR EventCode=5860 OR EventCode=5861)
 
     | eval op=lower(coalesce(Operation, Message))
