@@ -1,0 +1,59 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Narrow ScheduledTaskRegistered analytic: TaskExecCommand/Arguments contain powershell encoded
+
+  command AND download/exec intent (higher-precision subset of DAC-CS-0090).
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0135
+query:
+  crowdstrike: '#event_simpleName=ScheduledTaskRegistered event_platform=Win
+
+    | TaskName!=/^\\?Microsoft\\Windows\\/i
+
+    | TaskExecCommand=/(powershell|pwsh)/i OR TaskExecArguments=/(powershell|pwsh)/i
+
+    | (TaskExecCommand=/(-enc|-encodedcommand)/i OR TaskExecArguments=/(-enc|-encodedcommand)/i)
+
+    | (TaskExecCommand=/(downloadstring|downloadfile|iex|invoke-expression|frombase64string|net\.webclient)/i
+    OR TaskExecArguments=/(downloadstring|downloadfile|iex|invoke-expression|frombase64string|net\.webclient)/i)
+
+    | groupBy([aid, ComputerName, TaskName, TaskExecCommand, TaskExecArguments], function=count())
+
+    '
+mitre:
+  tactics:
+  - persistence
+  - execution
+  techniques:
+  - T1053.005
+  - T1059.001
+title: 'Falcon: Scheduled Task PowerShell Encoded Download'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+- https://attack.mitre.org/techniques/T1059/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/suspicious_scheduled_task_creation.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:suspicious_scheduled_task_creation.yml
+- esn:ScheduledTaskRegistered
+severity: critical
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- TaskExecArguments
+- TaskExecCommand
+- TaskName
+- aid
+- event_platform
