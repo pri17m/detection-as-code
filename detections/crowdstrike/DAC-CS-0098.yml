@@ -1,0 +1,48 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: "Correlates UserLogon and UserLogonFailed2 per user to surface accounts with 4+ failures\
+  \ that also\nhave successful logons \u2014 potential spray-then-success compromise.\n"
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0098
+query:
+  crowdstrike: "in(#event_simpleName, values=[\"UserLogon\",\"UserLogonFailed2\"])\n| case {\n    #event_simpleName=UserLogon\
+    \ | SuccessLogonTime:=ContextTimeStamp ;\n    #event_simpleName=UserLogonFailed2 | FailedLogonTime:=ContextTimeStamp\
+    \ ;\n  }\n| groupBy([UserSid, UserName], function=([\n    count(FailedLogonTime, as=TotalFailedLogins),\n\
+    \    count(SuccessLogonTime, as=TotalSuccessfulLogins),\n    max(SuccessLogonTime, as=LastSuccessfulLogin),\n\
+    \    max(FailedLogonTime, as=LastFailedLogon),\n    collect([ComputerName], limit=10)\n  ]))\n| TotalFailedLogins>3\n\
+    | sort(TotalFailedLogins, order=desc)\n"
+mitre:
+  tactics:
+  - credential-access
+  - initial-access
+  techniques:
+  - T1110
+  - T1078
+title: 'Falcon: Failed and Successful User Logon Correlation'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1110/
+- https://attack.mitre.org/techniques/T1078/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Failed_and_Successful_User_Logon_Events.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Failed_and_Successful_User_Logon_Events.yml
+- esn:UserLogon
+- esn:UserLogonFailed2
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- ContextTimeStamp
+- UserName
+- UserSid
+- aid
