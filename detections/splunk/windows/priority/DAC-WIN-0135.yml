@@ -1,0 +1,38 @@
+id: DAC-WIN-0135
+title: Password spray distinct users single source (4625)
+description: 4625 dc(TargetUserName) by IpAddress
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1110.003
+severity: high
+false_positives:
+- Shared NAT
+references:
+- https://attack.mitre.org/techniques/T1110/003/
+telemetry_validated: false
+required_fields:
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+- Status
+- SubStatus
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P1
+- logon
+- remapped_from:DAC-WIN-0036
