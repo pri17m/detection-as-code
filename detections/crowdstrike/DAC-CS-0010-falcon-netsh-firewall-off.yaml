@@ -1,12 +1,3 @@
-id: DAC-CS-0010
-title: 'Falcon: netsh firewall off'
-description: Starter Falcon IOA/correlation rule candidate.
-author: DaC
-status: experimental
-platforms:
-- crowdstrike
-sourcetypes:
-- falcon:process
 mitre:
   tactics:
   - execution
@@ -14,17 +5,46 @@ mitre:
   techniques:
   - T1562.004
 severity: medium
-false_positives:
-- Tune to your environment and allowlist known tooling.
-references:
-- https://www.crowdstrike.com/
-telemetry_validated: false
 required_fields:
 - ImageFileName
 - CommandLine
 - ParentBaseFileName
+- aid
+- ComputerName
+- TargetProcessId
 query:
-  crowdstrike: 'falcon_ioa_pattern: ImageFileName="netsh.exe" AND CommandLine CONTAINS_ALL
-    ["advfirewall","state","off"]
+  crowdstrike: '#event_simpleName=ProcessRollup2
+
+    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
+
+    // prior: falcon_ioa_pattern: ImageFileName="netsh.exe" AND CommandLine CONTAINS_ALL ["advfirewall","state","off"]
+
+    // --- src: Firewall_Rule_Additions.yml (Falcon: Firewall Rule Additions) ---
+
+    | ImageFileName=/.*\\(?<fileName>.*\..*)/
+
+    | table([aid, UserSid, fileName, FirewallRuleId, FirewallRule, ImageFileName, CommandLine])
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
 
     '
+tags:
+- enhance-01b
+- processrollup2
+- qh:Firewall_Rule_Additions.yml
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+references:
+- https://www.crowdstrike.com/
+platforms:
+- crowdstrike
+false_positives:
+- Tune to your environment and allowlist known tooling.
+- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
+id: DAC-CS-0010
+title: 'Falcon: netsh firewall off'
+author: DaC
+status: experimental
+description: Starter Falcon IOA/correlation rule candidate. Enhanced with Query-Hub ProcessRollup2 patterns
+  (Firewall_Rule_Additions.yml).
