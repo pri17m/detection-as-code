@@ -1,0 +1,40 @@
+id: DAC-WIN-0138
+title: GPO modification by non-change-control account
+description: 5136/5137 GPO Directory Service Changes
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1484.001
+severity: high
+false_positives:
+- Tier-0 GPO admins
+references:
+- https://attack.mitre.org/techniques/T1484/001/
+telemetry_validated: false
+required_fields:
+- SubjectUserName
+- SubjectDomainName
+- ObjectDN
+- ObjectGUID
+- ObjectClass
+- AttributeLDAPDisplayName
+- AttributeValue
+- OperationType
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P1
+- ad-auth
+- remapped_from:DAC-WIN-0039
