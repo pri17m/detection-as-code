@@ -1,0 +1,38 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action IN ("runner.registered","org.runner_group.*","codespaces.create")
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0044
+title: 'GitHub: Codespaces or org runner created with elevated network egress'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P2
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1677/
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1677
+author: Detection Engineer
+status: experimental
+description: codespaces / self-hosted runner register
