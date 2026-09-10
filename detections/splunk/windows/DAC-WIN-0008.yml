@@ -1,0 +1,53 @@
+id: DAC-WIN-0008
+title: Suspicious PowerShell (enc/IEX/remote)
+description: 4104 ScriptBlock + Sysmon 1 -enc/IEX
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Execution
+  techniques:
+  - T1059.001
+sourcetypes:
+- WinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- ScriptBlockText
+- ScriptBlockId
+- Path
+- MessageNumber
+- MessageTotal
+- SubjectUserName
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+telemetry_validated: false
+false_positives:
+- Admin encoded automation
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+tags:
+- phase1
+- windows
+- P0
+- process
+query:
+  splunk: '(sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+    OR sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational)
+    (`windows_powershell_operational` EventCode=4104) OR (`windows_sysmon` EventCode=1
+    (Image="*\\powershell.exe" OR Image="*\\pwsh.exe") (CommandLine="*-enc*" OR CommandLine="*-EncodedCommand*"
+    OR CommandLine="*IEX*" OR CommandLine="*DownloadString*"))
+
+    | table _time host EventCode Image CommandLine User ScriptBlockText
+
+    '
