@@ -1,0 +1,52 @@
+id: DAC-WIN-0011
+title: Scheduled task created with LOLBin/SYSTEM
+description: 4698 TaskContent LOLBin/SYSTEM; Sysmon 1 schtasks /create
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1053.005
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- TaskName
+- SubjectUserName
+- SubjectDomainName
+- TaskContent
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+telemetry_validated: false
+false_positives:
+- Updaters
+- GPO tasks
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+tags:
+- phase1
+- windows
+- P0
+- persistence
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security
+    OR sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational)
+    (`windows_security` EventCode=4698) OR (`windows_sysmon` EventCode=1 Image="*\\schtasks.exe"
+    CommandLine="*/create*")
+
+    | table _time host EventCode TaskName TaskContent Image CommandLine SubjectUserName
+    User
+
+    '
