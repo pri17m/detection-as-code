@@ -1,0 +1,61 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Outbound NetworkConnectIP4 joined to ProcessRollup2 where ImageFileName is a common LOLBin
+
+  (certutil, bitsadmin, mshta, rundll32, regsvr32, msiexec, curl, wget).
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0114
+query:
+  crowdstrike: '#event_simpleName=NetworkConnectIP4
+
+    | !cidr(RemoteAddressIP4, subnet=["10.0.0.0/8","172.16.0.0/12","192.168.0.0/16","127.0.0.0/8"])
+
+    | join({#event_simpleName=ProcessRollup2 | ImageFileName=/\\(certutil|bitsadmin|mshta|rundll32|regsvr32|msiexec|curl|wget)\.exe$/i},
+    key=TargetProcessId, field=ContextProcessId, include=[ImageFileName, CommandLine, ParentBaseFileName],
+    tip="aid=aid")
+
+    | groupBy([aid, ComputerName, RemoteAddressIP4, RemotePort, ImageFileName, CommandLine, ParentBaseFileName],
+    function=count())
+
+    '
+mitre:
+  tactics:
+  - command-and-control
+  - defense-evasion
+  techniques:
+  - T1071
+  - T1218
+title: 'Falcon: LOLBin Outbound NetworkConnectIP4'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1071/
+- https://attack.mitre.org/techniques/T1218/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/External_Connectons_with_Process.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:External_Connectons_with_Process.yml
+- esn:NetworkConnectIP4
+- esn:ProcessRollup2
+severity: high
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ContextProcessId
+- ImageFileName
+- ParentBaseFileName
+- RemoteAddressIP4
+- RemotePort
+- TargetProcessId
+- aid
