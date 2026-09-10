@@ -13,7 +13,17 @@ Plug-and-play Detection-as-Code for orgs adopting an in-house SOC. This repo shi
 - **Config is deploy-time**. If your org requires index scoping, set it as an optional token/macro in `config/org.yaml` and apply it at deploy time.
 - **Single metadata contract** across platforms (Splunk SPL, Defender KQL, Falcon IOA/correlation stubs, Sigma sources).
 
+## Splunk Free / PoC adopters
+
+Splunk Free (or a single-instance trial) is enough to validate this repo:
+
+1. Onboard Windows Security + Sysmon with **allowlisted sourcetypes** (see `config/sourcetype_map.yaml` and `docs/telemetry/windows-splunk.md`).
+2. Run rules **without** hardcoding `index=` — Free often uses `index=main`; set that only in `config/org.yaml` macros at deploy time.
+3. Prefer search macros such as `` `windows_security` `` / `` `windows_sysmon` `` from the sourcetype map.
+4. Stay within Free’s daily ingest cap (typically 500 MB/day) by scoping hosts and Sysmon filters — not by baking indexes into shared detections.
+
 ## Quickstart (adopters)
+
 
 1. **Clone**
 
@@ -34,7 +44,7 @@ Edit `config/org.yaml`:
 
 3. **Map your telemetry to canonical sourcetypes**
 
-Edit `config/sourcetype_map.yaml` to map your actual sourcetypes (or vendor add-on sourcetypes) onto canonical aliases used by detections.
+Edit `config/sourcetype_map.yaml` (and read `docs/telemetry/windows-splunk.md`) to map your actual sourcetypes onto the allowlisted aliases / macros used by detections.
 
 4. **Validate**
 
@@ -69,7 +79,7 @@ See platform docs:
     sourcetype_map.yaml
   detections/
     splunk/
-      windows/
+      windows/           # security/, priority/ (DAC-WIN-0100+), sigma_wave1/ (0200+), …
       active_directory/
       cloud/
       github/
@@ -77,6 +87,9 @@ See platform docs:
     crowdstrike/
     defender/
     sigma/
+  docs/
+    backlog/             # priority-100.csv + Phase-1 guides
+    telemetry/           # windows-splunk.md, required fields
   content/
     mitre/
       coverage.json

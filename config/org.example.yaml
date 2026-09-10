@@ -1,27 +1,42 @@
+# Example org config — copy to config/org.yaml (gitignored) at deploy time.
+# Shared detections MUST NOT hardcode index=. Prefer sourcetype= / macros from
+# config/sourcetype_map.yaml. Index macros below are optional deploy-time only.
+
 org:
   name: "example-corp"
   environment: "dev"
 
-# Optional index scoping tokens (deploy-time).
-# Prefer sourcetype-only searches; if your Splunk deployment requires index scoping,
-# define tokens/macros here and apply them at deploy-time.
+# ---------------------------------------------------------------------------
+# Splunk (incl. Splunk Free / trial — 500 MB/day license is fine for lab & PoC)
+# ---------------------------------------------------------------------------
+# Free/Enterprise share the same portability contract:
+# - Rules key off sourcetype (WinEventLog:Security, XmlWinEventLog:…Sysmon…, etc.)
+# - Optional index macros are expanded by YOUR deploy tooling or Splunk macros
+# - Do not bake index=wineventlog into committed query.splunk bodies
 splunk:
-  # Example: a macro name your org maintains (recommended if you must add index constraints)
+  # Preferred: org-maintained macros that expand to index constraints if needed
   # macro_windows_security_scope: "`org_windows_security_scope`"
-  # Example: token replacement used by your deploy tooling (avoid hardcoding in detections)
+  # Tokens for deploy-time substitution (least preferred vs macros)
   windows_security_index_token: "$org_windows_security_index$"
   windows_sysmon_index_token: "$org_windows_sysmon_index$"
+  windows_powershell_index_token: "$org_windows_powershell_index$"
+  windows_system_index_token: "$org_windows_system_index$"
+  # Optional Splunk Free / single-instance defaults (OVERRIDE in org.yaml)
+  # These illustrate deploy-time values only — never commit them into rules.
+  macros:
+    windows_security_index: "index=main"   # ORG OVERRIDE (Free often uses main)
+    windows_system_index: "index=main"
+    windows_powershell_index: "index=main"
+    windows_sysmon_index: "index=main"     # or index=sysmon if you created one
 
 crowdstrike:
   falcon_cid: "FALCON-CID-PLACEHOLDER"
   cloud:
-    # Optional: Falcon Cloud Security tenant / region identifiers if used
     tenant_id: "FALCON-TENANT-ID-PLACEHOLDER"
 
 defender:
   tenant_id: "AAD-TENANT-ID-PLACEHOLDER"
   workspace_id: "LOG-ANALYTICS-WORKSPACE-ID-PLACEHOLDER"
-  # Optional: if you deploy via Microsoft Sentinel, supply resource identifiers
   sentinel:
     subscription_id: "AZURE-SUBSCRIPTION-ID-PLACEHOLDER"
     resource_group: "RESOURCE-GROUP-PLACEHOLDER"
@@ -31,7 +46,7 @@ github:
   enterprise_slug: "GHE-SLUG-OPTIONAL"
 
 telemetry:
-  # Used by validators to enforce sourcetype portability and help adopters map sources.
+  # Canonical Windows sourcetypes — keep in sync with config/sourcetype_map.yaml
   windows:
     security_sourcetypes:
       - "WinEventLog:Security"
@@ -43,6 +58,7 @@ telemetry:
       - "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
     powershell_sourcetypes:
       - "XmlWinEventLog:Microsoft-Windows-PowerShell/Operational"
+      - "WinEventLog:Microsoft-Windows-PowerShell/Operational"
     wmi_sourcetypes:
       - "XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational"
     defender_sourcetypes:
