@@ -1,0 +1,63 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'ClassifiedModuleLoad of DLLs from Temp/AppData/Users Public joined to ProcessRollup2 for
+  loader
+
+  attribution.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0128
+query:
+  crowdstrike: '#event_simpleName=ClassifiedModuleLoad
+
+    | FileName=/\.dll$/i
+
+    | FilePath=/(\\AppData\\|\\Temp\\|\\Users\\Public\\|\\Windows\\Temp\\)/i
+
+    | join({#event_simpleName=ProcessRollup2}, key=TargetProcessId, field=ContextProcessId, include=[ImageFileName,
+    CommandLine, ParentBaseFileName], tip="aid=aid")
+
+    | groupBy([aid, ComputerName, FileName, FilePath, ImageFileName, CommandLine, ParentBaseFileName],
+    function=count())
+
+    '
+mitre:
+  tactics:
+  - defense-evasion
+  - persistence
+  techniques:
+  - T1574.001
+  - T1574.002
+title: 'Falcon: ClassifiedModuleLoad from Temp or AppData'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1574/001/
+- https://attack.mitre.org/techniques/T1574/002/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Dll-Side_Loading_Detection_Query.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Dll-Side_Loading_Detection_Query.yml
+- esn:ClassifiedModuleLoad
+- esn:ProcessRollup2
+severity: high
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ContextProcessId
+- FileName
+- FilePath
+- ImageFileName
+- ParentBaseFileName
+- TargetProcessId
+- aid
