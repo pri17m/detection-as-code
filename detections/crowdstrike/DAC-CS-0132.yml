@@ -1,0 +1,63 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'ProcessRollup2 credential-dump CommandLine/ImageFileName patterns joined to UserIdentity
+
+  (AuthenticationId) and SyntheticProcessRollup2 parent hash enrichment.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0132
+query:
+  crowdstrike: '#event_simpleName=ProcessRollup2
+
+    | (CommandLine=/(mimikatz|sekurlsa|procdump.*lsass|lsass\.dmp|comsvcs\.dll.*MiniDump)/i OR ImageFileName=/\\(mimikatz|procdump|pwdump|nanodump)\.exe$/i)
+
+    | ParentBaseFileName!=/^(MsMpEng|CSFalconService)$/i
+
+    | join({#event_simpleName=UserIdentity}, field=AuthenticationId, include=[UserName, UserSid], tip="aid=aid")
+
+    | join({#event_simpleName=SyntheticProcessRollup2}, field=[aid, RawProcessId], include=[SHA256HashData],
+    suffix="Parent")
+
+    | groupBy([aid, ComputerName, UserName, ImageFileName, CommandLine, ParentBaseFileName, SHA256HashData],
+    function=count())
+
+    '
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.001
+  - T1003.002
+title: 'Falcon: Credential Dump Tools with UserIdentity Join'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+- https://attack.mitre.org/techniques/T1003/002/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Credential_Dumping_Detection.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Credential_Dumping_Detection.yml
+- esn:ProcessRollup2
+- esn:UserIdentity
+- esn:SyntheticProcessRollup2
+severity: critical
+required_fields:
+- '#event_simpleName'
+- AuthenticationId
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- RawProcessId
+- SHA256HashData
+- aid
