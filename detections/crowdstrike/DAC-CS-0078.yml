@@ -1,47 +1,49 @@
-references:
-- https://attack.mitre.org/techniques/T1059/
-- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/find_openclaw_on_endpoints.yml
-query:
-  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `find_openclaw_on_endpoints.yml`\
-    \ \u2014 experimental sketch; not raw dump\n| CommandLine=/openclaw\\.ai\\/install\\.sh/\n| CommandLine=/openclaw\\\
-    .ai\\/install\\.ps1/\n| CommandLine =~ in(values=[\"* openclaw*\", \"* clawdbot*\", \"* moltbot*\"\
-    ])\n| CommandLine =~ in(values=[\"*npm*\", \"*npx*\", \"*brew*\"])\n| CommandLine=\"* install *\"\n\
-    | FilePath =~ in(values=[\"*/.openclaw/*\", \"*/.clawdbot/*\", \"*/.moltbot/*\"])\n| CommandLine =~\
-    \ in(values=[\"*openclaw*\", \"*clawdbot*\", \"*moltbot*\"])\n| ImageFileName=/node/i\n| CommandLine=/gateway\
-    \ --port 18789/i\n| CommandLine =~ in(values=[\"*openclaw*\", \"*clawdbot*\", \"*moltbot*\"])\n| groupBy([aid,\
-    \ ComputerName, ImageFileName, CommandLine], function=count())\n"
-title: 'Falcon: Find OpenClaw on Endpoints'
+id: DAC-CS-0078
+status: experimental
+severity: medium
+author: Detection Engineer
 false_positives:
 - "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
   \ before promote."
 - Tune ParentBaseFileName allowlists for known management tools.
-description: Identifies the installation, configuration, and execution of the OpenClaw (Moltbot/Clawdbot)
-  autonomous AI agent. OpenClaw poses a significant risk for shadow AI and data exfiltrat
-id: DAC-CS-0078
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+description: Identifies the installation, configuration, and execution of the OpenClaw (Moltbot/Clawdbot)
+  autonomous AI agent. OpenClaw poses a significant risk for shadow AI and data exfiltrat
 platforms:
 - crowdstrike
+title: 'Falcon: Find OpenClaw on Endpoints'
 mitre:
   tactics:
   - execution
   techniques:
   - T1059
-severity: medium
-author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/find_openclaw_on_endpoints.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n| case {\n    CommandLine=/openclaw\\.ai\\/install\\\
+    .(sh|ps1)/i | Action:=\"openclaw installed via curl script\";\n    CommandLine=/(openclaw|clawdbot|moltbot)/i\
+    \ AND CommandLine=/(npm|npx|brew)/i AND CommandLine=/\\sinstall\\s/i | Action:=\"openclaw package\
+    \ install\";\n    ImageFileName=/node/i AND CommandLine=/(openclaw|clawdbot|moltbot)/i AND CommandLine=/gateway(\\\
+    s+--port\\s+18789)?/i | Action:=\"openclaw gateway started\";\n    CommandLine=/(openclaw|clawdbot|moltbot)/i\
+    \ AND ImageFileName=/(curl|wget|powershell|pwsh|bash|sh)/i | Action:=\"openclaw tooling\";\n    *\
+    \ | Action:=\"none\";\n  }\n| Action!=\"none\"\n| groupBy([aid, ComputerName, UserName, Action], function=[collect([CommandLine,\
+    \ ImageFileName], limit=10), count(as=Hits)])\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- UserName
+- aid
 tags:
 - cs-query-hub
 - processrollup2
 - wave-cs-qh
 - P1
 - src:find_openclaw_on_endpoints.yml
-telemetry_validated: false
-required_fields:
-- CommandLine
-- ComputerName
-- FileName
-- FilePath
-- ImageFileName
-- UserName
-- aid
-status: experimental
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2
