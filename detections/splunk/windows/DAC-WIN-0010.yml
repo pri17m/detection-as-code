@@ -1,0 +1,48 @@
+id: DAC-WIN-0010
+title: Password spray then success
+description: 4625/4771 many users one src then 4624
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1110.003
+  - T1078.002
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+- Status
+- SubStatus
+- TicketEncryptionType
+telemetry_validated: false
+false_positives:
+- Scanners
+- shared NAT
+references:
+- https://attack.mitre.org/techniques/T1110/003/
+- https://attack.mitre.org/techniques/T1078/002/
+tags:
+- phase1
+- windows
+- P0
+- logon
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security` EventCode IN (4625,4771,4624)
+
+    | bin _time span=15m
+
+    | stats dc(TargetUserName) AS users values(EventCode) AS codes by _time IpAddress
+
+    | where users > 15
+
+    '
