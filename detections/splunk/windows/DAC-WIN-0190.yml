@@ -1,0 +1,37 @@
+id: DAC-WIN-0190
+title: Suspicious driver load (Sysmon 6)
+description: Sysmon 6 unsigned/unusual driver
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1547.006
+  - T1068
+severity: high
+false_positives:
+- Hardware vendors
+references:
+- https://attack.mitre.org/techniques/T1547/006/
+- https://attack.mitre.org/techniques/T1068/
+telemetry_validated: false
+required_fields:
+- EventCode
+- ImageLoaded
+- Hashes
+- Signed
+- Signature
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- persistence
