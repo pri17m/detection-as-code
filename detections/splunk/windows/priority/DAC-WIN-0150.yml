@@ -1,0 +1,39 @@
+id: DAC-WIN-0150
+title: Bitsadmin download
+description: Sysmon 1 bitsadmin /transfer
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1197
+  - T1105
+severity: medium
+false_positives:
+- Legacy updaters
+references:
+- https://attack.mitre.org/techniques/T1197/
+- https://attack.mitre.org/techniques/T1105/
+telemetry_validated: false
+required_fields:
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P1
+- process
+- remapped_from:DAC-WIN-0051
