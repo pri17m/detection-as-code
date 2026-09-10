@@ -1,0 +1,61 @@
+id: DAC-WIN-0109
+title: Password spray then success
+description: '4625/4771 many users one src then 4624 | checklist: macros only; no index=; EventCode on
+  allowlisted channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true;
+  FP baseline pending org allowlists'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1110.003
+  - T1078.002
+severity: high
+false_positives:
+- Scanners
+- shared NAT
+references:
+- https://attack.mitre.org/techniques/T1110/003/
+- https://attack.mitre.org/techniques/T1078/002/
+telemetry_validated: false
+required_fields:
+- EventCode
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+- Status
+- SubStatus
+- TicketEncryptionType
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    EventCode IN (4625,4771,4624)
+
+    | eval TargetUserName=coalesce(TargetUserName, Account_Name, user)
+
+    | eval IpAddress=coalesce(IpAddress, Client_Address, src, src_ip, IpAddress)
+
+    | eval WorkstationName=coalesce(WorkstationName, Workstation_Name)
+
+    | eval src=coalesce(IpAddress, WorkstationName)
+
+    | bin _time span=15m
+
+    | stats dc(TargetUserName) AS users values(EventCode) AS codes count(eval(EventCode=4625 OR EventCode=4771))
+    AS fails count(eval(EventCode=4624)) AS oks by _time src host
+
+    | where users > 15 AND fails > 20'
+tags:
+- phase1
+- windows
+- P0
+- logon
+- hardened-v1
+- remapped_from:DAC-WIN-0010
