@@ -1,43 +1,64 @@
-references:
-- https://attack.mitre.org/techniques/T1059/
-- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/External_Connectons_with_Process.yml
-query:
-  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `External_Connectons_with_Process.yml`\
-    \ \u2014 experimental sketch; not raw dump\n// Multi-ESN source: keep ProcessRollup2 primary; join\
-    \ behaviors via aid+TargetProcessId/ContextProcessId per Telemetry matrix\n| ImageFileName=*\n| CommandLine=*\n\
-    // TODO: refine filters from Query-Hub External_Connectons_with_Process.yml using only ProcessRollup-fields.md\n\
-    | groupBy([aid, ComputerName, ImageFileName, CommandLine], function=count())\n"
-title: 'Falcon: External Connectons with Process'
+id: DAC-CS-0076
+status: experimental
+severity: medium
+author: Detection Engineer
 false_positives:
 - "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
   \ before promote."
 - Tune ParentBaseFileName allowlists for known management tools.
-description: ProcessRollup2 detection enhanced from Query-Hub External_Connectons_with_Process.yml
-id: DAC-CS-0076
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+description: ProcessRollup2 detection enhanced from Query-Hub External_Connectons_with_Process.yml
 platforms:
 - crowdstrike
+title: 'Falcon: External Connectons with Process'
 mitre:
   tactics:
   - execution
   techniques:
   - T1059
-severity: medium
-author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/External_Connectons_with_Process.yml
+query:
+  crowdstrike: '#event_simpleName=NetworkConnectIP4
+
+    | !cidr(RemoteAddressIP4, subnet=["10.0.0.0/8","192.168.0.0/16","172.16.0.0/12","127.0.0.0/8"])
+
+    | RemotePort=*
+
+    | join({#event_simpleName=ProcessRollup2 | ImageFileName=/\\[^\\]+\.exe$/i}, field=[aid, ContextProcessId],
+    key=[aid, TargetProcessId], include=[FileName, UserName, ImageFileName, CommandLine, ParentBaseFileName])
+
+    | ImageFileName=/\\[^\\]+\.exe$/i
+
+    | groupBy([aid, ComputerName, UserName, ImageFileName], function=[collect([CommandLine, ParentBaseFileName,
+    RemoteAddressIP4, RemotePort], limit=20), count(as=ConnCount)])
+
+    | sort(ConnCount, order=desc)
+
+    '
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ContextProcessId
+- FileName
+- ImageFileName
+- ParentBaseFileName
+- RemoteAddressIP4
+- RemotePort
+- TargetProcessId
+- UserName
+- aid
 tags:
 - cs-query-hub
 - processrollup2
 - wave-cs-qh
 - P1
 - src:External_Connectons_with_Process.yml
-telemetry_validated: false
-required_fields:
-- CommandLine
-- ComputerName
-- FileName
-- ImageFileName
-- TargetProcessId
-- UserName
-- aid
-status: experimental
+- tp-rewrite
+- tp-quality-v2
+- esn:NetworkConnectIP4
+- esn:ProcessRollup2
