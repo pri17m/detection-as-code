@@ -1,0 +1,50 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=1
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/process_creation/proc_creation_win_hktl_impacket_tools.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_impacket_tools.yml
+- https://attack.mitre.org/techniques/T1557/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/process_creation/proc_creation_win_hktl_impacket_tools.yml
+title: HackTool - Impacket Tools Execution
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0316
+description: Detects the execution of different compiled Windows binaries of the impacket toolset (based
+  on names or part of their names - could lead to false positives)
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1557.001
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+false_positives:
+- Legitimate use of the impacket tools
+status: experimental
