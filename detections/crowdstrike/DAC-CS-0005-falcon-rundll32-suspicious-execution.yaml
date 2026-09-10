@@ -1,12 +1,3 @@
-id: DAC-CS-0005
-title: 'Falcon: rundll32 suspicious execution'
-description: Starter Falcon IOA/correlation rule candidate.
-author: DaC
-status: experimental
-platforms:
-- crowdstrike
-sourcetypes:
-- falcon:process
 mitre:
   tactics:
   - execution
@@ -14,17 +5,58 @@ mitre:
   techniques:
   - T1218.011
 severity: medium
-false_positives:
-- Tune to your environment and allowlist known tooling.
-references:
-- https://www.crowdstrike.com/
-telemetry_validated: false
 required_fields:
 - ImageFileName
 - CommandLine
 - ParentBaseFileName
+- aid
+- ComputerName
+- TargetProcessId
 query:
-  crowdstrike: 'falcon_ioa_pattern: ImageFileName="rundll32.exe" AND CommandLine CONTAINS_ANY
-    ["javascript:","vbscript:","comsvcs.dll",".dll,"]
+  crowdstrike: '#event_simpleName=ProcessRollup2
+
+    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
+
+    // prior: falcon_ioa_pattern: ImageFileName="rundll32.exe" AND CommandLine CONTAINS_ANY ["javascript:","vbscript:","comsvcs.dll",".dll,"]
+
+    // --- src: LOLBin_Rundll32.yml (Falcon: LOLBin Rundll32) ---
+
+    | event_platform=Win and ImageFileName=/rundll32.exe/i
+
+    | in(ParentBaseFileName, values=["cmd.exe","winword.exe","powerpnt.exe","excel.exe","outlook.exe","mshta.exe","cscript.exe","wscript.exe"])
+
+    // --- src: Rundll32_Remote_UNC_DLL_Ordinal_Execution.yml (Falcon: Rundll32 Remote UNC DLL Ordinal
+    Execution) ---
+
+    | FileName=/^rundll32(\.exe)?$/i
+
+    | CommandLine=/\\\\[a-z0-9._\-]+(@[a-z0-9]+)*\\/i
+
+    | CommandLine=/,#[0-9]+/i
+
+    | table([@timestamp, ComputerName, UserName, ParentBaseFileName, CommandLine])
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
 
     '
+tags:
+- enhance-01b
+- processrollup2
+- qh:LOLBin_Rundll32.yml
+- qh:Rundll32_Remote_UNC_DLL_Ordinal_Execution.yml
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+references:
+- https://www.crowdstrike.com/
+platforms:
+- crowdstrike
+false_positives:
+- Tune to your environment and allowlist known tooling.
+- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
+id: DAC-CS-0005
+title: 'Falcon: rundll32 suspicious execution'
+author: DaC
+status: experimental
+description: Starter Falcon IOA/correlation rule candidate. Enhanced with Query-Hub ProcessRollup2 patterns
+  (LOLBin_Rundll32.yml, Rundll32_Remote_UNC_DLL_Ordinal_Execution.yml).
