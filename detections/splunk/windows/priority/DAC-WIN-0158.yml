@@ -1,0 +1,39 @@
+id: DAC-WIN-0158
+title: Nltest / domain trust discovery
+description: Sysmon 1 nltest /dclist /domain_trusts
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Discovery
+  techniques:
+  - T1018
+  - T1482
+severity: medium
+false_positives:
+- Domain admin tooling
+references:
+- https://attack.mitre.org/techniques/T1018/
+- https://attack.mitre.org/techniques/T1482/
+telemetry_validated: false
+required_fields:
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P1
+- ad-auth
+- remapped_from:DAC-WIN-0059
