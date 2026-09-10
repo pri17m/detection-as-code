@@ -1,0 +1,40 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName="Update conditional access policy" OR ActivityDisplayName="Update conditional
+    access policy"
+
+    | search modifiedProperties{}.newValue="*mfa*" OR ResultReason="*disabled*" OR ResultReason="*exclude*"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0039
+title: 'Entra: Conditional Access break-glass account excluded then used'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1078/004/
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1078.004
+author: Detection Engineer
+status: experimental
+description: CA exclude emergency account + sign-in
