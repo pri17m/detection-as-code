@@ -1,0 +1,50 @@
+severity: high
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=4624
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/account_management/win_security_susp_privesc_kerberos_relay_over_ldap.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/account_management/win_security_susp_privesc_kerberos_relay_over_ldap.yml
+- https://attack.mitre.org/techniques/T1548/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_security
+- sigma:rules/windows/builtin/security/account_management/win_security_susp_privesc_kerberos_relay_over_ldap.yml
+title: Potential Privilege Escalation via Local Kerberos Relay over LDAP
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0270
+description: 'Detects a suspicious local successful logon event where the Logon Package is Kerberos, the
+  remote address is set to localhost, and the target user SID is the built-in local Administrator account.
+
+  This may indicate an attempt to leverage a Kerberos relay attack variant that can be used to elevate
+  privilege locally from a domain joined limited user to local System privileges.'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1548
+required_fields:
+- EventCode
+- LogonType
+- TargetUserName
+false_positives:
+- Unknown
+status: experimental
