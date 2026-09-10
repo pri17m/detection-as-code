@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685.002
+id: DAC-AWS-0027
+status: experimental
+title: 'AWS: GuardDuty DeleteDetector or UpdateDetector disable'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("DeleteDetector","UpdateDetector","DisassociateFromMasterAccount") eventSource="guardduty.amazonaws.com"
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1685/002/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: DeleteDetector UpdateDetector Enable=false
+sourcetypes:
+- aws:cloudtrail
