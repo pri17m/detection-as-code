@@ -1,0 +1,34 @@
+id: DAC-WIN-0139
+title: SYSVOL script/file create on DC
+description: Sysmon 11 SYSVOL Policies path
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1484.001
+severity: high
+false_positives:
+- Legit GPO updates
+references:
+- https://attack.mitre.org/techniques/T1484/001/
+telemetry_validated: false
+required_fields:
+- Image
+- TargetFilename
+- User
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P1
+- persistence
+- remapped_from:DAC-WIN-0040
