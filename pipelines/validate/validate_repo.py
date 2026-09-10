@@ -13,7 +13,17 @@ from jsonschema import Draft202012Validator
 
 
 RE_FORBIDDEN_INDEX = re.compile(r"(?i)(^|\s|\||\()index\s*=")  # strict ban, case-insensitive
-RE_SPLUNK_SOURCETYPE = re.compile(r"(?i)(\bsourcetype\s*=|`windows_(security|system|sysmon|powershell_operational|powershell_classic)`)")
+RE_SPLUNK_SOURCETYPE = re.compile(
+    r"(?i)(\bsourcetype\s*=|`(windows_security|windows_system|windows_powershell_operational|windows_powershell_classic|windows_sysmon)`)"
+)
+
+REQUIRED_WINDOWS_SOURCETYPE_MACROS = {
+    "windows_security",
+    "windows_system",
+    "windows_powershell_operational",
+    "windows_powershell_classic",
+    "windows_sysmon",
+}
 
 
 @dataclass(frozen=True)
@@ -37,11 +47,27 @@ def _load_yaml(path: Path) -> Any:
         raise ValueError(f"Failed to parse YAML: {path}: {e}") from e
 
 
-def _load_canonical_sourcetypes(sourcetype_map_path: Path) -> set[str]:
+def _load_sourcetype_contract(sourcetype_map_path: Path) -> tuple[list[str], set[str]]:
     obj = _load_yaml(sourcetype_map_path)
     if not isinstance(obj, dict):
         raise ValueError(f"{sourcetype_map_path}: expected YAML object")
-    out: set[str] = set()
+
+    allowed = obj.get("allowed_sourcetypes")
+    if not isinstance(allowed, list) or not all(isinstance(x, str) for x in allowed):
+        raise ValueError(f"{sourcetype_map_path}: missing/invalid 'allowed_sourcetypes' (must be a list of strings)")
+
+    macros = obj.get("macros")
+    if not isinstance(macros, dict):
+        raise ValueError(f"{sourcetype_map_path}: missing/invalid 'macros' map")
+    missing = sorted([m for m in REQUIRED_WINDOWS_SOURCETYPE_MACROS if m not in macros])
+    if missing:
+        raise ValueError(f"{sourcetype_map_path}: missing required macro(s): {', '.join(missing)}")
+
+    ci = obj.get("ci")
+    if not isinstance(ci, dict) or ci.get("reject_hardcoded_index") is not True:
+        raise ValueError(f"{sourcetype_map_path}: ci.reject_hardcoded_index must be true")
+
+    return [x for x in allowed if isinstance(x, str)], set(REQUIRED_WINDOWS_SOURCETYPE_MACROS)
     allowed = obj.get("allowed_sourcetypes")
     if isinstance(allowed, list):
         out.update(x for x in allowed if isinstance(x, str))
@@ -94,13 +120,13 @@ def _validate_schema(validator: Draft202012Validator, det: Dict[str, Any], *, pa
     return errors
 
 
-def _validate_sourcetypes_allowlist(det: Dict[str, Any], *, allowlist: set[str], path: Path) -> List[str]:
+def _validate_sourcetypes_allowlist(det: Dict[str, Any], *, allowed_sourcetypes: list[str], path: Path) -> List[str]:
     errors: List[str] = []
     sts = det.get("sourcetypes")
     if not isinstance(sts, list):
         return errors
-    exact = {x for x in allowlist if "*" not in x}
-    globs = [x for x in allowlist if "*" in x]
+    exact = {x for x in allowed_sourcetypes if "*" not in x}
+    globs = [x for x in allowed_sourcetypes if "*" in x]
     glob_res = []
     for g in globs:
         # simple glob: * matches any chars
@@ -114,9 +140,9 @@ def _validate_sourcetypes_allowlist(det: Dict[str, Any], *, allowlist: set[str],
             continue
         if any(r.match(st) for r in glob_res):
             continue
-        if st not in allowlist:
+        if st not in exact:
             errors.append(
-                f"{path}: sourcetypes: unknown allowlisted sourcetype/macro '{st}' (must exist in config/sourcetype_map.yaml allowed_sourcetypes/canonical/macros)"
+                f"{path}: sourcetypes: '{st}' not in allowed_sourcetypes (config/sourcetype_map.yaml)"
             )
     return errors
 
@@ -203,7 +229,7 @@ def main() -> int:
 
     schema = _load_schema(schema_path)
     validator = Draft202012Validator(schema)
-    canonical_sourcetypes = _load_canonical_sourcetypes(sourcetype_map_path)
+    allowed_sourcetypes, _required_macros = _load_sourcetype_contract(sourcetype_map_path)
 
     all_errors: List[str] = []
     flattened: List[Tuple[Path, Dict[str, Any]]] = []
@@ -217,7 +243,7 @@ def main() -> int:
         for det in df.detections:
             flattened.append((path, det))
             all_errors.extend(_validate_schema(validator, det, path=path))
-            all_errors.extend(_validate_sourcetypes_allowlist(det, allowlist=canonical_sourcetypes, path=path))
+            all_errors.extend(_validate_sourcetypes_allowlist(det, allowed_sourcetypes=allowed_sourcetypes, path=path))
             all_errors.extend(_validate_platform_query_match(det, path=path))
             all_errors.extend(_validate_portability(det, path=path))
 
