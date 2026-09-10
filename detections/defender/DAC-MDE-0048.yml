@@ -1,0 +1,33 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1490/
+title: 'MDE: vssadmin delete shadows'
+description: DeviceProcessEvents
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0048
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-CS starters
+query:
+  defender: "DeviceProcessEvents\n| where FileName in~ (\"ntdsutil.exe\",\"vssadmin.exe\",\"diskshadow.exe\"\
+    )\n   or ProcessCommandLine has_any (\"ntds.dit\",\"IFM\")\n| project Timestamp, DeviceName, AccountName,\
+    \ FileName, ProcessCommandLine\n"
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1490
