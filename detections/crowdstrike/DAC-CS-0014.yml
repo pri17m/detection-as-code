@@ -1,0 +1,32 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+title: 'Falcon: comsvcs MiniDump via rundll32'
+description: CommandLine MiniDump/comsvcs
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0014
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0115
+query:
+  crowdstrike: 'ImageFileName="rundll32.exe" AND CommandLine CONTAINS_ANY ["comsvcs","MiniDump","minidump"]
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.001
