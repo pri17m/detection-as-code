@@ -1,0 +1,57 @@
+severity: medium
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=1
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/process_creation/proc_creation_win_bitsadmin_potential_persistence.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_bitsadmin_potential_persistence.yml
+- https://attack.mitre.org/techniques/T1197/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/process_creation/proc_creation_win_bitsadmin_potential_persistence.yml
+title: Monitoring For Persistence Via BITS
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0303
+description: 'BITS will allow you to schedule a command to execute after a successful download to notify
+  you that the job is finished.
+
+  When the job runs on the system the command specified in the BITS job will be executed.
+
+  This can be abused by actors to create a backdoor within the system and for persistence.
+
+  It will be chained in a BITS job to schedule the download of malware/additional binaries and execute
+  the program after being downloaded.'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1197
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+false_positives:
+- Unknown
+status: experimental
