@@ -1,62 +1,52 @@
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- aid
+- event_platform
+status: experimental
+author: Detection Engineer
+description: Detects bitsadmin.exe transfer/addfile/download/SetNotifyCmdLine abuse and remote URL usage.
+  ProcessRollup2 port of Query-Hub hunting_bitsadmin_usage (ScriptControlScanV2/CommandHistory branch
+  deferred to SAFE PR2 only).
+tags:
+- enhance-tp
+- tp-quality-v2
+- processrollup2
+- esn:ProcessRollup2
+- qh:hunting_bitsadmin_usage.yml
 mitre:
   tactics:
   - execution
   - defense-evasion
   techniques:
   - T1105
-severity: medium
-required_fields:
-- ImageFileName
-- CommandLine
-- ParentBaseFileName
-- aid
-- ComputerName
-- TargetProcessId
+id: DAC-CS-0012
 query:
-  crowdstrike: '#event_simpleName=ProcessRollup2
+  crowdstrike: '#event_simpleName=ProcessRollup2 event_platform=Win
 
-    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
+    | ImageFileName=/\\bitsadmin\.exe$/i
 
-    // prior: falcon_ioa_pattern: ImageFileName="bitsadmin.exe" AND CommandLine CONTAINS_ANY ["/transfer","/addfile"]
+    | CommandLine=/(\/transfer|\/addfile|\/download|\/SetNotifyCmdLine|\/resume|https?:\/\/|ftp:\/\/)/i
 
-    // --- src: hunting_bitsadmin_usage.yml (Falcon: Hunting Bitsadmin usage) ---
-
-    | AND (ImageFileName=/\\bitsadmin\.exe$/i OR OriginalFilename="bitsadmin.exe")
-
-    | CommandLine=/\/transfer/i
-
-    | OR CommandLine=/\/addfile/i
-
-    | OR CommandLine=/\/download/i
-
-    | OR CommandLine=/\/SetNotifyCmdLine/i
-
-    | OR CommandLine=/\/resume/i
-
-    | OR CommandLine=/https?:\/\//i
-
-    | OR CommandLine=/ftp:\/\//i
+    | !in(field=ParentBaseFileName, values=["svchost.exe","msiexec.exe"], ignoreCase=true)
 
     | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
 
     '
-tags:
-- enhance-01b
-- processrollup2
-- qh:hunting_bitsadmin_usage.yml
-sourcetypes:
-- falcon:process
-telemetry_validated: false
-references:
-- https://www.crowdstrike.com/
+severity: medium
+title: 'Falcon: bitsadmin transfer'
+false_positives:
+- "Legitimate BITS jobs from msiexec/svchost during software updates \u2014 ParentBaseFileName exclusions\
+  \ applied; extend allowlist as needed."
+- Admin transfer tooling using bitsadmin; baseline CommandLine.
 platforms:
 - crowdstrike
-false_positives:
-- Tune to your environment and allowlist known tooling.
-- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
-id: DAC-CS-0012
-title: 'Falcon: bitsadmin transfer'
-author: DaC
-status: experimental
-description: Starter Falcon IOA/correlation rule candidate. Enhanced with Query-Hub ProcessRollup2 patterns
-  (hunting_bitsadmin_usage.yml).
+references:
+- https://attack.mitre.org/techniques/T1105/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/hunting_bitsadmin_usage.yml
