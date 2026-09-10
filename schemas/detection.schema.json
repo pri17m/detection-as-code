@@ -29,7 +29,7 @@
     "author": { "type": "string", "minLength": 2 },
     "status": {
       "type": "string",
-      "enum": ["draft", "experimental", "test", "stable"]
+      "enum": ["experimental", "test", "stable"]
     },
     "platforms": {
       "type": "array",
