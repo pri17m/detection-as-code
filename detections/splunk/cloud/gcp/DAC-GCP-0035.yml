@@ -1,0 +1,38 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- protoPayload.methodName
+- protoPayload.authenticationInfo.principalEmail
+- protoPayload.requestMetadata.callerIp
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685.002
+id: DAC-GCP-0035
+status: experimental
+title: 'GCP: Privileged role grant then SetIamPolicy on logging'
+query:
+  splunk: '(sourcetype=gcp:audit OR sourcetype=google:gcp:cloudaudit:json OR sourcetype=google:gcp:pubsub:message)
+
+    | search protoPayload.methodName="*SetIamPolicy"
+
+    | search text="*roles/owner*" OR text="*roles/editor*" OR protoPayload.serviceData.policyDelta.bindingDeltas{}.role="roles/owner"
+
+    | table _time, protoPayload.methodName, protoPayload.authenticationInfo.principalEmail, protoPayload.requestMetadata.callerIp,
+    resource.type, severity
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1685/002/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: "owner grant \u2192 DeleteSink chain"
+sourcetypes:
+- gcp:audit
