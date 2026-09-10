@@ -1,0 +1,47 @@
+severity: medium
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=4662
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/win_security_ad_replication_non_machine_account.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_ad_replication_non_machine_account.yml
+- https://attack.mitre.org/techniques/T1003/006/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_security
+- sigma:rules/windows/builtin/security/win_security_ad_replication_non_machine_account.yml
+title: Active Directory Replication from Non Machine Account - DcSync Indicator
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0202
+description: Detects potential abuse of Active Directory Replication Service (ADRS) from a non machine
+  account to request credentials.
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.006
+required_fields:
+- EventCode
+- SubjectUserName
+- Properties
+false_positives:
+- Unknown
+status: experimental
