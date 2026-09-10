@@ -1,50 +1,54 @@
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- aid
+- event_platform
+status: experimental
+author: Detection Engineer
+description: "Detects netsh disabling or weakening the Windows firewall (advfirewall state off / firewall\
+  \ set opmode disable / delete rule). SAFE ProcessRollup2 rewrite \u2014 FirewallSetRule-heavy Query-Hub\
+  \ Firewall_Rule_Additions.yml is THIN; uses ImageFileName+CommandLine predicates instead."
+tags:
+- enhance-tp
+- tp-quality-v2
+- processrollup2
+- esn:ProcessRollup2
+- esn:ProcessBlocked
+- qh:Firewall_Rule_Additions.yml
+- rewrite:firewallsetrule-thin-to-pr2-netsh
 mitre:
   tactics:
   - execution
   - defense-evasion
   techniques:
   - T1562.004
-severity: medium
-required_fields:
-- ImageFileName
-- CommandLine
-- ParentBaseFileName
-- aid
-- ComputerName
-- TargetProcessId
+id: DAC-CS-0010
 query:
-  crowdstrike: '#event_simpleName=ProcessRollup2
+  crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
 
-    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
+    | event_platform=Win
 
-    // prior: falcon_ioa_pattern: ImageFileName="netsh.exe" AND CommandLine CONTAINS_ALL ["advfirewall","state","off"]
+    | ImageFileName=/netsh\.exe$/i
 
-    // --- src: Firewall_Rule_Additions.yml (Falcon: Firewall Rule Additions) ---
-
-    | ImageFileName=/.*\\(?<fileName>.*\..*)/
-
-    | table([aid, UserSid, fileName, FirewallRuleId, FirewallRule, ImageFileName, CommandLine])
+    | CommandLine=/(advfirewall\s+set\s+(currentprofile|allprofiles|domainprofile|privateprofile|publicprofile)\s+state\s+off|firewall\s+set\s+opmode\s+(mode=)?disable|advfirewall\s+firewall\s+(add|delete)\s+rule|interface\s+.*\s+(admin|enabled)\s*=\s*disable)/i
 
     | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
 
     '
-tags:
-- enhance-01b
-- processrollup2
-- qh:Firewall_Rule_Additions.yml
-sourcetypes:
-- falcon:process
-telemetry_validated: false
-references:
-- https://www.crowdstrike.com/
+severity: medium
+title: 'Falcon: netsh firewall off'
+false_positives:
+- "Legitimate GPO/MDM or IT scripts that toggle firewall during provisioning \u2014 allowlist management\
+  \ parents."
+- Softphone/VPN installers briefly adjusting firewall rules; baseline CommandLine before promote.
 platforms:
 - crowdstrike
-false_positives:
-- Tune to your environment and allowlist known tooling.
-- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
-id: DAC-CS-0010
-title: 'Falcon: netsh firewall off'
-author: DaC
-status: experimental
-description: Starter Falcon IOA/correlation rule candidate. Enhanced with Query-Hub ProcessRollup2 patterns
-  (Firewall_Rule_Additions.yml).
+references:
+- https://attack.mitre.org/techniques/T1562/004/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Firewall_Rule_Additions.yml
