@@ -1,32 +1,49 @@
-author: Detection Engineer
-references:
-- https://attack.mitre.org/techniques/T1047/
-title: 'Falcon: wmic process call create'
-description: wmic process call
-severity: high
-telemetry_validated: false
-platforms:
-- crowdstrike
-required_fields:
-- ImageFileName
-- CommandLine
-- ParentBaseFileName
-false_positives:
-- Tune after baselining; experimental sketch may be noisy.
-id: DAC-CS-0038
-status: experimental
-tags:
-- wave-a
-- P0
-- parity:DAC-WIN-0113
-query:
-  crowdstrike: 'ImageFileName="wmic.exe" AND CommandLine CONTAINS "process call create"
-
-    '
-sourcetypes:
-- falcon:process
 mitre:
   tactics:
   - execution
   techniques:
   - T1047
+severity: high
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- aid
+- ComputerName
+- TargetProcessId
+query:
+  crowdstrike: '#event_simpleName=ProcessRollup2
+
+    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
+
+    // prior: ImageFileName="wmic.exe" AND CommandLine CONTAINS "process call create"
+
+    // --- src: LOLBin_WMIC.yml (Falcon: LOLBin WMIC) ---
+
+    | event_platform=Win and ImageFileName=/wmic.exe/i
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
+
+    '
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0113
+- enhance-01b
+- processrollup2
+- qh:LOLBin_WMIC.yml
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+references:
+- https://attack.mitre.org/techniques/T1047/
+platforms:
+- crowdstrike
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
+id: DAC-CS-0038
+title: 'Falcon: wmic process call create'
+author: Detection Engineer
+status: experimental
+description: wmic process call Enhanced with Query-Hub ProcessRollup2 patterns (LOLBin_WMIC.yml).
