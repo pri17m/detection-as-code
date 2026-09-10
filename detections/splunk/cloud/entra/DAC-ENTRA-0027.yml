@@ -1,0 +1,40 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search Category="SignInLogs" Status.errorCode=0
+
+    | search clientAppUsed IN ("Exchange ActiveSync","Other clients","IMAP","POP","SMTP","Authenticated
+    SMTP","MAPI")
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0027
+title: 'Entra: Legacy authentication successful for privileged account'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1078/004/
+mitre:
+  tactics:
+  - initial-access
+  techniques:
+  - T1078.004
+author: Detection Engineer
+status: experimental
+description: sign-in clientApp legacy / older protocol
