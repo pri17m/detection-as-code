@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1105/
+title: 'MDE: curl/wget to user-writable path'
+description: DeviceProcessEvents
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0058
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-CS-0058
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName in~ ("curl.exe","wget.exe")
+
+    | where ProcessCommandLine has_any (@"\Temp\", @"\Downloads\", @"\AppData\")
+
+    | project Timestamp, DeviceName, ProcessCommandLine
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1105
