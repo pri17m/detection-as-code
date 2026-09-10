@@ -1,0 +1,52 @@
+severity: critical
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=1
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/process_creation/proc_creation_win_hktl_c3_rundll32_pattern.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_c3_rundll32_pattern.yml
+- https://attack.mitre.org/techniques/T1218/011/
+- https://attack.mitre.org/techniques/T1574/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/process_creation/proc_creation_win_hktl_c3_rundll32_pattern.yml
+title: HackTool - F-Secure C3 Load by Rundll32
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0312
+description: F-Secure C3 produces DLLs with a default exported StartNodeRelay function.
+mitre:
+  tactics:
+  - defense-evasion
+  - persistence
+  techniques:
+  - T1218.011
+  - T1574.001
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+false_positives:
+- Unknown
+status: experimental
