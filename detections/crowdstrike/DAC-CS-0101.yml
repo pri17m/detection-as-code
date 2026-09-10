@@ -1,0 +1,50 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Detects interactive/remote logons using common generic/shared account names (admin, administrator,
+
+  test, guest, user, support, temp, shared).
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0101
+query:
+  crowdstrike: '#event_simpleName=UserLogon
+
+    | in(LogonType, values=["2","10","11"])
+
+    | UserName=/^(admin|administrator|test|guest|user|support|temp|shared|default|demo)$/i
+
+    | groupBy([aid, ComputerName, UserName, LogonType], function=count())
+
+    '
+mitre:
+  tactics:
+  - initial-access
+  - persistence
+  techniques:
+  - T1078
+title: 'Falcon: Generic Shared Account Logon Usage'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1078/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/detection_of_generic_user_account_usage.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:detection_of_generic_user_account_usage.yml
+- esn:UserLogon
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- LogonType
+- UserName
+- aid
