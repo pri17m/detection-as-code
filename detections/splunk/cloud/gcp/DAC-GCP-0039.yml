@@ -1,0 +1,37 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- protoPayload.methodName
+- protoPayload.authenticationInfo.principalEmail
+- protoPayload.requestMetadata.callerIp
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1098.001
+id: DAC-GCP-0039
+status: experimental
+title: 'GCP: API key create with no application restriction'
+query:
+  splunk: '(sourcetype=gcp:audit OR sourcetype=google:gcp:cloudaudit:json OR sourcetype=google:gcp:pubsub:message)
+
+    | search protoPayload.methodName IN ("google.iam.admin.v1.CreateServiceAccountKey","google.iam.admin.v1.CreateServiceAccountKey")
+    OR protoPayload.methodName="*CreateServiceAccountKey*"
+
+    | table _time, protoPayload.methodName, protoPayload.authenticationInfo.principalEmail, protoPayload.requestMetadata.callerIp,
+    resource.type, severity
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1098/001/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: apikeys.create unrestricted
+sourcetypes:
+- gcp:audit
