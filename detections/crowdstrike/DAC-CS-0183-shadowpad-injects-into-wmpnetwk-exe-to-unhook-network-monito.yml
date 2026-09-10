@@ -1,0 +1,45 @@
+id: DAC-CS-0183
+title: 'Falcon: ShadowPad Injects into wmpnetwk.exe to Unhook Network Monitoring APIs'
+description: |
+  detections.ai community gap-fill for: ShadowPad Injects into wmpnetwk.exe to Unhook Network Monitoring APIs. Heuristic TP-style CQL on SAFE ESN ClassifiedModuleLoad derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/01a089d0-24f4-7452-8230-cf0b98dea1ad
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  - persistence
+  techniques:
+  - T1574.001
+  - T1055
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/01a089d0-24f4-7452-8230-cf0b98dea1ad
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1574/001/
+- https://attack.mitre.org/techniques/T1055/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- ModulePath
+- ImageFileName
+- ComputerName
+- aid
+- TargetProcessId
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:ClassifiedModuleLoad
+- lang:cql
+query:
+  crowdstrike: |
+    #event_simpleName=ClassifiedModuleLoad
+    | ModulePath=/(\\users\\|\\appdata\\|\\programdata\\|\\temp\\)/i
+    | groupBy([aid, ComputerName, ModulePath, ImageFileName], function=count())

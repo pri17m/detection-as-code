@@ -1,0 +1,43 @@
+id: DAC-CS-0180
+title: 'Falcon: T1222 icacls/takeown or chmod/chown Weakening AV-EDR Directory Permissions'
+description: |
+  detections.ai community gap-fill for: T1222 icacls/takeown or chmod/chown Weakening AV-EDR Directory Permissions. Heuristic TP-style CQL on SAFE ESN ProcessRollup2 derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/01a080f8-e8e8-7215-a45b-6c345344000b
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.001
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/01a080f8-e8e8-7215-a45b-6c345344000b
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1562/001/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- ComputerName
+- aid
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:ProcessRollup2
+- lang:kql-ported
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2
+    | ImageFileName=/\\(icacls|takeown|chmod|chown)\.exe$/i
+    | CommandLine=/(crowdstrike|falcon|windows\s?defender|sophos|carbonblack|elastic|sentinel)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

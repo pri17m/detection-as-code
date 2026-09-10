@@ -1,0 +1,45 @@
+id: DAC-CS-0145
+title: 'Falcon: Velvet Ant Nginx FastCGI Proxy-Chain Pivoting to Isolated Internal Hosts'
+description: |
+  detections.ai community gap-fill for: Velvet Ant Nginx FastCGI Proxy-Chain Pivoting to Isolated Internal Hosts. Heuristic TP-style CQL on SAFE ESN ProcessRollup2 derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/019f1a46-7349-716b-8f02-cd2ab21ffad9
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - command-and-control
+  - exfiltration
+  techniques:
+  - T1071
+  - T1105
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/019f1a46-7349-716b-8f02-cd2ab21ffad9
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1071/
+- https://attack.mitre.org/techniques/T1105/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- ComputerName
+- aid
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:ProcessRollup2
+- lang:cql
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2
+    | CommandLine=/(velvet|nginx|fastcgi|proxy)/i OR ImageFileName=/(velvet|nginx|fastcgi|proxy)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

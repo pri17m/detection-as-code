@@ -1,0 +1,45 @@
+id: DAC-CS-0176
+title: 'Falcon: FalconFlank: SYSTEM child process from Falcon sensor after unsigned DLL load'
+description: |
+  detections.ai community gap-fill for: FalconFlank: SYSTEM child process from Falcon sensor after unsigned DLL load. Heuristic TP-style CQL on SAFE ESN ProcessRollup2 derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/01a07c1e-84ef-72ad-8c02-61948b50eb43
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  - persistence
+  techniques:
+  - T1574.001
+  - T1055
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/01a07c1e-84ef-72ad-8c02-61948b50eb43
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1574/001/
+- https://attack.mitre.org/techniques/T1055/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- ComputerName
+- aid
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:ProcessRollup2
+- lang:kql-ported
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2
+    | CommandLine=/(falconflank|system|child|sensor)/i OR ImageFileName=/(falconflank|system|child|sensor)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

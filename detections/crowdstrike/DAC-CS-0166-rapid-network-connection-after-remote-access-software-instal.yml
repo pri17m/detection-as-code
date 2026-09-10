@@ -1,0 +1,45 @@
+id: DAC-CS-0166
+title: 'Falcon: Rapid Network Connection After Remote Access Software Installation'
+description: |
+  detections.ai community gap-fill for: Rapid Network Connection After Remote Access Software Installation. Heuristic TP-style CQL on SAFE ESN ProcessRollup2 derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/01a05aa1-695f-75ec-80f8-5b2f7d7b0351
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - command-and-control
+  - exfiltration
+  techniques:
+  - T1071
+  - T1105
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/01a05aa1-695f-75ec-80f8-5b2f7d7b0351
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1071/
+- https://attack.mitre.org/techniques/T1105/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- ComputerName
+- aid
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:ProcessRollup2
+- lang:cql
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2
+    | CommandLine=/(rapid|network|connection|remote)/i OR ImageFileName=/(rapid|network|connection|remote)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

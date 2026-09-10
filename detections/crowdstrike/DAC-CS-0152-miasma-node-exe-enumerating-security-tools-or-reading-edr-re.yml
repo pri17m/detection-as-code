@@ -1,0 +1,41 @@
+id: DAC-CS-0152
+title: 'Falcon: Miasma: node.exe Enumerating Security Tools or Reading EDR Registry Keys Pre-Payl…'
+description: |
+  detections.ai community gap-fill for: Miasma: node.exe Enumerating Security Tools or Reading EDR Registry Keys Pre-Payload. Heuristic TP-style CQL on SAFE ESN ProcessRollup2 derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/019f679f-180c-7638-862e-de2dc2487c26
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.001
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/019f679f-180c-7638-862e-de2dc2487c26
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1562/001/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- ComputerName
+- aid
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:ProcessRollup2
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2
+    | CommandLine=/(miasma|node|enumerating|security)/i OR ImageFileName=/(miasma|node|enumerating|security)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
