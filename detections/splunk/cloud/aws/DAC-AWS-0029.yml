@@ -1,0 +1,38 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562
+id: DAC-AWS-0029
+status: experimental
+title: 'AWS: VPC CreateSecurityGroup ingress 0.0.0.0/0 admin ports'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("AuthorizeSecurityGroupIngress","AuthorizeSecurityGroupEgress")
+
+    | search requestParameters.ipPermissions{}.ipRanges{}.cidrIp="0.0.0.0/0" OR requestParameters.cidrIp="0.0.0.0/0"
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1562/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: AuthorizeSecurityGroupIngress 0.0.0.0/0 22/3389
+sourcetypes:
+- aws:cloudtrail

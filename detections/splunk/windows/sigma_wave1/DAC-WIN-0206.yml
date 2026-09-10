@@ -1,0 +1,47 @@
+severity: high
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=5145
+
+    | search ShareName="\\\\\*\\IPC$"
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/win_security_impacket_psexec.yml; fieldsummary
+    before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_impacket_psexec.yml
+- https://attack.mitre.org/techniques/T1021/002/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_security
+- sigma:rules/windows/builtin/security/win_security_impacket_psexec.yml
+title: Impacket PsExec Execution
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0206
+description: Detects execution of Impacket's psexec.py.
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021.002
+required_fields:
+- EventCode
+- ShareName
+false_positives:
+- Unknown
+status: experimental

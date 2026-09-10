@@ -1,0 +1,47 @@
+id: DAC-WIN-0151
+title: Wevtutil clear or set-log tamper
+description: Sysmon 1 wevtutil cl/clear-log/sl
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1070.001
+  - T1562.002
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+telemetry_validated: false
+false_positives:
+- Log mgmt scripts
+references:
+- https://attack.mitre.org/techniques/T1070/001/
+- https://attack.mitre.org/techniques/T1562/002/
+tags:
+- P1
+- category:defense-evasion
+- defense-evasion
+- phase1
+- remapped_from:DAC-WIN-0052
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | table _time host
+
+    '

@@ -1,0 +1,32 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+title: 'Falcon: ProcDump targeting LSASS'
+description: procdump + lsass in cmdline
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0015
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:WIN
+query:
+  crowdstrike: 'ImageFileName="procdump.exe" AND CommandLine CONTAINS "lsass"
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.001

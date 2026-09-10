@@ -1,0 +1,37 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1485
+id: DAC-AZ-0039
+status: experimental
+title: 'Azure: Key Vault purge protection disabled then purge'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName IN ("Microsoft.KeyVault/vaults/secrets/get/action","SecretGet","SecretList")
+    OR operationName="*secrets*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1485/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: vaults write enablePurgeProtection false
+sourcetypes:
+- azure:monitor:activity

@@ -1,0 +1,45 @@
+id: DAC-WIN-0156
+title: PowerShell AD enumeration burst
+description: 4104 Get-ADUser/DirectorySearcher
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - Discovery
+  techniques:
+  - T1087.002
+  - T1059.001
+sourcetypes:
+- WinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+required_fields:
+- ScriptBlockText
+- ScriptBlockId
+- Path
+- MessageNumber
+- MessageTotal
+- SubjectUserName
+telemetry_validated: false
+false_positives:
+- IT identity tooling
+references:
+- https://attack.mitre.org/techniques/T1087/002/
+- https://attack.mitre.org/techniques/T1059/001/
+tags:
+- P1
+- ad-auth
+- category:ad-auth
+- phase1
+- remapped_from:DAC-WIN-0057
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational)
+    `windows_powershell_operational`
+
+    | table _time host
+
+    '

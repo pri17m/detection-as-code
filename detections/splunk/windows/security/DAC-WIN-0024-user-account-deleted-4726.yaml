@@ -1,0 +1,35 @@
+id: DAC-WIN-0024
+title: User account deleted (4726)
+description: Detects deletion of a user account which can be used to hide traces or
+  sabotage access.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1531
+severity: high
+false_positives:
+- Planned deprovisioning.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4726
+telemetry_validated: false
+required_fields:
+- EventCode
+- TargetUserName
+- SubjectUserName
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4726
+
+    | eval target=coalesce(TargetUserName, user)
+
+    | eval actor=coalesce(SubjectUserName, src_user)
+
+    | stats count values(target) as deleted_users by actor, host
+
+    '

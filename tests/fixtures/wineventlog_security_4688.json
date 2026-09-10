@@ -1,0 +1,10 @@
+{
+  "sourcetype": "WinEventLog:Security",
+  "EventCode": 4688,
+  "host": "WS-002",
+  "SubjectUserName": "ACME\\jdoe",
+  "NewProcessName": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+  "ParentProcessName": "C:\\\\Program Files\\\\Microsoft Office\\\\root\\\\Office16\\\\WINWORD.EXE",
+  "CommandLine": "powershell.exe -NoP -W Hidden -Enc AABiAG8AZwB1AHMA"
+}
+

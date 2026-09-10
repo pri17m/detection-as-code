@@ -1,0 +1,36 @@
+id: DAC-WIN-0087
+title: '[Sigma→Splunk] Regsvr32 remote scriptlet'
+description: 'Sigma-derived detection converted/implemented for Splunk. Source: DAC-SIG-0003.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1218.010
+severity: medium
+false_positives:
+- Tune by allowlisting known admin tooling or software installers.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+telemetry_validated: false
+required_fields:
+- EventCode
+- CommandLine
+- NewProcessName
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4688
+
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+
+    | where match(cmd,"regsvr32\\.exe.*(http|https).*\\.sct") OR match(cmd,"regsvr32\\.exe.*scrobj\\.dll")
+
+    | stats count values(cmd) as commands by host, SubjectUserName
+
+    '
+sigma:
+  path: /workspace/detections/sigma/DAC-SIG-0003-regsvr32-remote-scriptlet.yaml

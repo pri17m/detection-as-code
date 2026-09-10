@@ -1,0 +1,37 @@
+id: DAC-WIN-0164
+title: Service installed via sc.exe create
+description: Sysmon 1 sc.exe create
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1543.003
+severity: medium
+false_positives:
+- Admin service mgmt
+references:
+- https://attack.mitre.org/techniques/T1543/003/
+telemetry_validated: false
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- persistence

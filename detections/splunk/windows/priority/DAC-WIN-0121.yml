@@ -1,0 +1,45 @@
+id: DAC-WIN-0121
+title: PowerShell encoded command line (Sysmon)
+description: Sysmon 1 powershell -EncodedCommand/-enc
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - Execution
+  techniques:
+  - T1059.001
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+telemetry_validated: false
+false_positives:
+- Packaged admin scripts
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+tags:
+- P0
+- category:process
+- phase1
+- process
+- remapped_from:DAC-WIN-0022
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | table _time host
+
+    '

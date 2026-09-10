@@ -1,0 +1,35 @@
+id: DAC-WIN-0171
+title: Unsigned DLL loaded by signed Microsoft process (user path)
+description: Sysmon 7 unsigned ImageLoaded under Users/Temp
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1574.001
+severity: medium
+false_positives:
+- Plugins/dev tools
+references:
+- https://attack.mitre.org/techniques/T1574/001/
+telemetry_validated: false
+required_fields:
+- EventCode
+- Image
+- ImageLoaded
+- Signed
+- SignatureStatus
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- defense-evasion

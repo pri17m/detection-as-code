@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - exfiltration
+  techniques:
+  - T1537
+id: DAC-AZ-0031
+status: experimental
+title: 'Azure: Image gallery or shared image version published externally'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="Microsoft.Compute/galleries/images/versions/write"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1537/
+platforms:
+- splunk
+tags:
+- wave-c
+- P2
+description: galleries/images/versions write
+sourcetypes:
+- azure:monitor:activity

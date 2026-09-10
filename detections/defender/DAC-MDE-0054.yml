@@ -1,0 +1,37 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1671/
+title: 'MDE: suspicious OAuth consent on endpoint session'
+description: CloudAppEvents / IdentityInfo if available
+severity: medium
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0054
+status: experimental
+tags:
+- wave-a
+- P1
+- phase2-top5
+query:
+  defender: 'CloudAppEvents
+
+    | where ActionType has_any ("Consent","Consent to application")
+
+    | project Timestamp, AccountDisplayName, Application, ActionType, RawEventData
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1671

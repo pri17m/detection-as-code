@@ -1,0 +1,27 @@
+id: DAC-SIG-0006
+title: Certutil download
+description: Normalized Sigma source reference (metadata-only). Convert using pipelines/convert/sigma_convert.py
+  or author a platform-native query.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1105
+severity: medium
+false_positives:
+- Varies by environment; validate and tune.
+references:
+- https://github.com/SigmaHQ/sigma
+telemetry_validated: false
+required_fields: []
+sigma:
+  path: SigmaHQ:windows/process_creation/certutil_urlcache.yml
+tags:
+- sigma
+- normalized

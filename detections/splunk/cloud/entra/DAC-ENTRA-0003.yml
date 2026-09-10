@@ -1,0 +1,40 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName="Add member to role" OR ActivityDisplayName="Add member to role"
+
+    | search ResultReason="*Permanent*" OR AdditionalDetails{}.key="AssignmentType" AdditionalDetails{}.value="Permanent"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0003
+title: 'Entra: Permanent privileged role assignment bypassing PIM'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-top5
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1098/003/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098.003
+author: Detection Engineer
+status: experimental
+description: role assignment type Permanent for GA/PRA

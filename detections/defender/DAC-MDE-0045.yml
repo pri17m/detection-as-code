@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1562/001/
+title: 'MDE: attempt stop WinDefend or Sense service'
+description: service stop/disable
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0045
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-MDE-0005
+query:
+  defender: 'DeviceProcessEvents
+
+    | where ProcessCommandLine has_any ("Set-MpPreference","DisableRealtimeMonitoring","WinDefend","Sense")
+
+    | where ProcessCommandLine has_any ("Disable","stop","delete")
+
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.001

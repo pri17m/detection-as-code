@@ -1,0 +1,34 @@
+id: DAC-WIN-0009
+title: AD CS suspicious cert issued / PKINIT (4768 PreAuthType=16, CA 4886/4887)
+description: Detects PKINIT Kerberos authentication (PreAuthType=16) and/or Certification Authority request/issuance events. Requires AD CS auditing and baseline of smartcard/PKINIT usage.
+author: Threat Detection Engineering
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - windows_security
+mitre:
+  tactics:
+    - credential-access
+  techniques:
+    - T1649
+severity: high
+false_positives:
+  - Legitimate smartcard/PKINIT usage and normal certificate enrollment flows.
+references:
+  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4768
+telemetry_validated: false
+required_fields:
+  - TargetUserName
+  - IpAddress
+  - TicketEncryptionType
+  - Status
+query:
+  splunk: |
+    `windows_security` (EventCode=4768 OR EventCode=4886 OR EventCode=4887)
+    | eval user=coalesce(TargetUserName, SubjectUserName, Account_Name, user)
+    | eval src_ip=coalesce(IpAddress, Source_Network_Address, src, src_ip)
+    | eval is_pkinit=if(EventCode=4768 AND (PreAuthType=16 OR PreAuthType="16"),1,0)
+    | eval is_ca_evt=if(EventCode=4886 OR EventCode=4887,1,0)
+    | where is_pkinit=1 OR is_ca_evt=1
+    | stats count values(PreAuthType) as preauth_types by host, user, src_ip, EventCode

@@ -1,0 +1,40 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action IN ("environment.update_protection_rule","repository_ruleset.update")
+
+    | search required_reviewers=0 OR protection_rules="*"
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0043
+title: 'GitHub: Environment protection reviewers removed'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P1
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1685/002/
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685.002
+author: Detection Engineer
+status: experimental
+description: environment update remove required reviewers

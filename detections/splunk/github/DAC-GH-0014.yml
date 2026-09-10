@@ -1,0 +1,39 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action IN ("hook.destroy","org.hook.destroy","repo.hook.destroy")
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0014
+title: 'GitHub: Org audit log export or webhook sink weakened'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-top5
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1685/002/
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685.002
+author: Detection Engineer
+status: experimental
+description: hook.destroy org audit-related

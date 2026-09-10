@@ -1,0 +1,46 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-PowerShell/Operational")
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/powershell/powershell_classic/posh_pc_delete_volume_shadow_copies.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/powershell/powershell_classic/posh_pc_delete_volume_shadow_copies.yml
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1490/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_powershell_operational
+- sigma:rules/windows/powershell/powershell_classic/posh_pc_delete_volume_shadow_copies.yml
+title: Delete Volume Shadow Copies Via WMI With PowerShell
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+id: DAC-WIN-0225
+description: Shadow Copies deletion using operating systems utilities via PowerShell
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+  - T1490
+required_fields:
+- EventCode
+false_positives:
+- Legitimate Administrator deletes Shadow Copies using operating systems utilities for legitimate reason
+status: experimental

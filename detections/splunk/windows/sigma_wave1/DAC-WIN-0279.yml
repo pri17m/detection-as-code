@@ -1,0 +1,62 @@
+severity: high
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode IN (4662,5136,5137)
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/win_security_kerberos_coercion_via_dns_object.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_kerberos_coercion_via_dns_object.yml
+- https://attack.mitre.org/techniques/T1557/003/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_security
+- sigma:rules/windows/builtin/security/win_security_kerberos_coercion_via_dns_object.yml
+title: Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0279
+description: 'Detects modifications to DNS records in Active Directory where the Distinguished Name (DN)
+  contains a base64-encoded blob
+
+  matching the pattern "1UWhRCAAAAA...BAAAA". This pattern corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION
+  structure,
+
+  commonly used in Kerberos coercion attacks. Adversaries may exploit this to coerce victim systems into
+  authenticating to
+
+  attacker-controlled hosts by spoofing SPNs via DNS. It is one of the strong indicators of a Kerberos
+  coercion attack,.
+
+  where adversaries manipulate DNS records to spoof Service Principal Names (SPNs) and redirect authentication
+  requests like CVE-2025-33073.
+
+  Please investigate the user account that made the changes, as it is likely a low-privileged account
+  that has been compromised.'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1557.003
+required_fields:
+- EventCode
+- SubjectUserName
+- Properties
+false_positives:
+- Unknown
+status: experimental

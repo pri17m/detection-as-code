@@ -1,0 +1,38 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098.003
+id: DAC-AZ-0026
+status: experimental
+title: 'Azure: Deployment of ARM/Bicep with Owner roleDefinitions'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="Microsoft.Resources/deployments/write"
+
+    | search properties="*Owner*" OR properties="*roleAssignments*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1098/003/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: deployments write roleAssignments Owner
+sourcetypes:
+- azure:monitor:activity

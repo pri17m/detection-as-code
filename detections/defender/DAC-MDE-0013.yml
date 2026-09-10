@@ -1,0 +1,42 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+title: 'MDE: LSASS access by non-security tooling'
+description: "DeviceProcessEvents/DeviceImageLoadEvents or API \u2014 exclude known AV"
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0013
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0100
+- parity:DAC-CS-0013
+query:
+  defender: 'DeviceProcessEvents
+
+    | where ProcessCommandLine has "lsass" or FolderPath has "lsass"
+
+    // Prefer DeviceEvents ProcessOpened for handle access when schema available
+
+    | where InitiatingProcessFileName !in~ ("MsMpEng.exe","MsSense.exe","CSFalconService.exe")
+
+    | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.001

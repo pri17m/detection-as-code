@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1547/001/
+title: 'MDE: Registry Run key user-writable persistence'
+description: DeviceRegistryEvents
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0023
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0111
+query:
+  defender: 'DeviceRegistryEvents
+
+    | where RegistryKey has_any (@"\CurrentVersion\Run", @"\CurrentVersion\RunOnce")
+
+    | where RegistryValueData has_any (@"\Temp\", @"\Users\", @"\AppData\")
+
+    | project Timestamp, DeviceName, RegistryKey, RegistryValueName, RegistryValueData, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1547.001

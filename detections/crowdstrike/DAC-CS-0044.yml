@@ -1,0 +1,32 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1562/002/
+title: 'Falcon: auditpol disable process/logon auditing'
+description: auditpol /set disable
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0044
+status: experimental
+tags:
+- wave-a
+- P0
+query:
+  crowdstrike: 'ImageFileName="auditpol.exe" AND CommandLine CONTAINS "/set" AND CommandLine CONTAINS
+    "disable"
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.002

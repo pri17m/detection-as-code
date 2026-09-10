@@ -1,0 +1,37 @@
+id: DAC-WIN-0010
+title: Password spray then success (4625/4771 → 4624)
+description: Detects password spraying patterns (many failures across many accounts) followed by at least one successful logon from the same source. Tune thresholds and allowlist known jump hosts/VPN egress.
+author: Threat Detection Engineering
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - windows_security
+mitre:
+  tactics:
+    - credential-access
+    - initial-access
+  techniques:
+    - T1110.003
+    - T1078.002
+severity: high
+false_positives:
+  - Shared jump hosts, password resets, or users mistyping passwords before success.
+references:
+  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625
+  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624
+telemetry_validated: false
+required_fields:
+  - LogonType
+  - TargetUserName
+  - IpAddress
+  - Status
+query:
+  splunk: |
+    `windows_security` (EventCode=4624 OR EventCode=4625 OR EventCode=4771)
+    | eval src_ip=coalesce(IpAddress, Source_Network_Address, src, src_ip)
+    | eval user=coalesce(TargetUserName, Account_Name, user)
+    | eval is_fail=if(EventCode=4625 OR EventCode=4771,1,0)
+    | eval is_success=if(EventCode=4624,1,0)
+    | stats sum(is_fail) as failures sum(is_success) as successes dc(eval(if(is_fail=1,user,NULL()))) as failed_users values(eval(if(is_success=1,user,NULL()))) as successful_users by src_ip
+    | where failures>=50 AND failed_users>=10 AND successes>=1

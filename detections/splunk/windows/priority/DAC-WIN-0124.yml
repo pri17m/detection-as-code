@@ -1,0 +1,44 @@
+id: DAC-WIN-0124
+title: Account added to Domain Admins / Tier-0 group
+description: 4728/4732/4756 Domain/Enterprise Admins
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: critical
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1098
+  - T1078.002
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- MemberName
+- MemberSid
+- TargetUserName
+- SubjectUserName
+- SubjectDomainName
+telemetry_validated: false
+false_positives:
+- Change-control
+references:
+- https://attack.mitre.org/techniques/T1098/
+- https://attack.mitre.org/techniques/T1078/002/
+tags:
+- P0
+- ad-auth
+- category:ad-auth
+- phase1
+- remapped_from:DAC-WIN-0025
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security`
+
+    | table _time host
+
+    '

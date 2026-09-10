@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685.002
+id: DAC-AZ-0027
+status: experimental
+title: 'Azure: Network Watcher or flow log disabled'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName IN ("Microsoft.Network/networkWatchers/delete","Microsoft.Network/networkWatchers/flowLogs/delete","Microsoft.Network/networkWatchers/flowLogs/write")
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1685/002/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: networkWatchers / flowLogs delete
+sourcetypes:
+- azure:monitor:activity

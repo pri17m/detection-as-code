@@ -1,0 +1,31 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1562/001/
+title: 'Falcon: AMSI or ETW bypass script patterns'
+description: amsiUtils/etw reflection tokens in PS
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0046
+status: experimental
+tags:
+- wave-a
+- P0
+query:
+  crowdstrike: 'ImageFileName IN ["powershell.exe","pwsh.exe"] AND CommandLine CONTAINS_ANY ["amsiUtils","AmsiScanBuffer","etw","System.Management.Automation.Tracing"]
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.001

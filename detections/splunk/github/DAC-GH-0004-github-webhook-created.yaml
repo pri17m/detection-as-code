@@ -1,0 +1,22 @@
+id: DAC-GH-0004
+title: "GitHub: Webhook created or updated"
+description: "Detects creation or update of repository or organization webhooks which can indicate data exfiltration or persistence."
+author: "DaC"
+status: experimental
+platforms: [splunk]
+sourcetypes: ["github:audit"]
+mitre:
+  tactics: ["exfiltration", "persistence"]
+  techniques: ["T1567.002"]
+severity: medium
+false_positives:
+  - "Legitimate CI/CD or integrations onboarding."
+references:
+  - "https://docs.github.com/en/webhooks"
+telemetry_validated: false
+required_fields: ["action", "actor", "repo", "created_at"]
+query:
+  splunk: |
+    sourcetype=github:audit (action="hook.create" OR action="hook.config_changed" OR action="hook.update" OR action="org.hook.create" OR action="org.hook.update")
+    | stats count values(actor) as actors values(repo) as repos values(org) as orgs values(hook_url) as webhook_urls by action
+

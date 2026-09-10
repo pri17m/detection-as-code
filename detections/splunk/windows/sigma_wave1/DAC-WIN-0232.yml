@@ -1,0 +1,47 @@
+severity: low
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-PowerShell/Operational")
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/powershell/powershell_classic/posh_pc_renamed_powershell.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/powershell/powershell_classic/posh_pc_renamed_powershell.yml
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1036/003/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_powershell_operational
+- sigma:rules/windows/powershell/powershell_classic/posh_pc_renamed_powershell.yml
+title: Renamed Powershell Under Powershell Channel
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+id: DAC-WIN-0232
+description: Detects a renamed Powershell execution, which is a common technique used to circumvent security
+  controls and bypass detection logic that's dependent on process names and process paths.
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+  - T1036.003
+required_fields:
+- EventCode
+false_positives:
+- Unknown
+status: experimental

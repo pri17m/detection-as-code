@@ -1,0 +1,37 @@
+id: DAC-WIN-0076
+title: 'Sysmon: PowerShell encoded command line'
+description: Detects Sysmon process creation for PowerShell with EncodedCommand usage.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+severity: high
+false_positives:
+- Some admin scripts use -EncodedCommand; tune with allowlists.
+references:
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+telemetry_validated: false
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- host
+query:
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1
+
+    | eval img=lower(coalesce(Image))
+
+    | eval cmd=lower(coalesce(CommandLine))
+
+    | where match(img,"(powershell|pwsh)\\.exe") AND match(cmd,"(-enc|-encodedcommand)\\s+[a-za-z0-9+/=]{50,}")
+
+    | stats count values(cmd) as commands by host, User
+
+    '

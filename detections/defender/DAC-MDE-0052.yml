@@ -1,0 +1,38 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1136/001/
+title: 'MDE: new local user create net.exe'
+description: DeviceProcessEvents
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0052
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-CS-0055
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName =~ "net.exe" and ProcessCommandLine has_any ("localgroup","user") and ProcessCommandLine
+    has "/add"
+
+    | project Timestamp, DeviceName, ProcessCommandLine, AccountName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1136.001

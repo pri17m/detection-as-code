@@ -1,0 +1,38 @@
+id: DAC-WIN-0017
+title: Privileged service called with SeDebugPrivilege (4673)
+description: Detects use of SeDebugPrivilege via privileged service calls, which can
+  be associated with credential dumping and process injection workflows.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - privilege-escalation
+  - credential-access
+  techniques:
+  - T1068
+severity: high
+false_positives:
+- Legitimate debuggers, EDR/AV, and some admin tools.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4673
+telemetry_validated: false
+required_fields:
+- EventCode
+- PrivilegeList
+- SubjectUserName
+- ProcessName
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4673
+
+    | eval priv=lower(coalesce(PrivilegeList, Privileges))
+
+    | where match(priv, "sedebugprivilege")
+
+    | stats count values(ProcessName) as processes values(priv) as privileges by host,
+    SubjectUserName
+
+    '

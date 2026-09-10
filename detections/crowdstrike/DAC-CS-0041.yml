@@ -1,0 +1,32 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1021/002/
+title: 'Falcon: PsExec-like service PSEXESVC'
+description: PSEXESVC service image
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0041
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0179
+query:
+  crowdstrike: 'ImageFileName CONTAINS "PSEXESVC" OR ServiceName="PSEXESVC" OR CommandLine CONTAINS "psexec"
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021.002

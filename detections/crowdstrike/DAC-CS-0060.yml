@@ -1,0 +1,37 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1574/002/
+title: 'Falcon: unsigned DLL load by signed Microsoft binary from user path'
+description: ImageLoad unsigned under Users
+severity: medium
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0060
+status: experimental
+tags:
+- wave-a
+- P1
+- parity:DAC-WIN-0171
+query:
+  crowdstrike: '# Experimental Custom IOA sketch for Falcon: unsigned DLL load by signed Microsoft binary
+    from user path
+
+    CommandLine="*"
+
+    # TODO: refine with Falcon event fields after Telemetry map
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1574.002

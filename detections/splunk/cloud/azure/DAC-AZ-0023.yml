@@ -1,0 +1,38 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562
+id: DAC-AZ-0023
+status: experimental
+title: 'Azure: SQL server firewall allow Azure services or 0.0.0.0-255'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="Microsoft.Sql/servers/firewallRules/write"
+
+    | search properties="*0.0.0.0*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: medium
+references:
+- https://attack.mitre.org/techniques/T1562/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: firewallRules 0.0.0.0
+sourcetypes:
+- azure:monitor:activity

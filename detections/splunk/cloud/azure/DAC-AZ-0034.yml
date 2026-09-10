@@ -1,0 +1,38 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1556
+id: DAC-AZ-0034
+status: experimental
+title: 'Azure: App Service auth settings disable Easy Auth'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="Microsoft.Web/sites/config/write"
+
+    | search properties="*authsettings*" OR properties="*enabled\":false*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: medium
+references:
+- https://attack.mitre.org/techniques/T1556/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: config/authsettings write enabled false
+sourcetypes:
+- azure:monitor:activity

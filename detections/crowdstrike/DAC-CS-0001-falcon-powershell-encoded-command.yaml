@@ -1,0 +1,30 @@
+id: DAC-CS-0001
+title: 'Falcon: PowerShell encoded command'
+description: Detects PowerShell executions using encoded command patterns (Custom
+  IOA candidate).
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+severity: high
+false_positives:
+- Legitimate automation; tune by parent process or signer.
+references:
+- https://www.crowdstrike.com/
+telemetry_validated: false
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+query:
+  crowdstrike: 'falcon_ioa_pattern: ImageFileName in ["powershell.exe","pwsh.exe"]
+    AND CommandLine CONTAINS_ANY ["-enc","-encodedcommand"]
+
+    '

@@ -1,0 +1,39 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1098.003
+id: DAC-AZ-0002
+status: experimental
+title: 'Azure: Role assignment Contributor on management group'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="Microsoft.Authorization/roleAssignments/write"
+
+    | search resourceId="*/managementGroups/*" properties="*Contributor*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1098/003/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-top5
+description: roleAssignments write MG scope
+sourcetypes:
+- azure:monitor:activity

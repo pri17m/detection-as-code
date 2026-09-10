@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1578
+id: DAC-AZ-0016
+status: experimental
+title: 'Azure: Logic App or Function app deploy from rare actor'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName IN ("Microsoft.Web/sites/write","Microsoft.Web/sites/functions/write","Microsoft.Logic/workflows/write")
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: medium
+references:
+- https://attack.mitre.org/techniques/T1578/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: sites/functions write / workflows write
+sourcetypes:
+- azure:monitor:activity

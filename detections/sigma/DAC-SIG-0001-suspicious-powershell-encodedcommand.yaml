@@ -1,0 +1,27 @@
+id: DAC-SIG-0001
+title: Suspicious PowerShell EncodedCommand
+description: Normalized Sigma source reference (metadata-only). Convert using pipelines/convert/sigma_convert.py
+  or author a platform-native query.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+severity: medium
+false_positives:
+- Varies by environment; validate and tune.
+references:
+- https://github.com/SigmaHQ/sigma
+telemetry_validated: false
+required_fields: []
+sigma:
+  path: SigmaHQ:windows/process_creation/powershell_encodedcommand.yml
+tags:
+- sigma
+- normalized

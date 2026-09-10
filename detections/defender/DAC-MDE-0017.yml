@@ -1,0 +1,37 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1003/002/
+title: 'MDE: SAM hive export via reg.exe'
+description: reg save SAM
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0017
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-CS-0017
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName =~ "reg.exe" and ProcessCommandLine has_any ("save","SAM","SECURITY")
+
+    | project Timestamp, DeviceName, AccountName, ProcessCommandLine
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.002

@@ -1,0 +1,38 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName IN ("Set federation settings on domain","Set domain authentication") OR ActivityDisplayName="*federation*"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0020
+title: 'Entra: New trusted realm or IdP partner configured'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-next
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1484/002/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1484.002
+author: Detection Engineer
+status: experimental
+description: Add partner / federation domain outside change

@@ -1,0 +1,39 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action IN ("protected_branch.destroy","protected_branch.update_allow_force_pushes","repository_ruleset.destroy","repository_ruleset.update")
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0015
+title: 'GitHub: Branch protection or ruleset weakened on default branch'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-top5
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1685/002/
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685.002
+author: Detection Engineer
+status: experimental
+description: protected_branch / repository_ruleset destroy or weaken

@@ -1,0 +1,38 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action IN ("repo.transfer","repo.transfer_start")
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0031
+title: 'GitHub: Repository transferred out of organization'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1213/003/
+mitre:
+  tactics:
+  - exfiltration
+  techniques:
+  - T1213.003
+author: Detection Engineer
+status: experimental
+description: repo.transfer outside org

@@ -1,0 +1,63 @@
+id: DAC-WIN-0108
+title: AD CS suspicious cert issued / PKINIT
+description: '4886/4887 + 4768 PreAuthType=16 | checklist: macros only; no index=;
+  EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary required
+  before telemetry_validated=true; FP baseline pending org allowlists'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1649
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- EventCode
+- RequestId
+- Requester
+- Attributes
+- Subject
+- Status
+- TargetUserName
+- IpAddress
+- TicketEncryptionType
+telemetry_validated: false
+false_positives:
+- Smartcard/PKI enrollment
+references:
+- https://attack.mitre.org/techniques/T1649/
+tags:
+- P0
+- ad-auth
+- category:ad-auth
+- hardened-v1
+- phase1
+- remapped_from:DAC-WIN-0009
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security` (EventCode=4768 OR EventCode IN (4886,4887,4888))
+
+    | eval TargetUserName=coalesce(TargetUserName, Account_Name, user)
+
+    | eval IpAddress=coalesce(IpAddress, Client_Address, src, src_ip)
+
+    | eval PreAuthType=coalesce(PreAuthType, Pre_Authentication_Type)
+
+    | eval RequestId=coalesce(RequestId, Request_ID)
+
+    | eval Requester=coalesce(Requester, SubjectUserName, RequesterName)
+
+    | search (EventCode=4768 (PreAuthType=16 OR PreAuthType="16")) OR EventCode IN
+    (4886,4887,4888)
+
+    | table _time host EventCode TargetUserName IpAddress PreAuthType RequestId Requester
+    Attributes Status
+
+    '

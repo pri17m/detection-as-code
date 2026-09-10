@@ -1,0 +1,40 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1555.006
+id: DAC-AWS-0020
+status: experimental
+title: 'AWS: Secrets Manager BatchGetSecretValue or ListSecrets anomalous'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("GetSecretValue","BatchGetSecretValue","ListSecrets")
+
+    | stats count by userIdentity.arn
+
+    | where count>20
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1555/006/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: ListSecrets BatchGetSecretValue
+sourcetypes:
+- aws:cloudtrail

@@ -1,0 +1,32 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+title: 'Falcon: PowerShell DownloadString or IEX cradle'
+description: IEX/DownloadString/WebClient
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0034
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0107
+query:
+  crowdstrike: 'ImageFileName IN ["powershell.exe","pwsh.exe"] AND CommandLine CONTAINS_ANY ["IEX","DownloadString","Net.WebClient","FromBase64String"]
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001

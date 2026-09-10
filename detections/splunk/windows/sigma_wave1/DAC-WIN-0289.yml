@@ -1,0 +1,50 @@
+severity: medium
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=7
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/image_load/image_load_dll_amsi_suspicious_process.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/image_load/image_load_dll_amsi_suspicious_process.yml
+- https://attack.mitre.org/techniques/T1574/001/
+- https://attack.mitre.org/techniques/T1574/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/image_load/image_load_dll_amsi_suspicious_process.yml
+title: Amsi.DLL Loaded Via LOLBIN Process
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0289
+description: Detects loading of "Amsi.dll" by a living of the land process. This could be an indication
+  of a "PowerShell without PowerShell" attack
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1574.001
+  - T1574
+required_fields:
+- EventCode
+- Image
+- ImageLoaded
+false_positives:
+- Unknown
+status: experimental

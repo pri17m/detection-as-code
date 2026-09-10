@@ -1,0 +1,51 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-PowerShell/Operational")
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/powershell/powershell_classic/posh_pc_remotefxvgpudisablement_abuse.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/powershell/powershell_classic/posh_pc_remotefxvgpudisablement_abuse.yml
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/techniques/T1218/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_powershell_operational
+- sigma:rules/windows/powershell/powershell_classic/posh_pc_remotefxvgpudisablement_abuse.yml
+title: Potential RemoteFXvGPUDisablement.EXE Abuse
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+id: DAC-WIN-0231
+description: Detects PowerShell module creation where the module Contents are set to "function Get-VMRemoteFXPhysicalVideoAdapter".
+  This could be a sign of potential abuse of  the "RemoteFXvGPUDisablement.exe" binary which is known
+  to be vulnerable to module load-order hijacking.
+mitre:
+  tactics:
+  - execution
+  - defense-evasion
+  techniques:
+  - T1059.001
+  - T1562.001
+  - T1218
+required_fields:
+- EventCode
+false_positives:
+- Unknown
+status: experimental

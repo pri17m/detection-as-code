@@ -1,0 +1,37 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- protoPayload.methodName
+- protoPayload.authenticationInfo.principalEmail
+- protoPayload.requestMetadata.callerIp
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1484
+id: DAC-GCP-0010
+status: experimental
+title: 'GCP: organization.policy disable domain restricted sharing'
+query:
+  splunk: '(sourcetype=gcp:audit OR sourcetype=google:gcp:cloudaudit:json OR sourcetype=google:gcp:pubsub:message)
+
+    | search protoPayload.methodName IN ("SetOrgPolicy","DeleteOrgPolicy","google.cloud.asset.v1.*") OR
+    protoPayload.methodName="*OrgPolicy*"
+
+    | table _time, protoPayload.methodName, protoPayload.authenticationInfo.principalEmail, protoPayload.requestMetadata.callerIp,
+    resource.type, severity
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1484/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: SetOrgPolicy weaken
+sourcetypes:
+- gcp:audit

@@ -1,0 +1,47 @@
+id: DAC-WIN-0152
+title: AMSI related registry tampering
+description: Sysmon 13 AMSI keys OR Sysmon 1
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1562.001
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- TargetObject
+- Details
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+telemetry_validated: false
+false_positives:
+- Security product installs
+references:
+- https://attack.mitre.org/techniques/T1562/001/
+tags:
+- P1
+- category:defense-evasion
+- defense-evasion
+- phase1
+- remapped_from:DAC-WIN-0053
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | table _time host
+
+    '

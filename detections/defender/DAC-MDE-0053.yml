@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1110/003/
+title: 'MDE: password spray then success (Identity)'
+description: IdentityLogonEvents / DeviceLogonEvents
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0053
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0109
+query:
+  defender: 'IdentityLogonEvents
+
+    | where ActionType == "LogonFailed"
+
+    | summarize FailedUsers=dcount(AccountName), Failures=count() by RemoteIP, bin(Timestamp, 15m)
+
+    | where FailedUsers >= 10
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1110.003

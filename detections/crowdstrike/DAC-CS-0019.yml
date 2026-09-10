@@ -1,0 +1,35 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+title: 'Falcon: OpenProcess LSASS with suspicious access mask'
+description: GrantedAccess patterns if Falcon exposes
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0019
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0100
+query:
+  crowdstrike: 'TargetFileName CONTAINS "lsass" OR CommandLine CONTAINS "lsass" OR ImageFileName CONTAINS
+    "lsass"
+
+    # Prefer process-access IOA when available; exclude known EDR SourceImage in tenant
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.001

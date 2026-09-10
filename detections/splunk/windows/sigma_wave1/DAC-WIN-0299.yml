@@ -1,0 +1,50 @@
+severity: medium
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=3
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/network_connection/net_connection_win_rundll32_net_connections.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/network_connection/net_connection_win_rundll32_net_connections.yml
+- https://attack.mitre.org/techniques/T1218/011/
+- https://attack.mitre.org/techniques/T1574/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/network_connection/net_connection_win_rundll32_net_connections.yml
+title: Rundll32 Internet Connection
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0299
+description: Detects a rundll32 that communicates with public IP addresses
+mitre:
+  tactics:
+  - defense-evasion
+  - persistence
+  techniques:
+  - T1218.011
+  - T1574.001
+required_fields:
+- EventCode
+- Image
+- DestinationIp
+false_positives:
+- Communication to other corporate systems that use IP addresses from public address spaces
+status: experimental

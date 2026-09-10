@@ -1,0 +1,35 @@
+id: DAC-WIN-0072
+title: PowerShell script block contains download/execution patterns (4104)
+description: Detects suspicious PowerShell script blocks (4104) indicative of download
+  cradles or obfuscation.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+severity: high
+false_positives:
+- Legitimate automation scripts; tune by signed scripts/paths.
+references:
+- https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_script_blocks
+telemetry_validated: false
+required_fields:
+- EventCode
+- ScriptBlockText
+- host
+query:
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational" EventCode=4104
+
+    | eval sb=lower(coalesce(ScriptBlockText, Message))
+
+    | where match(sb, "(downloadstring|invoke-webrequest|iwr|new-object\\s+net\\.webclient|frombase64string|iex|invoke-expression|join\\(.*char\\()")
+
+    | stats count values(sb) as scriptblocks by host, UserId
+
+    '

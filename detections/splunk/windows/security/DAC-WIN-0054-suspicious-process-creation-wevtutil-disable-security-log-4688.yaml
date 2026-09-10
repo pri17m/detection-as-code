@@ -1,0 +1,44 @@
+id: DAC-WIN-0054
+title: 'Suspicious process creation: Wevtutil disable Security log (4688)'
+description: 'Detects 4688 process creation events matching a known suspicious pattern:
+  Wevtutil disable Security log.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - execution
+  - defense-evasion
+  techniques:
+  - T1562.002
+severity: medium
+false_positives:
+- Administrative scripts or software installers may match; tune by allowlisting known
+  management hosts/accounts.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+telemetry_validated: false
+required_fields:
+- EventCode
+- NewProcessName
+- CommandLine
+- ParentProcessName
+- SubjectUserName
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4688
+
+    | eval proc=lower(coalesce(NewProcessName, process_path, Image))
+
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+
+    | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, parent_process_name))
+
+    | where match(cmd, "wevtutil\.exe\s+sl\s+security\s+/e:false")
+
+    | stats count values(proc) as processes values(parent) as parents values(cmd)
+    as commands by host, SubjectUserName
+
+    '

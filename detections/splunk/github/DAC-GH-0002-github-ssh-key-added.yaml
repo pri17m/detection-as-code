@@ -1,0 +1,22 @@
+id: DAC-GH-0002
+title: "GitHub: SSH key added to account"
+description: "Detects SSH key additions which can indicate persistence on a compromised GitHub account."
+author: "DaC"
+status: experimental
+platforms: [splunk]
+sourcetypes: ["github:audit"]
+mitre:
+  tactics: ["persistence"]
+  techniques: ["T1098"]
+severity: medium
+false_positives:
+  - "Legitimate key rotation or onboarding."
+references:
+  - "https://docs.github.com/en/authentication/connecting-to-github-with-ssh"
+telemetry_validated: false
+required_fields: ["action", "actor", "created_at"]
+query:
+  splunk: |
+    sourcetype=github:audit action="user.ssh_key.add"
+    | stats count values(actor) as actors values(user) as users by action
+

@@ -1,0 +1,38 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action IN ("repository_secret.create","environment_secret.create","org_secret.create")
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0029
+title: 'GitHub: Repository secret or environment secret created outside CI bot'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: medium
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P1
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1552/001/
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1552.001
+author: Detection Engineer
+status: experimental
+description: repository_secret.create by human admin

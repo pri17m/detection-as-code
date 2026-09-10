@@ -1,0 +1,36 @@
+id: DAC-MDE-0012
+title: RDP logon events spike (DeviceLogonEvents)
+description: Detects spikes in RDP (remote interactive) logon events on an endpoint;
+  useful for lateral movement triage.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021.001
+severity: medium
+false_positives:
+- Jump hosts and IT admin behavior.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-devicelogonevents-table
+telemetry_validated: false
+required_fields:
+- DeviceName
+- AccountName
+- LogonType
+query:
+  defender: 'DeviceLogonEvents
+
+    | where LogonType has_any ("RemoteInteractive","RemoteInteractiveSession")
+
+    | summarize count() as logons, dcount(AccountName) as users by DeviceName, bin(Timestamp,
+    1h)
+
+    | where logons >= 20 and users >= 5
+
+    '

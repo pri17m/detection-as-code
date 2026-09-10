@@ -1,0 +1,45 @@
+id: DAC-WIN-0161
+title: Successful logon after failures same account
+description: 4625 then 4624 same user+src
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1110
+  - T1078.002
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+- Status
+- SubStatus
+telemetry_validated: false
+false_positives:
+- User typo then success
+references:
+- https://attack.mitre.org/techniques/T1110/
+- https://attack.mitre.org/techniques/T1078/002/
+tags:
+- P1
+- category:logon
+- logon
+- phase1
+- remapped_from:DAC-WIN-0062
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security`
+
+    | table _time host
+
+    '

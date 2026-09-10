@@ -1,0 +1,38 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - exfiltration
+  techniques:
+  - T1537
+id: DAC-AZ-0012
+status: experimental
+title: 'Azure: Storage account firewall disable or public blob access'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="Microsoft.Storage/storageAccounts/write"
+
+    | search properties="*allowBlobPublicAccess*" OR properties="*publicNetworkAccess*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1537/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: storageAccounts write allowBlobPublicAccess
+sourcetypes:
+- azure:monitor:activity

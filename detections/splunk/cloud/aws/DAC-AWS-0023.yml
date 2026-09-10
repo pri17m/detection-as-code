@@ -1,0 +1,37 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1136.003
+id: DAC-AWS-0023
+status: experimental
+title: 'AWS: IAM CreateUser outside provisioning pipeline'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName="CreateUser"
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: medium
+references:
+- https://attack.mitre.org/techniques/T1136/003/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+- phase2-related
+description: CreateUser non-SCIM actor
+sourcetypes:
+- aws:cloudtrail

@@ -1,0 +1,23 @@
+id: DAC-GH-0001
+title: "GitHub: Personal access token created"
+description: "Detects creation of a personal access token (classic or fine-grained) in GitHub audit logs, which can indicate account takeover or persistence."
+author: "DaC"
+status: experimental
+platforms: [splunk]
+sourcetypes: ["github:audit"]
+mitre:
+  tactics: ["persistence", "credential-access"]
+  techniques: ["T1098"]
+severity: medium
+false_positives:
+  - "Legitimate token creation by developers and CI maintainers."
+references:
+  - "https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise"
+telemetry_validated: false
+required_fields: ["action", "actor", "created_at"]
+query:
+  splunk: |
+    sourcetype=github:audit
+    (action="oauth_authorization.create" OR action="personal_access_token.create" OR action="oauth_application_authorization.create")
+    | stats count values(actor) as actors values(user) as users values(token_scopes) as scopes by action
+

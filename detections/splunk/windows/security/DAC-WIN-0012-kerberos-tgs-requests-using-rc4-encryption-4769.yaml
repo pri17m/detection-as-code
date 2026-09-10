@@ -1,0 +1,31 @@
+id: DAC-WIN-0012
+title: Registry Run key persistence (Sysmon 13)
+description: Detects registry value sets in common Run/RunOnce persistence keys via Sysmon Event ID 13. Tune allowlists for known software updaters and enterprise tooling.
+author: Threat Detection Engineering
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - windows_sysmon
+mitre:
+  tactics:
+    - persistence
+  techniques:
+    - T1547.001
+severity: medium
+false_positives:
+  - Legitimate software auto-start entries and IT management tooling.
+references:
+  - https://learn.microsoft.com/sysinternals/downloads/sysmon
+telemetry_validated: false
+required_fields:
+  - Image
+  - TargetObject
+  - Details
+query:
+  splunk: |
+    `windows_sysmon` EventCode=13
+    | eval key=lower(TargetObject)
+    | where match(key,"\\\\software\\\\microsoft\\\\windows\\\\currentversion\\\\run(once)?\\\\")
+      OR match(key,"\\\\software\\\\microsoft\\\\windows\\\\currentversion\\\\policies\\\\explorer\\\\run\\\\")
+    | stats count values(Image) as images values(Details) as value_data by host, User, TargetObject

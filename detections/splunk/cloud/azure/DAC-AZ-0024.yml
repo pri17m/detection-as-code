@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1490
+id: DAC-AZ-0024
+status: experimental
+title: 'Azure: Backup vault soft-delete disabled or backup item delete'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName IN ("Microsoft.RecoveryServices/vaults/backupconfig/write","Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems/delete")
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1490/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: backup softDelete / protectedItems delete
+sourcetypes:
+- azure:monitor:activity

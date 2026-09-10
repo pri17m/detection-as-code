@@ -1,0 +1,31 @@
+id: DAC-MDE-0011
+title: Registry Run key created or modified
+description: Detects modifications to common Run key paths on endpoints which can
+  indicate persistence.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1547.001
+severity: medium
+false_positives:
+- Legitimate software startup entries.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceregistryevents-table
+telemetry_validated: false
+required_fields:
+- DeviceName
+- RegistryKey
+- RegistryValueName
+query:
+  defender: "DeviceRegistryEvents\n| where RegistryKey has @\"\\Software\\Microsoft\\\
+    Windows\\CurrentVersion\\Run\"\n    or RegistryKey has @\"\\Software\\Microsoft\\\
+    Windows\\CurrentVersion\\RunOnce\"\n| project Timestamp, DeviceName, AccountName,\
+    \ RegistryKey, RegistryValueName, RegistryValueData, InitiatingProcessFileName,\
+    \ InitiatingProcessCommandLine\n"

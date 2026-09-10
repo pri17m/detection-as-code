@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- protoPayload.methodName
+- protoPayload.authenticationInfo.principalEmail
+- protoPayload.requestMetadata.callerIp
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1555.006
+id: DAC-GCP-0019
+status: experimental
+title: 'GCP: Secret Manager ListSecrets anomalous'
+query:
+  splunk: '(sourcetype=gcp:audit OR sourcetype=google:gcp:cloudaudit:json OR sourcetype=google:gcp:pubsub:message)
+
+    | search protoPayload.methodName="*ListSecrets"
+
+    | table _time, protoPayload.methodName, protoPayload.authenticationInfo.principalEmail, protoPayload.requestMetadata.callerIp,
+    resource.type, severity
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1555/006/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: ListSecrets Experimental Wave C Splunk cloud detection stub.
+sourcetypes:
+- gcp:audit

@@ -1,0 +1,30 @@
+id: DAC-WIN-0088
+title: '[Sigma→Splunk] Mshta remote execution'
+description: 'Sigma-derived detection converted/implemented for Splunk. Source: DAC-SIG-0004.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1218.005
+severity: medium
+false_positives:
+- Tune by allowlisting known admin tooling or software installers.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+telemetry_validated: false
+required_fields:
+- EventCode
+- CommandLine
+- NewProcessName
+query:
+  splunk: "sourcetype=WinEventLog:Security EventCode=4688\n| eval cmd=lower(coalesce(CommandLine,\
+    \ Process_Command_Line, cmdline))\n| where match(cmd,\"mshta\\\\.exe.*(http|https|javascript:|vbscript:)\"\
+    ) \n| stats count values(cmd) as commands by host, SubjectUserName\n"
+sigma:
+  path: /workspace/detections/sigma/DAC-SIG-0004-mshta-remote-execution.yaml

@@ -1,0 +1,43 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search Category="SignInLogs" OR OperationName="Sign-in activity"
+
+    | search Status.errorCode=0
+
+    | search authenticationRequirement="singleFactorAuthentication" OR logonType="nonInteractiveUser"
+    OR isInteractive=false
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0011
+title: 'Entra: Non-interactive or refresh token success from new ASN'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-top5
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1528/
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1528
+author: Detection Engineer
+status: experimental
+description: sign-in nonInteractive / refresh novel ASN

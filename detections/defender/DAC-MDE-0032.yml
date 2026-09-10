@@ -1,0 +1,40 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+title: 'MDE: Office child process PowerShell/cmd/mshta'
+description: tighten starters
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0032
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-MDE-0002
+- parity:DAC-CS-0033
+query:
+  defender: 'DeviceProcessEvents
+
+    | where InitiatingProcessFileName in~ ("WINWORD.EXE","EXCEL.EXE","OUTLOOK.EXE","POWERPNT.EXE")
+
+    | where FileName in~ ("powershell.exe","pwsh.exe","cmd.exe","mshta.exe")
+
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001

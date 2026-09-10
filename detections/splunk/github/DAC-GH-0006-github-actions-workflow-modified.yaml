@@ -1,0 +1,22 @@
+id: DAC-GH-0006
+title: "GitHub: Actions workflow modified"
+description: "Detects modifications to GitHub Actions workflows which can be used to execute malicious code in CI/CD (supply chain risk)."
+author: "DaC"
+status: experimental
+platforms: [splunk]
+sourcetypes: ["github:audit"]
+mitre:
+  tactics: ["execution", "persistence"]
+  techniques: ["T1195"]
+severity: high
+false_positives:
+  - "Normal CI/CD iteration and workflow maintenance."
+references:
+  - "https://docs.github.com/en/actions"
+telemetry_validated: false
+required_fields: ["action", "actor", "repo", "created_at"]
+query:
+  splunk: |
+    sourcetype=github:audit (action="workflows.workflow_file_modified" OR action="repo.actions_workflow_update" OR action="repo.create_workflow" OR action="repo.update_workflow")
+    | stats count values(actor) as actors values(repo) as repos by action
+

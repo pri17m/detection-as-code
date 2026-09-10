@@ -1,0 +1,42 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search Category="SignInLogs" Status.errorCode=0
+
+    | search roles="*Global Administrator*" OR roles="*User Administrator*" OR Level="high"
+
+    | search riskLevelDuringSignIn!="none" OR location.countryOrRegion!=""
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0026
+title: 'Entra: Privileged user successful sign-in from unfamiliar location'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-related
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1078/004/
+mitre:
+  tactics:
+  - initial-access
+  techniques:
+  - T1078.004
+author: Detection Engineer
+status: experimental
+description: sign-in success GA/User Admin novel country

@@ -1,0 +1,41 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action IN ("repo.add_member","member.invite")
+
+    | search permission IN ("write","admin","maintain") OR visibility="outside"
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0023
+title: 'GitHub: Outside collaborator added with write or admin on production repo'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-related
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1199/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1199
+author: Detection Engineer
+status: experimental
+description: repo.add_member outside write/admin

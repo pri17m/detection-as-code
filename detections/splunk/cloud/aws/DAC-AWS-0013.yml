@@ -1,0 +1,39 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - exfiltration
+  techniques:
+  - T1537
+id: DAC-AWS-0013
+status: experimental
+title: 'AWS: S3 PutBucketPolicy or PutBucketAcl granting external account'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("PutBucketPolicy","PutBucketAcl","PutBucketPublicAccessBlock")
+
+    | search requestParameters="*Principal*" OR requestParameters="*AllUsers*" OR requestParameters="*AuthenticatedUsers*"
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1537/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-related
+description: PutBucketPolicy Principal external account
+sourcetypes:
+- aws:cloudtrail

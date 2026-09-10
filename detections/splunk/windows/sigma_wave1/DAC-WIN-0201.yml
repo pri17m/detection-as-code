@@ -1,0 +1,49 @@
+severity: high
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=5136
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/win_security_account_backdoor_dcsync_rights.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_account_backdoor_dcsync_rights.yml
+- https://attack.mitre.org/techniques/T1003/006/
+- https://attack.mitre.org/techniques/T1098/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_security
+- sigma:rules/windows/builtin/security/win_security_account_backdoor_dcsync_rights.yml
+title: Powerview Add-DomainObjectAcl DCSync AD Extend Right
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0201
+description: Backdooring domain object to grant the rights associated with DCSync to a regular user or
+  machine account using Powerview\Add-DomainObjectAcl DCSync Extended Right cmdlet, will allow to re-obtain
+  the pwd hashes of any user/computer
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.006
+  - T1098
+required_fields:
+- EventCode
+false_positives:
+- New Domain Controller computer account, check user SIDs within the value attribute of event 5136 and
+  verify if it's a regular user or DC computer account.
+status: experimental

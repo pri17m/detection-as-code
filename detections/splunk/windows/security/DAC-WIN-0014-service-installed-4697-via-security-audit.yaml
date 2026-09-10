@@ -1,0 +1,35 @@
+id: DAC-WIN-0014
+title: WmiPrvSE / wsmprovhost unusual children (Sysmon 1)
+description: Detects suspicious child processes spawned by WmiPrvSE.exe (WMI) or wsmprovhost.exe (WinRM provider host), common in remote execution and lateral movement. Requires Sysmon ProcessCreate.
+author: Threat Detection Engineering
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - windows_sysmon
+mitre:
+  tactics:
+    - execution
+    - lateral-movement
+  techniques:
+    - T1047
+    - T1021.006
+severity: high
+false_positives:
+  - Legitimate remote administration tooling; tune allowlists for known management servers.
+references:
+  - https://learn.microsoft.com/sysinternals/downloads/sysmon
+telemetry_validated: false
+required_fields:
+  - Image
+  - CommandLine
+  - ParentImage
+  - User
+query:
+  splunk: |
+    `windows_sysmon` EventCode=1
+    | eval parent=lower(ParentImage)
+    | where match(parent,"\\\\wmiprvse\\.exe$|\\\\wsmprovhost\\.exe$")
+    | eval child=lower(Image)
+    | where match(child,"\\\\(powershell|cmd|rundll32|mshta|wscript|cscript|regsvr32)\\.exe$")
+    | stats count values(CommandLine) as command_lines values(ParentCommandLine) as parent_command_lines by host, User, parent, child

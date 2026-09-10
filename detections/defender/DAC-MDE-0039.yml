@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1021/006/
+title: 'MDE: WinRM host unusual children'
+description: wsmprovhost children
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0039
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-CS-0040
+query:
+  defender: 'DeviceProcessEvents
+
+    | where InitiatingProcessFileName in~ ("wsmprovhost.exe","winrshost.exe")
+
+    | where FileName in~ ("cmd.exe","powershell.exe","pwsh.exe")
+
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021.006

@@ -1,0 +1,34 @@
+query:
+  splunk: "sourcetype=azure:monitor:aad\n| search operationName IN (\"Update application \u2013 Certificates\
+    \ and secrets management\",\"Add application password\",\"Update application\")\n| search ActivityDisplayName=\"\
+    *Certificates*\" OR ActivityDisplayName=\"*password*\"\n| table _time, operationName, ActivityDisplayName,\
+    \ initiatedBy, targetResources, Result, ipAddress, userPrincipalName\n"
+id: DAC-ENTRA-0006
+title: 'Entra: Application password or key credential added to privileged app'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-top5
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1098/001/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098.001
+author: Detection Engineer
+status: experimental
+description: Update application / Add app password high-priv app

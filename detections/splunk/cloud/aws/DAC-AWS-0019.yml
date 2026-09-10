@@ -1,0 +1,41 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1555.006
+id: DAC-AWS-0019
+status: experimental
+title: 'AWS: Secrets Manager GetSecretValue high volume by one principal'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("GetSecretValue","BatchGetSecretValue","ListSecrets")
+
+    | stats count by userIdentity.arn
+
+    | where count>20
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1555/006/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-related
+description: GetSecretValue burst
+sourcetypes:
+- aws:cloudtrail

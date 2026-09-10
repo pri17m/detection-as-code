@@ -1,0 +1,41 @@
+id: DAC-WIN-0073
+title: WMI activity indicates remote process execution (WMI-Activity)
+description: Detects WMI activity events that can indicate remote execution or persistence
+  via WMI.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog
+- WinEventLog
+mitre:
+  tactics:
+  - execution
+  - persistence
+  techniques:
+  - T1047
+severity: medium
+false_positives:
+- Legitimate WMI usage by monitoring and management systems.
+references:
+- https://learn.microsoft.com/windows/win32/wmisdk/wmi-start-page
+telemetry_validated: false
+required_fields:
+- EventCode
+- Operation
+- ClientMachine
+- host
+query:
+  splunk: '(sourcetype=XmlWinEventLog OR sourcetype=WinEventLog) source="*Microsoft-Windows-WMI-Activity/Operational"
+    (EventCode=5857 OR EventCode=5858 OR EventCode=5859 OR EventCode=5860 OR EventCode=5861)
+
+    | eval op=lower(coalesce(Operation, Message))
+
+    | eval client=coalesce(ClientMachine, ClientMachineName, src, src_host)
+
+    | where isnotnull(client)
+
+    | stats count values(op) as operations by host, client, UserId
+
+    '

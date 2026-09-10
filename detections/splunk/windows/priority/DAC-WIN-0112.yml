@@ -1,0 +1,57 @@
+id: DAC-WIN-0112
+title: Tier-0 account first-seen host / odd LogonType
+description: '4624 Tier-0 first-seen host or odd LogonType | checklist: macros only;
+  no index=; EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary
+  required before telemetry_validated=true; FP baseline pending org allowlists'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Initial Access
+  techniques:
+  - T1078.002
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- EventCode
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+- SubjectUserName
+- PrivilegeList
+telemetry_validated: false
+false_positives:
+- New admin workstations
+- break-glass
+references:
+- https://attack.mitre.org/techniques/T1078/002/
+tags:
+- P0
+- category:logon
+- hardened-v1
+- logon
+- phase1
+- remapped_from:DAC-WIN-0013
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security` EventCode=4624
+
+    | eval TargetUserName=coalesce(TargetUserName, Account_Name, user)
+
+    | eval IpAddress=coalesce(IpAddress, src, src_ip)
+
+    | eval WorkstationName=coalesce(WorkstationName, Workstation_Name, src_nt_host)
+
+    | table _time host TargetUserName LogonType IpAddress WorkstationName
+
+    | `comment("PRODUCTION: join Tier-0 identity allowlist / first-seen host baseline
+    KV before enabling")`
+
+    '

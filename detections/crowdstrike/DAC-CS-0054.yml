@@ -1,0 +1,32 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1098/
+title: 'Falcon: net localgroup administrators add'
+description: net localgroup administrators /add
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0054
+status: experimental
+tags:
+- wave-a
+- P0
+query:
+  crowdstrike: 'ImageFileName="net.exe" AND CommandLine CONTAINS "localgroup" AND CommandLine CONTAINS
+    "administrators" AND CommandLine CONTAINS "/add"
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098

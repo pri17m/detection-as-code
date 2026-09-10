@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+title: 'MDE: comsvcs MiniDump via rundll32'
+description: DeviceProcessEvents CommandLine
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0014
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-CS-0014
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName =~ "rundll32.exe"
+
+    | where ProcessCommandLine has_any ("comsvcs","MiniDump","minidump")
+
+    | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.001

@@ -1,0 +1,41 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - initial-access
+  techniques:
+  - T1078.004
+id: DAC-AZ-0028
+status: experimental
+title: 'Azure: Privileged activity from new IP for Owner principal'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search category="Administrative"
+
+    | stats dc(callerIpAddress) as ips values(operationName) as ops by caller
+
+    | where ips>3
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1078/004/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-related
+description: callerIpAddress novelty + write ops
+sourcetypes:
+- azure:monitor:activity

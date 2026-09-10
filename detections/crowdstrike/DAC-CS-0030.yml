@@ -1,0 +1,35 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1197/
+title: 'Falcon: BITS job persistence create'
+description: bitsadmin /SetNotifyCmdLine
+severity: medium
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0030
+status: experimental
+tags:
+- wave-a
+- P1
+query:
+  crowdstrike: '# Experimental Custom IOA sketch for Falcon: BITS job persistence create
+
+    CommandLine="*"
+
+    # TODO: refine with Falcon event fields after Telemetry map
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1197

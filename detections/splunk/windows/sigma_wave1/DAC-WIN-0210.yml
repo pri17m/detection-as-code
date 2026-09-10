@@ -1,0 +1,54 @@
+severity: high
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=4697
+
+    | search ServiceName="PSEXESVC"
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/win_security_metasploit_or_impacket_smb_psexec_service_install.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_metasploit_or_impacket_smb_psexec_service_install.yml
+- https://attack.mitre.org/techniques/T1021/002/
+- https://attack.mitre.org/techniques/T1543/003/
+- https://attack.mitre.org/techniques/T1570/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_security
+- sigma:rules/windows/builtin/security/win_security_metasploit_or_impacket_smb_psexec_service_install.yml
+title: Metasploit Or Impacket Service Installation Via SMB PsExec
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0210
+description: Detects usage of Metasploit SMB PsExec (exploit/windows/smb/psexec) and Impacket psexec.py
+  by triggering on specific service installation
+mitre:
+  tactics:
+  - lateral-movement
+  - persistence
+  techniques:
+  - T1021.002
+  - T1543.003
+  - T1570
+  - T1569.002
+required_fields:
+- EventCode
+- ServiceName
+false_positives:
+- Possible, different agents with a 8 character binary and a 4, 8 or 16 character service name
+status: experimental

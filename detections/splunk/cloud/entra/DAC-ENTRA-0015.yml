@@ -1,0 +1,38 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName IN ("Delete diagnostic setting","Update diagnostic setting","Disable AzureAD
+    audit logs") OR ActivityDisplayName="*diagnostic*"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0015
+title: 'Entra: Directory audit log retention or export weakened'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1685/002/
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685.002
+author: Detection Engineer
+status: experimental
+description: audit retention / streaming sink remove

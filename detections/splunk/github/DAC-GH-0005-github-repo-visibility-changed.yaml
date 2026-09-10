@@ -1,0 +1,23 @@
+id: DAC-GH-0005
+title: "GitHub: Repository visibility changed"
+description: "Detects repository visibility changes (e.g., private → public) which can indicate accidental exposure or malicious intent."
+author: "DaC"
+status: experimental
+platforms: [splunk]
+sourcetypes: ["github:audit"]
+mitre:
+  tactics: ["exfiltration"]
+  techniques: ["T1567.002"]
+severity: high
+false_positives:
+  - "Intentional open-sourcing or repo policy changes."
+references:
+  - "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility"
+telemetry_validated: false
+required_fields: ["action", "actor", "repo", "created_at"]
+query:
+  splunk: |
+    sourcetype=github:audit (action="repo.change_visibility" OR action="repository.change_visibility")
+    | eval new_visibility=coalesce(visibility, new_visibility, repo_visibility)
+    | stats count values(actor) as actors values(repo) as repos values(new_visibility) as new_visibility by action
+

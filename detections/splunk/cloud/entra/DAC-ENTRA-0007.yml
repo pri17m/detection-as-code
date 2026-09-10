@@ -1,0 +1,40 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName="Add service principal credentials"
+
+    | # Join to subsequent non-interactive sign-in by appId within short window (tenant-tune)
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0007
+title: 'Entra: New credential on SP then token use from new IP'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-top5
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1098/001/
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1098.001
+author: Detection Engineer
+status: experimental
+description: "credential add \u2192 non-interactive sign-in novel IP"

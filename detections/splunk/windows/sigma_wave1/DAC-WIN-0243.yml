@@ -1,0 +1,52 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=10
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/process_access/proc_access_win_lsass_dump_comsvcs_dll.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_access/proc_access_win_lsass_dump_comsvcs_dll.yml
+- https://attack.mitre.org/techniques/T1003/001/
+- https://attack.mitre.org/techniques/T1574/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/process_access/proc_access_win_lsass_dump_comsvcs_dll.yml
+title: Lsass Memory Dump via Comsvcs DLL
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0243
+description: Detects adversaries leveraging the MiniDump export function from comsvcs.dll via rundll32
+  to perform a memory dump from lsass.
+mitre:
+  tactics:
+  - credential-access
+  - persistence
+  techniques:
+  - T1003.001
+  - T1574.001
+required_fields:
+- EventCode
+- SourceImage
+- TargetImage
+- GrantedAccess
+false_positives:
+- Unknown
+status: experimental

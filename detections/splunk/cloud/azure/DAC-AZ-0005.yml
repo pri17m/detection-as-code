@@ -1,0 +1,38 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685.002
+id: DAC-AZ-0005
+status: experimental
+title: 'Azure: Activity log export or Log Analytics linked storage removed'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName IN ("Microsoft.Insights/diagnosticSettings/delete","microsoft.insights/diagnosticSettings/write")
+
+    | search status="Succeeded" OR activityStatusValue="Success"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1685/002/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: diagnosticSettings / logprofiles delete
+sourcetypes:
+- azure:monitor:activity

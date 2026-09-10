@@ -1,0 +1,37 @@
+id: DAC-WIN-0020
+title: Scheduled task created (4698) with suspicious command
+description: Detects creation of scheduled tasks where task actions include suspicious
+  LOLBins or PowerShell.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1053.005
+severity: high
+false_positives:
+- Legitimate software updaters or admin automation.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4698
+telemetry_validated: false
+required_fields:
+- EventCode
+- TaskName
+- TaskContent
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4698
+
+    | eval task=coalesce(TaskName, Task_Name)
+
+    | eval content=coalesce(TaskContent, Message, task_content)
+
+    | where match(lower(content), "(powershell|cmd\\.exe|wscript|cscript|mshta|rundll32|regsvr32|bitsadmin|certutil)")
+
+    | stats count values(task) as tasks by host, SubjectUserName
+
+    '

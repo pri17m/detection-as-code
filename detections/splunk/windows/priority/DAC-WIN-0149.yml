@@ -1,0 +1,47 @@
+id: DAC-WIN-0149
+title: Certutil download or decode
+description: Sysmon 1 certutil -urlcache/-decode
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1140
+  - T1105
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+telemetry_validated: false
+false_positives:
+- PKI admin
+references:
+- https://attack.mitre.org/techniques/T1140/
+- https://attack.mitre.org/techniques/T1105/
+tags:
+- P1
+- category:process
+- phase1
+- process
+- remapped_from:DAC-WIN-0050
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | table _time host
+
+    '

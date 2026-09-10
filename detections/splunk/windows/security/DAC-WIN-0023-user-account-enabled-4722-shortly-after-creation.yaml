@@ -1,0 +1,35 @@
+id: DAC-WIN-0023
+title: User account enabled (4722) shortly after creation
+description: Detects user enablement events; attackers may create then enable accounts
+  during compromise.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098
+severity: medium
+false_positives:
+- Normal provisioning workflows.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4722
+telemetry_validated: false
+required_fields:
+- EventCode
+- TargetUserName
+- SubjectUserName
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4722
+
+    | eval target=coalesce(TargetUserName, user)
+
+    | eval actor=coalesce(SubjectUserName, src_user)
+
+    | stats count values(target) as enabled_users by actor, host
+
+    '

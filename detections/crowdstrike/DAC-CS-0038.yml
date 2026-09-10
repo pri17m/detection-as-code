@@ -1,0 +1,32 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1047/
+title: 'Falcon: wmic process call create'
+description: wmic process call
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0038
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0113
+query:
+  crowdstrike: 'ImageFileName="wmic.exe" AND CommandLine CONTAINS "process call create"
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1047

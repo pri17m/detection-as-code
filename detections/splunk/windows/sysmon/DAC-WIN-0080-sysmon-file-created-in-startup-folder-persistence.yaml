@@ -1,0 +1,39 @@
+id: DAC-WIN-0080
+title: 'Sysmon: File created in Startup folder (persistence)'
+description: Detects creation of executable/script content in Startup folders which
+  is a common persistence technique.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1547.001
+severity: high
+false_positives:
+- Legitimate software adding startup entries; tune by publisher/path allowlists.
+references:
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+telemetry_validated: false
+required_fields:
+- EventCode
+- TargetFilename
+- Image
+- host
+query:
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=11
+
+    | eval file=lower(coalesce(TargetFilename))
+
+    | eval img=lower(coalesce(Image))
+
+    | where match(file,"\\\\(programdata|users)\\\\.*\\\\start menu\\\\programs\\\\startup\\\\")
+    AND match(file,"\\.(exe|dll|ps1|vbs|js|lnk|bat|cmd)$")
+
+    | stats count values(file) as files values(img) as images by host, User
+
+    '

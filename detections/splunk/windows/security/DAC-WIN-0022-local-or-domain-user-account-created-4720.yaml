@@ -1,0 +1,35 @@
+id: DAC-WIN-0022
+title: Local or domain user account created (4720)
+description: Detects creation of a new user account; attackers often create accounts
+  for persistence.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1136
+severity: high
+false_positives:
+- Standard IT provisioning.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4720
+telemetry_validated: false
+required_fields:
+- EventCode
+- TargetUserName
+- SubjectUserName
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4720
+
+    | eval new_user=coalesce(TargetUserName, user)
+
+    | eval actor=coalesce(SubjectUserName, src_user)
+
+    | stats count values(new_user) as created_users by actor, host
+
+    '

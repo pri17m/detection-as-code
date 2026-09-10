@@ -1,0 +1,41 @@
+id: DAC-WIN-0142
+title: Event log cleared (1102)
+description: Security 1102
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1562.001
+  - T1070.001
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- SubjectUserName
+- SubjectDomainName
+telemetry_validated: false
+false_positives:
+- Rare log rotation
+references:
+- https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/techniques/T1070/001/
+tags:
+- P1
+- category:defense-evasion
+- defense-evasion
+- phase1
+- remapped_from:DAC-WIN-0043
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security`
+
+    | table _time host
+
+    '

@@ -1,0 +1,41 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search Category="SignInLogs" Status.errorCode=0
+
+    | stats dc(location.countryOrRegion) as countries by userPrincipalName, sessionId
+
+    | where countries>=2
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0013
+title: 'Entra: Same session or token family used from multiple geos'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1550/001/
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1550.001
+author: Detection Engineer
+status: experimental
+description: impossible travel on refresh/CAE

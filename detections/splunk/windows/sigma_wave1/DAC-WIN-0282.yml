@@ -1,0 +1,48 @@
+severity: high
+query:
+  splunk: '(sourcetype=XmlWinEventLog:System OR sourcetype=WinEventLog:System) EventCode=104
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/system/microsoft_windows_eventlog/win_system_susp_eventlog_cleared.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/system/microsoft_windows_eventlog/win_system_susp_eventlog_cleared.yml
+- https://attack.mitre.org/techniques/T1070/001/
+- https://attack.mitre.org/techniques/T1685/005/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_system
+- sigma:rules/windows/builtin/system/microsoft_windows_eventlog/win_system_susp_eventlog_cleared.yml
+title: Important Windows Eventlog Cleared
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:System
+- XmlWinEventLog:System
+id: DAC-WIN-0282
+description: Detects the clearing of one of the Windows Core Eventlogs. e.g. caused by "wevtutil cl" command
+  execution
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1070.001
+  - T1685.005
+required_fields:
+- EventCode
+false_positives:
+- Rollout of log collection agents (the setup routine often includes a reset of the local Eventlog)
+- System provisioning (system reset before the golden image creation)
+status: experimental

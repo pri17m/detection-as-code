@@ -1,0 +1,39 @@
+id: DAC-WIN-0189
+title: CMSTP / InstallUtil / Regasm LOLBin execution
+description: Sysmon 1 cmstp/installutil/regasm uncommon
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1218.003
+  - T1218.004
+severity: medium
+false_positives:
+- Software installs
+references:
+- https://attack.mitre.org/techniques/T1218/003/
+- https://attack.mitre.org/techniques/T1218/004/
+telemetry_validated: false
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- defense-evasion

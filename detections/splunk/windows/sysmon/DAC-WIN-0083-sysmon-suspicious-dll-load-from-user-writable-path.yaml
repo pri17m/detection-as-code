@@ -1,0 +1,41 @@
+id: DAC-WIN-0083
+title: 'Sysmon: Suspicious DLL load from user-writable path'
+description: Detects DLL loads from user-writable paths (Temp/AppData) which can indicate
+  DLL search order hijacking or sideloading.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - persistence
+  - defense-evasion
+  techniques:
+  - T1574.002
+severity: medium
+false_positives:
+- Some applications legitimately load plugins from user directories; tune by signer
+  and process allowlists.
+references:
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+telemetry_validated: false
+required_fields:
+- EventCode
+- ImageLoaded
+- Image
+- host
+query:
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=7
+
+    | eval loaded=lower(coalesce(ImageLoaded))
+
+    | eval img=lower(coalesce(Image))
+
+    | where match(loaded,"\\\\(users|programdata)\\\\.*\\\\(temp|appdata)\\\\") AND
+    match(loaded,"\\.dll$")
+
+    | stats count values(loaded) as loaded_dlls values(img) as images by host, User
+
+    '

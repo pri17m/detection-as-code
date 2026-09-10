@@ -1,0 +1,43 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName="Add member to role completed (PIM activation)" OR ActivityDisplayName="*PIM*"
+    OR Operation="Activate role"
+
+    | eval hour=strftime(_time,"%H")
+
+    | where hour<"08" OR hour>"19"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0002
+title: 'Entra: PIM privileged role activation outside change window'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-top5
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1098/003/
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1098.003
+author: Detection Engineer
+status: experimental
+description: PIM role activation after hours / no ticket

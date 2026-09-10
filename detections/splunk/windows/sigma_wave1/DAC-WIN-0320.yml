@@ -1,0 +1,44 @@
+title: System File Execution Location Anomaly
+platforms:
+- splunk
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=1
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | table _time host EventCode user process
+
+    | `comment("sigma-wave1b from rules/windows/process_creation/proc_creation_win_susp_system_exe_anomaly.yml")`
+
+    '
+tags:
+- sigma-wave1b
+- P1
+- windows_sysmon
+- sigma:rules/windows/process_creation/proc_creation_win_susp_system_exe_anomaly.yml
+- validation-pending
+required_fields:
+- EventCode
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1036
+id: DAC-WIN-0320
+status: experimental
+description: Detects the execution of a Windows system binary that is usually located in the system folder
+  from an uncommon location.
+false_positives:
+- Unknown
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_system_exe_anomaly.yml
+- https://attack.mitre.org/techniques/T1036/
+author: Detection Engineer
+severity: high
+telemetry_validated: false

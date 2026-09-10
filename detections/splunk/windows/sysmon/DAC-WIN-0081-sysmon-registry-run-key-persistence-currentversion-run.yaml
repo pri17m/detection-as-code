@@ -1,0 +1,39 @@
+id: DAC-WIN-0081
+title: 'Sysmon: Registry Run key persistence (CurrentVersion\\Run)'
+description: Detects registry value sets in Run/RunOnce keys which can indicate persistence.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1547.001
+severity: high
+false_positives:
+- Legitimate software auto-start entries; tune by key/value allowlists.
+references:
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+telemetry_validated: false
+required_fields:
+- EventCode
+- TargetObject
+- Details
+- Image
+- host
+query:
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=13
+
+    | eval obj=lower(coalesce(TargetObject))
+
+    | eval img=lower(coalesce(Image))
+
+    | where match(obj,"\\\\software\\\\microsoft\\\\windows\\\\currentversion\\\\run(once)?\\\\")
+
+    | stats count values(obj) as registry_paths values(Details) as details values(img)
+    as images by host, User
+
+    '

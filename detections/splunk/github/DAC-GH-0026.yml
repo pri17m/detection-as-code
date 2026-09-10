@@ -1,0 +1,39 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action IN ("public_key.create","user.add_public_key")
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0026
+title: 'GitHub: SSH key added to privileged org member account'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P1
+- parity:T1078
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1098/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098
+author: Detection Engineer
+status: experimental
+description: public_key.create for admin members

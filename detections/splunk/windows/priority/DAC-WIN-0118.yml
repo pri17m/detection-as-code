@@ -1,0 +1,45 @@
+id: DAC-WIN-0118
+title: Explicit credentials (4648) to remote host
+description: Security 4648 remote TargetServerName
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - Lateral Movement
+  techniques:
+  - T1021.002
+  - T1550.002
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- SubjectUserName
+- SubjectDomainName
+- TargetUserName
+- TargetDomainName
+- TargetServerName
+- ProcessName
+telemetry_validated: false
+false_positives:
+- Scheduled tasks/runas
+references:
+- https://attack.mitre.org/techniques/T1021/002/
+- https://attack.mitre.org/techniques/T1550/002/
+tags:
+- P0
+- category:logon
+- logon
+- phase1
+- remapped_from:DAC-WIN-0019
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security`
+
+    | table _time host
+
+    '

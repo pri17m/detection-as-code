@@ -1,0 +1,45 @@
+id: DAC-WIN-0155
+title: PowerShell DownloadString / IEX cradle (4104)
+description: 4104 DownloadString/IEX/WebClient
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Execution
+  techniques:
+  - T1059.001
+  - T1105
+sourcetypes:
+- WinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+required_fields:
+- ScriptBlockText
+- ScriptBlockId
+- Path
+- MessageNumber
+- MessageTotal
+- SubjectUserName
+telemetry_validated: false
+false_positives:
+- Admin bootstrap
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1105/
+tags:
+- P1
+- category:process
+- phase1
+- process
+- remapped_from:DAC-WIN-0056
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational)
+    `windows_powershell_operational`
+
+    | table _time host
+
+    '

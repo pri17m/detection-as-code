@@ -1,0 +1,39 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- protoPayload.methodName
+- protoPayload.authenticationInfo.principalEmail
+- protoPayload.requestMetadata.callerIp
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1548.005
+id: DAC-GCP-0040
+status: experimental
+title: 'GCP: TokenCreator role granted on sensitive SA'
+query:
+  splunk: '(sourcetype=gcp:audit OR sourcetype=google:gcp:cloudaudit:json OR sourcetype=google:gcp:pubsub:message)
+
+    | search protoPayload.methodName="*SetIamPolicy"
+
+    | search text="*roles/iam.serviceAccountTokenCreator*"
+
+    | table _time, protoPayload.methodName, protoPayload.authenticationInfo.principalEmail, protoPayload.requestMetadata.callerIp,
+    resource.type, severity
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1548/005/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-top5
+description: roles/iam.serviceAccountTokenCreator binding
+sourcetypes:
+- gcp:audit

@@ -1,0 +1,45 @@
+title: CurrentVersion Autorun Keys Modification
+platforms:
+- splunk
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=13
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | table _time host EventCode user process
+
+    | `comment("sigma-wave1b from rules/windows/registry/registry_set/registry_set_asep_reg_keys_modification_currentversion.yml")`
+
+    '
+tags:
+- sigma-wave1b
+- P1
+- windows_sysmon
+- sigma:rules/windows/registry/registry_set/registry_set_asep_reg_keys_modification_currentversion.yml
+- validation-pending
+required_fields:
+- EventCode
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1547.001
+id: DAC-WIN-0328
+status: experimental
+description: Detects modification of autostart extensibility point (ASEP) in registry.
+false_positives:
+- Legitimate software automatically (mostly, during installation) sets up autorun keys for legitimate
+  reason
+- Legitimate administrator sets up autorun keys for legitimate reason
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_asep_reg_keys_modification_currentversion.yml
+- https://attack.mitre.org/techniques/T1547/001/
+author: Detection Engineer
+severity: medium
+telemetry_validated: false

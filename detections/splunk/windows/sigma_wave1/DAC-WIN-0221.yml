@@ -1,0 +1,50 @@
+severity: medium
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=7
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/image_load/image_load_lsass_unsigned_image_load.yml; fieldsummary
+    before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/image_load/image_load_lsass_unsigned_image_load.yml
+- https://attack.mitre.org/techniques/T1003/001/
+- https://attack.mitre.org/techniques/T1574/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/image_load/image_load_lsass_unsigned_image_load.yml
+title: Unsigned Image Loaded Into LSASS Process
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0221
+description: Loading unsigned image (DLL, EXE) into LSASS process
+mitre:
+  tactics:
+  - credential-access
+  - persistence
+  techniques:
+  - T1003.001
+  - T1574
+required_fields:
+- EventCode
+- Image
+- ImageLoaded
+false_positives:
+- Valid user connecting using RDP
+status: experimental

@@ -1,0 +1,39 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName IN ("Register device","Device registered to user","Join device") OR ActivityDisplayName="*Register
+    device*"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0029
+title: 'Entra: Device registration for privileged user from unusual location'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P1
+- phase2-related
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1098/005/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098.005
+author: Detection Engineer
+status: experimental
+description: Register device / Join device privileged UPN

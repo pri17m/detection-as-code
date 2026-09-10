@@ -1,0 +1,8 @@
+# Example org overrides — index macros ONLY
+# Shared detection rules must NEVER hardcode index=; they may reference these macros.
+
+macros:
+  windows_security_index: "index=wineventlog"
+  windows_system_index: "index=wineventlog"
+  windows_powershell_index: "index=wineventlog"
+  windows_sysmon_index: "index=sysmon"

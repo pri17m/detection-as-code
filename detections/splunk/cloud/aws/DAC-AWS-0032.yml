@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098.003
+id: DAC-AWS-0032
+status: experimental
+title: 'AWS: EKS UpdateClusterConfig or aws-auth ConfigMap change via API'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("UpdateClusterConfig","CreateAccessEntry","AssociateAccessPolicy") eventSource="eks.amazonaws.com"
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1098/003/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: UpdateClusterConfig access
+sourcetypes:
+- aws:cloudtrail

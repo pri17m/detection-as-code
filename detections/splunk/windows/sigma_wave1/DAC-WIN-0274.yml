@@ -1,0 +1,47 @@
+severity: high
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=4719
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/win_security_disable_event_auditing_critical.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_disable_event_auditing_critical.yml
+- https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/techniques/T1685/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_security
+- sigma:rules/windows/builtin/security/win_security_disable_event_auditing_critical.yml
+title: Important Windows Event Auditing Disabled
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0274
+description: Detects scenarios where system auditing for important events such as "Process Creation" or
+  "Logon" events is disabled.
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.001
+  - T1685.001
+required_fields:
+- EventCode
+false_positives:
+- Unlikely
+status: experimental

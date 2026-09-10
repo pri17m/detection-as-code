@@ -1,0 +1,41 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action IN ("oauth_authorization.create","org.oauth_app.*") OR action="oauth_authorization.create"
+
+    | search scopes="*repo*" OR scopes="*admin:org*" OR permission="*admin*"
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0007
+title: 'GitHub: OAuth App authorized with broad repo or admin:org scopes'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-top5
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1671/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1671
+author: Detection Engineer
+status: experimental
+description: org audit oauth_authorization.create high scopes

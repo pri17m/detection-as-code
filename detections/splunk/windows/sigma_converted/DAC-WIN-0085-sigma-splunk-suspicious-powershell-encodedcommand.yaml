@@ -1,0 +1,36 @@
+id: DAC-WIN-0085
+title: '[Sigma→Splunk] Suspicious PowerShell EncodedCommand'
+description: 'Sigma-derived detection converted/implemented for Splunk. Source: DAC-SIG-0001.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+severity: medium
+false_positives:
+- Tune by allowlisting known admin tooling or software installers.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+telemetry_validated: false
+required_fields:
+- EventCode
+- CommandLine
+- NewProcessName
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4688
+
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+
+    | where match(cmd,"(powershell\\.exe|pwsh\\.exe).*(-enc|-encodedcommand)\\s+[a-za-z0-9+/=]{50,}")
+
+    | stats count values(cmd) as commands by host, SubjectUserName
+
+    '
+sigma:
+  path: /workspace/detections/sigma/DAC-SIG-0001-suspicious-powershell-encodedcommand.yaml

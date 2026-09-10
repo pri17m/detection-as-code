@@ -1,0 +1,49 @@
+title: Potential AMSI COM Server Hijacking
+platforms:
+- splunk
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=13
+
+    | search Details="%windir%\system32\amsi.dll"
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | table _time host EventCode user process
+
+    | `comment("sigma-wave1b from rules/windows/registry/registry_set/registry_set_amsi_com_hijack.yml")`
+
+    '
+tags:
+- sigma-wave1b
+- P1
+- windows_sysmon
+- sigma:rules/windows/registry/registry_set/registry_set_amsi_com_hijack.yml
+- validation-pending
+required_fields:
+- EventCode
+- Details
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685
+id: DAC-WIN-0323
+status: experimental
+description: Detects changes to the AMSI come server registry key in order disable AMSI scanning functionalities.
+  When AMSI attempts to starts its COM component, it will query its registered CLSID and return a non-existent
+  COM server. This causes a load failure and prevents any scanning methods from being accessed, ultimately
+  rendering AMSI useless
+false_positives:
+- Unknown
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_amsi_com_hijack.yml
+- https://attack.mitre.org/techniques/T1685/
+author: Detection Engineer
+severity: high
+telemetry_validated: false

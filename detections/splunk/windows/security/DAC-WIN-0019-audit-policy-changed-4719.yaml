@@ -1,0 +1,33 @@
+id: DAC-WIN-0019
+title: Audit policy changed (4719)
+description: Detects changes to local audit policy (4719), which can be used to impair
+  logging and evade detection.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.002
+severity: high
+false_positives:
+- Planned policy changes via GPO or security tooling.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4719
+telemetry_validated: false
+required_fields:
+- EventCode
+- SubjectUserName
+- host
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4719
+
+    | eval user=coalesce(SubjectUserName, user, Account_Name)
+
+    | stats count values(AuditPolicyChanges) as changes by user, host
+
+    '

@@ -1,0 +1,30 @@
+id: DAC-CS-0007
+title: 'Falcon: sc.exe service creation'
+description: Starter Falcon IOA/correlation rule candidate.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - execution
+  - defense-evasion
+  techniques:
+  - T1543.003
+severity: medium
+false_positives:
+- Tune to your environment and allowlist known tooling.
+references:
+- https://www.crowdstrike.com/
+telemetry_validated: false
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+query:
+  crowdstrike: 'falcon_ioa_pattern: ImageFileName="sc.exe" AND CommandLine CONTAINS
+    "create"
+
+    '

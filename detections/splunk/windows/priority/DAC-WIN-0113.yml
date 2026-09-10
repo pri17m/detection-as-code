@@ -1,0 +1,66 @@
+id: DAC-WIN-0113
+title: WmiPrvSE / wsmprovhost unusual children
+description: 'Sysmon 1 Parent WmiPrvSE/wsmprovhost to cmd/powershell/LOLBins | checklist:
+  macros only; no index=; EventCode on allowlisted channel; coalesce classic/XML aliases;
+  fieldsummary required before telemetry_validated=true; FP baseline pending org allowlists'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Execution
+  techniques:
+  - T1047
+  - T1021.006
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+telemetry_validated: false
+false_positives:
+- SCCM/remote management
+references:
+- https://attack.mitre.org/techniques/T1047/
+- https://attack.mitre.org/techniques/T1021/006/
+tags:
+- P0
+- category:process
+- hardened-v1
+- phase1
+- process
+- remapped_from:DAC-WIN-0014
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon` EventCode=1
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName, parent_process)
+
+    | eval Image=coalesce(Image, NewProcessName, process)
+
+    | eval CommandLine=coalesce(CommandLine, process_command_line, cmdline)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search ParentImage="*\\WmiPrvSE.exe" OR ParentImage="*\\wsmprovhost.exe" OR
+    ParentImage="*\\winrshost.exe"
+
+    | search Image="*\\cmd.exe" OR Image="*\\powershell.exe" OR Image="*\\pwsh.exe"
+    OR Image="*\\certutil.exe" OR Image="*\\mshta.exe" OR Image="*\\rundll32.exe"
+    OR Image="*\\bitsadmin.exe"
+
+    | table _time host ParentImage Image CommandLine User
+
+    '

@@ -1,0 +1,41 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action="workflows.update"
+
+    | search data.diff="*@v*" OR data.diff="*@main*" OR data.diff="*@master*"
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0032
+title: 'GitHub: New third-party Action introduced without SHA pin'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: medium
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P1
+- phase2-related
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1195/001/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1195.001
+author: Detection Engineer
+status: experimental
+description: workflow uses new marketplace action @tag

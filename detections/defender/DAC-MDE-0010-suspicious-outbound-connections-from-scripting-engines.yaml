@@ -1,0 +1,35 @@
+id: DAC-MDE-0010
+title: Suspicious outbound connections from scripting engines
+description: Detects endpoints making outbound connections from scripting engines
+  and common LOLBins; useful for staging/exfil triage.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1105
+severity: medium
+false_positives:
+- Browsers and legitimate updaters; tune by process allowlist.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-devicenetworkevents-table
+telemetry_validated: false
+required_fields:
+- DeviceName
+- InitiatingProcessFileName
+- RemoteUrl
+- RemoteIP
+query:
+  defender: 'DeviceNetworkEvents
+
+    | where InitiatingProcessFileName in~ ("powershell.exe","pwsh.exe","mshta.exe","rundll32.exe","regsvr32.exe","wscript.exe","cscript.exe")
+
+    | project Timestamp, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName,
+    InitiatingProcessCommandLine, RemoteUrl, RemoteIP, RemotePort
+
+    '

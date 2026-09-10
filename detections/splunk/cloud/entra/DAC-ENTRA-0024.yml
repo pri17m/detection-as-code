@@ -1,0 +1,38 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName="*Password Hash Sync*" OR ActivityDisplayName="*Pass-through*" OR ResultReason="*PTA*"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0024
+title: 'Entra: PHS or PTA authentication method feature flipped'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-next
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1556/007/
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1556.007
+author: Detection Engineer
+status: experimental
+description: Password hash sync / PTA enable-disable unexpected

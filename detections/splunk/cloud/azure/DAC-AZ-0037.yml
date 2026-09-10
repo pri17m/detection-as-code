@@ -1,0 +1,40 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1485
+id: DAC-AZ-0037
+status: experimental
+title: 'Azure: Mass resource delete after role grant'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="*/delete" category="Administrative"
+
+    | stats count by caller, bin(_time,15m)
+
+    | where count>20
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1485/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: "roleAssignments \u2192 delete spike"
+sourcetypes:
+- azure:monitor:activity

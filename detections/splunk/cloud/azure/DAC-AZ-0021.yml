@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1078.004
+id: DAC-AZ-0021
+status: experimental
+title: 'Azure: AKS cluster admin credential list or kubeconfig pull'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName IN ("Microsoft.ContainerService/managedClusters/listClusterAdminCredential/action","Microsoft.ContainerService/managedClusters/listClusterUserCredential/action")
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1078/004/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: listClusterAdminCredential
+sourcetypes:
+- azure:monitor:activity

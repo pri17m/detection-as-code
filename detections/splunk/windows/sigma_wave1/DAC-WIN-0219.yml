@@ -1,0 +1,49 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=11
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/file/file_event/file_event_win_lsass_shtinkering.yml; fieldsummary
+    before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/file/file_event/file_event_win_lsass_shtinkering.yml
+- https://attack.mitre.org/techniques/T1003/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/file/file_event/file_event_win_lsass_shtinkering.yml
+title: LSASS Process Dump Artefact In CrashDumps Folder
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0219
+description: Detects the presence of an LSASS dump file in the "CrashDumps" folder. This could be a sign
+  of LSASS credential dumping. Techniques such as the LSASS Shtinkering have been seen abusing the Windows
+  Error Reporting to dump said process.
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.001
+required_fields:
+- EventCode
+- Image
+- TargetFilename
+false_positives:
+- Rare legitimate dump of the process by the operating system due to a crash of lsass
+status: experimental

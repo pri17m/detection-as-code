@@ -1,0 +1,32 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1036/005/
+title: 'Falcon: masquerading svchost outside System32'
+description: svchost path anomaly
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0061
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0169
+query:
+  crowdstrike: 'ImageFileName="svchost.exe" AND ImageFilePath NOT CONTAINS "\\Windows\\System32\\"
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1036.005

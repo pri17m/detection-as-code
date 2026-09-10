@@ -1,0 +1,35 @@
+id: DAC-MDE-0008
+title: Rundll32 suspicious execution (signed proxy)
+description: Detects rundll32 with suspicious arguments such as javascript/vbscript
+  or DLL entrypoint patterns.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218.011
+severity: medium
+false_positives:
+- Some control panel applets; tune by allowlists.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table
+telemetry_validated: false
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName =~ "rundll32.exe"
+
+    | where ProcessCommandLine has_any ("javascript:","vbscript:",".dll,", "comsvcs.dll")
+
+    | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+
+    '

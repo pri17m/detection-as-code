@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1651
+id: DAC-AWS-0022
+status: experimental
+title: 'AWS: EC2 Instance Connect or serial console session'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("SendSSHPublicKey","SendSerialConsoleSSHPublicKey") OR eventName="*Serial*"
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: medium
+references:
+- https://attack.mitre.org/techniques/T1651/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: SendSSHPublicKey / serial-console
+sourcetypes:
+- aws:cloudtrail
