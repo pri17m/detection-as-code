@@ -1,0 +1,48 @@
+references:
+- https://attack.mitre.org/techniques/T1595/
+- https://attack.mitre.org/techniques/T1046/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/systems_initiating_connections_to_a_high_number_of_ports.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `systems_initiating_connections_to_a_high_number_of_ports.yml`\
+    \ \u2014 experimental sketch; not raw dump\n// Multi-ESN source: keep ProcessRollup2 primary; join\
+    \ behaviors via aid+TargetProcessId/ContextProcessId per Telemetry matrix\n| falconPID:=TargetProcessId\
+    \ | falconPID:=ContextProcessId\n| UserID:=UserSid | UserID:=UID\n| collect([FileName, CommandLine,\
+    \ UserName, UserID]),\n| FileName=* RemotePort=*\n| groupBy([aid, ComputerName, ImageFileName, CommandLine],\
+    \ function=count())\n"
+title: 'Falcon: Systems Initiating Connections to a High Number of Ports'
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+description: Detects hosts that establish network connections across a large number of unique ports within
+  a given period. This behavior may indicate port scanning, network reconnaissance, or p
+id: DAC-CS-0088
+sourcetypes:
+- falcon:process
+platforms:
+- crowdstrike
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1595
+  - T1046
+severity: medium
+author: Detection Engineer
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:systems_initiating_connections_to_a_high_number_of_ports.yml
+telemetry_validated: false
+required_fields:
+- CommandLine
+- ComputerName
+- FileName
+- TargetProcessId
+- UserName
+- UserSid
+- ImageFileName
+- aid
+status: experimental
