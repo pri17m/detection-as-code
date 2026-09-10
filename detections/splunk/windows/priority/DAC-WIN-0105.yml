@@ -1,0 +1,57 @@
+id: DAC-WIN-0105
+title: Pass-the-Hash NTLM Type 3 anomalies
+description: '4624 LogonType=3 AuthenticationPackage=NTLM | checklist: macros only; no index=; EventCode
+  on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true;
+  FP baseline pending org allowlists'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Lateral Movement
+  techniques:
+  - T1550.002
+severity: high
+false_positives:
+- Legacy NTLM service accounts
+references:
+- https://attack.mitre.org/techniques/T1550/002/
+- rules/windows/builtin/security/account_management/win_security_pass_the_hash_2.yml
+telemetry_validated: false
+required_fields:
+- EventCode
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    EventCode=4624 LogonType=3
+
+    | eval TargetUserName=coalesce(TargetUserName, Account_Name, user)
+
+    | eval IpAddress=coalesce(IpAddress, src, src_ip, IpAddress)
+
+    | eval WorkstationName=coalesce(WorkstationName, Workstation_Name, src_nt_host)
+
+    | eval AuthenticationPackageName=coalesce(AuthenticationPackageName, Authentication_Package, AuthenticationPackage)
+
+    | eval KeyLength=coalesce(KeyLength, Key_Length)
+
+    | search AuthenticationPackageName="NTLM" OR Authentication_Package="NTLM"
+
+    | search NOT TargetUserName="*$"
+
+    | table _time host TargetUserName IpAddress WorkstationName LogonType AuthenticationPackageName KeyLength'
+tags:
+- phase1
+- windows
+- P0
+- logon
+- hardened-v1
+- remapped_from:DAC-WIN-0006
