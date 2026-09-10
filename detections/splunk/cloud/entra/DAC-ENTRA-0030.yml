@@ -1,0 +1,32 @@
+query:
+  splunk: "sourcetype=azure:monitor:aad\n| search Category=\"SignInLogs\"\n| search deviceDetail.isCompliant=true\n\
+    | # After prior CA failures \u2014 tune with failure\u2192success sequence\n| table _time, operationName,\
+    \ ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress, userPrincipalName\n"
+id: DAC-ENTRA-0030
+title: 'Entra: Compliant device claim success after prior CA failures'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P1
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1098/005/
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1098.005
+author: Detection Engineer
+status: experimental
+description: device ID new + CA success after fails
