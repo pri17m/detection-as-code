@@ -1,0 +1,45 @@
+references:
+- https://attack.mitre.org/techniques/T1572/
+- https://attack.mitre.org/techniques/T1021/004/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/remote_port_forwarding_via_plink_unauthorized_rdp_tunneling_detection.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `remote_port_forwarding_via_plink_unauthorized_rdp_tunneling_detection.yml`\
+    \ \u2014 experimental sketch; not raw dump\n| ImageFileName=/\\\\plink(64)?\\.exe$/i\n| CommandLine=/\\\
+    s-(R|L).*:3389/i\n| table([aid, ComputerName, UserName, ImageFileName, CommandLine, ParentBaseFileName])\n\
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine], function=count())\n"
+title: 'Falcon: Remote Port Forwarding via Plink - Unauthorized RDP Tunneling Detection'
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+description: Detects the use of Plink (PuTTY Link) to establish remote port forwarding tunnels, specifically
+  targeting traffic redirected to port 3389 (RDP). This technique is frequently used b
+id: DAC-CS-0085
+sourcetypes:
+- falcon:process
+platforms:
+- crowdstrike
+mitre:
+  tactics:
+  - execution
+  - lateral-movement
+  techniques:
+  - T1572
+  - T1021.004
+severity: medium
+author: Detection Engineer
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:remote_port_forwarding_via_plink_unauthorized_rdp_tunneling_detection.yml
+telemetry_validated: false
+required_fields:
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- UserName
+- aid
+status: experimental
