@@ -1,0 +1,24 @@
+id: DAC-GH-0003
+title: "GitHub: Organization owner added"
+description: "Detects elevation to organization owner in GitHub audit logs, which can indicate privilege escalation or malicious persistence."
+author: "DaC"
+status: experimental
+platforms: [splunk]
+sourcetypes: ["github:audit"]
+mitre:
+  tactics: ["privilege-escalation", "persistence"]
+  techniques: ["T1098"]
+severity: high
+false_positives:
+  - "Legitimate org administration changes."
+references:
+  - "https://docs.github.com/en/organizations/managing-peoples-access-to-your-organization-with-roles/roles-in-an-organization"
+telemetry_validated: false
+required_fields: ["action", "actor", "org", "created_at"]
+query:
+  splunk: |
+    sourcetype=github:audit (action="org.add_member" OR action="org.update_member")
+    | eval new_role=coalesce(role, permission, new_permission)
+    | where match(lower(new_role), "owner")
+    | stats count values(actor) as actors values(user) as users values(org) as orgs by action, new_role
+
