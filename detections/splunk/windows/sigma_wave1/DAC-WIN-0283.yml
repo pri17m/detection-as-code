@@ -1,0 +1,55 @@
+severity: medium
+query:
+  splunk: '(sourcetype=XmlWinEventLog:System OR sourcetype=WinEventLog:System) EventCode IN (39,41)
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/system/microsoft_windows_kerberos_key_distribution_center/win_system_kdcsvc_cert_use_no_strong_mapping.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/system/microsoft_windows_kerberos_key_distribution_center/win_system_kdcsvc_cert_use_no_strong_mapping.yml
+- https://attack.mitre.org/techniques/T1105/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_system
+- sigma:rules/windows/builtin/system/microsoft_windows_kerberos_key_distribution_center/win_system_kdcsvc_cert_use_no_strong_mapping.yml
+title: Certificate Use With No Strong Mapping
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:System
+- XmlWinEventLog:System
+id: DAC-WIN-0283
+description: 'Detects a user certificate that was valid but could not be mapped to a user in a strong
+  way (such as via explicit mapping, key trust mapping, or a SID)
+
+  This could be a sign of exploitation of the elevation of privilege vulnerabilities (CVE-2022-34691,
+  CVE-2022-26931, CVE-2022-26923) that can occur when the KDC allows certificate spoofing by not requiring
+  a strong mapping.
+
+  Events where the AccountName and CN of the Subject do not match, or where the CN ends in a dollar sign
+  indicating a machine, may indicate certificate spoofing.'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1105
+required_fields:
+- EventCode
+false_positives:
+- If prevalent in the environment, filter on events where the AccountName and CN of the Subject do not
+  reference the same user
+- If prevalent in the environment, filter on CNs that end in a dollar sign indicating it is a machine
+  name
+status: experimental
