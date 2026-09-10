@@ -1,29 +1,70 @@
-id: DAC-CS-0002
-title: 'Falcon: Office spawning shell'
-description: Detects Office processes spawning cmd/powershell/script interpreters.
-author: DaC
-status: experimental
-platforms:
-- crowdstrike
-sourcetypes:
-- falcon:process
 mitre:
   tactics:
   - execution
   techniques:
   - T1204
 severity: high
-false_positives:
-- Legitimate add-ins; tune by user/group and doc origin.
-references:
-- https://www.crowdstrike.com/
-telemetry_validated: false
 required_fields:
 - ImageFileName
 - ParentBaseFileName
 - CommandLine
+- aid
+- ComputerName
+- TargetProcessId
 query:
-  crowdstrike: 'falcon_ioa_pattern: ParentBaseFileName in ["winword.exe","excel.exe","powerpnt.exe","outlook.exe"]
-    AND ImageFileName in ["cmd.exe","powershell.exe","pwsh.exe","wscript.exe","cscript.exe"]
+  crowdstrike: '#event_simpleName=ProcessRollup2
+
+    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
+
+    // prior: falcon_ioa_pattern: ParentBaseFileName in ["winword.exe","excel.exe","powerpnt.exe","outlook.exe"]
+    AND ImageFileName in ["cmd.exe","powershell.exe","pwsh.exe","
+
+    // --- src: attachments_send_by_outlook.yml (Falcon: List of attachments sent from Outlook) ---
+
+    | CommandLine=/content.outlook/i
+
+    | ImageFileName=/(\/|\\)(?<FileName>\w*\.?\w*)$/
+
+    | FileName=/(winword|excel|powerpnt)\.exe/i
+
+    | CommandLine=/Outlook\\(?<ShortFile>\w*\\.*)$/i
+
+    | table([@timestamp, aid, TargetProcessId, ShortFile, CommandLine], limit=1000)
+
+    // --- src: Hunt_links_opened_from_Outlook.yml (Falcon: Phishing - List of links opened from Outlook)
+    ---
+
+    | aid=?aid ImageFileName=/\\outlook\.exe/i
+
+    | regex("(?<FileName>[^\\/|\\\\]*)$", field=ImageFileName, strict=false)
+
+    | MD5:=MD5HashData | ImageFileName=/(\/|\\)(?<ChildFileName>\w*\.?\w*)$/
+
+    | ChildCLI:=CommandLine
+
+    | key=ParentProcessId, field=TargetProcessId, include=[MD5, ChildFileName, ChildCLI]
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
 
     '
+tags:
+- enhance-01b
+- processrollup2
+- qh:attachments_send_by_outlook.yml
+- qh:Hunt_links_opened_from_Outlook.yml
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+references:
+- https://www.crowdstrike.com/
+platforms:
+- crowdstrike
+false_positives:
+- Legitimate add-ins; tune by user/group and doc origin.
+- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
+id: DAC-CS-0002
+title: 'Falcon: Office spawning shell'
+author: DaC
+status: experimental
+description: Detects Office processes spawning cmd/powershell/script interpreters. Enhanced with Query-Hub
+  ProcessRollup2 patterns (attachments_send_by_outlook.yml, Hunt_links_opened_from_Outlook.yml).
