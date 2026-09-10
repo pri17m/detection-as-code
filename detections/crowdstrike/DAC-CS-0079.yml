@@ -1,41 +1,52 @@
-references:
-- https://attack.mitre.org/techniques/T1059/001/
-- https://attack.mitre.org/techniques/T1204/002/
-- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/jar_file_executed_from_appdata.yml
-query:
-  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `jar_file_executed_from_appdata.yml`\
-    \ \u2014 experimental sketch; not raw dump\n| ImageFileName=/javaw.exe/i CommandLine=/appdata/i\n\
-    | table([aid, @timestamp, #event_simpleName, ImageFileName, SHA256HashData], limit=1000)\n| groupBy([aid,\
-    \ ComputerName, ImageFileName, CommandLine], function=count())\n"
-title: 'Falcon: JAR files executed from %AppData%'
+id: DAC-CS-0079
+status: experimental
+severity: medium
+author: Detection Engineer
 false_positives:
 - "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
   \ before promote."
 - Tune ParentBaseFileName allowlists for known management tools.
-description: This query detects if a JAR file was executed from the %AppData% folder
-id: DAC-CS-0079
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+description: This query detects if a JAR file was executed from the %AppData% folder
 platforms:
 - crowdstrike
+title: 'Falcon: JAR files executed from %AppData%'
 mitre:
   tactics:
   - execution
   techniques:
   - T1059.001
   - T1204.002
-severity: medium
-author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1204/002/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/jar_file_executed_from_appdata.yml
+query:
+  crowdstrike: '#event_simpleName=ProcessRollup2
+
+    | ImageFileName=/javaw\.exe/i
+
+    | CommandLine=/appdata/i
+
+    | table([aid, @timestamp, ComputerName, ImageFileName, CommandLine, SHA256HashData, ParentBaseFileName])
+
+    '
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- SHA256HashData
+- aid
 tags:
 - cs-query-hub
 - processrollup2
 - wave-cs-qh
 - P1
 - src:jar_file_executed_from_appdata.yml
-telemetry_validated: false
-required_fields:
-- CommandLine
-- ImageFileName
-- SHA256HashData
-- aid
-status: experimental
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2
