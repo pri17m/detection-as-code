@@ -1,60 +1,49 @@
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- SHA256HashData
+- UserName
+- aid
+- event_platform
+status: experimental
+author: Detection Engineer
+description: Detects credential-dumping tooling and LSASS-targeted CommandLine/ImageFileName activity
+  (mimikatz/procdump/pwdump/sekurlsa). ProcessRollup2 port of Query-Hub Credential_Dumping_Detection;
+  process-access IOA preferred when available in tenant.
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0100
+- enhance-tp
+- tp-quality-v2
+- processrollup2
+- esn:ProcessRollup2
+- qh:Credential_Dumping_Detection.yml
 mitre:
   tactics:
   - credential-access
   techniques:
   - T1003.001
-severity: high
-required_fields:
-- ImageFileName
-- CommandLine
-- ParentBaseFileName
-- aid
-- ComputerName
-- TargetProcessId
+id: DAC-CS-0013
 query:
-  crowdstrike: '#event_simpleName=ProcessRollup2
-
-    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
-
-    // prior: TargetFileName CONTAINS "lsass" OR CommandLine CONTAINS "lsass" OR ImageFileName CONTAINS
-    "lsass"
-
-    // prior: # Prefer process-access IOA when available; exclude known EDR SourceImage in tenant
-
-    // --- src: Credential_Dumping_Detection.yml (Falcon: Credential Dumping Detection) ---
-
-    | (CommandLine=/mimikatz|procdump|lsass|sekurlsa/i OR ImageFileName=/\\(mimikatz|procdump|pwdump)\.exe$/i)
-
-    | ParentImageFileName!=/\\(powershell|cmd)\.exe$/i
-
-    | table([aid, UserName, ImageFileName, CommandLine, ParentImageFileName, SHA256HashData])
-
-    // Optional: join #event_simpleName=SyntheticProcessRollup2 on [aid, RawProcessId] for parent hash
-    enrichment
-
-    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
-
-    '
-tags:
-- wave-a
-- P0
-- parity:DAC-WIN-0100
-- enhance-01b
-- processrollup2
-- qh:Credential_Dumping_Detection.yml
-sourcetypes:
-- falcon:process
-telemetry_validated: false
-references:
-- https://attack.mitre.org/techniques/T1003/001/
+  crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| (CommandLine=/(mimikatz|procdump|sekurlsa|lsass\\\
+    .exe)/i\n    OR ImageFileName=/\\\\(mimikatz|procdump|pwdump)\\.exe$/i)\n| !in(field=ParentBaseFileName,\
+    \ values=[\"powershell.exe\",\"pwsh.exe\",\"cmd.exe\"], ignoreCase=true)\n| table([aid, ComputerName,\
+    \ UserName, ImageFileName, CommandLine, ParentBaseFileName, SHA256HashData])\n"
+severity: high
+title: 'Falcon: LSASS process access by non-EDR'
+false_positives:
+- "Security tools and EDR that legitimately touch LSASS \u2014 exclude known EDR ImageFileName/SHA256\
+  \ in tenant."
+- Admin procdump for crash analysis; allowlist approved operators and parents.
 platforms:
 - crowdstrike
-false_positives:
-- Tune after baselining; experimental sketch may be noisy.
-- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
-id: DAC-CS-0013
-title: 'Falcon: LSASS process access by non-EDR'
-author: Detection Engineer
-status: experimental
-description: Custom IOA process access / handle to lsass.exe excluding known EDR Enhanced with Query-Hub
-  ProcessRollup2 patterns (Credential_Dumping_Detection.yml).
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Credential_Dumping_Detection.yml
