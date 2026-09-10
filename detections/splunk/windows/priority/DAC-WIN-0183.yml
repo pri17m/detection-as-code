@@ -1,0 +1,38 @@
+id: DAC-WIN-0183
+title: Scheduled task deleted suspiciously (4699)
+description: Security 4699
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1053.005
+  - T1070
+severity: low
+false_positives:
+- Software cleanup
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+- https://attack.mitre.org/techniques/T1070/
+telemetry_validated: false
+required_fields:
+- EventCode
+- TaskName
+- SubjectUserName
+- SubjectDomainName
+- TaskContent
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- persistence
