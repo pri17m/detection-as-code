@@ -1,0 +1,39 @@
+references:
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/cve_2026_32202_windows_shell.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `cve_2026_32202_windows_shell.yml`\
+    \ \u2014 experimental sketch; not raw dump\n| ImageFileName=*\n| CommandLine=*\n// TODO: refine filters\
+    \ from Query-Hub cve_2026_32202_windows_shell.yml using only ProcessRollup-fields.md\n| groupBy([aid,\
+    \ ComputerName, ImageFileName, CommandLine], function=count())\n"
+title: 'Falcon: CVE-2026-32202 - Windows Shell'
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+description: Exploitation of Windows Shell CVE-2026-32202
+id: DAC-CS-0068
+sourcetypes:
+- falcon:process
+platforms:
+- crowdstrike
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059
+severity: medium
+author: Detection Engineer
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:cve_2026_32202_windows_shell.yml
+telemetry_validated: false
+required_fields:
+- ComputerName
+- ImageFileName
+- CommandLine
+- aid
+status: experimental
