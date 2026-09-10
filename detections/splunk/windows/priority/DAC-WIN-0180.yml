@@ -1,0 +1,34 @@
+id: DAC-WIN-0180
+title: Account locked out burst (4740)
+description: 4740 many users one caller
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1110
+severity: medium
+false_positives:
+- Password policy
+references:
+- https://attack.mitre.org/techniques/T1110/
+telemetry_validated: false
+required_fields:
+- EventCode
+- TargetUserName
+- CallerComputerName
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- logon
