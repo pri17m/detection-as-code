@@ -1,0 +1,56 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Identifies Windows hosts/accounts with more than 5 UserLogonFailed2 events in the search
+  window,
+
+  useful for brute-force and password-spray detection.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0097
+query:
+  crowdstrike: '#event_simpleName=UserLogonFailed2 event_platform=Win
+
+    | groupBy([aid, ComputerName, UserName, LogonType], function=([count(as=FailCount), min(ContextTimeStamp,
+    as=FirstLogonAttempt), max(ContextTimeStamp, as=LastLogonAttempt)]))
+
+    | FailCount>5
+
+    | sort(FailCount, order=desc)
+
+    '
+mitre:
+  tactics:
+  - credential-access
+  - initial-access
+  techniques:
+  - T1110
+  - T1110.001
+title: 'Falcon: Failed User Logon Thresholding'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1110/
+- https://attack.mitre.org/techniques/T1110/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Failed_User_Logon_Thresholding.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Failed_User_Logon_Thresholding.yml
+- esn:UserLogonFailed2
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- ContextTimeStamp
+- LogonType
+- UserName
+- aid
+- event_platform
