@@ -1,0 +1,35 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1087/002/
+title: 'Falcon: Adfind or SharpHound-like AD enum'
+description: adfind/sharphound cmdline
+severity: medium
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0052
+status: experimental
+tags:
+- wave-a
+- P1
+query:
+  crowdstrike: '# Experimental Custom IOA sketch for Falcon: Adfind or SharpHound-like AD enum
+
+    CommandLine="*"
+
+    # TODO: refine with Falcon event fields after Telemetry map
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1087.002
