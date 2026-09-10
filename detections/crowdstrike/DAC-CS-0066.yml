@@ -1,0 +1,39 @@
+references:
+- https://attack.mitre.org/techniques/T1552/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/applications_with_plaintext_passwords.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `applications_with_plaintext_passwords.yml`\
+    \ \u2014 experimental sketch; not raw dump\n| \"#event_simpleName\" = ProcessRollup2 event_platform=\"\
+    Win\" CommandLine=/REDACTED/\n| groupBy([aid, ComputerName, ImageFileName, CommandLine], function=count())\n"
+title: 'Falcon: Applications with plaintext passwords'
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+description: Table of applications identified as potentially handling plaintext passwords.
+id: DAC-CS-0066
+sourcetypes:
+- falcon:process
+platforms:
+- crowdstrike
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1552
+severity: medium
+author: Detection Engineer
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:applications_with_plaintext_passwords.yml
+telemetry_validated: false
+required_fields:
+- CommandLine
+- ComputerName
+- FileName
+- ImageFileName
+- aid
+status: experimental
