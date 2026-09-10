@@ -1,0 +1,39 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098.001
+id: DAC-AZ-0017
+status: experimental
+title: 'Azure: Managed identity assign to VM then token use pattern'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="Microsoft.Compute/virtualMachines/write"
+
+    | search properties="*identity*" OR properties="*SystemAssigned*" OR properties="*UserAssigned*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1098/001/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-top5
+description: "virtualMachines write identity \u2192 ARM calls"
+sourcetypes:
+- azure:monitor:activity
