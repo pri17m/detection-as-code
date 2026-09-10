@@ -13,7 +13,7 @@ from jsonschema import Draft202012Validator
 
 
 RE_FORBIDDEN_INDEX = re.compile(r"(?i)(^|\s|\||\()index\s*=")  # strict ban, case-insensitive
-RE_SPLUNK_SOURCETYPE = re.compile(r"(?i)\bsourcetype\s*=")
+RE_SPLUNK_SOURCETYPE = re.compile(r"(?i)(\bsourcetype\s*=|`windows_(security|system|sysmon|powershell_operational|powershell_classic)`)")
 
 
 @dataclass(frozen=True)
@@ -41,15 +41,26 @@ def _load_canonical_sourcetypes(sourcetype_map_path: Path) -> set[str]:
     obj = _load_yaml(sourcetype_map_path)
     if not isinstance(obj, dict):
         raise ValueError(f"{sourcetype_map_path}: expected YAML object")
-    canonical = obj.get("canonical")
-    if not isinstance(canonical, dict):
-        raise ValueError(f"{sourcetype_map_path}: missing/invalid 'canonical' map")
     out: set[str] = set()
-    for _, vals in canonical.items():
-        if isinstance(vals, list):
-            for v in vals:
-                if isinstance(v, str):
-                    out.add(v)
+    allowed = obj.get("allowed_sourcetypes")
+    if isinstance(allowed, list):
+        out.update(x for x in allowed if isinstance(x, str))
+    canonical = obj.get("canonical")
+    if isinstance(canonical, dict):
+        for _, vals in canonical.items():
+            if isinstance(vals, list):
+                out.update(x for x in vals if isinstance(x, str))
+    macros = obj.get("allowed_sourcetype_macros") or []
+    if isinstance(macros, list):
+        out.update(x for x in macros if isinstance(x, str))
+    # also allow macro keys under macros: that are sourcetype macros (not *_index)
+    mac = obj.get("macros")
+    if isinstance(mac, dict):
+        for k in mac.keys():
+            if isinstance(k, str) and not k.endswith("_index"):
+                out.add(k)
+    if not out:
+        raise ValueError(f"{sourcetype_map_path}: no sourcetypes found under allowed_sourcetypes/canonical")
     return out
 
 
@@ -93,7 +104,7 @@ def _validate_sourcetypes_allowlist(det: Dict[str, Any], *, allowlist: set[str],
             continue
         if st not in allowlist:
             errors.append(
-                f"{path}: sourcetypes: unknown canonical sourcetype '{st}' (must exist in config/sourcetype_map.yaml under canonical)"
+                f"{path}: sourcetypes: unknown allowlisted sourcetype/macro '{st}' (must exist in config/sourcetype_map.yaml allowed_sourcetypes/canonical/macros)"
             )
     return errors
 
