@@ -1,0 +1,40 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName="Set federation settings on domain" OR ActivityDisplayName="*federation*cert*"
+
+    | # Correlate with federated sign-in issuer/thumbprint anomalies
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0021
+title: 'Entra: Federation signing certificate rollover anomalous'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-related
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1606/002/
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1606.002
+author: Detection Engineer
+status: experimental
+description: Update federation cert then federated sign-in spike
