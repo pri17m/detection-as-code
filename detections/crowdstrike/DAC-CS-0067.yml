@@ -1,25 +1,18 @@
-references:
-- https://attack.mitre.org/techniques/T1190/
-- https://attack.mitre.org/techniques/T1620/
-- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/cve_2025_53770___sharepoint_toolshell.yml
-query:
-  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `cve_2025_53770___sharepoint_toolshell.yml`\
-    \ \u2014 experimental sketch; not raw dump\n| } include: [aid, ComputerName, TargetProcessId, ParentBaseFileName,\
-    \ FileName, CommandLine],\n| ParentProcessId <=> cmd.TargetProcessId\n| } include: [aid, ComputerName,\
-    \ TargetProcessId, ParentBaseFileName, FileName, CommandLine],\n| ContextProcessId <=> pwsh.TargetProcessId\n\
-    | } include: [aid, ComputerName, TargetFileName],\n| groupBy([aid, ComputerName, ImageFileName, CommandLine],\
-    \ function=count())\n"
-title: 'Falcon: CVE-2025-53770 - SharePoint ToolShell'
+id: DAC-CS-0067
+status: experimental
+severity: medium
+author: Detection Engineer
 false_positives:
 - "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
   \ before promote."
 - Tune ParentBaseFileName allowlists for known management tools.
-description: WebShell Discovery from w3wp.exe
-id: DAC-CS-0067
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+description: WebShell Discovery from w3wp.exe
 platforms:
 - crowdstrike
+title: 'Falcon: CVE-2025-53770 - SharePoint ToolShell'
 mitre:
   tactics:
   - initial-access
@@ -27,22 +20,33 @@ mitre:
   techniques:
   - T1190
   - T1620
-severity: medium
-author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1190/
+- https://attack.mitre.org/techniques/T1620/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/cve_2025_53770___sharepoint_toolshell.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| (\n    (ImageFileName=/\\\\cmd\\\
+    .exe$/i AND ParentBaseFileName=/^w3wp\\.exe$/i)\n    OR\n    (ImageFileName=/\\\\powershell(\\.exe)?$/i\
+    \ AND ParentBaseFileName=/^cmd\\.exe$/i\n      AND CommandLine=/(DownloadString|IEX|Invoke-Expression|FromBase64String|WebClient|\\\
+    \\u00|aspx|spinstall|ToolShell)/i)\n  )\n| table([aid, ComputerName, UserName, ParentBaseFileName,\
+    \ ImageFileName, CommandLine, TargetProcessId, ParentProcessId])\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- ParentProcessId
+- TargetProcessId
+- UserName
+- aid
+- event_platform
 tags:
 - cs-query-hub
 - processrollup2
 - wave-cs-qh
 - P1
 - src:cve_2025_53770___sharepoint_toolshell.yml
-telemetry_validated: false
-required_fields:
-- CommandLine
-- ComputerName
-- FileName
-- ParentBaseFileName
-- ParentProcessId
-- TargetProcessId
-- ImageFileName
-- aid
-status: experimental
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2

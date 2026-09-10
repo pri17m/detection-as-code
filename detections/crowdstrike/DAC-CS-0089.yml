@@ -1,34 +1,19 @@
-references:
-- https://attack.mitre.org/techniques/T1059/001/
-- https://attack.mitre.org/techniques/T1562/001/
-- https://attack.mitre.org/techniques/T1490/
-- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/the_gentlemen_raas_custom_backdoors_and_evolving_tactics.yml
-query:
-  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `the_gentlemen_raas_custom_backdoors_and_evolving_tactics.yml`\
-    \ \u2014 experimental sketch; not raw dump\n| HuntLogic := \"Netsh_Trace_Packet_Capture\" | SeverityTier\
-    \ := \"High\" | HuntObject := CommandLine;\n| HuntLogic := \"SharpADWS_AD_Recon\" | SeverityTier :=\
-    \ \"High\" | HuntObject := CommandLine;\n| HuntLogic := \"Network_Scanner_Execution\" | SeverityTier\
-    \ := \"Medium\" | HuntObject := FileName;\n| HuntLogic := \"Defender_Disable_via_SetMpPreference\"\
-    \ | SeverityTier := \"Critical\" | HuntObject := CommandLine;\n| HuntLogic := \"Defender_Exclusion_Added\"\
-    \ | SeverityTier := \"Critical\" | HuntObject := CommandLine;\n| HuntLogic := \"Defender_Disable_via_Registry_RegExe\"\
-    \ | SeverityTier := \"Critical\" | HuntObject := CommandLine;\n| HuntLogic := \"Defender_Disable_RegEvent\"\
-    \ | SeverityTier := \"Critical\" | HuntObject := CommandLine;\n| HuntLogic := \"Kaspersky_Uninstall_kavrmvr\"\
-    \ | SeverityTier := \"High\" | HuntObject := CommandLine;\n| HuntLogic := \"Kernel_Rootkit_EDR_Kill_Tool\"\
-    \ | SeverityTier := \"Critical\" | HuntObject := FileName;\n| HuntLogic := \"BYOVD_Vulnerable_Driver_Dropped\"\
-    \ | SeverityTier := \"Critical\" | HuntObject := TargetFileName;\n| groupBy([aid, ComputerName, ImageFileName,\
-    \ CommandLine], function=count())\n"
-title: 'Falcon: The Gentlemen RaaS - Custom Backdoors and Evolving Tactics'
+id: DAC-CS-0089
+status: experimental
+severity: medium
+author: Detection Engineer
 false_positives:
 - "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
   \ before promote."
 - Tune ParentBaseFileName allowlists for known management tools.
-description: Detection logic covering multiple stages of the Gentlemen ransomware attack lifecycle, including
-  reconnaissance, defense impairment (disabling Defender/EDR), persistence, lateral m
-id: DAC-CS-0089
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+description: Detection logic covering multiple stages of the Gentlemen ransomware attack lifecycle, including
+  reconnaissance, defense impairment (disabling Defender/EDR), persistence, lateral m
 platforms:
 - crowdstrike
+title: 'Falcon: The Gentlemen RaaS - Custom Backdoors and Evolving Tactics'
 mitre:
   tactics:
   - execution
@@ -38,23 +23,49 @@ mitre:
   - T1562.001
   - T1490
   - T1070.004
-severity: medium
-author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/techniques/T1490/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/the_gentlemen_raas_custom_backdoors_and_evolving_tactics.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n| case {\n    ImageFileName=/\\\\netsh\\.exe$/i AND\
+    \ CommandLine=/trace start capture=yes/i | HuntLogic:=\"Netsh_Trace_Packet_Capture\";\n    CommandLine=/SharpADWS/i\
+    \ | HuntLogic:=\"SharpADWS_AD_Recon\";\n    ImageFileName=/\\\\(netscan|netscan64|advanced_ip_scanner[^\\\
+    \\]*|advanced_port_scanner[^\\\\]*)\\.exe$/i | HuntLogic:=\"Network_Scanner_Execution\";\n    CommandLine=/Set-MpPreference/i\
+    \ AND CommandLine=/DisableRealtimeMonitoring|EnableControlledFolderAccess\\s+Disabled/i | HuntLogic:=\"\
+    Defender_Disable_via_SetMpPreference\";\n    CommandLine=/Add-MpPreference/i AND CommandLine=/ExclusionProcess|ExclusionPath/i\
+    \ | HuntLogic:=\"Defender_Exclusion_Added\";\n    ImageFileName=/\\\\reg\\.exe$/i AND CommandLine=/Windows\
+    \ Defender/i AND CommandLine=/DisableAntiSpyware|DisableBehaviorMonitoring|DisableOnAccessProtection|DisableScanOnRealtimeEnable/i\
+    \ | HuntLogic:=\"Defender_Disable_via_Registry_RegExe\";\n    ImageFileName=/\\\\kavrmvr\\.exe$/i\
+    \ | HuntLogic:=\"Kaspersky_Uninstall_kavrmvr\";\n    ImageFileName=/\\\\(openark64|kernelexplorer)\\\
+    .exe$/i | HuntLogic:=\"Kernel_Rootkit_EDR_Kill_Tool\";\n    CommandLine=/deploy_gpo\\.ps1/i | HuntLogic:=\"\
+    GPO_Lateral_Movement_Script\";\n    CommandLine=/Invoke-WebRequest|iwr\\s/i AND CommandLine=/live\\\
+    .sysinternals\\.com\\/PsExec/i | HuntLogic:=\"PsExec_Download_Sysinternals\";\n    CommandLine=/Rsat\\\
+    .ActiveDirectory\\.DS-LDS\\.Tools|RSAT-AD-PowerShell/i | HuntLogic:=\"RSAT_AD_Tools_Install_Recon\"\
+    ;\n    CommandLine=/Get-VM/i AND CommandLine=/Stop-VM\\s+-Force\\s+-TurnOff/i | HuntLogic:=\"HyperV_VM_Stop_PreEncryption\"\
+    ;\n    ImageFileName=/\\\\schtasks\\.exe$/i AND CommandLine=/UpdateUser|TaskSystem/i | HuntLogic:=\"\
+    Ransomware_Persistence_SchedTask\";\n    ImageFileName=/\\\\reg\\.exe$/i AND CommandLine=/CurrentVersion\\\
+    \\Run/i AND CommandLine=/GupdateS/i | HuntLogic:=\"Ransomware_Persistence_RunKey\";\n    ImageFileName=/\\\
+    \\icacls\\.exe$/i AND CommandLine=/grant\\s+\\*?S-1-1-0:F/i | HuntLogic:=\"ACL_Override_Everyone_FullControl\"\
+    ;\n    ImageFileName=/\\\\(vssadmin|wmic)\\.exe$/i AND CommandLine=/delete\\s+shadows|shadowcopy\\\
+    s+delete/i | HuntLogic:=\"Shadow_Copy_Deletion\";\n    * | HuntLogic:=\"none\";\n  }\n| HuntLogic!=\"\
+    none\"\n| groupBy([HuntLogic, aid, ComputerName, UserName], function=[collect([ImageFileName, CommandLine,\
+    \ ParentBaseFileName], limit=10), count(as=Hits)])\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- UserName
+- aid
 tags:
 - cs-query-hub
 - processrollup2
 - wave-cs-qh
 - P1
 - src:the_gentlemen_raas_custom_backdoors_and_evolving_tactics.yml
-telemetry_validated: false
-required_fields:
-- CommandLine
-- ComputerName
-- FileName
-- MD5HashData
-- OriginalFilename
-- ParentBaseFileName
-- UserName
-- ImageFileName
-- aid
-status: experimental
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2

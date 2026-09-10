@@ -1,30 +1,18 @@
-references:
-- https://attack.mitre.org/techniques/T1105/
-- https://attack.mitre.org/techniques/T1059/
-- https://attack.mitre.org/techniques/T1071/001/
-- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Detection_of_External_Direct_IP_Usage_in_CommandLine_Windows_and_Mac.yml
-query:
-  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `Detection_of_External_Direct_IP_Usage_in_CommandLine_Windows_and_Mac.yml`\
-    \ \u2014 experimental sketch; not raw dump\n| CommandLine=*http* event_platform!=\"Lin\"\n| regex(\"\
-    (?<Urlink>\\\\bhttps?://\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}.*\\\\/\\\\b)\", field=CommandLine)\n\
-    | default(field=GrandParentBaseFileName, value=\"Unknown\")\n| ContextId:=ContextProcessId; TargetProcessId=\"\
-    *\"\n| ContextId:=TargetProcessId}\n| format(\"[GraphExplorer]%sgraphs/process-explorer/graph?id=pid:%s:%s\"\
-    , field=[\"rootURL\", \"aid\", \"TargetProcessId\"], as=\"GraphExplorer\")\n| format(format=\"%s\\\
-    n\\t\u21B3 %s[ppid=%s]\\n\\t\\t\u21B3 %s [pid=%s|raw_pid=%s|start=%s]\\n\\t\\t\\t%,.100s[...TRIMMED]\\\
-    n\\t\\t\\t%s\\n\\t\\t\\t%s\\n---\", field=[GrandParentBaseFileName, ParentBaseFileName, ParentProcessId,\
-    \ ImageFileName, TargetProcessId, RawProcessId, processStart, CommandLine, ProcessExplorer, GraphExplorer],\
-    \ as=\"ExecutionSummary\")\n| groupBy([aid, ComputerName, ImageFileName, CommandLine], function=count())\n"
-title: 'Falcon: Detection of External Direct IP Usage in CommandLine Windows and Mac'
+id: DAC-CS-0074
+status: experimental
+severity: medium
+author: Detection Engineer
 false_positives:
 - "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
   \ before promote."
 - Tune ParentBaseFileName allowlists for known management tools.
-description: Detection of External Direct IP Usage
-id: DAC-CS-0074
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+description: Detection of External Direct IP Usage
 platforms:
 - crowdstrike
+title: 'Falcon: Detection of External Direct IP Usage in CommandLine Windows and Mac'
 mitre:
   tactics:
   - command-and-control
@@ -33,25 +21,48 @@ mitre:
   - T1105
   - T1059
   - T1071.001
-severity: medium
-author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1105/
+- https://attack.mitre.org/techniques/T1059/
+- https://attack.mitre.org/techniques/T1071/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Detection_of_External_Direct_IP_Usage_in_CommandLine_Windows_and_Mac.yml
+query:
+  crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","SyntheticProcessRollup2"])
+
+    | event_platform!=Lin
+
+    | CommandLine=/https?:\/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/i
+
+    | regex("(?<Urlink>\\bhttps?://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[^\\s]*)", field=CommandLine)
+
+    | regex("(?<Ipaddress>\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})", field=Urlink)
+
+    | !cidr(Ipaddress, subnet=["224.0.0.0/4","10.0.0.0/8","172.16.0.0/12","192.168.0.0/16","127.0.0.0/8","169.254.0.0/16","0.0.0.0/8"])
+
+    | ImageFileName=/\\(curl|wget|powershell|pwsh|cmd|certutil|bitsadmin|mshta|rundll32|python|pythonw|bash|sh|osascript)(\.exe)?$/i
+
+    | !in(field=ParentBaseFileName, values=["chrome.exe","msedge.exe","firefox.exe","Google Chrome"],
+    ignoreCase=true)
+
+    | table([aid, ComputerName, UserName, ParentBaseFileName, ImageFileName, CommandLine, Urlink, Ipaddress])
+
+    '
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- UserName
+- aid
+- event_platform
 tags:
 - cs-query-hub
 - processrollup2
 - wave-cs-qh
 - P1
 - src:Detection_of_External_Direct_IP_Usage_in_CommandLine_Windows_and_Mac.yml
-telemetry_validated: false
-required_fields:
-- CommandLine
-- ComputerName
-- FileName
-- ImageFileName
-- ParentBaseFileName
-- ParentProcessId
-- ProcessStartTime
-- RawProcessId
-- TargetProcessId
-- UserName
-- aid
-status: experimental
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2
+- esn:SyntheticProcessRollup2

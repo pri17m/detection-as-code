@@ -1,45 +1,58 @@
-references:
-- https://attack.mitre.org/techniques/T1059/
-- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/chromium_based_browser_hunting_via_dll_load.yml
-query:
-  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `chromium_based_browser_hunting_via_dll_load.yml`\
-    \ \u2014 experimental sketch; not raw dump\n// Multi-ESN source: keep ProcessRollup2 primary; join\
-    \ behaviors via aid+TargetProcessId/ContextProcessId per Telemetry matrix\n| ImageFileName=/chrome\\\
-    .dll/i\n| TargetImageFileName!=/chrome\\.exe/i}, include=[ComputerName, TargetProcessId], name=\"\
-    DllLoads\")\n| #event_simpleName=ProcessRollup2 TargetProcessId=*\n| match(table=\"DllLoads\", field=[TargetProcessId])\n\
-    | table([@timestamp, aid, ComputerName, FileName, TargetProcessId, ImageFileName, TargetImageFileName])\n\
-    | groupBy([aid, ComputerName, ImageFileName, CommandLine], function=count())\n"
-title: 'Falcon: Chromium-Based Browser Hunting via DLL Load'
+id: DAC-CS-0069
+status: experimental
+severity: medium
+author: Detection Engineer
 false_positives:
 - "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
   \ before promote."
 - Tune ParentBaseFileName allowlists for known management tools.
-description: This query identifies Chromium-based browsers by detecting the loading of chrome.dll into
-  running processes. Unlike simple process name checks, this method helps uncover browsers t
-id: DAC-CS-0069
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+description: This query identifies Chromium-based browsers by detecting the loading of chrome.dll into
+  running processes. Unlike simple process name checks, this method helps uncover browsers t
 platforms:
 - crowdstrike
+title: 'Falcon: Chromium-Based Browser Hunting via DLL Load'
 mitre:
   tactics:
   - execution
   techniques:
   - T1059
-severity: medium
-author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/chromium_based_browser_hunting_via_dll_load.yml
+query:
+  crowdstrike: 'defineTable(query={#event_simpleName=ClassifiedModuleLoad
+
+    | ImageFileName=/chrome\.dll/i
+
+    | TargetImageFileName!=/chrome\.exe$/i}, include=[ComputerName, TargetProcessId, ImageFileName, TargetImageFileName],
+    name="DllLoads")
+
+    | #event_simpleName=ProcessRollup2
+
+    | match(table="DllLoads", field=[TargetProcessId])
+
+    | table([@timestamp, aid, ComputerName, ImageFileName, TargetProcessId, CommandLine, ParentBaseFileName])
+
+    '
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- TargetImageFileName
+- TargetProcessId
+- aid
 tags:
 - cs-query-hub
 - processrollup2
 - wave-cs-qh
 - P1
 - src:chromium_based_browser_hunting_via_dll_load.yml
-telemetry_validated: false
-required_fields:
-- ComputerName
-- FileName
-- ImageFileName
-- TargetProcessId
-- CommandLine
-- aid
-status: experimental
+- tp-rewrite
+- tp-quality-v2
+- esn:ClassifiedModuleLoad
+- esn:ProcessRollup2
