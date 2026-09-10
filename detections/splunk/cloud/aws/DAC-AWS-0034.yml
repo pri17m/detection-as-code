@@ -1,0 +1,37 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1556.006
+id: DAC-AWS-0034
+status: experimental
+title: 'AWS: IAM DeactivateMFADevice or DeleteVirtualMFADevice'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("DeactivateMFADevice","DeleteVirtualMFADevice","DeleteAccessKey")
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1556/006/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-next
+description: DeactivateMFADevice
+sourcetypes:
+- aws:cloudtrail
