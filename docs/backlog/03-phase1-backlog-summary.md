@@ -1,5 +1,3 @@
-**ID namespace update:** Threat-Intel pack rebased to DAC-WIN-0100+ (additive to PR #1 max 0094).
-
 # Phase-1 Backlog Summary — Windows Splunk DaC
 
 **To:** Threat Detection Engineer  
@@ -14,11 +12,11 @@
 
 ## Executive summary
 
-Contract-aligned Windows backlog of **97** analytics (`DAC-WIN-0100` … `DAC-WIN-0196`):
+Contract-aligned Windows backlog of **97** analytics (`DAC-WIN-0001` … `DAC-WIN-0097`):
 
 - **0001–0015** = Threat Intel pack top-15 **exact order/titles**.
 - Remainder expands **P0 → P1 → P2** toward ~100 high-value Windows host + AD detections.
-- Macros only from Telemetry allowlist; **no `index=`**; `status=draft`; `platforms=[splunk]`; `telemetry_validated=false`.
+- Macros only from Telemetry allowlist; **no `index=`**; `status=draft`; `platforms=[windows]`; `telemetry_validated=false`.
 - High-level SPL sketches **only for top-15**; `required_fields` from Telemetry map (empty when Event ID unmapped).
 
 ---
@@ -31,7 +29,7 @@ Contract-aligned Windows backlog of **97** analytics (`DAC-WIN-0100` … `DAC-WI
 | Sourcetypes | windows_security / windows_system / windows_powershell_* / windows_sysmon |
 | MITRE techniques | Required on every rule |
 | Schema | status, platforms, telemetry_validated, required_fields, false_positives, references |
-| Extra channels / data-gaps | Not invented; operational data_gap notes retained where needed |
+| Extra channels | Not invented; **32** rules with telemetry_gap |
 
 ---
 
@@ -60,17 +58,14 @@ Contract-aligned Windows backlog of **97** analytics (`DAC-WIN-0100` … `DAC-WI
 
 | Item | Count |
 | --- | --- |
-| required_fields populated | 95 |
-| required_fields empty (map gap) | 2 |
+| required_fields populated | 78 |
+| required_fields empty (map gap) | 19 |
 | Top-15 SPL sketches | 15 |
 | SigmaHQ wave-1 shortlist | 139 |
 
 ---
 
 ## Telemetry / scaffold dependencies
-
-**Update 2026-09-10:** Phase-1 field expansion filled map gaps (4104, 4662, 4702, 4719, 4724, 4738, 4740/4741, 4886–4888, 5136/5137, 5145, Sysmon 4/6/8/16/17–21/25). Top-15 YAML stubs refreshed. AD CS / Sysmon pipe-WMI-tamper / noisy 4662+5145 remain `telemetry_validated: false` with data_gap notes.
-
 
 1. Use **`/workspace/dac-telemetry-windows/config/sourcetype_map.yaml`** (scaffold branch `cursor/dac-scaffold-05fa`).
 2. Expand field map for 4662, 5145, 4719, 4702, 4724, 4740/4741, 4738, 5136/5137, 4886–4888, 4104; Sysmon 4/6/8/16/17–21/25.
@@ -94,7 +89,7 @@ Contract-aligned Windows backlog of **97** analytics (`DAC-WIN-0100` … `DAC-WI
 ## Next steps after scaffold PR
 
 1. Confirm sourcetype_map in scaffold branch.
-2. TDE reviews DAC-WIN-0100..0015.
+2. TDE reviews DAC-WIN-0001..0015.
 3. Close Telemetry field gaps; harden SPL.
 4. Import Sigma wave-1 (`builtin/security` + LSASS process_access first).
 5. CI schema lint; promote telemetry_validated only after checklist.
