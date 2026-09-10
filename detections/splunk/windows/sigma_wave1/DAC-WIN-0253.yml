@@ -1,0 +1,56 @@
+severity: medium
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=1
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/process_creation/proc_creation_win_certutil_certificate_installation.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certutil_certificate_installation.yml
+- https://attack.mitre.org/techniques/T1649/
+- https://attack.mitre.org/techniques/T1553/004/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/process_creation/proc_creation_win_certutil_certificate_installation.yml
+title: New Root Certificate Installed Via Certutil.EXE
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0253
+description: 'Detects execution of "certutil" with the "addstore" flag in order to install a new certificate
+  on the system.
+
+  Adversaries may install a root certificate on a compromised system to avoid warnings when connecting
+  to adversary controlled web servers.'
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1649
+  - T1553.004
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+false_positives:
+- Help Desk or IT may need to manually add a corporate Root CA on occasion. Need to test if GPO push doesn't
+  trigger FP
+status: experimental
