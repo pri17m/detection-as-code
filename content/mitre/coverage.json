@@ -1,13 +1,13 @@
 {
   "summary": {
-    "detections_total": 317,
-    "detections_with_mitre": 317,
+    "detections_total": 360,
+    "detections_with_mitre": 360,
     "detections_with_mitre_percent": 100.0,
-    "unique_techniques": 97,
+    "unique_techniques": 105,
     "platform_counts": {
       "crowdstrike": 12,
       "defender": 12,
-      "splunk": 293
+      "splunk": 336
     }
   },
   "techniques": {
@@ -25,6 +25,8 @@
       "DAC-WIN-0115",
       "DAC-WIN-0116",
       "DAC-WIN-0128",
+      "DAC-WIN-0173",
+      "DAC-WIN-0182",
       "DAC-WIN-0209",
       "DAC-WIN-0213",
       "DAC-WIN-0215",
@@ -73,6 +75,7 @@
       "DAC-WIN-0005",
       "DAC-WIN-0131",
       "DAC-WIN-0132",
+      "DAC-WIN-0191",
       "DAC-WIN-0267",
       "DAC-WIN-0268",
       "DAC-WIN-0269",
@@ -91,6 +94,9 @@
       "DAC-WIN-0154",
       "DAC-WIN-0159",
       "DAC-WIN-0162",
+      "DAC-WIN-0179",
+      "DAC-WIN-0188",
+      "DAC-WIN-0196",
       "DAC-WIN-0206",
       "DAC-WIN-0210"
     ],
@@ -123,18 +129,25 @@
       "DAC-WIN-0258"
     ],
     "T1036": [
+      "DAC-WIN-0174",
       "DAC-WIN-0311",
-      "DAC-WIN-0317"
+      "DAC-WIN-0317",
+      "DAC-WIN-0320"
     ],
     "T1036.003": [
       "DAC-WIN-0232",
       "DAC-WIN-0302"
+    ],
+    "T1036.005": [
+      "DAC-WIN-0169",
+      "DAC-WIN-0170"
     ],
     "T1047": [
       "DAC-WIN-0044",
       "DAC-WIN-0073",
       "DAC-WIN-0113",
       "DAC-WIN-0134",
+      "DAC-WIN-0178",
       "DAC-WIN-0262",
       "DAC-WIN-0271",
       "DAC-WIN-0292",
@@ -153,6 +166,7 @@
       "DAC-WIN-0110",
       "DAC-WIN-0126",
       "DAC-WIN-0154",
+      "DAC-WIN-0183",
       "DAC-WIN-0205",
       "DAC-WIN-0261",
       "DAC-WIN-0263",
@@ -160,9 +174,17 @@
     ],
     "T1055": [
       "DAC-WIN-0078",
+      "DAC-WIN-0173",
       "DAC-WIN-0213",
       "DAC-WIN-0214",
       "DAC-WIN-0215"
+    ],
+    "T1055.012": [
+      "DAC-WIN-0175"
+    ],
+    "T1059": [
+      "DAC-WIN-0174",
+      "DAC-WIN-0193"
     ],
     "T1059.001": [
       "DAC-CS-0001",
@@ -179,6 +201,8 @@
       "DAC-WIN-0122",
       "DAC-WIN-0155",
       "DAC-WIN-0156",
+      "DAC-WIN-0177",
+      "DAC-WIN-0192",
       "DAC-WIN-0211",
       "DAC-WIN-0213",
       "DAC-WIN-0214",
@@ -224,10 +248,12 @@
       "DAC-WIN-0063"
     ],
     "T1068": [
-      "DAC-WIN-0017"
+      "DAC-WIN-0017",
+      "DAC-WIN-0190"
     ],
     "T1070": [
       "DAC-WIN-0069",
+      "DAC-WIN-0183",
       "DAC-WIN-0216",
       "DAC-WIN-0217"
     ],
@@ -242,7 +268,11 @@
       "DAC-WIN-0282"
     ],
     "T1070.003": [
+      "DAC-WIN-0187",
       "DAC-WIN-0240"
+    ],
+    "T1071.004": [
+      "DAC-WIN-0176"
     ],
     "T1074.001": [
       "DAC-WIN-0234"
@@ -262,6 +292,8 @@
       "DAC-WIN-0124",
       "DAC-WIN-0161",
       "DAC-WIN-0162",
+      "DAC-WIN-0191",
+      "DAC-WIN-0194",
       "DAC-WIN-0267"
     ],
     "T1078.003": [
@@ -294,6 +326,11 @@
       "DAC-WIN-0051",
       "DAC-WIN-0124",
       "DAC-WIN-0125",
+      "DAC-WIN-0165",
+      "DAC-WIN-0166",
+      "DAC-WIN-0167",
+      "DAC-WIN-0168",
+      "DAC-WIN-0184",
       "DAC-WIN-0201"
     ],
     "T1105": [
@@ -313,6 +350,7 @@
       "DAC-WIN-0149",
       "DAC-WIN-0150",
       "DAC-WIN-0155",
+      "DAC-WIN-0185",
       "DAC-WIN-0227",
       "DAC-WIN-0283",
       "DAC-WIN-0294",
@@ -331,6 +369,7 @@
       "DAC-WIN-0008",
       "DAC-WIN-0010",
       "DAC-WIN-0161",
+      "DAC-WIN-0180",
       "DAC-WIN-0269"
     ],
     "T1110.003": [
@@ -339,6 +378,9 @@
       "DAC-WIN-0135",
       "DAC-WIN-0136",
       "DAC-WIN-0137"
+    ],
+    "T1112": [
+      "DAC-WIN-0322"
     ],
     "T1127.001": [
       "DAC-WIN-0039"
@@ -384,11 +426,16 @@
       "DAC-WIN-0291"
     ],
     "T1218": [
+      "DAC-WIN-0185",
       "DAC-WIN-0231",
       "DAC-WIN-0310"
     ],
+    "T1218.003": [
+      "DAC-WIN-0189"
+    ],
     "T1218.004": [
-      "DAC-WIN-0038"
+      "DAC-WIN-0038",
+      "DAC-WIN-0189"
     ],
     "T1218.005": [
       "DAC-CS-0004",
@@ -460,6 +507,9 @@
       "DAC-WIN-0046",
       "DAC-WIN-0071",
       "DAC-WIN-0120",
+      "DAC-WIN-0163",
+      "DAC-WIN-0164",
+      "DAC-WIN-0196",
       "DAC-WIN-0210",
       "DAC-WIN-0211",
       "DAC-WIN-0277",
@@ -471,8 +521,12 @@
       "DAC-WIN-0134",
       "DAC-WIN-0292"
     ],
+    "T1546.010": [
+      "DAC-WIN-0186"
+    ],
     "T1546.012": [
-      "DAC-WIN-0060"
+      "DAC-WIN-0060",
+      "DAC-WIN-0186"
     ],
     "T1547.001": [
       "DAC-MDE-0011",
@@ -481,7 +535,15 @@
       "DAC-WIN-0081",
       "DAC-WIN-0111",
       "DAC-WIN-0127",
-      "DAC-WIN-0301"
+      "DAC-WIN-0181",
+      "DAC-WIN-0301",
+      "DAC-WIN-0325",
+      "DAC-WIN-0326",
+      "DAC-WIN-0327",
+      "DAC-WIN-0328"
+    ],
+    "T1547.006": [
+      "DAC-WIN-0190"
     ],
     "T1547.008": [
       "DAC-WIN-0266"
@@ -498,6 +560,7 @@
       "DAC-WIN-0118",
       "DAC-WIN-0128",
       "DAC-WIN-0160",
+      "DAC-WIN-0195",
       "DAC-WIN-0200"
     ],
     "T1550.003": [
@@ -532,12 +595,14 @@
       "DAC-WIN-0012",
       "DAC-WIN-0102",
       "DAC-WIN-0123",
+      "DAC-WIN-0194",
       "DAC-WIN-0207",
       "DAC-WIN-0284"
     ],
     "T1558.004": [
       "DAC-WIN-0011",
       "DAC-WIN-0103",
+      "DAC-WIN-0168",
       "DAC-WIN-0208"
     ],
     "T1559.001": [
@@ -587,6 +652,7 @@
       "DAC-WIN-0084"
     ],
     "T1569.002": [
+      "DAC-WIN-0179",
       "DAC-WIN-0210",
       "DAC-WIN-0211"
     ],
@@ -609,6 +675,8 @@
       "DAC-WIN-0293"
     ],
     "T1574.001": [
+      "DAC-WIN-0171",
+      "DAC-WIN-0172",
       "DAC-WIN-0220",
       "DAC-WIN-0222",
       "DAC-WIN-0237",
@@ -639,7 +707,10 @@
       "DAC-WIN-0235",
       "DAC-WIN-0252",
       "DAC-WIN-0263",
-      "DAC-WIN-0264"
+      "DAC-WIN-0264",
+      "DAC-WIN-0321",
+      "DAC-WIN-0323",
+      "DAC-WIN-0324"
     ],
     "T1685.001": [
       "DAC-WIN-0273",
