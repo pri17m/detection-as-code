@@ -1,0 +1,49 @@
+severity: critical
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-PowerShell/Operational")
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/powershell/powershell_module/posh_pm_bad_opsec_artifacts.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/powershell/powershell_module/posh_pm_bad_opsec_artifacts.yml
+- https://attack.mitre.org/techniques/T1059/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_powershell_operational
+- sigma:rules/windows/powershell/powershell_module/posh_pm_bad_opsec_artifacts.yml
+title: Bad Opsec Powershell Code Artifacts
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+id: DAC-WIN-0239
+description: 'focuses on trivial artifacts observed in variants of prevalent offensive ps1 payloads, including
+
+  Cobalt Strike Beacon, PoshC2, Powerview, Letmein, Empire, Powersploit, and other attack payloads
+
+  that often undergo minimal changes by attackers due to bad opsec.'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+required_fields:
+- EventCode
+false_positives:
+- Moderate-to-low; Despite the shorter length/lower entropy for some of these, because of high specificity,
+  fp appears to be fairly limited in many environments.
+status: experimental
