@@ -1,0 +1,56 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'SAFE port of ClickFix Run-dialog hunting onto RegGenericValue (not CAUTION Reg*Update ESNs):
+  RunMRU
+
+  writes containing interpreter names plus http/UNC/encoded/hidden/IEX tokens.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0122
+query:
+  crowdstrike: '#event_simpleName=RegGenericValue
+
+    | RegObjectName=/RunMRU/i
+
+    | RegStringValue=/(powershell|cmd|mshta|rundll32|conhost|curl|msiexec|certutil|bitsadmin|python)/i
+
+    | RegStringValue=/(https?:|\\\\|-enc|-e\s|hidden|iex|FromBase64|--headless)/i
+
+    | groupBy([aid, ComputerName, RegObjectName, RegValueName, RegStringValue], function=count())
+
+    '
+mitre:
+  tactics:
+  - execution
+  - initial-access
+  techniques:
+  - T1204
+  - T1059
+title: 'Falcon: ClickFix-style RunMRU Interpreter via RegGenericValue'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1204/
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/clickfix_run_dialog_command_detection.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:clickfix_run_dialog_command_detection.yml
+- esn:RegGenericValue
+severity: high
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- RegObjectName
+- RegStringValue
+- RegValueName
+- aid
