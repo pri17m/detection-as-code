@@ -1,0 +1,51 @@
+severity: medium
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-PowerShell/Operational")
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/powershell/powershell_classic/posh_pc_susp_zip_compress.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/powershell/powershell_classic/posh_pc_susp_zip_compress.yml
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1074/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_powershell_operational
+- sigma:rules/windows/powershell/powershell_classic/posh_pc_susp_zip_compress.yml
+title: Zip A Folder With PowerShell For Staging In Temp - PowerShell
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+id: DAC-WIN-0234
+description: 'Detects PowerShell scripts that make use of the "Compress-Archive" Cmdlet in order to compress
+  folders and files where the output is stored in a potentially suspicious location that is used often
+  by malware for exfiltration.
+
+  An adversary might compress data (e.g., sensitive documents) that is collected prior to exfiltration
+  in order to make it portable and minimize the amount of data sent over the network.'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+  - T1074.001
+required_fields:
+- EventCode
+false_positives:
+- Unknown
+status: experimental
