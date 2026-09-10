@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+title: 'MDE: PowerShell encoded command with network'
+description: DeviceProcessEvents + DeviceNetworkEvents
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0033
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-MDE-0001
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName in~ ("powershell.exe","pwsh.exe")
+
+    | where ProcessCommandLine has_any ("-enc","-EncodedCommand","IEX","DownloadString","FromBase64String")
+
+    | project Timestamp, DeviceName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
