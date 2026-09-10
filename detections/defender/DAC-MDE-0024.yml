@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1547/001/
+title: 'MDE: Startup folder executable drop'
+description: DeviceFileEvents
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0024
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-CS-0024
+query:
+  defender: 'DeviceFileEvents
+
+    | where FolderPath has @"Start Menu\Programs\Startup"
+
+    | where ActionType == "FileCreated"
+
+    | project Timestamp, DeviceName, FileName, FolderPath, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1547.001
