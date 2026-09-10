@@ -1,0 +1,53 @@
+id: DAC-WIN-0100
+title: LSASS process access by non-EDR
+description: 'Sysmon EID 10 TargetImage=lsass.exe; filter EDR/AV SourceImage | checklist: macros only;
+  no index=; EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before
+  telemetry_validated=true; FP baseline pending org allowlists'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1003.001
+severity: critical
+false_positives:
+- Legitimate AV/EDR/backup agents
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+- rules/windows/process_access/proc_access_win_lsass_memdump.yml
+telemetry_validated: false
+required_fields:
+- EventCode
+- SourceImage
+- TargetImage
+- GrantedAccess
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    EventCode=10
+
+    | eval TargetImage=coalesce(TargetImage, TargetFilename)
+
+    | eval SourceImage=coalesce(SourceImage, Image)
+
+    | eval GrantedAccess=coalesce(GrantedAccess, AccessMask)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search TargetImage="*\\lsass.exe"
+
+    | search NOT (SourceImage IN ("*\\MsMpEng.exe","*\\csfalconservice.exe","*\\SentinelAgent.exe","*\\MsSense.exe","*\\elastic-endpoint.exe","*\\CylanceSvc.exe"))
+
+    | table _time host SourceImage TargetImage GrantedAccess User CallTrace'
+tags:
+- phase1
+- windows
+- P0
+- process
+- hardened-v1
+- remapped_from:DAC-WIN-0001
