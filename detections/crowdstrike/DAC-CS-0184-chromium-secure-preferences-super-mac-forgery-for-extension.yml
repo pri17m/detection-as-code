@@ -1,0 +1,45 @@
+id: DAC-CS-0184
+title: 'Falcon: Chromium Secure Preferences super_mac Forgery for Extension Persistence'
+description: |
+  detections.ai community gap-fill for: Chromium Secure Preferences super_mac Forgery for Extension Persistence. Heuristic TP-style CQL on SAFE ESN ProcessRollup2 derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/01a089d0-97c7-713c-958e-cda15d27a296
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1547
+  - T1053
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/01a089d0-97c7-713c-958e-cda15d27a296
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1547/
+- https://attack.mitre.org/techniques/T1053/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- ComputerName
+- aid
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:ProcessRollup2
+- lang:cql
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2
+    | CommandLine=/(Secure Preferences|Preferences|ExtensionInstall|super_mac)/i
+    | ImageFileName=/\\(chrome|msedge|brave|opera)\.exe$/i OR ParentBaseFileName=/\\(chrome|msedge|brave)\.exe$/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

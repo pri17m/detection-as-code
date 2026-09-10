@@ -1,0 +1,41 @@
+id: DAC-CS-0140
+title: 'Falcon: Hunting Crowdstrike ScriptControl'
+description: |
+  detections.ai community gap-fill for: Hunting Crowdstrike ScriptControl. Heuristic TP-style CQL on SAFE ESN ScriptControlScanV2 derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/019efe55-194e-73a8-af71-766e6749f3b5
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/019efe55-194e-73a8-af71-766e6749f3b5
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1059/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- ComputerName
+- aid
+- ScriptContent
+- ImageFileName
+- CommandLine
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:ScriptControlScanV2
+- lang:cql
+query:
+  crowdstrike: |
+    #event_simpleName=ScriptControlScanV2
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine], function=count())

@@ -1,0 +1,43 @@
+id: DAC-CS-0190
+title: 'Falcon: Miasma node.exe Spawning wmic/PowerShell for Security Tool Enumeration'
+description: |
+  detections.ai community gap-fill for: Miasma node.exe Spawning wmic/PowerShell for Security Tool Enumeration. Heuristic TP-style CQL on SAFE ESN ProcessRollup2 derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/019f0589-7fcd-77d5-a536-e23d04765d2e
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/019f0589-7fcd-77d5-a536-e23d04765d2e
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1059/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- ComputerName
+- aid
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:ProcessRollup2
+- lang:kql-ported
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2
+    | ImageFileName=/\\(powershell|pwsh|cmd)\.exe$/i
+    | CommandLine=/(invoke-|iex|downloadstring|frombase64|-enc|hidden|bypass)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

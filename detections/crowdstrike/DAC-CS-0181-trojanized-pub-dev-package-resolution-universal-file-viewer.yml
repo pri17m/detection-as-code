@@ -1,0 +1,44 @@
+id: DAC-CS-0181
+title: 'Falcon: Trojanized pub.dev Package Resolution: universal_file_viewer / surveyjs_flutter'
+description: |
+  detections.ai community gap-fill for: Trojanized pub.dev Package Resolution: universal_file_viewer / surveyjs_flutter. Heuristic TP-style CQL on SAFE ESN DnsRequest derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/01a084fe-bde5-7158-b81a-14d18c9b47af
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - initial-access
+  - execution
+  techniques:
+  - T1195.001
+  - T1059
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/01a084fe-bde5-7158-b81a-14d18c9b47af
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1195/001/
+- https://attack.mitre.org/techniques/T1059/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- DomainName
+- ComputerName
+- aid
+- ContextProcessId
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:DnsRequest
+- lang:cql
+query:
+  crowdstrike: |
+    #event_simpleName=DnsRequest
+    | DomainName=/(npmjs|registry\.npmjs|pub\.dev|googleapis|github)/i
+    | groupBy([aid, ComputerName, DomainName], function=count())

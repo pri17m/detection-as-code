@@ -1,0 +1,49 @@
+id: DAC-CS-0151
+title: 'Falcon: Storm-1175 - Medusa - WDigest Enablement Followed by LSASS Credential Dumping'
+description: |
+  detections.ai community gap-fill for: Storm-1175 - Medusa - WDigest Enablement Followed by LSASS Credential Dumping. Heuristic TP-style CQL on SAFE ESN RegGenericValue derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/019f6686-cb9c-71cc-a35c-86ea0070897f
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003
+  - T1558
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/019f6686-cb9c-71cc-a35c-86ea0070897f
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1003/
+- https://attack.mitre.org/techniques/T1558/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- RegObjectName
+- RegValueName
+- RegStringValue
+- ComputerName
+- aid
+- ImageFileName
+- CommandLine
+- TargetImageFileName
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:RegGenericValue
+- lang:cql
+query:
+  crowdstrike: |
+    #event_simpleName=RegGenericValue
+    | RegObjectName=/\\CurrentControlSet\\Control\\SecurityProviders\\WDigest/i
+    | RegValueName=/UseLogonCredential/i
+    | RegStringValue=/^1$/
+    | groupBy([aid, ComputerName, RegObjectName, RegValueName, RegStringValue], function=count())

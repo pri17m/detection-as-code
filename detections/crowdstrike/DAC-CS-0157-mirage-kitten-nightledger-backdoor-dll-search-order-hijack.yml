@@ -1,0 +1,45 @@
+id: DAC-CS-0157
+title: 'Falcon: Mirage Kitten NightLedger Backdoor: DLL Search-Order Hijack'
+description: |
+  detections.ai community gap-fill for: Mirage Kitten NightLedger Backdoor: DLL Search-Order Hijack. Heuristic TP-style CQL on SAFE ESN ProcessRollup2 derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/019fd24b-ca22-74ed-b7f6-4cf0d59010cd
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  - persistence
+  techniques:
+  - T1574.001
+  - T1055
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/019fd24b-ca22-74ed-b7f6-4cf0d59010cd
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1574/001/
+- https://attack.mitre.org/techniques/T1055/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- ComputerName
+- aid
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:ProcessRollup2
+- lang:cql
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2
+    | CommandLine=/(mirage|kitten|nightledger|backdoor)/i OR ImageFileName=/(mirage|kitten|nightledger|backdoor)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

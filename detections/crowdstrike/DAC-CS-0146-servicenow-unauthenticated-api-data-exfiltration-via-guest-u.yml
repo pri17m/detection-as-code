@@ -1,0 +1,45 @@
+id: DAC-CS-0146
+title: 'Falcon: ServiceNow Unauthenticated API Data Exfiltration via Guest User on /api/now/ Endp…'
+description: |
+  detections.ai community gap-fill for: ServiceNow Unauthenticated API Data Exfiltration via Guest User on /api/now/ Endpoints. Heuristic TP-style CQL on SAFE ESN ProcessRollup2 derived from title/tags; telemetry_validated=false until tenant baselining. Source: https://detections.ai/rules/019f1a58-da43-7200-a78b-a4cf13ba04e6
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - command-and-control
+  - exfiltration
+  techniques:
+  - T1071
+  - T1105
+severity: medium
+false_positives:
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+references:
+- https://detections.ai/rules/019f1a58-da43-7200-a78b-a4cf13ba04e6
+- https://attack.mitre.org/
+- https://attack.mitre.org/techniques/T1071/
+- https://attack.mitre.org/techniques/T1105/
+telemetry_validated: false
+required_fields:
+- #event_simpleName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- ComputerName
+- aid
+tags:
+- detections-ai-gap
+- tp-quality-v2
+- src:detections.ai
+- esn:ProcessRollup2
+- lang:cql
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2
+    | CommandLine=/(servicenow|unauthenticated|data|exfiltration)/i OR ImageFileName=/(servicenow|unauthenticated|data|exfiltration)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
