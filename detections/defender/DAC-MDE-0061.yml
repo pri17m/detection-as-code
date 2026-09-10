@@ -1,0 +1,41 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1055/
+title: 'MDE: remote thread injection into LSASS'
+description: DeviceEvents if CreateRemoteThread exposed
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0061
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-CS-0059
+query:
+  defender: 'DeviceProcessEvents
+
+    | where ProcessCommandLine has "lsass" or FolderPath has "lsass"
+
+    // Prefer DeviceEvents ProcessOpened for handle access when schema available
+
+    | where InitiatingProcessFileName !in~ ("MsMpEng.exe","MsSense.exe","CSFalconService.exe")
+
+    | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1055
