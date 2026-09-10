@@ -1,0 +1,37 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1555.006
+id: DAC-AZ-0014
+status: experimental
+title: 'Azure: Key Vault secret list/get burst by unusual principal'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName IN ("Microsoft.KeyVault/vaults/secrets/get/action","SecretGet","SecretList")
+    OR operationName="*secrets*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1555/006/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: SecretGet SecretList high volume
+sourcetypes:
+- azure:monitor:activity
