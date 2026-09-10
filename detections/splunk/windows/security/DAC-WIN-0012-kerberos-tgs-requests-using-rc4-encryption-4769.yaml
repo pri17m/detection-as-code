@@ -1,0 +1,39 @@
+id: DAC-WIN-0012
+title: Kerberos TGS requests using RC4 encryption (4769)
+description: Detects Kerberos service ticket requests using RC4 (0x17) which can be
+  associated with Kerberoasting and legacy configurations.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1558.003
+severity: medium
+false_positives:
+- Legacy environments with RC4 enabled; tune by SPN allowlist.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4769
+telemetry_validated: false
+required_fields:
+- EventCode
+- Account_Name
+- ServiceName
+- TicketEncryptionType
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4769
+
+    | eval user=coalesce(Account_Name, TargetUserName, user)
+
+    | where TicketEncryptionType="0x17" OR TicketEncryptionType=0x17 OR TicketEncryptionType=23
+
+    | stats count as tgs_requests dc(ServiceName) as spn_count values(ServiceName)
+    as spns by user
+
+    | where tgs_requests >= 10
+
+    '

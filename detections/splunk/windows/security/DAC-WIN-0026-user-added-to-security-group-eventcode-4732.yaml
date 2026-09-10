@@ -1,0 +1,39 @@
+id: DAC-WIN-0026
+title: User added to security group (EventCode 4732)
+description: Detects group membership additions (EventCode 4732); review for privileged
+  groups (e.g., Domain Admins, local Administrators).
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - privilege-escalation
+  - persistence
+  techniques:
+  - T1098
+severity: high
+false_positives:
+- Legitimate group administration.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4732
+telemetry_validated: false
+required_fields:
+- EventCode
+- TargetUserName
+- SubjectUserName
+- GroupName
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4732
+
+    | eval actor=coalesce(SubjectUserName, src_user)
+
+    | eval member=coalesce(MemberName, TargetUserName, user)
+
+    | eval group=coalesce(GroupName, TargetDomainName, group_name)
+
+    | stats count values(member) as members values(group) as groups by actor, host
+
+    '

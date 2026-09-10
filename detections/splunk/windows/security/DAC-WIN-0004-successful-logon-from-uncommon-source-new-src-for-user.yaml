@@ -1,0 +1,46 @@
+id: DAC-WIN-0004
+title: Successful logon from uncommon source (new src for user)
+description: Detects a successful logon (4624) where the source IP is new for the
+  user over a lookback period; useful for initial credential compromise triage.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - initial-access
+  - credential-access
+  techniques:
+  - T1078
+severity: medium
+false_positives:
+- Users traveling or new VPN egress points.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624
+telemetry_validated: false
+required_fields:
+- EventCode
+- IpAddress
+- TargetUserName
+- _time
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4624
+
+    | eval src_ip=coalesce(IpAddress, src, src_ip)
+
+    | eval user=coalesce(TargetUserName, Account_Name, user)
+
+    | where isnotnull(src_ip) AND isnotnull(user)
+
+    | bin _time span=1h
+
+    | stats earliest(_time) as first_seen latest(_time) as last_seen values(host)
+    as hosts by user, src_ip
+
+    | eventstats earliest(first_seen) as global_first_seen by user, src_ip
+
+    | where first_seen = global_first_seen
+
+    '

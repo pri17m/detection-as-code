@@ -1,0 +1,36 @@
+id: DAC-WIN-0071
+title: New service installed (7045) with suspicious image path
+description: Detects service installation events where the service image path is suspicious
+  (temp/user-writable paths or command interpreters).
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:System
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1543.003
+severity: high
+false_positives:
+- Legitimate software installs; tune by publisher/path allowlists.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-7045
+telemetry_validated: false
+required_fields:
+- EventCode
+- ServiceName
+- ImagePath
+- host
+query:
+  splunk: 'sourcetype=WinEventLog:System EventCode=7045
+
+    | eval img=lower(coalesce(ImagePath, ServiceFileName, service_image_path))
+
+    | where match(img, "(\\\\users\\\\|\\\\temp\\\\|\\\\appdata\\\\|cmd\\.exe|powershell\\.exe|wscript\\.exe|cscript\\.exe)")
+
+    | stats count values(ServiceName) as services values(img) as image_paths by host
+
+    '

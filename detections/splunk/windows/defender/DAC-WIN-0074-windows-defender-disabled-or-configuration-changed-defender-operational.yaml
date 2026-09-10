@@ -1,0 +1,34 @@
+id: DAC-WIN-0074
+title: Windows Defender disabled or configuration changed (Defender Operational)
+description: Detects Defender operational events associated with disabling or configuration
+  changes that may indicate defense evasion.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.001
+severity: high
+false_positives:
+- IT-driven Defender policy changes.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender-endpoint/troubleshoot-microsoft-defender-antivirus
+telemetry_validated: false
+required_fields:
+- EventCode
+- Message
+- host
+query:
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational"
+    (EventCode=5001 OR EventCode=5007 OR EventCode=5010 OR EventCode=5012)
+
+    | eval msg=lower(coalesce(Message))
+
+    | stats count values(msg) as messages by host
+
+    '

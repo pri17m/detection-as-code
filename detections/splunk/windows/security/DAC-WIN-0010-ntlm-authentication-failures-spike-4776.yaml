@@ -1,0 +1,37 @@
+id: DAC-WIN-0010
+title: NTLM authentication failures spike (4776)
+description: Detects bursts of NTLM authentication failures that can indicate password
+  guessing or legacy auth abuse.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1110
+severity: medium
+false_positives:
+- Legacy applications with stale passwords.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4776
+telemetry_validated: false
+required_fields:
+- EventCode
+- AccountName
+- Workstation
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4776
+
+    | eval user=coalesce(AccountName, Account_Name, user)
+
+    | eval workstation=coalesce(Workstation, src, host)
+
+    | stats count as failures dc(user) as users values(user) as user_list by workstation
+
+    | where failures >= 25 AND users >= 10
+
+    '

@@ -1,0 +1,41 @@
+id: DAC-WIN-0075
+title: 'Sysmon: Office spawns shell or PowerShell'
+description: Detects Sysmon process creation where Office applications spawn cmd/powershell/wscript/cscript,
+  commonly associated with macro-based execution.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1204
+severity: high
+false_positives:
+- Legitimate add-ins or automation; tune by allowlisting known templates/macros.
+references:
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+telemetry_validated: false
+required_fields:
+- EventCode
+- Image
+- ParentImage
+- CommandLine
+- host
+query:
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1
+
+    | eval img=lower(coalesce(Image))
+
+    | eval parent=lower(coalesce(ParentImage))
+
+    | eval cmd=lower(coalesce(CommandLine))
+
+    | where match(parent,"(winword|excel|powerpnt|outlook)\\.exe") AND match(img,"(cmd|powershell|pwsh|wscript|cscript)\\.exe")
+
+    | stats count values(cmd) as commands values(parent) as parents by host, User
+
+    '

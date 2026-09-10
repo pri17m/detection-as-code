@@ -1,0 +1,35 @@
+id: DAC-WIN-0006
+title: Special privileges assigned to new logon (4672) for non-admin users
+description: Detects privileged logon events (4672) for accounts that are not commonly
+  privileged, which can indicate privilege escalation or admin misuse.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1078
+severity: high
+false_positives:
+- Newly promoted admins; service accounts.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4672
+telemetry_validated: false
+required_fields:
+- EventCode
+- SubjectUserName
+- host
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4672
+
+    | eval user=coalesce(SubjectUserName, Account_Name, user)
+
+    | search NOT user IN ("Administrator","SYSTEM","LOCAL SERVICE","NETWORK SERVICE")
+
+    | stats count values(PrivilegeList) as privileges by user, host
+
+    '

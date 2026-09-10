@@ -1,0 +1,41 @@
+id: DAC-WIN-0084
+title: 'Sysmon: Suspicious DNS queries (long subdomains / risky TLDs)'
+description: Detects DNS queries with long or high-entropy-looking domains and selected
+  risky TLDs as a lightweight signal for dynamic resolution.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1568
+severity: medium
+false_positives:
+- CDNs and legitimate long domains; tune with allowlists.
+references:
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+telemetry_validated: false
+required_fields:
+- EventCode
+- QueryName
+- Image
+- host
+query:
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=22
+
+    | eval q=lower(coalesce(QueryName, query))
+
+    | eval img=lower(coalesce(Image))
+
+    | where len(q) >= 35 OR match(q,"\\.(top|xyz|gq|work|click|country|zip|mov)$")
+
+    | stats count as queries dc(q) as domains values(q) as domain_list by host, User,
+    img
+
+    | where domains >= 10
+
+    '

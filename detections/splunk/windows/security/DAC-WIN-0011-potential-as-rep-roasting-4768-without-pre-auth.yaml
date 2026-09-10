@@ -1,0 +1,35 @@
+id: DAC-WIN-0011
+title: Potential AS-REP Roasting (4768 without pre-auth)
+description: Detects Kerberos AS-REQ events where pre-authentication is not required,
+  which can indicate AS-REP Roasting opportunities or abuse.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1558.004
+severity: high
+false_positives:
+- Accounts intentionally configured without pre-auth (should be rare).
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4768
+telemetry_validated: false
+required_fields:
+- EventCode
+- TargetUserName
+- PreAuthType
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4768
+
+    | eval user=coalesce(TargetUserName, Account_Name, user)
+
+    | where PreAuthType=0 OR PreAuthType="0"
+
+    | stats count values(IpAddress) as src_ips by user
+
+    '

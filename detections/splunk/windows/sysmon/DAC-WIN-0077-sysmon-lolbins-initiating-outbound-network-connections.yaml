@@ -1,0 +1,40 @@
+id: DAC-WIN-0077
+title: 'Sysmon: LOLBins initiating outbound network connections'
+description: Detects Sysmon network connections initiated by common LOLBins often
+  used for tool transfer or staging.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1105
+severity: medium
+false_positives:
+- Legitimate admin tooling and package managers; tune by destination allowlists.
+references:
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+telemetry_validated: false
+required_fields:
+- EventCode
+- Image
+- DestinationIp
+- DestinationPort
+- host
+query:
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=3
+
+    | eval img=lower(coalesce(Image))
+
+    | where match(img,"(powershell|pwsh|mshta|rundll32|regsvr32|bitsadmin|certutil)\\.exe")
+
+    | stats count dc(DestinationIp) as dest_ips values(DestinationPort) as ports by
+    host, User, img
+
+    | where count >= 10 AND dest_ips >= 5
+
+    '

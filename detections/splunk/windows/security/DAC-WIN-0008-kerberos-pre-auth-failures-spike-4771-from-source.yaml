@@ -1,0 +1,37 @@
+id: DAC-WIN-0008
+title: Kerberos pre-auth failures spike (4771) from source
+description: Detects spikes of Kerberos pre-auth failures that can indicate password
+  guessing or AS-REQ abuse.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1110
+severity: medium
+false_positives:
+- Time skew; users with expired passwords.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4771
+telemetry_validated: false
+required_fields:
+- EventCode
+- IpAddress
+- TargetUserName
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4771
+
+    | eval src_ip=coalesce(IpAddress, src, src_ip)
+
+    | eval user=coalesce(TargetUserName, Account_Name, user)
+
+    | stats count as failures dc(user) as users values(user) as user_list by src_ip
+
+    | where failures >= 30 AND users >= 10
+
+    '

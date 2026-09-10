@@ -1,0 +1,33 @@
+id: DAC-WIN-0018
+title: Security audit log cleared (1102)
+description: Detects Event ID 1102 indicating the Security log was cleared, commonly
+  used for defense evasion.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1070.001
+severity: high
+false_positives:
+- Legitimate log maintenance (should be rare and controlled).
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-1102
+telemetry_validated: false
+required_fields:
+- EventCode
+- SubjectUserName
+- host
+query:
+  splunk: 'sourcetype=WinEventLog:Security EventCode=1102
+
+    | eval user=coalesce(SubjectUserName, user, Account_Name)
+
+    | stats count values(user) as users by host
+
+    '
