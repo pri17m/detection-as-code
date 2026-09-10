@@ -1,142 +1,60 @@
-# Canonical Splunk sourcetype allowlist for Detection-as-Code
+# Canonical Splunk sourcetype allowlist for Detection-as-Code (Windows telemetry)
 # CI MUST reject detection rules that reference sourcetypes not listed under
 # allowed_sourcetypes (exact string match after macro expansion).
 #
 # Repo path: config/sourcetype_map.yaml
-# Box draft: /workspace/dac-telemetry-windows/config/sourcetype_map.yaml
+# Companion docs:
+#   - docs/telemetry/windows-splunk.md  (recommended future home)
+#   - /workspace/dac-windows-splunk-telemetry.md (research deliverable)
 #
-# Prefer sourcetype=… in rules. Never hardcode index=.
-# Families: windows + Wave A CS/MDE + Wave B Entra + Wave C AWS/Azure/GCP + GitHub.
+# Prefer sourcetype=… in rules. Never hardcode index=. Optional index macros
+# live in org config (see org.example.yaml placeholders below).
+#
+# Notes on TA influence:
+# - Splunk Add-on for Microsoft Windows >= 5.0: channel often in `source`,
+#   sourcetype collapses to WinEventLog (classic) or XmlWinEventLog (XML).
+# - Pre-5.0 / many production installs still use compound sourcetypes
+#   (e.g. WinEventLog:Security, XmlWinEventLog:Security). BOTH are allowed.
+# - Splunk Add-on for Sysmon: prefers XML; sourcetype XmlWinEventLog with
+#   source=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational, OR compound
+#   XmlWinEventLog:Microsoft-Windows-Sysmon/Operational. Legacy: sysmon / sysmon:*.
 
 version: 1
 platform: splunk
-telemetry_families:
-  - windows
-  - crowdstrike
-  - defender
-  - github
-  - entra
-  - aws
-  - gcp
+telemetry_family: windows
 
 # ---------------------------------------------------------------------------
-# Canonical allowed sourcetype strings
+# Canonical allowed sourcetype strings (FIRST set = Windows)
 # ---------------------------------------------------------------------------
 allowed_sourcetypes:
   # --- Windows Security ---
   - WinEventLog:Security
   - XmlWinEventLog:Security
-  - WinEventLog
-  - XmlWinEventLog
+  - WinEventLog                 # TA >=5 classic; filter with source=*Security*
+  - XmlWinEventLog              # TA >=5 XML; filter with source=*Security* / *System* / *Sysmon* / *PowerShell*
 
   # --- Windows System ---
   - WinEventLog:System
   - XmlWinEventLog:System
 
-  # --- PowerShell ---
+  # --- PowerShell Operational (module/script block: 4103/4104) ---
   - WinEventLog:Microsoft-Windows-PowerShell/Operational
   - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+
+  # --- PowerShell classic channel (engine: 400/403/600) ---
   - WinEventLog:Windows PowerShell
   - XmlWinEventLog:Windows PowerShell
 
   # --- Sysmon ---
   - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
-  - WinEventLog:Microsoft-Windows-Sysmon/Operational
+  - WinEventLog:Microsoft-Windows-Sysmon/Operational  # classic render (not preferred; TA fields incomplete)
   - sysmon
-  - "sysmon:*"
-
-  # --- WMI Activity (host) ---
-  - XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
-  - WinEventLog:Microsoft-Windows-WMI-Activity/Operational
-
-  # --- Windows Defender Operational (host channel) ---
-  - XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
-  - WinEventLog:Microsoft-Windows-Windows Defender/Operational
-
-  # --- Wave A: CrowdStrike Falcon (portable stub key) ---
-  - falcon:process
-  # future (not yet allowlisted until Telemetry maps): falcon:identity, falcon:dns, falcon:network
-
-  # --- Wave A: Microsoft Defender / MDE Advanced Hunting ---
-  - mde:advanced_hunting
-  # future table-scoped keys when DE/Telemetry agree: mde:device_process, mde:device_network, …
-
-  # --- GitHub (Splunk) ---
-  - github:audit
-  # --- Wave B: Entra / Azure AD (Splunk) ---
-  - azure:monitor:aad              # preferred (Azure Monitor / AAD)
-  - azure:aad:signin               # legacy alias
-  - azure:aad:audit                # legacy alias
-
-  # --- GitHub aliases ---
-  # github:audit already listed
-  - github:cloud:audit              # alias used by some GH cloud packs
-  # --- Wave C: Cloud audit (AWS / Azure Activity / GCP) ---
-  - aws:cloudtrail                 # preferred
-  - aws:cloudtrail:json             # common TA / HEC alias
-  - aws:cloudtrail:event            # alternate pipeline alias
-  - azure:monitor:activity          # preferred Azure Activity / Monitor
-  - azure:activity                  # legacy short alias
-  - azure:insights:activitylogs     # Insights/export alias
-  - gcp:audit                       # preferred portable key
-  - google:gcp:pubsub:message       # Splunk Add-on for GCP common
-  - google:gcp:cloudaudit:json      # Cloud Audit Logs JSON alias
+  - "sysmon:*"                  # glob form used in some orgs / legacy TAs
 
 # ---------------------------------------------------------------------------
-# Canonical macro → sourcetype sets (CI / rule authors)
+# Optional: source= patterns that pair with collapsed sourcetypes
+# (not CI-enforced as sourcetype strings; documented for rule authors)
 # ---------------------------------------------------------------------------
-canonical:
-  windows_security:
-    - WinEventLog:Security
-    - XmlWinEventLog:Security
-    - WinEventLog
-    - XmlWinEventLog
-  windows_system:
-    - WinEventLog:System
-    - XmlWinEventLog:System
-  windows_sysmon:
-    - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
-    - WinEventLog:Microsoft-Windows-Sysmon/Operational
-    - sysmon
-    - "sysmon:*"
-  windows_powershell_operational:
-    - WinEventLog:Microsoft-Windows-PowerShell/Operational
-    - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
-  windows_powershell_classic:
-    - WinEventLog:Windows PowerShell
-    - XmlWinEventLog:Windows PowerShell
-  windows_wmi:
-    - XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
-    - WinEventLog:Microsoft-Windows-WMI-Activity/Operational
-  windows_defender:
-    - XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
-    - WinEventLog:Microsoft-Windows-Windows Defender/Operational
-  crowdstrike_falcon_process:
-    - falcon:process
-  defender_advanced_hunting:
-    - mde:advanced_hunting
-  github_audit:
-    - github:audit
-  entra_azure_ad:
-    - azure:monitor:aad
-    - azure:aad:signin
-    - azure:aad:audit
-  github_cloud_audit:
-    - github:cloud:audit
-    - github:audit
-  aws_cloudtrail:
-    - aws:cloudtrail
-    - aws:cloudtrail:json
-    - aws:cloudtrail:event
-  azure_monitor_activity:
-    - azure:monitor:activity
-    - azure:activity
-    - azure:insights:activitylogs
-  gcp_audit:
-    - gcp:audit
-    - google:gcp:pubsub:message
-    - google:gcp:cloudaudit:json
-
 source_patterns:
   security:
     - WinEventLog:Security
@@ -155,17 +73,16 @@ source_patterns:
   sysmon:
     - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
     - WinEventLog:Microsoft-Windows-Sysmon/Operational
-    - XmlWinEventLog:WEC-Sysmon
-  defender_operational:
-    - XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational
-    - WinEventLog:Microsoft-Windows-Windows Defender/Operational
-  wmi_activity:
-    - XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
-    - WinEventLog:Microsoft-Windows-WMI-Activity/Operational
+    - XmlWinEventLog:WEC-Sysmon   # WEF/WEC via Sysmon TA >=3.0 (uncertain naming in some orgs)
 
+# ---------------------------------------------------------------------------
+# Recommended search macros (org overrides index; rules use sourcetype macros)
+# Implement as Splunk macros or DaC YAML macros expanded at build time.
+# ---------------------------------------------------------------------------
 macros:
+  # Sourcetype-portability macros (PREFERRED in detections)
   windows_security:
-    description: Security channel — classic + XML compound + collapsed forms
+    description: Security channel — classic + XML compound + collapsed XmlWinEventLog/WinEventLog
     suggested_definition: >-
       (sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security
        OR (sourcetype=WinEventLog source=WinEventLog:Security)
@@ -197,71 +114,22 @@ macros:
        OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
        OR (sourcetype=XmlWinEventLog source="*Microsoft-Windows-Sysmon/Operational")
        OR sourcetype=sysmon OR sourcetype=sysmon:*)
-  windows_wmi:
-    description: WMI-Activity/Operational
-    suggested_definition: >-
-      (sourcetype=XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational
-       OR sourcetype=WinEventLog:Microsoft-Windows-WMI-Activity/Operational)
-  windows_defender:
-    description: Windows Defender Operational channel
-    suggested_definition: >-
-      (sourcetype="XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational"
-       OR sourcetype="WinEventLog:Microsoft-Windows-Windows Defender/Operational")
-  crowdstrike_falcon_process:
-    description: Wave A Falcon process / Custom IOA portable key
-    suggested_definition: "sourcetype=falcon:process"
-  defender_advanced_hunting:
-    description: Wave A MDE Advanced Hunting portable key (KQL stubs)
-    suggested_definition: "sourcetype=mde:advanced_hunting"
-  github_audit:
-    description: GitHub audit log (Splunk)
-    suggested_definition: "sourcetype=github:audit"
 
   # Optional INDEX macros — org-specific; NEVER hardcode index= in rule bodies
-  entra_azure_ad:
-    description: Wave B Entra / Azure AD — prefer azure:monitor:aad; legacy signin/audit aliases
-    suggested_definition: >-
-      (sourcetype=azure:monitor:aad OR sourcetype=azure:aad:signin OR sourcetype=azure:aad:audit)
-  github_cloud_audit:
-    description: GitHub audit including cloud alias
-    suggested_definition: >-
-      (sourcetype=github:audit OR sourcetype=github:cloud:audit)
-
-  aws_cloudtrail:
-    description: Wave C AWS CloudTrail — prefer aws:cloudtrail
-    suggested_definition: >-
-      (sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
-  azure_monitor_activity:
-    description: Wave C Azure Activity / Monitor — prefer azure:monitor:activity
-    suggested_definition: >-
-      (sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
-  gcp_audit:
-    description: Wave C GCP audit — prefer gcp:audit; include Splunk GCP TA aliases
-    suggested_definition: >-
-      (sourcetype=gcp:audit OR sourcetype=google:gcp:pubsub:message OR sourcetype=google:gcp:cloudaudit:json)
-
   windows_security_index:
     description: Placeholder index constraint for Security events
-    suggested_definition: "index=wineventlog"
+    suggested_definition: "index=wineventlog"   # ORG OVERRIDE
   windows_system_index:
     description: Placeholder index constraint for System events
-    suggested_definition: "index=wineventlog"
+    suggested_definition: "index=wineventlog"   # ORG OVERRIDE
   windows_powershell_index:
     description: Placeholder index constraint for PowerShell events
-    suggested_definition: "index=wineventlog"
+    suggested_definition: "index=wineventlog"   # ORG OVERRIDE
   windows_sysmon_index:
     description: Placeholder index constraint for Sysmon events
-    suggested_definition: "index=sysmon"
-  falcon_index:
-    description: Placeholder for Falcon/NG-SIEM ingest if routed via Splunk
-    suggested_definition: "index=falcon"
-  mde_index:
-    description: Placeholder for MDE/AH export if routed via Splunk
-    suggested_definition: "index=mde"
-  github_index:
-    description: Placeholder for GitHub audit
-    suggested_definition: "index=github"
+    suggested_definition: "index=sysmon"        # ORG OVERRIDE
 
+# Aliases: compound form ↔ collapsed form (documentation for CI / linters)
 aliases:
   WinEventLog:Security:
     - { sourcetype: WinEventLog, source: WinEventLog:Security }
@@ -275,23 +143,6 @@ aliases:
     - { sourcetype: XmlWinEventLog, source: XmlWinEventLog:Microsoft-Windows-Sysmon/Operational }
   XmlWinEventLog:Microsoft-Windows-PowerShell/Operational:
     - { sourcetype: XmlWinEventLog, source: XmlWinEventLog:Microsoft-Windows-PowerShell/Operational }
-
-allowed_sourcetype_macros:
-  - gcp_audit
-  - azure_monitor_activity
-  - aws_cloudtrail
-  - github_cloud_audit
-  - entra_azure_ad
-  - windows_security
-  - windows_system
-  - windows_powershell_operational
-  - windows_powershell_classic
-  - windows_sysmon
-  - windows_wmi
-  - windows_defender
-  - crowdstrike_falcon_process
-  - defender_advanced_hunting
-  - github_audit
 
 ci:
   enforce: true

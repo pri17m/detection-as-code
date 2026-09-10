@@ -147,6 +147,12 @@ def _validate_sourcetypes_allowlist(
     for st in sts:
         if not isinstance(st, str):
             continue
+        # Telemetry canonical allowlist is Windows-focused; other platform packs may define
+        # their own portable sourcetypes (e.g., Falcon/MDE stubs) that are not part of the
+        # Windows telemetry contract. Enforce allowlist strictly for Windows-family sourcetypes
+        # and for allowlisted macro keys.
+        if st not in allowed_macros and not _is_windows_splunk_sourcetype(st):
+            continue
         if st in allowed_macros:
             continue
         if st in exact:
