@@ -1,0 +1,49 @@
+severity: critical
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode IN (12,13,14)
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/registry/registry_event/registry_event_silentprocessexit_lsass.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_event/registry_event_silentprocessexit_lsass.yml
+- https://attack.mitre.org/techniques/T1003/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/registry/registry_event/registry_event_silentprocessexit_lsass.yml
+title: Potential Credential Dumping Via LSASS SilentProcessExit Technique
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0265
+description: Detects changes to the Registry in which a monitor program gets registered to dump the memory
+  of the lsass.exe process
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.001
+required_fields:
+- EventCode
+- Image
+- TargetObject
+- Details
+false_positives:
+- Unlikely
+status: experimental
