@@ -1,0 +1,38 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1548.005
+id: DAC-AZ-0030
+status: experimental
+title: 'Azure: PIM Azure resource role activation anomalous'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="*roleAssignmentSchedule*" OR operationName="Microsoft.Authorization/roleAssignmentScheduleRequests/write"
+    OR operationName="*PIM*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1548/005/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-top5
+description: PIM resource role activate
+sourcetypes:
+- azure:monitor:activity
