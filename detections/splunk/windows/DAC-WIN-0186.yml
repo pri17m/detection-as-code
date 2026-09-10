@@ -1,0 +1,36 @@
+id: DAC-WIN-0186
+title: Registry ASEP AppInit_DLLs / IFEO debugger
+description: Sysmon 13 AppInit_DLLs or IFEO
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1546.010
+  - T1546.012
+severity: high
+false_positives:
+- Dev tooling
+references:
+- https://attack.mitre.org/techniques/T1546/010/
+- https://attack.mitre.org/techniques/T1546/012/
+telemetry_validated: false
+required_fields:
+- EventCode
+- Image
+- TargetObject
+- Details
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- persistence
