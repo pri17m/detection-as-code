@@ -1,0 +1,41 @@
+id: DAC-WIN-0001
+title: LSASS process access by non-EDR
+description: Sysmon EID 10 TargetImage=lsass.exe; filter EDR/AV SourceImage
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: critical
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1003.001
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- SourceImage
+- TargetImage
+- GrantedAccess
+telemetry_validated: false
+false_positives:
+- Legitimate AV/EDR/backup agents
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+- rules/windows/process_access/proc_access_win_lsass_memdump.yml
+tags:
+- phase1
+- windows
+- P0
+- process
+query:
+  splunk: '`windows_sysmon` EventCode=10 TargetImage="*\\lsass.exe"
+
+    | search NOT (SourceImage IN ("*\\MsMpEng.exe","*\\csfalconservice.exe","*\\SentinelAgent.exe"))
+
+    | table _time host SourceImage TargetImage GrantedAccess User
+
+    '
