@@ -1,0 +1,39 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1555.006
+id: DAC-AZ-0013
+status: experimental
+title: 'Azure: Key Vault access policy or RBAC grant broad secrets get'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName IN ("Microsoft.KeyVault/vaults/accessPolicies/write","Microsoft.Authorization/roleAssignments/write")
+
+    | search resourceId="*/vaults/*" OR properties="*Key Vault*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1555/006/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-related
+description: vaults/accessPolicies write secrets get
+sourcetypes:
+- azure:monitor:activity
