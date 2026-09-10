@@ -1,0 +1,37 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1047/
+title: "MDE: WmiPrvSE \u2192 powershell/cmd"
+description: DeviceProcessEvents parent/child
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0038
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0113
+query:
+  defender: 'DeviceEvents
+
+    | where ActionType has "Wmi" or AdditionalFields has "EventConsumer"
+
+    | project Timestamp, DeviceName, ActionType, AdditionalFields
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1047
