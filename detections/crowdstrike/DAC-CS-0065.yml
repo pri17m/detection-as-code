@@ -1,0 +1,51 @@
+references:
+- https://attack.mitre.org/techniques/T1219/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/unauthorized_rmm_tool_usage.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `unauthorized_rmm_tool_usage.yml`\
+    \ \u2014 experimental sketch; not raw dump\n// Optional parent enrichment: join SyntheticProcessRollup2\
+    \ on [aid, RawProcessId]\n| ImageFileName=/(\\\\|\\/)(?<FileName>[^\\\\\\/]+)$/\n| FileName=/^anydesk(_custom)?(\\\
+    .exe)?$/i                                  | RMMTool:=\"AnyDesk\";\n| FileName=/^(teamviewer(_service|_desktop)?|tv_w32|tv_x64)(\\\
+    .exe)?$/i     | RMMTool:=\"TeamViewer\";\n| FileName=/^(screenconnect|connectwise)[\\w.]*(\\.exe)?$/i\
+    \                  | RMMTool:=\"ScreenConnect / ConnectWise\";\n| FileName=/^(ateraagent|atera[\\\
+    w.]*)(\\.exe)?$/i                           | RMMTool:=\"Atera\";\n| FileName=/^(splashtop[\\w.]*|srservice|strwinclt|srmanager)(\\\
+    .exe)?$/i    | RMMTool:=\"Splashtop\";\n| FileName=/^rustdesk(\\.exe)?$/i                        \
+    \                   | RMMTool:=\"RustDesk\";\n| FileName=/^supremo(helper|service)?(\\.exe)?$/i  \
+    \                         | RMMTool:=\"Supremo\";\n| FileName=/^ammyy[\\w.]*(\\.exe)?$/i         \
+    \                               | RMMTool:=\"Ammyy Admin\";\n| FileName=/^ultraviewer[\\w.]*(\\.exe)?$/i\
+    \                                  | RMMTool:=\"UltraViewer\";\n| groupBy([aid, ComputerName, ImageFileName,\
+    \ CommandLine], function=count())\n"
+title: 'Falcon: Unauthorized RMM Tool Usage'
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+description: Detects the execution of Remote Monitoring & Management (RMM) and remote access tools such
+  as AnyDesk, TeamViewer, ScreenConnect, Atera, Splashtop, RustDesk, and others. Threat act
+id: DAC-CS-0065
+sourcetypes:
+- falcon:process
+platforms:
+- crowdstrike
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1219
+severity: high
+author: Detection Engineer
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P0
+- src:unauthorized_rmm_tool_usage.yml
+telemetry_validated: false
+required_fields:
+- CommandLine
+- ComputerName
+- FileName
+- ImageFileName
+- UserName
+- aid
+status: experimental
