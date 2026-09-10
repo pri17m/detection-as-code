@@ -1,0 +1,32 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1070/001/
+title: 'Falcon: wevtutil clear or disable log'
+description: wevtutil cl/sl
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0043
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0114
+query:
+  crowdstrike: 'ImageFileName="wevtutil.exe" AND CommandLine CONTAINS_ANY [" cl ","clear-log","sl "]
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1070.001
