@@ -1,0 +1,37 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685.002
+id: DAC-AWS-0006
+status: experimental
+title: 'AWS: CloudTrail StopLogging or DeleteTrail'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("StopLogging","DeleteTrail")
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1685/002/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-top5
+description: StopLogging DeleteTrail
+sourcetypes:
+- aws:cloudtrail
