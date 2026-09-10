@@ -1,12 +1,3 @@
-id: DAC-CS-0003
-title: 'Falcon: regsvr32 remote scriptlet'
-description: Starter Falcon IOA/correlation rule candidate.
-author: DaC
-status: experimental
-platforms:
-- crowdstrike
-sourcetypes:
-- falcon:process
 mitre:
   tactics:
   - execution
@@ -14,17 +5,44 @@ mitre:
   techniques:
   - T1218.010
 severity: medium
-false_positives:
-- Tune to your environment and allowlist known tooling.
-references:
-- https://www.crowdstrike.com/
-telemetry_validated: false
 required_fields:
 - ImageFileName
 - CommandLine
 - ParentBaseFileName
+- aid
+- ComputerName
+- TargetProcessId
 query:
-  crowdstrike: 'falcon_ioa_pattern: ImageFileName="regsvr32.exe" AND CommandLine CONTAINS_ANY
-    ["http://","https://",".sct","scrobj.dll"]
+  crowdstrike: '#event_simpleName=ProcessRollup2
+
+    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
+
+    // prior: falcon_ioa_pattern: ImageFileName="regsvr32.exe" AND CommandLine CONTAINS_ANY ["http://","https://",".sct","scrobj.dll"]
+
+    // --- src: LOLBin_Regsvr32.yml (Falcon: LOLBin Regsvr32) ---
+
+    | ImageFileName=/regsvr32.exe/i CommandLine=/scrobj.dll/i CommandLine=/i:/i
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
 
     '
+tags:
+- enhance-01b
+- processrollup2
+- qh:LOLBin_Regsvr32.yml
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+references:
+- https://www.crowdstrike.com/
+platforms:
+- crowdstrike
+false_positives:
+- Tune to your environment and allowlist known tooling.
+- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
+id: DAC-CS-0003
+title: 'Falcon: regsvr32 remote scriptlet'
+author: DaC
+status: experimental
+description: Starter Falcon IOA/correlation rule candidate. Enhanced with Query-Hub ProcessRollup2 patterns
+  (LOLBin_Regsvr32.yml).
