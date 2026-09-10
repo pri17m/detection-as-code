@@ -1,0 +1,53 @@
+severity: high
+query:
+  splunk: '(sourcetype=XmlWinEventLog:System OR sourcetype=WinEventLog:System) EventCode=7045
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/system/service_control_manager/win_system_invoke_obfuscation_via_use_mshta_services.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/system/service_control_manager/win_system_invoke_obfuscation_via_use_mshta_services.yml
+- https://attack.mitre.org/techniques/T1218/005/
+- https://attack.mitre.org/techniques/T1543/003/
+- https://attack.mitre.org/techniques/T1027/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_system
+- sigma:rules/windows/builtin/system/service_control_manager/win_system_invoke_obfuscation_via_use_mshta_services.yml
+title: Invoke-Obfuscation Via Use MSHTA - System
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:System
+- XmlWinEventLog:System
+id: DAC-WIN-0285
+description: Detects Obfuscated Powershell via use MSHTA in Scripts
+mitre:
+  tactics:
+  - defense-evasion
+  - persistence
+  - execution
+  techniques:
+  - T1218.005
+  - T1543.003
+  - T1027
+  - T1059.001
+required_fields:
+- EventCode
+- ServiceName
+- ImagePath
+false_positives:
+- Unknown
+status: experimental
