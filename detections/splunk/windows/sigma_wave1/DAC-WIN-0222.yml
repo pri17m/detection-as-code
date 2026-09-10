@@ -1,0 +1,52 @@
+severity: medium
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=7
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/image_load/image_load_office_powershell_dll_load.yml; fieldsummary
+    before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/image_load/image_load_office_powershell_dll_load.yml
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1574/001/
+- https://attack.mitre.org/techniques/T1574/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/image_load/image_load_office_powershell_dll_load.yml
+title: PowerShell Core DLL Loaded Via Office Application
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0222
+description: Detects PowerShell core DLL being loaded by an Office Product
+mitre:
+  tactics:
+  - execution
+  - persistence
+  techniques:
+  - T1059.001
+  - T1574.001
+  - T1574
+required_fields:
+- EventCode
+- Image
+- ImageLoaded
+false_positives:
+- Unknown
+status: experimental
