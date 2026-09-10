@@ -1,0 +1,49 @@
+severity: medium
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=3
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/network_connection/net_connection_win_regsvr32_network_activity.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/network_connection/net_connection_win_regsvr32_network_activity.yml
+- https://attack.mitre.org/techniques/T1218/010/
+- https://attack.mitre.org/techniques/T1559/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/network_connection/net_connection_win_regsvr32_network_activity.yml
+title: Network Connection Initiated By Regsvr32.EXE
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0298
+description: Detects a network connection initiated by "Regsvr32.exe"
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218.010
+  - T1559.001
+required_fields:
+- EventCode
+- Image
+- DestinationIp
+false_positives:
+- Unknown
+status: experimental
