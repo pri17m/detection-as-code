@@ -1,0 +1,49 @@
+severity: low
+query:
+  splunk: '(sourcetype=XmlWinEventLog:System OR sourcetype=WinEventLog:System) EventCode IN (16,27)
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/system/microsoft_windows_kerberos_key_distribution_center/win_system_kdcsvc_tgs_no_suitable_encryption_key_found.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/system/microsoft_windows_kerberos_key_distribution_center/win_system_kdcsvc_tgs_no_suitable_encryption_key_found.yml
+- https://attack.mitre.org/techniques/T1558/003/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_system
+- sigma:rules/windows/builtin/system/microsoft_windows_kerberos_key_distribution_center/win_system_kdcsvc_tgs_no_suitable_encryption_key_found.yml
+title: No Suitable Encryption Key Found For Generating Kerberos Ticket
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:System
+- XmlWinEventLog:System
+id: DAC-WIN-0284
+description: 'Detects errors when a target server doesn''t have suitable keys for generating kerberos
+  tickets.
+
+  This issue can occur for example when a service uses a user account or a computer account that is configured
+  for only DES encryption on a computer that is running Windows 7 which has DES encryption for Kerberos
+  authentication disabled.'
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1558.003
+required_fields:
+- EventCode
+false_positives:
+- Unknown
+status: experimental
