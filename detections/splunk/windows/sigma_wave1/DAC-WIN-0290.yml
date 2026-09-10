@@ -1,0 +1,58 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=7
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/image_load/image_load_dll_dbghelp_dbgcore_unsigned_load.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/image_load/image_load_dll_dbghelp_dbgcore_unsigned_load.yml
+- https://attack.mitre.org/techniques/T1574/001/
+- https://attack.mitre.org/techniques/T1574/
+- https://attack.mitre.org/techniques/T1003/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/image_load/image_load_dll_dbghelp_dbgcore_unsigned_load.yml
+title: Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0290
+description: 'Detects the load of dbghelp/dbgcore DLL (used to make memory dumps) by suspicious processes.
+
+  Tools like ProcessHacker and some attacker tradecract use MiniDumpWriteDump API found in dbghelp.dll
+  or dbgcore.dll.
+
+  As an example, SilentTrynity C2 Framework has a module that leverages this API to dump the contents
+  of Lsass.exe and transfer it over the network back to the attacker''s machine.'
+mitre:
+  tactics:
+  - persistence
+  - credential-access
+  techniques:
+  - T1574.001
+  - T1574
+  - T1003.001
+required_fields:
+- EventCode
+- Image
+- ImageLoaded
+false_positives:
+- Unknown
+status: experimental
