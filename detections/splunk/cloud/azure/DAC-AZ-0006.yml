@@ -1,0 +1,37 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1651
+id: DAC-AZ-0006
+status: experimental
+title: 'Azure: RunCommand or RunCommandPreview on VM fleets'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName IN ("Microsoft.Compute/virtualMachines/runCommand/action","Microsoft.Compute/virtualMachines/runCommands/write")
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1651/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-related
+description: Microsoft.Compute/virtualMachines/runCommand
+sourcetypes:
+- azure:monitor:activity
