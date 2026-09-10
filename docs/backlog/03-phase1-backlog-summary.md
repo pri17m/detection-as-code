@@ -95,3 +95,4 @@ Contract-aligned Windows backlog of **97** analytics (`DAC-WIN-0001` … `DAC-WI
 5. CI schema lint; promote telemetry_validated only after checklist.
 
 *Planning only — verify audit policy + Sysmon before measuring coverage.*
+
