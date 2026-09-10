@@ -1,0 +1,33 @@
+query:
+  splunk: "sourcetype=azure:monitor:aad\n| search Category=\"SignInLogs\" isInteractive=false\n| # Experimental:\
+    \ missing interactive parent session \u2014 tune with sessionId correlation\n| table _time, operationName,\
+    \ ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress, userPrincipalName\n"
+id: DAC-ENTRA-0012
+title: 'Entra: Application access token use without matching interactive parent'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-top5
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1550/001/
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1550.001
+author: Detection Engineer
+status: experimental
+description: token/session family missing interactive ancestor
