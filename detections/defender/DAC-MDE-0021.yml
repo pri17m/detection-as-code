@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1550/002/
+title: 'MDE: NTLM LogonType 3 KeyLength 0 privileged user'
+description: DeviceLogonEvents
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0021
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0105
+query:
+  defender: 'DeviceLogonEvents
+
+    | where LogonType == 3 and Protocol =~ "NTLM"
+
+    | where AccountName !endswith "$"
+
+    | project Timestamp, DeviceName, AccountName, RemoteIP, LogonType, Protocol
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1550.002
