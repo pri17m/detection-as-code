@@ -1,0 +1,35 @@
+id: DAC-WIN-0167
+title: Computer account created unexpectedly
+description: 4741 (Phase-1 experimental Splunk detection).
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1098
+severity: low
+false_positives:
+- Domain join
+references:
+- https://attack.mitre.org/techniques/T1098/
+telemetry_validated: false
+required_fields:
+- EventCode
+- TargetUserName
+- SubjectUserName
+- SubjectDomainName
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- ad-auth
