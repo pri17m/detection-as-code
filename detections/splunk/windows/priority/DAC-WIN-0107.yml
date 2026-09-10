@@ -1,0 +1,64 @@
+id: DAC-WIN-0107
+title: Suspicious PowerShell (enc/IEX/remote)
+description: '4104 ScriptBlock + Sysmon 1 -enc/IEX | checklist: macros only; no index=; EventCode on allowlisted
+  channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true; FP baseline
+  pending org allowlists'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Execution
+  techniques:
+  - T1059.001
+severity: high
+false_positives:
+- Admin encoded automation
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+telemetry_validated: false
+required_fields:
+- EventCode
+- ScriptBlockText
+- ScriptBlockId
+- Path
+- MessageNumber
+- MessageTotal
+- SubjectUserName
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational" OR sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    (`windows_powershell_operational` EventCode=4104) OR (`windows_sysmon` EventCode=1 (Image="*\\powershell.exe"
+    OR Image="*\\pwsh.exe"))
+
+    | eval ScriptBlockText=coalesce(ScriptBlockText, Message)
+
+    | eval CommandLine=coalesce(CommandLine, process_command_line, cmdline)
+
+    | eval Image=coalesce(Image, NewProcessName, process)
+
+    | eval User=coalesce(User, UserName, SubjectUserName, user)
+
+    | search EventCode=4104 (ScriptBlockText="*IEX*" OR ScriptBlockText="*Invoke-Expression*" OR ScriptBlockText="*DownloadString*"
+    OR ScriptBlockText="*FromBase64String*" OR ScriptBlockText="*Net.WebClient*") OR (EventCode=1 (CommandLine="*-enc*"
+    OR CommandLine="*-EncodedCommand*" OR CommandLine="*IEX*" OR CommandLine="*DownloadString*" OR CommandLine="*-w
+    hidden*" OR CommandLine="*-WindowStyle Hidden*"))
+
+    | table _time host EventCode Image CommandLine User ScriptBlockText Path'
+tags:
+- phase1
+- windows
+- P0
+- process
+- hardened-v1
+- remapped_from:DAC-WIN-0008
