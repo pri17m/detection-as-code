@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1197/
+title: 'MDE: BITS SetNotifyCmdLine persistence'
+description: DeviceProcessEvents
+severity: medium
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0031
+status: experimental
+tags:
+- wave-a
+- P1
+- parity:DAC-CS-0030
+query:
+  defender: 'DeviceProcessEvents
+
+    | where ProcessCommandLine has "*"
+
+    // Experimental stub: MDE: BITS SetNotifyCmdLine persistence
+
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1197
