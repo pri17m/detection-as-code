@@ -1,0 +1,42 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search Category="SignInLogs" Status.errorCode!=0
+
+    | stats dc(userPrincipalName) as users count as attempts by ipAddress, bin(_time,15m)
+
+    | where users>=10 AND attempts/users < 5
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0033
+title: 'Entra: Password spray pattern across many users one source IP'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-related
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1110/003/
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1110.003
+author: Detection Engineer
+status: experimental
+description: many users fail low attempts same IP
