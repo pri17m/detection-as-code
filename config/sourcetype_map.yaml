@@ -1,151 +1,112 @@
-# Canonical Splunk sourcetype allowlist for Detection-as-Code (Windows telemetry)
-# CI MUST reject detection rules that reference sourcetypes not listed under
-# allowed_sourcetypes (exact string match after macro expansion).
-#
-# Repo path: config/sourcetype_map.yaml
-# Companion docs:
-#   - docs/telemetry/windows-splunk.md  (recommended future home)
-#   - /workspace/dac-windows-splunk-telemetry.md (research deliverable)
-#
-# Prefer sourcetype=… in rules. Never hardcode index=. Optional index macros
-# live in org config (see org.example.yaml placeholders below).
-#
-# Notes on TA influence:
-# - Splunk Add-on for Microsoft Windows >= 5.0: channel often in `source`,
-#   sourcetype collapses to WinEventLog (classic) or XmlWinEventLog (XML).
-# - Pre-5.0 / many production installs still use compound sourcetypes
-#   (e.g. WinEventLog:Security, XmlWinEventLog:Security). BOTH are allowed.
-# - Splunk Add-on for Sysmon: prefers XML; sourcetype XmlWinEventLog with
-#   source=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational, OR compound
-#   XmlWinEventLog:Microsoft-Windows-Sysmon/Operational. Legacy: sysmon / sysmon:*.
-
+# Canonical sourcetype aliases used by detections (Wave B: Entra + GitHub cloud audit).
 version: 1
 platform: splunk
 telemetry_family: windows
-
-# ---------------------------------------------------------------------------
-# Canonical allowed sourcetype strings (FIRST set = Windows)
-# ---------------------------------------------------------------------------
 allowed_sourcetypes:
-  # --- Windows Security ---
-  - WinEventLog:Security
-  - XmlWinEventLog:Security
-  - WinEventLog                 # TA >=5 classic; filter with source=*Security*
-  - XmlWinEventLog              # TA >=5 XML; filter with source=*Security* / *System* / *Sysmon* / *PowerShell*
-
-  # --- Windows System ---
-  - WinEventLog:System
-  - XmlWinEventLog:System
-
-  # --- PowerShell Operational (module/script block: 4103/4104) ---
-  - WinEventLog:Microsoft-Windows-PowerShell/Operational
-  - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
-
-  # --- PowerShell classic channel (engine: 400/403/600) ---
-  - WinEventLog:Windows PowerShell
-  - XmlWinEventLog:Windows PowerShell
-
-  # --- Sysmon ---
-  - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
-  - WinEventLog:Microsoft-Windows-Sysmon/Operational  # classic render (not preferred; TA fields incomplete)
-  - sysmon
-  - "sysmon:*"                  # glob form used in some orgs / legacy TAs
-
-# ---------------------------------------------------------------------------
-# Optional: source= patterns that pair with collapsed sourcetypes
-# (not CI-enforced as sourcetype strings; documented for rule authors)
-# ---------------------------------------------------------------------------
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- WinEventLog
+- XmlWinEventLog
+- WinEventLog:System
+- XmlWinEventLog:System
+- WinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+- WinEventLog:Windows PowerShell
+- XmlWinEventLog:Windows PowerShell
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+- azure:monitor:aad
+- azure:aad:signin
+- azure:aad:audit
+- github:cloud:audit
+- github:audit
 source_patterns:
   security:
-    - WinEventLog:Security
-    - XmlWinEventLog:Security
-    - WMI:WinEventLog:Security
+  - WinEventLog:Security
+  - XmlWinEventLog:Security
+  - WMI:WinEventLog:Security
   system:
-    - WinEventLog:System
-    - XmlWinEventLog:System
-    - WMI:WinEventLog:System
+  - WinEventLog:System
+  - XmlWinEventLog:System
+  - WMI:WinEventLog:System
   powershell_operational:
-    - WinEventLog:Microsoft-Windows-PowerShell/Operational
-    - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+  - WinEventLog:Microsoft-Windows-PowerShell/Operational
+  - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
   powershell_classic:
-    - "WinEventLog:Windows PowerShell"
-    - "XmlWinEventLog:Windows PowerShell"
+  - WinEventLog:Windows PowerShell
+  - XmlWinEventLog:Windows PowerShell
   sysmon:
-    - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
-    - WinEventLog:Microsoft-Windows-Sysmon/Operational
-    - XmlWinEventLog:WEC-Sysmon   # WEF/WEC via Sysmon TA >=3.0 (uncertain naming in some orgs)
-
-# ---------------------------------------------------------------------------
-# Recommended search macros (org overrides index; rules use sourcetype macros)
-# Implement as Splunk macros or DaC YAML macros expanded at build time.
-# ---------------------------------------------------------------------------
+  - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+  - WinEventLog:Microsoft-Windows-Sysmon/Operational
+  - XmlWinEventLog:WEC-Sysmon
 macros:
-  # Sourcetype-portability macros (PREFERRED in detections)
   windows_security:
-    description: Security channel — classic + XML compound + collapsed XmlWinEventLog/WinEventLog
-    suggested_definition: >-
-      (sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security
-       OR (sourcetype=WinEventLog source=WinEventLog:Security)
-       OR (sourcetype=XmlWinEventLog source=XmlWinEventLog:Security))
+    description: "Security channel \u2014 classic + XML compound + collapsed XmlWinEventLog/WinEventLog"
+    suggested_definition: "(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security\n OR\
+      \ (sourcetype=WinEventLog source=WinEventLog:Security)\n OR (sourcetype=XmlWinEventLog source=XmlWinEventLog:Security))"
   windows_system:
     description: System channel variants
-    suggested_definition: >-
-      (sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System
-       OR (sourcetype=WinEventLog source=WinEventLog:System)
-       OR (sourcetype=XmlWinEventLog source=XmlWinEventLog:System))
+    suggested_definition: "(sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System\n OR (sourcetype=WinEventLog\
+      \ source=WinEventLog:System)\n OR (sourcetype=XmlWinEventLog source=XmlWinEventLog:System))"
   windows_powershell_operational:
     description: PowerShell Operational (4103/4104)
-    suggested_definition: >-
-      (sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational
-       OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
-       OR (sourcetype=XmlWinEventLog source="*Microsoft-Windows-PowerShell/Operational")
-       OR (sourcetype=WinEventLog source="*Microsoft-Windows-PowerShell/Operational"))
+    suggested_definition: "(sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational\n OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational\n\
+      \ OR (sourcetype=XmlWinEventLog source=\"*Microsoft-Windows-PowerShell/Operational\")\n OR (sourcetype=WinEventLog\
+      \ source=\"*Microsoft-Windows-PowerShell/Operational\"))"
   windows_powershell_classic:
     description: Classic Windows PowerShell channel (400/403/600)
-    suggested_definition: >-
-      (sourcetype="WinEventLog:Windows PowerShell"
-       OR sourcetype="XmlWinEventLog:Windows PowerShell"
-       OR (sourcetype=WinEventLog source="*Windows PowerShell")
-       OR (sourcetype=XmlWinEventLog source="*Windows PowerShell"))
+    suggested_definition: "(sourcetype=\"WinEventLog:Windows PowerShell\"\n OR sourcetype=\"XmlWinEventLog:Windows\
+      \ PowerShell\"\n OR (sourcetype=WinEventLog source=\"*Windows PowerShell\")\n OR (sourcetype=XmlWinEventLog\
+      \ source=\"*Windows PowerShell\"))"
   windows_sysmon:
     description: Sysmon Operational + legacy sysmon
-    suggested_definition: >-
-      (sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
-       OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
-       OR (sourcetype=XmlWinEventLog source="*Microsoft-Windows-Sysmon/Operational")
-       OR sourcetype=sysmon OR sourcetype=sysmon:*)
-
-  # Optional INDEX macros — org-specific; NEVER hardcode index= in rule bodies
+    suggested_definition: "(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational\n OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational\n\
+      \ OR (sourcetype=XmlWinEventLog source=\"*Microsoft-Windows-Sysmon/Operational\")\n OR sourcetype=sysmon\
+      \ OR sourcetype=sysmon:*)"
   windows_security_index:
     description: Placeholder index constraint for Security events
-    suggested_definition: "index=wineventlog"   # ORG OVERRIDE
+    suggested_definition: index=wineventlog
   windows_system_index:
     description: Placeholder index constraint for System events
-    suggested_definition: "index=wineventlog"   # ORG OVERRIDE
+    suggested_definition: index=wineventlog
   windows_powershell_index:
     description: Placeholder index constraint for PowerShell events
-    suggested_definition: "index=wineventlog"   # ORG OVERRIDE
+    suggested_definition: index=wineventlog
   windows_sysmon_index:
     description: Placeholder index constraint for Sysmon events
-    suggested_definition: "index=sysmon"        # ORG OVERRIDE
-
-# Aliases: compound form ↔ collapsed form (documentation for CI / linters)
+    suggested_definition: index=sysmon
 aliases:
   WinEventLog:Security:
-    - { sourcetype: WinEventLog, source: WinEventLog:Security }
+  - sourcetype: WinEventLog
+    source: WinEventLog:Security
   XmlWinEventLog:Security:
-    - { sourcetype: XmlWinEventLog, source: XmlWinEventLog:Security }
+  - sourcetype: XmlWinEventLog
+    source: XmlWinEventLog:Security
   WinEventLog:System:
-    - { sourcetype: WinEventLog, source: WinEventLog:System }
+  - sourcetype: WinEventLog
+    source: WinEventLog:System
   XmlWinEventLog:System:
-    - { sourcetype: XmlWinEventLog, source: XmlWinEventLog:System }
+  - sourcetype: XmlWinEventLog
+    source: XmlWinEventLog:System
   XmlWinEventLog:Microsoft-Windows-Sysmon/Operational:
-    - { sourcetype: XmlWinEventLog, source: XmlWinEventLog:Microsoft-Windows-Sysmon/Operational }
+  - sourcetype: XmlWinEventLog
+    source: XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
   XmlWinEventLog:Microsoft-Windows-PowerShell/Operational:
-    - { sourcetype: XmlWinEventLog, source: XmlWinEventLog:Microsoft-Windows-PowerShell/Operational }
-
+  - sourcetype: XmlWinEventLog
+    source: XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
 ci:
   enforce: true
   match: exact_or_macro_expanded
   reject_hardcoded_index: true
   require_sourcetype_or_macro: true
+canonical:
+  entra_azure_ad:
+  - azure:monitor:aad
+  - azure:aad:signin
+  - azure:aad:audit
+  github_audit:
+  - github:audit
+  github_cloud_audit:
+  - github:cloud:audit
