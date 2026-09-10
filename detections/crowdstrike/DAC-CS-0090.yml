@@ -1,0 +1,67 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Surfaces newly registered Windows scheduled tasks whose TaskExecCommand/arguments match
+  persistence
+
+  abuse patterns: encoded PowerShell with download/exec intent, LOLBin proxy execution, user-writable
+
+  payload paths, embedded URLs, or chained cmd one-liners. Flags remote task registration via
+
+  RemoteAddressIP4/IP6.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0090
+query:
+  crowdstrike: "#event_simpleName=ScheduledTaskRegistered event_platform=Win\n| TaskName!=/^\\\\?Microsoft\\\
+    \\Windows\\\\/i\n| TaskCmd := lower(TaskExecCommand)\n| TaskArgs := lower(TaskExecArguments)\n| CmdLine\
+    \ := format(\"%s %s\", field=[TaskCmd, TaskArgs])\n| case {\n    CmdLine=/(powershell|pwsh)/i AND\
+    \ CmdLine=/(-enc|-encodedcommand|-e\\s)/i AND CmdLine=/(downloadstring|downloadfile|iex|invoke-expression|frombase64string|net\\\
+    .webclient|-w\\s+hidden|-windowstyle\\s+hidden)/i\n      | Reason := \"Encoded PowerShell w/ download\
+    \ or exec intent\" ;\n    CmdLine=/(mshta|rundll32|regsvr32|wscript|cscript|certutil|bitsadmin|installutil)\\\
+    .exe/i\n      | Reason := \"LOLBin proxy execution\" ;\n    CmdLine=/(\\\\appdata\\\\|\\\\users\\\\\
+    public\\\\|\\\\temp\\\\|\\\\windows\\\\temp\\\\|%temp%|%appdata%)/i\n      | Reason := \"Payload in\
+    \ user-writable/temp path\" ;\n    CmdLine=/(https?:\\/\\/|ftp:\\/\\/)/i\n      | Reason := \"Web\
+    \ URL in task action\" ;\n    CmdLine=/cmd(\\.exe)?\\s+\\/c.*(&&|\\|)/i\n      | Reason := \"Chained\
+    \ cmd one-liner\" ;\n    * | Reason := \"no-match\" ;\n  }\n| Reason!=\"no-match\"\n| case {\n   \
+    \ RemoteAddressIP4=* AND RemoteAddressIP4!=\"0.0.0.0\" | Origin := format(\"REMOTE (%s)\", field=[RemoteAddressIP4])\
+    \ ;\n    RemoteAddressIP6=* | Origin := format(\"REMOTE (%s)\", field=[RemoteAddressIP6]) ;\n    *\
+    \ | Origin := \"local\" ;\n  }\n| groupBy([aid, ComputerName, TaskName, Reason, Origin, TaskExecCommand,\
+    \ TaskExecArguments], function=count())\n"
+mitre:
+  tactics:
+  - persistence
+  - execution
+  techniques:
+  - T1053
+  - T1053.005
+title: 'Falcon: Suspicious Scheduled Task Creation'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1053/
+- https://attack.mitre.org/techniques/T1053/005/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/suspicious_scheduled_task_creation.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:suspicious_scheduled_task_creation.yml
+- esn:ScheduledTaskRegistered
+severity: high
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- RemoteAddressIP4
+- RemoteAddressIP6
+- TaskExecArguments
+- TaskExecCommand
+- TaskName
+- aid
+- event_platform
