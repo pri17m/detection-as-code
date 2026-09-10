@@ -1,0 +1,51 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Detects non-Microsoft scheduled tasks registered with BootTrigger or Startup-style triggers
+  for boot
+
+  persistence.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0095
+query:
+  crowdstrike: '#event_simpleName=ScheduledTaskRegistered
+
+    | TaskName!=/^\\?Microsoft\\Windows\\/i
+
+    | TaskXML=/(BootTrigger|StartupTrigger)/i
+
+    | groupBy([aid, ComputerName, TaskName, TaskExecCommand], function=count())
+
+    '
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1053.005
+title: 'Falcon: Scheduled Task Boot/Startup Trigger'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/startup_events.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:startup_events.yml
+- esn:ScheduledTaskRegistered
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- TaskExecCommand
+- TaskName
+- TaskXML
+- aid
