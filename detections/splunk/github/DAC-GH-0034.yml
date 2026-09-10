@@ -1,0 +1,39 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action IN ("release.update","release.editasset","release.uploadasset")
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0034
+title: 'GitHub: Release asset replaced after publish'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: medium
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P1
+- phase2-related
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1195/002/
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1195.002
+author: Detection Engineer
+status: experimental
+description: release.update asset replace
