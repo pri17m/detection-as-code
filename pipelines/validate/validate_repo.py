@@ -78,26 +78,6 @@ def _load_sourcetype_contract(sourcetype_map_path: Path) -> tuple[list[str], set
         raise ValueError(f"{sourcetype_map_path}: ci.reject_hardcoded_index must be true")
 
     return [x for x in allowed if isinstance(x, str)], set(REQUIRED_WINDOWS_SOURCETYPE_MACROS)
-    allowed = obj.get("allowed_sourcetypes")
-    if isinstance(allowed, list):
-        out.update(x for x in allowed if isinstance(x, str))
-    canonical = obj.get("canonical")
-    if isinstance(canonical, dict):
-        for _, vals in canonical.items():
-            if isinstance(vals, list):
-                out.update(x for x in vals if isinstance(x, str))
-    macros = obj.get("allowed_sourcetype_macros") or []
-    if isinstance(macros, list):
-        out.update(x for x in macros if isinstance(x, str))
-    # also allow macro keys under macros: that are sourcetype macros (not *_index)
-    mac = obj.get("macros")
-    if isinstance(mac, dict):
-        for k in mac.keys():
-            if isinstance(k, str) and not k.endswith("_index"):
-                out.add(k)
-    if not out:
-        raise ValueError(f"{sourcetype_map_path}: no sourcetypes found under allowed_sourcetypes/canonical")
-    return out
 
 
 def _iter_detection_files(detections_root: Path) -> Iterable[Path]:
