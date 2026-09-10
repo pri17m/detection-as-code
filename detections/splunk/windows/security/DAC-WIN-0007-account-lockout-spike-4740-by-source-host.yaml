@@ -1,47 +1,37 @@
 id: DAC-WIN-0007
-title: Administrative share access followed by new service install (5140/5145 + 7045/4697)
-description: Correlates administrative share access with a subsequent service installation on the same host within a short window, a common PsExec-/SMB-based lateral movement pattern.
-author: Detection Engineering
+title: Account lockout spike (4740) by source host
+description: Detects spikes in account lockouts, which can indicate password spraying
+  against multiple accounts or misconfigured services.
+author: DaC
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_security
-  - windows_system
+- WinEventLog:Security
 mitre:
   tactics:
-    - lateral-movement
-    - persistence
+  - credential-access
   techniques:
-    - T1021.002
-    - T1543.003
-severity: high
+  - T1110
+severity: medium
 false_positives:
-  - Legitimate admin tooling, software deployment, patching, or SCCM activity.
+- Password policy changes; misconfigured service accounts.
 references:
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-5140
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-5145
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4697
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-7045
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4740
 telemetry_validated: false
 required_fields:
-  - EventCode
-  - ShareName
-  - IpAddress
-  - SubjectUserName
-  - ServiceName
-  - ImagePath
-  - host
+- EventCode
+- TargetUserName
+- CallerComputerName
 query:
-  splunk: |
-    (`windows_security` (EventCode=5140 OR EventCode=5145 OR EventCode=4697))
-    OR (`windows_system` EventCode=7045)
-    | eval src_ip=coalesce(IpAddress, Source_Network_Address, src, src_ip)
-    | eval user=coalesce(SubjectUserName, SubjectAccountName, user)
-    | eval share=lower(coalesce(ShareName, Share_Name))
-    | eval is_admin_share=if(match(share,"\\\\(admin\\$|c\\$|d\\$|ipc\\$)$"),1,0)
-    | eval is_share_evt=if((EventCode=5140 OR EventCode=5145) AND is_admin_share=1,1,0)
-    | eval is_service_evt=if(EventCode=7045 OR EventCode=4697,1,0)
-    | bin _time span=30m
-    | stats sum(is_share_evt) as admin_share_events sum(is_service_evt) as service_events values(ShareName) as shares values(ServiceName) as service_names values(ImagePath) as service_image_paths by _time, host, user, src_ip
-    | where admin_share_events>0 AND service_events>0
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4740
+
+    | eval user=coalesce(TargetUserName, user)
+
+    | eval caller=coalesce(CallerComputerName, src, host)
+
+    | stats count dc(user) as users values(user) as user_list by caller
+
+    | where count >= 10 AND users >= 8
+
+    '

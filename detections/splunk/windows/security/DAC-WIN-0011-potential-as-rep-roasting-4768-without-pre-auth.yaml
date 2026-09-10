@@ -1,36 +1,35 @@
 id: DAC-WIN-0011
-title: Scheduled task created or modified with suspicious command (4698/4702)
-description: Detects scheduled task creation or modification where the task content references common LOLBins or suspicious interpreters. Requires Security auditing for task events and TaskContent extraction.
-author: Detection Engineering
+title: Potential AS-REP Roasting (4768 without pre-auth)
+description: Detects Kerberos AS-REQ events where pre-authentication is not required,
+  which can indicate AS-REP Roasting opportunities or abuse.
+author: DaC
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_security
+- WinEventLog:Security
 mitre:
   tactics:
-    - persistence
-    - execution
+  - credential-access
   techniques:
-    - T1053.005
+  - T1558.004
 severity: high
 false_positives:
-  - Legitimate admin automation and enterprise scheduled tasks (allowlist by TaskName/publisher).
+- Accounts intentionally configured without pre-auth (should be rare).
 references:
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4698
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4702
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4768
 telemetry_validated: false
 required_fields:
-  - EventCode
-  - TaskName
-  - TaskContent
-  - SubjectUserName
-  - host
+- EventCode
+- TargetUserName
+- PreAuthType
 query:
-  splunk: |
-    `windows_security` (EventCode=4698 OR EventCode=4702)
-    | eval user=coalesce(SubjectUserName, Account_Name, user)
-    | eval task=coalesce(TaskName, Task_Name, ObjectName)
-    | eval content=lower(coalesce(TaskContent, Message))
-    | where match(content,"powershell(\\.exe)?|cmd(\\.exe)?|rundll32(\\.exe)?|mshta(\\.exe)?|wscript(\\.exe)?|cscript(\\.exe)?|regsvr32(\\.exe)?|bitsadmin(\\.exe)?")
-    | stats count values(task) as task_names values(content) as task_content_samples by host, user, EventCode
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4768
+
+    | eval user=coalesce(TargetUserName, Account_Name, user)
+
+    | where PreAuthType=0 OR PreAuthType="0"
+
+    | stats count values(IpAddress) as src_ips by user
+
+    '

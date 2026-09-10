@@ -1,37 +1,36 @@
 id: DAC-WIN-0009
-title: AD CS / PKINIT authentication signals (4768 PreAuthType=16, CA 4886/4887)
-description: Detects PKINIT Kerberos authentication (PreAuthType=16) and/or Certification Authority issuance/request events that may indicate certificate-based authentication paths. Requires AD CS auditing and baseline of smartcard/PKINIT usage.
-author: Detection Engineering
+title: Potential Kerberoasting (high volume TGS requests) (4769)
+description: Detects high volume Kerberos service ticket requests for many SPNs by
+  a single account, a common Kerberoasting pattern.
+author: DaC
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_security
+- WinEventLog:Security
 mitre:
   tactics:
-    - credential-access
+  - credential-access
   techniques:
-    - T1649
+  - T1558.003
 severity: high
 false_positives:
-  - Legitimate smartcard/PKINIT usage and normal certificate enrollment flows.
+- Legitimate service discovery or monitoring accounts.
 references:
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4768
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4886
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4887
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4769
 telemetry_validated: false
 required_fields:
-  - EventCode
-  - PreAuthType
-  - TargetUserName
-  - IpAddress
-  - host
+- EventCode
+- Account_Name
+- ServiceName
 query:
-  splunk: |
-    `windows_security` (EventCode=4768 OR EventCode=4886 OR EventCode=4887)
-    | eval user=coalesce(TargetUserName, SubjectUserName, Account_Name, user)
-    | eval src_ip=coalesce(IpAddress, Source_Network_Address, src, src_ip)
-    | eval is_pkinit=if(EventCode=4768 AND (PreAuthType=16 OR PreAuthType="16"),1,0)
-    | eval is_ca_evt=if(EventCode=4886 OR EventCode=4887,1,0)
-    | where is_pkinit=1 OR is_ca_evt=1
-    | stats count values(PreAuthType) as preauth_types by host, user, src_ip, EventCode
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4769
+
+    | eval user=coalesce(Account_Name, TargetUserName, user)
+
+    | stats count as tgs_requests dc(ServiceName) as spn_count values(ServiceName)
+    as spns by user
+
+    | where tgs_requests >= 50 AND spn_count >= 20
+
+    '

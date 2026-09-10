@@ -1,32 +1,46 @@
 id: DAC-WIN-0004
-title: AS-REP roasting opportunity or abuse (4768 PreAuthType=0)
-description: Detects Kerberos AS-REQ events where pre-authentication is not required (PreAuthType=0), which can indicate AS-REP roasting opportunities or abuse. Maintain a rare allowlist of legitimate no-preauth accounts.
-author: Detection Engineering
+title: Successful logon from uncommon source (new src for user)
+description: Detects a successful logon (4624) where the source IP is new for the
+  user over a lookback period; useful for initial credential compromise triage.
+author: DaC
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_security
+- WinEventLog:Security
 mitre:
   tactics:
-    - credential-access
+  - initial-access
+  - credential-access
   techniques:
-    - T1558.004
-severity: high
+  - T1078
+severity: medium
 false_positives:
-  - Accounts intentionally configured without pre-authentication (should be rare).
+- Users traveling or new VPN egress points.
 references:
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4768
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624
 telemetry_validated: false
 required_fields:
-  - EventCode
-  - TargetUserName
-  - PreAuthType
-  - IpAddress
+- EventCode
+- IpAddress
+- TargetUserName
+- _time
 query:
-  splunk: |
-    `windows_security` EventCode=4768
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4624
+
+    | eval src_ip=coalesce(IpAddress, src, src_ip)
+
     | eval user=coalesce(TargetUserName, Account_Name, user)
-    | where PreAuthType=0 OR PreAuthType="0"
-    | eval src_ip=coalesce(IpAddress, Source_Network_Address, src, src_ip)
-    | stats count as as_req values(src_ip) as src_ips by user
+
+    | where isnotnull(src_ip) AND isnotnull(user)
+
+    | bin _time span=1h
+
+    | stats earliest(_time) as first_seen latest(_time) as last_seen values(host)
+    as hosts by user, src_ip
+
+    | eventstats earliest(first_seen) as global_first_seen by user, src_ip
+
+    | where first_seen = global_first_seen
+
+    '

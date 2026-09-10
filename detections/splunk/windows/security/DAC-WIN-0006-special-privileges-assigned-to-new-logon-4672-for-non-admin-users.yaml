@@ -1,39 +1,35 @@
 id: DAC-WIN-0006
-title: Pass-the-Hash signal (4624 NTLM Type 3 with KeyLength=0)
-description: Detects network logons where NTLM is used and the negotiated KeyLength is 0, a common (but imperfect) heuristic for Pass-the-Hash or legacy NTLM patterns. Tune by workstation/jump-host allowlists and service accounts.
-author: Detection Engineering
+title: Special privileges assigned to new logon (4672) for non-admin users
+description: Detects privileged logon events (4672) for accounts that are not commonly
+  privileged, which can indicate privilege escalation or admin misuse.
+author: DaC
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_security
+- WinEventLog:Security
 mitre:
   tactics:
-    - lateral-movement
-    - credential-access
+  - privilege-escalation
   techniques:
-    - T1550.002
+  - T1078
 severity: high
 false_positives:
-  - Legacy NTLM flows, misconfigured clients, or certain service authentication patterns.
+- Newly promoted admins; service accounts.
 references:
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4672
 telemetry_validated: false
 required_fields:
-  - EventCode
-  - LogonType
-  - AuthenticationPackageName
-  - KeyLength
-  - TargetUserName
-  - IpAddress
-  - host
+- EventCode
+- SubjectUserName
+- host
 query:
-  splunk: |
-    `windows_security` EventCode=4624
-    | eval user=coalesce(TargetUserName, Account_Name, user)
-    | eval src_ip=coalesce(IpAddress, Source_Network_Address, src, src_ip)
-    | where LogonType=3
-    | where AuthenticationPackageName="NTLM" OR lower(AuthenticationPackageName)="ntlm"
-    | where KeyLength=0 OR KeyLength="0"
-    | where isnotnull(user) AND NOT match(user,"\\$$")
-    | stats count values(WorkstationName) as workstations values(LogonProcessName) as logon_processes by host, user, src_ip
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4672
+
+    | eval user=coalesce(SubjectUserName, Account_Name, user)
+
+    | search NOT user IN ("Administrator","SYSTEM","LOCAL SERVICE","NETWORK SERVICE")
+
+    | stats count values(PrivilegeList) as privileges by user, host
+
+    '

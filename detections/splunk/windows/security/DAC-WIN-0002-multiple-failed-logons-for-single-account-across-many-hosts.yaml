@@ -1,35 +1,35 @@
 id: DAC-WIN-0002
-title: DCSync replication rights usage (4662) on Domain Controllers
-description: Detects Directory Service Access events with replication-related GUIDs consistent with DCSync. Requires Directory Service Access auditing on DCs and GUID mapping quality.
-author: Detection Engineering
+title: Multiple failed logons for single account across many hosts
+description: Detects a single user failing authentication across many hosts, which
+  can indicate credential stuffing or lateral movement attempts.
+author: DaC
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_security
+- WinEventLog:Security
 mitre:
   tactics:
-    - credential-access
+  - credential-access
   techniques:
-    - T1003.006
-severity: critical
+  - T1110
+severity: medium
 false_positives:
-  - Legitimate directory replication or identity tooling using replication APIs (should be allowlisted).
+- User password expired or account locked causing repeated failures.
 references:
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4662
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625
 telemetry_validated: false
 required_fields:
-  - EventCode
-  - Properties
-  - ObjectName
-  - SubjectUserName
-  - SubjectDomainName
-  - host
+- EventCode
+- TargetUserName
+- host
 query:
-  splunk: |
-    `windows_security` EventCode=4662
-    | eval props=lower(coalesce(Properties, Message))
-    | where match(props,"1131f6aa-9c07-11d1-f79f-00c04fc2dcd2|1131f6ad-9c07-11d1-f79f-00c04fc2dcd2|89e95b76-444d-4c62-991a-0facbeda640c")
-    | eval user=coalesce(SubjectUserName, Account_Name, user)
-    | where isnotnull(user) AND NOT match(user,"\\$$")
-    | stats count as events values(ObjectName) as objects values(Properties) as property_guids by host, user, SubjectDomainName
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4625
+
+    | eval user=coalesce(TargetUserName, Account_Name, user)
+
+    | stats count as failures dc(host) as hosts values(host) as host_list by user
+
+    | where failures >= 20 AND hosts >= 8
+
+    '

@@ -1,36 +1,43 @@
 id: DAC-WIN-0013
-title: Tier-0 account first seen on new host (4624 baseline over lookback)
-description: Detects the first observed logon of a Tier-0 account from a given workstation/host within the configured lookback window. Requires a Tier-0 allowlist (e.g., a Splunk lookup) and should be executed with a multi-week lookback to build baseline.
-author: Detection Engineering
+title: Administrative share access spike (5140) from source
+description: Detects spikes in access to administrative shares (e.g., ADMIN$, C$),
+  which can indicate lateral movement over SMB.
+author: DaC
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_security
+- WinEventLog:Security
 mitre:
   tactics:
-    - initial-access
-    - credential-access
+  - lateral-movement
   techniques:
-    - T1078.002
-severity: high
+  - T1021.002
+severity: medium
 false_positives:
-  - New admin workstations, rebuilt endpoints, or newly on-boarded privileged users.
+- Legitimate admin tools, software deployment, patching.
 references:
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-5140
 telemetry_validated: false
 required_fields:
-  - EventCode
-  - TargetUserName
-  - WorkstationName
-  - IpAddress
-  - _time
+- EventCode
+- ShareName
+- IpAddress
+- SubjectUserName
 query:
-  splunk: |
-    `windows_security` EventCode=4624
-    | eval user=coalesce(TargetUserName, Account_Name, user)
-    | eval workstation=coalesce(WorkstationName, Workstation, src, src_host)
-    | lookup dac_tier0_accounts user OUTPUT is_tier0
-    | where is_tier0=1
-    | stats earliest(_time) as first_seen latest(_time) as last_seen values(IpAddress) as src_ips by user, workstation
-    | where first_seen >= relative_time(now(), "-1d@h")
+  splunk: 'sourcetype=WinEventLog:Security EventCode=5140
+
+    | eval share=lower(coalesce(ShareName, share_name))
+
+    | where match(share, "\\\\(admin\\$|c\\$|d\\$|ipc\\$)$")
+
+    | eval src_ip=coalesce(IpAddress, src, src_ip)
+
+    | eval user=coalesce(SubjectUserName, user)
+
+    | stats count dc(share) as shares values(share) as share_list by src_ip, user,
+    host
+
+    | where count >= 20
+
+    '

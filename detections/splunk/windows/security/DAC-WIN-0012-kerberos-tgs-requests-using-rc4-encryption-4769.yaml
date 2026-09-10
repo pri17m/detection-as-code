@@ -1,34 +1,39 @@
 id: DAC-WIN-0012
-title: Run key persistence (Sysmon 13) CurrentVersion\\Run / RunOnce value set
-description: Detects registry value sets in common Run/RunOnce persistence keys via Sysmon Event ID 13. Tune allowlists for known software updaters and enterprise tooling.
-author: Detection Engineering
+title: Kerberos TGS requests using RC4 encryption (4769)
+description: Detects Kerberos service ticket requests using RC4 (0x17) which can be
+  associated with Kerberoasting and legacy configurations.
+author: DaC
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_sysmon
+- WinEventLog:Security
 mitre:
   tactics:
-    - persistence
+  - credential-access
   techniques:
-    - T1547.001
-severity: high
+  - T1558.003
+severity: medium
 false_positives:
-  - Legitimate software auto-start entries and IT management tooling.
+- Legacy environments with RC4 enabled; tune by SPN allowlist.
 references:
-  - https://learn.microsoft.com/sysinternals/downloads/sysmon
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4769
 telemetry_validated: false
 required_fields:
-  - EventCode
-  - TargetObject
-  - Details
-  - Image
-  - User
-  - host
+- EventCode
+- Account_Name
+- ServiceName
+- TicketEncryptionType
 query:
-  splunk: |
-    `windows_sysmon` EventCode=13
-    | eval key=lower(TargetObject)
-    | where match(key,"\\\\software\\\\microsoft\\\\windows\\\\currentversion\\\\run(once)?\\\\")
-      OR match(key,"\\\\software\\\\microsoft\\\\windows\\\\currentversion\\\\policies\\\\explorer\\\\run\\\\")
-    | stats count values(Image) as images values(Details) as value_data by host, User, TargetObject
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4769
+
+    | eval user=coalesce(Account_Name, TargetUserName, user)
+
+    | where TicketEncryptionType="0x17" OR TicketEncryptionType=0x17 OR TicketEncryptionType=23
+
+    | stats count as tgs_requests dc(ServiceName) as spn_count values(ServiceName)
+    as spns by user
+
+    | where tgs_requests >= 10
+
+    '

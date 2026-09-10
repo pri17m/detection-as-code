@@ -1,37 +1,37 @@
 id: DAC-WIN-0014
-title: WmiPrvSE or wsmprovhost spawning suspicious child processes (Sysmon 1)
-description: Detects suspicious child processes spawned by WmiPrvSE.exe (WMI) or wsmprovhost.exe (WinRM provider host), common in remote execution and lateral movement. Requires Sysmon ProcessCreate.
-author: Detection Engineering
+title: Service installed (4697) via Security audit
+description: Detects service installation via Security auditing (4697), which can
+  indicate persistence using new or modified services.
+author: DaC
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_sysmon
+- WinEventLog:Security
 mitre:
   tactics:
-    - lateral-movement
-    - execution
+  - persistence
   techniques:
-    - T1047
-    - T1021.006
+  - T1543.003
 severity: high
 false_positives:
-  - Legitimate remote administration and management tooling; tune allowlists for known management servers.
+- Legitimate software installs.
 references:
-  - https://learn.microsoft.com/sysinternals/downloads/sysmon
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4697
 telemetry_validated: false
 required_fields:
-  - EventCode
-  - Image
-  - ParentImage
-  - CommandLine
-  - User
-  - host
+- EventCode
+- ServiceName
+- ServiceFileName
+- SubjectUserName
 query:
-  splunk: |
-    `windows_sysmon` EventCode=1
-    | eval parent=lower(ParentImage)
-    | where match(parent,"\\\\wmiprvse\\.exe$|\\\\wsmprovhost\\.exe$")
-    | eval child=lower(Image)
-    | where match(child,"\\\\(powershell|cmd|rundll32|mshta|wscript|cscript|regsvr32)\\.exe$")
-    | stats count values(CommandLine) as command_lines values(ParentCommandLine) as parent_command_lines by host, User, parent, child
+  splunk: 'sourcetype=WinEventLog:Security EventCode=4697
+
+    | eval img=lower(coalesce(ServiceFileName, ImagePath, Message))
+
+    | where match(img, "(\\\\users\\\\|\\\\temp\\\\|\\\\appdata\\\\|cmd\\.exe|powershell\\.exe|wscript\\.exe|cscript\\.exe)")
+
+    | stats count values(ServiceName) as services values(img) as image_paths by host,
+    SubjectUserName
+
+    '
