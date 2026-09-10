@@ -1,65 +1,8 @@
-# Example org config — copy to config/org.yaml (gitignored) at deploy time.
-# Shared detections MUST NOT hardcode index=. Prefer sourcetype= / macros from
-# config/sourcetype_map.yaml. Index macros below are optional deploy-time only.
+# Example org overrides — index macros ONLY
+# Shared detection rules must NEVER hardcode index=; they may reference these macros.
 
-org:
-  name: "example-corp"
-  environment: "dev"
-
-# ---------------------------------------------------------------------------
-# Splunk (incl. Splunk Free / trial — 500 MB/day license is fine for lab & PoC)
-# ---------------------------------------------------------------------------
-# Free/Enterprise share the same portability contract:
-# - Rules key off sourcetype (WinEventLog:Security, XmlWinEventLog:…Sysmon…, etc.)
-# - Optional index macros are expanded by YOUR deploy tooling or Splunk macros
-# - Do not bake index=wineventlog into committed query.splunk bodies
-splunk:
-  # Preferred: org-maintained macros that expand to index constraints if needed
-  # macro_windows_security_scope: "`org_windows_security_scope`"
-  # Tokens for deploy-time substitution (least preferred vs macros)
-  windows_security_index_token: "$org_windows_security_index$"
-  windows_sysmon_index_token: "$org_windows_sysmon_index$"
-  windows_powershell_index_token: "$org_windows_powershell_index$"
-  windows_system_index_token: "$org_windows_system_index$"
-  # Optional Splunk Free / single-instance defaults (OVERRIDE in org.yaml)
-  # These illustrate deploy-time values only — never commit them into rules.
-  macros:
-    windows_security_index: "index=main"   # ORG OVERRIDE (Free often uses main)
-    windows_system_index: "index=main"
-    windows_powershell_index: "index=main"
-    windows_sysmon_index: "index=main"     # or index=sysmon if you created one
-
-crowdstrike:
-  falcon_cid: "FALCON-CID-PLACEHOLDER"
-  cloud:
-    tenant_id: "FALCON-TENANT-ID-PLACEHOLDER"
-
-defender:
-  tenant_id: "AAD-TENANT-ID-PLACEHOLDER"
-  workspace_id: "LOG-ANALYTICS-WORKSPACE-ID-PLACEHOLDER"
-  sentinel:
-    subscription_id: "AZURE-SUBSCRIPTION-ID-PLACEHOLDER"
-    resource_group: "RESOURCE-GROUP-PLACEHOLDER"
-    workspace_name: "SENTINEL-WORKSPACE-NAME-PLACEHOLDER"
-
-github:
-  enterprise_slug: "GHE-SLUG-OPTIONAL"
-
-telemetry:
-  # Canonical Windows sourcetypes — keep in sync with config/sourcetype_map.yaml
-  windows:
-    security_sourcetypes:
-      - "WinEventLog:Security"
-      - "XmlWinEventLog:Security"
-    system_sourcetypes:
-      - "WinEventLog:System"
-      - "XmlWinEventLog:System"
-    sysmon_sourcetypes:
-      - "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
-    powershell_sourcetypes:
-      - "XmlWinEventLog:Microsoft-Windows-PowerShell/Operational"
-      - "WinEventLog:Microsoft-Windows-PowerShell/Operational"
-    wmi_sourcetypes:
-      - "XmlWinEventLog:Microsoft-Windows-WMI-Activity/Operational"
-    defender_sourcetypes:
-      - "XmlWinEventLog:Microsoft-Windows-Windows Defender/Operational"
+macros:
+  windows_security_index: "index=wineventlog"
+  windows_system_index: "index=wineventlog"
+  windows_powershell_index: "index=wineventlog"
+  windows_sysmon_index: "index=sysmon"
