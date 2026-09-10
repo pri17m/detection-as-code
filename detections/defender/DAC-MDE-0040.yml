@@ -1,0 +1,37 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1021/002/
+title: 'MDE: PsExec service installation artifact'
+description: PSEXESVC file/service
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0040
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-CS-0041
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName has "PSEXESVC" or ProcessCommandLine has "psexec"
+
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021.002
