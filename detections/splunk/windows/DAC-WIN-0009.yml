@@ -1,0 +1,41 @@
+id: DAC-WIN-0009
+title: AD CS suspicious cert issued / PKINIT
+description: 4886/4887 + 4768 PreAuthType=16
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1649
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- RequestId
+- Requester
+- Attributes
+- Subject
+- Status
+- TargetUserName
+- IpAddress
+- TicketEncryptionType
+telemetry_validated: false
+false_positives:
+- Smartcard/PKI enrollment
+references:
+- https://attack.mitre.org/techniques/T1649/
+tags:
+- phase1
+- windows
+- P0
+- ad-auth
+query:
+  splunk: '`windows_security` (EventCode=4768 PreAuthType=16) OR EventCode IN (4886,4887,4888)
+
+    | table _time host EventCode TargetUserName IpAddress PreAuthType
+
+    '
