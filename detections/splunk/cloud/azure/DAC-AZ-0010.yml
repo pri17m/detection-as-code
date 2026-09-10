@@ -1,0 +1,38 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1578
+id: DAC-AZ-0010
+status: experimental
+title: 'Azure: VM extension CustomScript or DesiredStateConfig deploy'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="Microsoft.Compute/virtualMachines/extensions/write"
+
+    | search properties="*CustomScript*" OR properties="*DesiredStateConfiguration*" OR properties="*RunCommand*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1578/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: virtualMachineExtensions write CustomScript
+sourcetypes:
+- azure:monitor:activity
