@@ -1,9 +1,26 @@
-status: experimental
-platforms:
-- crowdstrike
+references:
+- https://attack.mitre.org/techniques/T1021/001/
+- https://attack.mitre.org/techniques/T1021/002/
+- https://attack.mitre.org/techniques/T1135/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Lateral_Movement_Detection.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `Lateral_Movement_Detection.yml`\
+    \ \u2014 experimental sketch; not raw dump\n// Multi-ESN source: keep ProcessRollup2 primary; join\
+    \ behaviors via aid+TargetProcessId/ContextProcessId per Telemetry matrix\n| table([aid, UserName,\
+    \ ImageFileName, RemoteAddressIP4, RemotePort, CommandLine])\n| groupBy([aid, ComputerName, ImageFileName,\
+    \ CommandLine], function=count())\n"
+title: 'Falcon: Lateral Movement Detection'
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+description: This query identifies potential lateral movement activities by detecting remote connections
+  and credential usage patterns across multiple hosts.
+id: DAC-CS-0064
 sourcetypes:
 - falcon:process
-title: 'Falcon: Lateral Movement Detection'
+platforms:
+- crowdstrike
 mitre:
   tactics:
   - lateral-movement
@@ -12,36 +29,19 @@ mitre:
   - T1021.001
   - T1021.002
   - T1135
-description: This query identifies potential lateral movement activities by detecting remote connections
-  and credential usage patterns across multiple hosts.
-false_positives:
-- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
-  \ before promote."
-- Tune ParentBaseFileName allowlists for known management tools.
-telemetry_validated: false
+severity: high
+author: Detection Engineer
 tags:
 - cs-query-hub
 - processrollup2
 - wave-cs-qh
 - P0
 - src:Lateral_Movement_Detection.yml
-query:
-  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `Lateral_Movement_Detection.yml`\
-    \ \u2014 experimental sketch; not raw dump\n// Multi-ESN source: keep ProcessRollup2 primary; join\
-    \ behaviors via aid+TargetProcessId/ContextProcessId per Telemetry matrix\n| table([aid, UserName,\
-    \ ImageFileName, RemoteAddressIP4, RemotePort, CommandLine])\n| groupBy([aid, ComputerName, ImageFileName,\
-    \ CommandLine], function=count())\n"
-author: Detection Engineer
+telemetry_validated: false
 required_fields:
 - CommandLine
 - ImageFileName
 - RawProcessId
 - UserName
 - aid
-id: DAC-CS-0064
-severity: high
-references:
-- https://attack.mitre.org/techniques/T1021/001/
-- https://attack.mitre.org/techniques/T1021/002/
-- https://attack.mitre.org/techniques/T1135/
-- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Lateral_Movement_Detection.yml
+status: experimental
