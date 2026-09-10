@@ -1,0 +1,39 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName IN ("Add service principal","Add application")
+
+    | # Chain: create SP then Add app role assignment Grant
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0010
+title: 'Entra: New service principal created then app role assignment'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1671/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1671
+author: Detection Engineer
+status: experimental
+description: "Add service principal \u2192 Add app role assignment"
