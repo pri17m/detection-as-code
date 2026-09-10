@@ -1,0 +1,42 @@
+id: DAC-WIN-0116
+title: Suspicious process creating LSASS dump file
+description: Sysmon 11 TargetFilename *.dmp
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1003.001
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- TargetFilename
+- User
+telemetry_validated: false
+false_positives:
+- WER dumps
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+tags:
+- P0
+- category:process
+- phase1
+- process
+- remapped_from:DAC-WIN-0017
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | table _time host
+
+    '

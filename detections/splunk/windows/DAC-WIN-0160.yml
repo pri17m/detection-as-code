@@ -1,0 +1,48 @@
+id: DAC-WIN-0160
+title: Over-pass-the-hash indicators
+description: 4648 + 4768 overpass patterns
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Lateral Movement
+  techniques:
+  - T1550.002
+  - T1550.003
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- SubjectUserName
+- SubjectDomainName
+- TargetUserName
+- TargetDomainName
+- TargetServerName
+- ProcessName
+- IpAddress
+- TicketEncryptionType
+- Status
+telemetry_validated: false
+false_positives:
+- SSO agents
+references:
+- https://attack.mitre.org/techniques/T1550/002/
+- https://attack.mitre.org/techniques/T1550/003/
+tags:
+- P1
+- ad-auth
+- category:ad-auth
+- phase1
+- remapped_from:DAC-WIN-0061
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security`
+
+    | table _time host
+
+    '

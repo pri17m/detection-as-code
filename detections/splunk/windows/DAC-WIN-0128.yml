@@ -1,0 +1,51 @@
+id: DAC-WIN-0128
+title: NTLM logon after recent LSASS access (correlated)
+description: Sysmon 10 lsass then 4624 Type3 NTLM
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: critical
+mitre:
+  tactics:
+  - Lateral Movement
+  techniques:
+  - T1003.001
+  - T1550.002
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+- SourceImage
+- TargetImage
+- GrantedAccess
+telemetry_validated: false
+false_positives:
+- EDR + admin tools
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+- https://attack.mitre.org/techniques/T1550/002/
+tags:
+- P0
+- category:logon
+- logon
+- phase1
+- remapped_from:DAC-WIN-0029
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security
+    OR sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational)
+    `windows_security`
+
+    | table _time host
+
+    '

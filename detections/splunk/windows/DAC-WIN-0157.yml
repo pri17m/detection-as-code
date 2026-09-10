@@ -1,0 +1,45 @@
+id: DAC-WIN-0157
+title: Net.exe domain group enumeration
+description: Sysmon 1 net group/user /domain
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: low
+mitre:
+  tactics:
+  - Discovery
+  techniques:
+  - T1087.002
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+telemetry_validated: false
+false_positives:
+- Helpdesk scripts
+references:
+- https://attack.mitre.org/techniques/T1087/002/
+tags:
+- P1
+- ad-auth
+- category:ad-auth
+- phase1
+- remapped_from:DAC-WIN-0058
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | table _time host
+
+    '

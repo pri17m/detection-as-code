@@ -1,0 +1,60 @@
+id: DAC-WIN-0111
+title: Registry Run key persistence (user-writable path)
+description: 'Sysmon 13 Run/RunOnce; Details Temp/Users | checklist: macros only;
+  no index=; EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary
+  required before telemetry_validated=true; FP baseline pending org allowlists'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1547.001
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- EventCode
+- Image
+- TargetObject
+- Details
+telemetry_validated: false
+false_positives:
+- Installer RunOnce
+references:
+- https://attack.mitre.org/techniques/T1547/001/
+tags:
+- P0
+- category:persistence
+- hardened-v1
+- persistence
+- phase1
+- remapped_from:DAC-WIN-0012
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon` EventCode=13
+
+    | eval Image=coalesce(Image, process)
+
+    | eval TargetObject=coalesce(TargetObject, Target_Object)
+
+    | eval Details=coalesce(Details, NewValue, details)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search TargetObject="*\\CurrentVersion\\Run*" OR TargetObject="*\\CurrentVersion\\RunOnce*"
+    OR TargetObject="*\\Winlogon\\Shell*" OR TargetObject="*\\Winlogon\\Userinit*"
+
+    | search Details="*\\Temp\\*" OR Details="*\\Users\\*" OR Details="*\\AppData\\*"
+    OR Details="*\\Downloads\\*" OR Details="*\\Public\\*"
+
+    | table _time host Image TargetObject Details User
+
+    '

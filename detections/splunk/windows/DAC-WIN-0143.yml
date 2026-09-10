@@ -1,0 +1,42 @@
+id: DAC-WIN-0143
+title: Audit policy changed (4719)
+description: Security 4719
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1562.001
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- SubjectUserName
+- SubjectDomainName
+- CategoryId
+- SubcategoryGuid
+- AuditPolicyChanges
+telemetry_validated: false
+false_positives:
+- GPO audit refresh
+references:
+- https://attack.mitre.org/techniques/T1562/001/
+tags:
+- P1
+- category:defense-evasion
+- defense-evasion
+- phase1
+- remapped_from:DAC-WIN-0044
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security`
+
+    | table _time host
+
+    '

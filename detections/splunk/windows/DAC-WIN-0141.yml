@@ -1,0 +1,42 @@
+id: DAC-WIN-0141
+title: Suspicious process access for token theft
+description: Sysmon 10 unusual Source to high-priv Target
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Privilege Escalation
+  techniques:
+  - T1134.001
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- SourceImage
+- TargetImage
+- GrantedAccess
+telemetry_validated: false
+false_positives:
+- Debuggers/EDR
+references:
+- https://attack.mitre.org/techniques/T1134/001/
+tags:
+- P1
+- category:priv-esc
+- phase1
+- priv-esc
+- remapped_from:DAC-WIN-0042
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | table _time host
+
+    '

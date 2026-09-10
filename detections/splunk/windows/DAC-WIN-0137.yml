@@ -1,0 +1,40 @@
+id: DAC-WIN-0137
+title: NTLM credential validation failures spray (4776)
+description: 4776 Status failures burst
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1110.003
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- TargetUserName
+- Workstation
+- Status
+telemetry_validated: false
+false_positives:
+- Legacy NTLM apps
+references:
+- https://attack.mitre.org/techniques/T1110/003/
+tags:
+- P1
+- ad-auth
+- category:ad-auth
+- phase1
+- remapped_from:DAC-WIN-0038
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security`
+
+    | table _time host
+
+    '

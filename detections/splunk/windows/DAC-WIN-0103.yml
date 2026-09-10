@@ -1,0 +1,58 @@
+id: DAC-WIN-0103
+title: AS-REP roasting (PreAuthType 0)
+description: 'Security 4768 PreAuthType=0 | checklist: macros only; no index=; EventCode
+  on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before
+  telemetry_validated=true; FP baseline pending org allowlists'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1558.004
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- EventCode
+- TargetUserName
+- IpAddress
+- TicketEncryptionType
+- Status
+telemetry_validated: false
+false_positives:
+- Accounts without Kerberos preauth (allowlist ideally empty)
+references:
+- https://attack.mitre.org/techniques/T1558/004/
+- rules/windows/builtin/security/win_security_kerberos_asrep_roasting.yml
+tags:
+- P0
+- ad-auth
+- category:ad-auth
+- hardened-v1
+- phase1
+- remapped_from:DAC-WIN-0004
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security` EventCode=4768
+
+    | eval TargetUserName=coalesce(TargetUserName, Account_Name, user)
+
+    | eval IpAddress=coalesce(IpAddress, Client_Address, src, src_ip)
+
+    | eval PreAuthType=coalesce(PreAuthType, Pre_Authentication_Type)
+
+    | eval TicketEncryptionType=coalesce(TicketEncryptionType, Ticket_Encryption_Type)
+
+    | search PreAuthType=0 OR PreAuthType="0"
+
+    | search NOT TargetUserName="*$"
+
+    | table _time host TargetUserName IpAddress TicketEncryptionType Status PreAuthType
+
+    '

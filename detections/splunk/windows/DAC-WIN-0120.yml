@@ -1,0 +1,43 @@
+id: DAC-WIN-0120
+title: New service installed with suspicious ImagePath
+description: System 7045 ImagePath Temp/Users/UNC
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1543.003
+  - T1021.002
+sourcetypes:
+- WinEventLog:System
+- XmlWinEventLog:System
+required_fields:
+- ServiceName
+- ImagePath
+- ServiceFileName
+- StartType
+- AccountName
+telemetry_validated: false
+false_positives:
+- Software deployment
+references:
+- https://attack.mitre.org/techniques/T1543/003/
+- https://attack.mitre.org/techniques/T1021/002/
+tags:
+- P0
+- category:persistence
+- persistence
+- phase1
+- remapped_from:DAC-WIN-0021
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System) `windows_system`
+
+    | table _time host
+
+    '

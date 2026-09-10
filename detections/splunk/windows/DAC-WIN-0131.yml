@@ -1,0 +1,42 @@
+id: DAC-WIN-0131
+title: RDP LogonType 10 outside jump-host allowlist
+description: 4624 LogonType=10
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - Lateral Movement
+  techniques:
+  - T1021.001
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+telemetry_validated: false
+false_positives:
+- Helpdesk RDP
+- VDI
+references:
+- https://attack.mitre.org/techniques/T1021/001/
+tags:
+- P1
+- category:logon
+- logon
+- phase1
+- remapped_from:DAC-WIN-0032
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security`
+
+    | table _time host
+
+    '

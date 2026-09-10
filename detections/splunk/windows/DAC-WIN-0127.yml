@@ -1,0 +1,42 @@
+id: DAC-WIN-0127
+title: Startup folder file create
+description: Sysmon 11 Startup folder
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1547.001
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- TargetFilename
+- User
+telemetry_validated: false
+false_positives:
+- User-installed apps
+references:
+- https://attack.mitre.org/techniques/T1547/001/
+tags:
+- P0
+- category:persistence
+- persistence
+- phase1
+- remapped_from:DAC-WIN-0028
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | table _time host
+
+    '

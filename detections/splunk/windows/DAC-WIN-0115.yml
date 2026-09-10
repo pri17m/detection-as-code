@@ -1,0 +1,48 @@
+id: DAC-WIN-0115
+title: LSASS access via comsvcs MiniDump pattern
+description: Sysmon 1 rundll32/comsvcs MiniDump OR Sysmon 10
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: critical
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1003.001
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+- SourceImage
+- TargetImage
+- GrantedAccess
+telemetry_validated: false
+false_positives:
+- Rare diagnostics
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+tags:
+- P0
+- category:process
+- phase1
+- process
+- remapped_from:DAC-WIN-0016
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | table _time host
+
+    '

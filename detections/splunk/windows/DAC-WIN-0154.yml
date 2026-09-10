@@ -1,0 +1,47 @@
+id: DAC-WIN-0154
+title: Remote scheduled task creation (schtasks /s)
+description: Sysmon 1 schtasks /create /s
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Lateral Movement
+  techniques:
+  - T1053.005
+  - T1021.002
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+telemetry_validated: false
+false_positives:
+- IT orchestration
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+- https://attack.mitre.org/techniques/T1021/002/
+tags:
+- P1
+- category:persistence
+- persistence
+- phase1
+- remapped_from:DAC-WIN-0055
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | table _time host
+
+    '

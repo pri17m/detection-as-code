@@ -1,0 +1,49 @@
+id: DAC-WIN-0159
+title: SMB sweep many destinations from one host
+description: Sysmon 3 many DestinationIp:445
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - Discovery
+  techniques:
+  - T1018
+  - T1021.002
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- Image
+- User
+- Protocol
+- Initiated
+- SourceIp
+- SourcePort
+- DestinationIp
+- DestinationPort
+telemetry_validated: false
+false_positives:
+- Vuln scanners allowlist
+references:
+- https://attack.mitre.org/techniques/T1018/
+- https://attack.mitre.org/techniques/T1021/002/
+tags:
+- P1
+- category:process
+- phase1
+- process
+- remapped_from:DAC-WIN-0060
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | table _time host
+
+    '

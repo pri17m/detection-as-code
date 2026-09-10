@@ -1,0 +1,41 @@
+id: DAC-WIN-0129
+title: Possible Golden Ticket (unusual TGT)
+description: 4768 encryption/lifetime anomalies
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: critical
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1558.001
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- TargetUserName
+- IpAddress
+- TicketEncryptionType
+- Status
+telemetry_validated: false
+false_positives:
+- Clock skew
+references:
+- https://attack.mitre.org/techniques/T1558/001/
+tags:
+- P1
+- ad-auth
+- category:ad-auth
+- phase1
+- remapped_from:DAC-WIN-0030
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security`
+
+    | table _time host
+
+    '

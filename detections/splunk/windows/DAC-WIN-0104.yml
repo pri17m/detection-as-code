@@ -1,0 +1,62 @@
+id: DAC-WIN-0104
+title: NTDS/VSS suspicious access on DCs
+description: 'Sysmon 1 ntdsutil/vssadmin/diskshadow; Sysmon 11 *.dit | checklist:
+  macros only; no index=; EventCode on allowlisted channel; coalesce classic/XML aliases;
+  fieldsummary required before telemetry_validated=true; FP baseline pending org allowlists'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: critical
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1003.003
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+- sysmon:*
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+- TargetFilename
+telemetry_validated: false
+false_positives:
+- Authorized backup/DR on DCs
+references:
+- https://attack.mitre.org/techniques/T1003/003/
+tags:
+- P0
+- category:process
+- hardened-v1
+- phase1
+- process
+- remapped_from:DAC-WIN-0005
+- tier:P0
+- windows
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon` ((EventCode=1 (Image="*\\ntdsutil.exe"
+    OR Image="*\\vssadmin.exe" OR Image="*\\diskshadow.exe" OR Image="*\\wbadmin.exe"
+    OR CommandLine="*ntds.dit*" OR CommandLine="*IFM*")) OR (EventCode=11 TargetFilename="*.dit"))
+
+    | eval Image=coalesce(Image, NewProcessName, process)
+
+    | eval CommandLine=coalesce(CommandLine, process_command_line, cmdline)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName, parent_process)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | eval TargetFilename=coalesce(TargetFilename, TargetFilename)
+
+    | table _time host EventCode Image CommandLine ParentImage TargetFilename User
+
+    '

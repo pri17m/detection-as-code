@@ -1,0 +1,41 @@
+id: DAC-WIN-0140
+title: Token impersonation / NewCredentials LogonType 9
+description: 4624 LogonType=9
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - Privilege Escalation
+  techniques:
+  - T1134.001
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+telemetry_validated: false
+false_positives:
+- runas /netonly
+references:
+- https://attack.mitre.org/techniques/T1134/001/
+tags:
+- P1
+- category:priv-esc
+- phase1
+- priv-esc
+- remapped_from:DAC-WIN-0041
+- tier:P1
+- windows
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security`
+
+    | table _time host
+
+    '
