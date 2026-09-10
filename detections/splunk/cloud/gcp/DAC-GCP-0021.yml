@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- protoPayload.methodName
+- protoPayload.authenticationInfo.principalEmail
+- protoPayload.requestMetadata.callerIp
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - collection
+  techniques:
+  - T1651
+id: DAC-GCP-0021
+status: experimental
+title: 'GCP: compute.instances.getSerialPortOutput sensitive'
+query:
+  splunk: '(sourcetype=gcp:audit OR sourcetype=google:gcp:cloudaudit:json OR sourcetype=google:gcp:pubsub:message)
+
+    | search protoPayload.methodName="*getSerialPortOutput*" OR protoPayload.methodName="v1.compute.instances.getSerialPortOutput"
+
+    | table _time, protoPayload.methodName, protoPayload.authenticationInfo.principalEmail, protoPayload.requestMetadata.callerIp,
+    resource.type, severity
+
+    '
+severity: medium
+references:
+- https://attack.mitre.org/techniques/T1651/
+platforms:
+- splunk
+tags:
+- wave-c
+- P2
+description: GetSerialPortOutput
+sourcetypes:
+- gcp:audit
