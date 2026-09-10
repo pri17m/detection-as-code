@@ -1,0 +1,41 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - collection
+  techniques:
+  - T1530
+id: DAC-AWS-0035
+status: experimental
+title: 'AWS: S3 GetObject high volume from unusual principal'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName="GetObject"
+
+    | stats count by userIdentity.arn, requestParameters.bucketName
+
+    | where count>100
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: medium
+references:
+- https://attack.mitre.org/techniques/T1530/
+platforms:
+- splunk
+tags:
+- wave-c
+- P2
+- phase2-related
+description: "GetObject burst \u2014 needs data events"
+sourcetypes:
+- aws:cloudtrail
