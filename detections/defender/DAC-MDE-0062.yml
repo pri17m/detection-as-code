@@ -1,0 +1,38 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1486/
+title: 'MDE: ransomware file rename burst entropy'
+description: "DeviceFileEvents mass extension change \u2014 tune heavily"
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0062
+status: experimental
+tags:
+- wave-a
+- P1
+query:
+  defender: 'DeviceFileEvents
+
+    | where ActionType == "FileRenamed"
+
+    | summarize Count=count() by DeviceName, InitiatingProcessFileName, bin(Timestamp, 5m)
+
+    | where Count > 50
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1486
