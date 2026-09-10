@@ -1,0 +1,38 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1098.003
+id: DAC-AWS-0025
+status: experimental
+title: 'AWS: IAM PassRole to privileged service then Create*'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName="RunInstances"
+
+    | search requestParameters.userData="*" OR requestParameters.networkInterfaces{}.associatePublicIpAddress=true
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1098/003/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: PassRole + CreateFunction/RunInstances
+sourcetypes:
+- aws:cloudtrail
