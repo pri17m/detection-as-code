@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685.002
+id: DAC-AZ-0025
+status: experimental
+title: 'Azure: Resource lock deleted before destructive change'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="Microsoft.Authorization/locks/delete"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1685/002/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: "locks delete \u2192 delete resource"
+sourcetypes:
+- azure:monitor:activity
