@@ -1,0 +1,67 @@
+id: DAC-WIN-0106
+title: Admin share write + new service (PsExec-class)
+description: '5145 Admin$/C$ + System 7045 / Security 4697 | checklist: macros only; no index=; EventCode
+  on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true;
+  FP baseline pending org allowlists'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- WinEventLog:System
+- XmlWinEventLog:System
+mitre:
+  tactics:
+  - Lateral Movement
+  techniques:
+  - T1021.002
+severity: high
+false_positives:
+- SCCM/IT jump hosts
+references:
+- https://attack.mitre.org/techniques/T1021/002/
+- rules/windows/builtin/security/win_security_impacket_psexec.yml
+telemetry_validated: false
+required_fields:
+- EventCode
+- SubjectUserName
+- SubjectDomainName
+- ShareName
+- RelativeTargetName
+- AccessMask
+- IpAddress
+- ServiceName
+- ImagePath
+- StartType
+- AccountName
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security" OR sourcetype="WinEventLog:System"
+    OR sourcetype="XmlWinEventLog:System")
+
+    (`windows_security` EventCode=5145) OR (`windows_system` EventCode=7045) OR (`windows_security` EventCode=4697)
+
+    | eval SubjectUserName=coalesce(SubjectUserName, Account_Name, user)
+
+    | eval ShareName=coalesce(ShareName, Share_Name)
+
+    | eval RelativeTargetName=coalesce(RelativeTargetName, Relative_Target_Name)
+
+    | eval ServiceName=coalesce(ServiceName, Service_Name)
+
+    | eval ImagePath=coalesce(ImagePath, ServiceFileName, Service_File_Name, Image_Path)
+
+    | eval IpAddress=coalesce(IpAddress, src, src_ip)
+
+    | search (EventCode=5145 ShareName IN ("Admin$","\\\\*\\Admin$","C$","\\\\*\\C$")) OR EventCode IN
+    (7045,4697)
+
+    | table _time host EventCode ShareName RelativeTargetName ServiceName ImagePath SubjectUserName IpAddress'
+tags:
+- phase1
+- windows
+- P0
+- persistence
+- hardened-v1
+- remapped_from:DAC-WIN-0007
