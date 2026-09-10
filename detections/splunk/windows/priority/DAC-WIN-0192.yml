@@ -1,0 +1,31 @@
+id: DAC-WIN-0192
+title: PowerShell module logging suspicious cmdlets (4103)
+description: 4103 Module logging suspicious
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+mitre:
+  tactics:
+  - Execution
+  techniques:
+  - T1059.001
+severity: medium
+false_positives:
+- Admin modules
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+telemetry_validated: false
+required_fields:
+- EventCode
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- process
