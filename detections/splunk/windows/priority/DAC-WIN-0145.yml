@@ -1,0 +1,37 @@
+id: DAC-WIN-0145
+title: Rundll32 with unusual DLL path
+description: Sysmon 1 rundll32 Temp/Users/javascript
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1218.011
+severity: medium
+false_positives:
+- OEM utilities
+references:
+- https://attack.mitre.org/techniques/T1218/011/
+telemetry_validated: false
+required_fields:
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P1
+- defense-evasion
+- remapped_from:DAC-WIN-0046
