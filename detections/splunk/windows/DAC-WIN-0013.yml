@@ -1,0 +1,41 @@
+id: DAC-WIN-0013
+title: Tier-0 account first-seen host / odd LogonType
+description: 4624 Tier-0 first-seen host or odd LogonType
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Initial Access
+  techniques:
+  - T1078.002
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+- SubjectUserName
+- PrivilegeList
+telemetry_validated: false
+false_positives:
+- New admin workstations
+- break-glass
+references:
+- https://attack.mitre.org/techniques/T1078/002/
+tags:
+- phase1
+- windows
+- P0
+- logon
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
+    `windows_security` EventCode=4624
+
+    | table _time host TargetUserName LogonType IpAddress WorkstationName
+
+    '
