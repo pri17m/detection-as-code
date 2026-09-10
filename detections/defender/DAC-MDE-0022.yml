@@ -1,0 +1,38 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1550/002/
+title: 'MDE: Pass-the-Hash related explicit logon 4648-class'
+description: DeviceLogonEvents / IdentityLogonEvents
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0022
+status: experimental
+tags:
+- wave-a
+- P1
+query:
+  defender: 'DeviceProcessEvents
+
+    | where ProcessCommandLine has "*"
+
+    // Experimental stub: MDE: Pass-the-Hash related explicit logon 4648-class
+
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1550.002
