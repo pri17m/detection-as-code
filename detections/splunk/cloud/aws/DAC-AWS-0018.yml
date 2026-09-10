@@ -1,0 +1,36 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1578
+id: DAC-AWS-0018
+status: experimental
+title: 'AWS: Lambda UpdateFunctionCode from unexpected principal'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("UpdateFunctionCode20150331v2","UpdateFunctionCode","UpdateFunctionConfiguration")
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: medium
+references:
+- https://attack.mitre.org/techniques/T1578/
+platforms:
+- splunk
+tags:
+- wave-c
+- P1
+description: UpdateFunctionCode
+sourcetypes:
+- aws:cloudtrail
