@@ -1,0 +1,52 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'ClassifiedModuleLoad with ModuleLoadTelemetryClassification MOTW (32), UNUSUAL_EXTENSION
+  (16), or
+
+  REMOVABLE_MEDIA (512).
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0127
+query:
+  crowdstrike: '#event_simpleName=ClassifiedModuleLoad
+
+    | in(ModuleLoadTelemetryClassification, values=[16,32,512])
+
+    | groupBy([aid, ComputerName, FileName, FilePath, ModuleLoadTelemetryClassification], function=count())
+
+    '
+mitre:
+  tactics:
+  - defense-evasion
+  - execution
+  techniques:
+  - T1553.005
+  - T1574
+title: 'Falcon: ClassifiedModuleLoad MOTW or Unusual Extension'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1553/005/
+- https://attack.mitre.org/techniques/T1574/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Dll-Side_Loading_Detection_Query.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Dll-Side_Loading_Detection_Query.yml
+- esn:ClassifiedModuleLoad
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- FileName
+- FilePath
+- ModuleLoadTelemetryClassification
+- aid
