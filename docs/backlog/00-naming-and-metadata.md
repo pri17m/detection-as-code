@@ -1,5 +1,3 @@
-**ID namespace update:** Threat-Intel pack rebased to DAC-WIN-0100+ (additive to PR #1 max 0094).
-
 # DAC Windows Pack — Naming, Metadata Schema & Sourcetype Contract
 
 **Audience:** Detection Engineer → Threat Detection Engineer  
@@ -14,7 +12,7 @@
 
 | Pattern | Example |
 | --- | --- |
-| `DAC-WIN-####` | `DAC-WIN-0100` |
+| `DAC-WIN-####` | `DAC-WIN-0001` |
 
 Zero-padded 4 digits. Phase-1 IDs follow **P0→P1→P2** (0001–0015 = locked top-15 from Threat Intel pack).
 
@@ -68,7 +66,7 @@ macros:
 ## 4. Metadata YAML example
 
 ```yaml
-id: DAC-WIN-0100
+id: DAC-WIN-0001
 title: "LSASS process access by non-EDR"
 mitre:
   tactics: ["Credential Access"]
@@ -77,7 +75,7 @@ preferred_macro: windows_sysmon
 sourcetypes: [XmlWinEventLog:Microsoft-Windows-Sysmon/Operational, WinEventLog:Microsoft-Windows-Sysmon/Operational]
 severity: critical
 status: draft
-platforms: [splunk]
+platforms: [windows]
 telemetry_validated: false
 required_fields: [SourceImage, TargetImage, GrantedAccess]
 false_positives: "Legitimate AV/EDR/backup agents"
@@ -90,7 +88,7 @@ references: ["https://attack.mitre.org/techniques/T1003/001/"]
 
 ```text
 config/sourcetype_map.yaml   # from dac-telemetry-windows
-detections/splunk/windows/DAC-WIN-####.yml
+detections/windows/DAC-WIN-####.yml
 docs/phase1/
 tests/windows/
 ```
