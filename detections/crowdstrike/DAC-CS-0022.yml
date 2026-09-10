@@ -1,0 +1,35 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1555/
+title: 'Falcon: DPAPI master key access anomaly'
+description: unusual process touching Protect/CREDENTIAL
+severity: medium
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0022
+status: experimental
+tags:
+- wave-a
+- P1
+query:
+  crowdstrike: '# Experimental Custom IOA sketch for Falcon: DPAPI master key access anomaly
+
+    CommandLine="*"
+
+    # TODO: refine with Falcon event fields after Telemetry map
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1555
