@@ -1,0 +1,49 @@
+id: DAC-WIN-0007
+title: Admin share write + new service (PsExec-class)
+description: 5145 Admin$/C$ + System 7045 / Security 4697
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - Lateral Movement
+  techniques:
+  - T1021.002
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- WinEventLog:System
+- XmlWinEventLog:System
+required_fields:
+- SubjectUserName
+- SubjectDomainName
+- ShareName
+- RelativeTargetName
+- AccessMask
+- IpAddress
+- ServiceName
+- ImagePath
+- StartType
+- AccountName
+telemetry_validated: false
+false_positives:
+- SCCM/IT jump hosts
+references:
+- https://attack.mitre.org/techniques/T1021/002/
+- rules/windows/builtin/security/win_security_impacket_psexec.yml
+tags:
+- phase1
+- windows
+- P0
+- persistence
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security
+    OR sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System) (`windows_security`
+    EventCode=5145 ShareName IN ("Admin$","C$")) OR (`windows_system` EventCode=7045)
+    OR (`windows_security` EventCode=4697)
+
+    | table _time host EventCode ShareName ServiceName ImagePath SubjectUserName
+
+    '
