@@ -1,0 +1,41 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search Category="SignInLogs" OR servicePrincipalId="*"
+
+    | stats count by appId, ipAddress
+
+    | where count>100
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0028
+title: 'Entra: Service principal sign-in spike to Graph or ARM'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: medium
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P1
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1078/004/
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1078.004
+author: Detection Engineer
+status: experimental
+description: SP sign-in volume anomaly
