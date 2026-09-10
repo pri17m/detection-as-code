@@ -1,0 +1,57 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Detects UserLogon activity for the built-in Administrator account (SID ending in -500).
+  Treat as
+
+  honeytoken-style signal where RID-500 is disabled or unused; tune UserSid for custom honeytoken
+
+  accounts.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0100
+query:
+  crowdstrike: '#event_simpleName=UserLogon
+
+    | UserSid=/S-1-5-21-\d+-\d+-\d+-500$/
+
+    | in(LogonType, values=["2","10","3","9","11"])
+
+    | groupBy([aid, ComputerName, UserName, UserSid, LogonType], function=count())
+
+    '
+mitre:
+  tactics:
+  - defense-evasion
+  - persistence
+  - credential-access
+  techniques:
+  - T1078
+  - T1078.001
+title: 'Falcon: Built-in Administrator RID-500 Logon'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1078/
+- https://attack.mitre.org/techniques/T1078/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Honey_Token_Account_Logon.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Honey_Token_Account_Logon.yml
+- esn:UserLogon
+severity: high
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- LogonType
+- UserName
+- UserSid
+- aid
