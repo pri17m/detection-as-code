@@ -1,0 +1,37 @@
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+title: 'Falcon: LOLBin Msiexec'
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218.007
+description: This query detects the use of Msiexec.exe.
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+telemetry_validated: false
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P0
+- src:LOLBin_Msiexec.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `LOLBin_Msiexec.yml` \u2014\
+    \ experimental sketch; not raw dump\n| event_platform=Win and ImageFileName=/msiexec.exe/i and CommandLine=/http/i\n\
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine], function=count())\n"
+author: Detection Engineer
+required_fields:
+- CommandLine
+- ImageFileName
+- aid
+id: DAC-CS-0063
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1218/007/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/LOLBin_Msiexec.yml
