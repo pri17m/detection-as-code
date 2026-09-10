@@ -1,0 +1,47 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: "Detects non-Microsoft scheduled tasks registered with a LogonTrigger \u2014 common user-logon\n\
+  persistence.\n"
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0094
+query:
+  crowdstrike: '#event_simpleName=ScheduledTaskRegistered
+
+    | TaskName!=/^\\?Microsoft\\Windows\\/i
+
+    | TaskXML=/LogonTrigger/i
+
+    | groupBy([aid, ComputerName, TaskName, TaskExecCommand], function=count())
+
+    '
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1053.005
+title: 'Falcon: Scheduled Task Logon Trigger'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/logon_events.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:logon_events.yml
+- esn:ScheduledTaskRegistered
+severity: low
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- TaskExecCommand
+- TaskName
+- TaskXML
+- aid
