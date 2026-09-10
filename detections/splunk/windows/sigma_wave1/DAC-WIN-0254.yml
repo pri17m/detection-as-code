@@ -1,0 +1,55 @@
+severity: medium
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=1
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/process_creation/proc_creation_win_conhost_headless_powershell.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_conhost_headless_powershell.yml
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1059/003/
+- https://attack.mitre.org/techniques/T1564/003/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/process_creation/proc_creation_win_conhost_headless_powershell.yml
+title: Powershell Executed From Headless ConHost Process
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0254
+description: 'Detects the use of powershell commands from headless ConHost window.
+
+  The "--headless" flag hides the windows from the user upon execution.'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+  - T1059.003
+  - T1564.003
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+false_positives:
+- Unknown
+status: experimental
