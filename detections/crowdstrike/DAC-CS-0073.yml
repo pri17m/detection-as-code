@@ -1,47 +1,57 @@
-references:
-- https://attack.mitre.org/techniques/T1059/
-- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Detect_Suspicious_Windows_Command-Line_Activity_Using_System_Utilities.yml
-query:
-  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `Detect_Suspicious_Windows_Command-Line_Activity_Using_System_Utilities.yml`\
-    \ \u2014 experimental sketch; not raw dump\n| ImageFileName=/\\\\(?<FileName>(whoami|net1?|systeminfo|ping|nltest|sc|hostname|ipconfig)\\\
-    .exe)/i\n| CommandLine := lower(CommandLine)\n| FileName := lower(FileName)\n| regex(\"(sc|net1?)\\\
-    s+(?<netFlag>\\S+)\\s+\", field=CommandLine, strict=false)\n| FileName=/net1?\\.exe/ AND netFlag=\"\
-    start\" | behaviorWeight := \"4\" ;\n| FileName=/net1?\\.exe/ AND netFlag=\"stop\" | behaviorWeight\
-    \ := \"4\" ;\n| FileName=/net1?\\.exe/ AND netFlag=\"stop\" AND CommandLine=/falcon/i | behaviorWeight\
-    \ := \"25\" ;\n| FileName=/sc\\.exe/ AND netFlag=\"start\" | behaviorWeight := \"4\" ;\n| FileName=/sc\\\
-    .exe/ AND netFlag=\"stop\" | behaviorWeight := \"4\" ;\n| FileName=/sc\\.exe/ AND netFlag=/(query|stop)/i\
-    \ AND CommandLine=/csagent/i | behaviorWeight := \"25\" ;\n| groupBy([aid, ComputerName, ImageFileName,\
-    \ CommandLine], function=count())\n"
-title: 'Falcon: Detect Suspicious Windows Command-Line Activity Using System Utilities'
+id: DAC-CS-0073
+status: experimental
+severity: medium
+author: Detection Engineer
 false_positives:
 - "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
   \ before promote."
 - Tune ParentBaseFileName allowlists for known management tools.
-description: The query analyzes Windows ProcessRollup2 events to identify unusual use of common administrative
-  tools (e.g., net.exe, sc.exe, nltest.exe, systeminfo.exe). It assigns behavior wei
-id: DAC-CS-0073
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+description: The query analyzes Windows ProcessRollup2 events to identify unusual use of common administrative
+  tools (e.g., net.exe, sc.exe, nltest.exe, systeminfo.exe). It assigns behavior wei
 platforms:
 - crowdstrike
+title: 'Falcon: Detect Suspicious Windows Command-Line Activity Using System Utilities'
 mitre:
   tactics:
   - execution
   techniques:
   - T1059
-severity: medium
-author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Detect_Suspicious_Windows_Command-Line_Activity_Using_System_Utilities.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| ImageFileName=/\\\\(?<FileName>(whoami|net1?|systeminfo|ping|nltest|sc|hostname|ipconfig)\\\
+    .exe)$/i\n| CommandLine := lower(CommandLine)\n| FileName := lower(FileName)\n| regex(\"(sc|net1?)\\\
+    s+(?<netFlag>\\S+)\\s+\", field=CommandLine, strict=false)\n| case {\n    FileName=/net1?\\.exe/ AND\
+    \ netFlag=\"start\" | behaviorWeight := \"4\";\n    FileName=/net1?\\.exe/ AND netFlag=\"stop\" AND\
+    \ CommandLine=/falcon/i | behaviorWeight := \"25\";\n    FileName=/net1?\\.exe/ AND netFlag=\"stop\"\
+    \ | behaviorWeight := \"4\";\n    FileName=/sc\\.exe/ AND netFlag=/(query|stop)/i AND CommandLine=/csagent/i\
+    \ | behaviorWeight := \"25\";\n    FileName=/sc\\.exe/ AND netFlag=\"start\" | behaviorWeight := \"\
+    4\";\n    FileName=/sc\\.exe/ AND netFlag=\"stop\" | behaviorWeight := \"4\";\n    FileName=/net1?\\\
+    .exe/ AND netFlag=\"user\" AND CommandLine=/\\/(add|delete)/i | behaviorWeight := \"10\";\n    FileName=/net1?\\\
+    .exe/ AND netFlag=\"localgroup\" AND CommandLine=/\\/(add|delete)/i | behaviorWeight := \"10\";\n\
+    \    FileName=/nltest\\.exe/ | behaviorWeight := \"3\";\n    FileName=/whoami\\.exe/ | behaviorWeight\
+    \ := \"3\";\n    FileName=/systeminfo\\.exe/ | behaviorWeight := \"3\";\n    FileName=/ipconfig\\\
+    .exe/ | behaviorWeight := \"3\";\n    * | behaviorWeight := \"1\";\n  }\n| groupBy([aid, ComputerName],\
+    \ function=[count(FileName, distinct=true, as=fileCount), sum(behaviorWeight, as=behaviorWeight),\
+    \ collect([ImageFileName, CommandLine], limit=20)])\n| fileCount>=5 OR behaviorWeight>30\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- FileName
+- ImageFileName
+- aid
+- event_platform
 tags:
 - cs-query-hub
 - processrollup2
 - wave-cs-qh
 - P1
 - src:Detect_Suspicious_Windows_Command-Line_Activity_Using_System_Utilities.yml
-telemetry_validated: false
-required_fields:
-- CommandLine
-- FileName
-- ImageFileName
-- ProcessStartTime
-- aid
-status: experimental
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2
