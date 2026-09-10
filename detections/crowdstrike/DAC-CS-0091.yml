@@ -1,0 +1,51 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Detects registration of Windows scheduled tasks marked Hidden=true in TaskXML, a common
+  persistence
+
+  stealth technique.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0091
+query:
+  crowdstrike: '#event_simpleName=ScheduledTaskRegistered
+
+    | TaskName!=/^\\?Microsoft\\Windows\\/i
+
+    | TaskXML=/<Hidden>\s*true\s*<\/Hidden>/i
+
+    | groupBy([aid, ComputerName, TaskName], function=[count(), collect([TaskXML], limit=1)])
+
+    '
+mitre:
+  tactics:
+  - persistence
+  - defense-evasion
+  techniques:
+  - T1053.005
+title: 'Falcon: Hidden Scheduled Task Registration'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/hidden_scheduled_tasks.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:hidden_scheduled_tasks.yml
+- esn:ScheduledTaskRegistered
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- TaskName
+- TaskXML
+- aid
