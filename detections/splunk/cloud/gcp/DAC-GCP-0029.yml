@@ -1,0 +1,37 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- protoPayload.methodName
+- protoPayload.authenticationInfo.principalEmail
+- protoPayload.requestMetadata.callerIp
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1078.004
+id: DAC-GCP-0029
+status: experimental
+title: 'GCP: GKE cluster getCredentials or legacy ABAC enable'
+query:
+  splunk: '(sourcetype=gcp:audit OR sourcetype=google:gcp:cloudaudit:json OR sourcetype=google:gcp:pubsub:message)
+
+    | search protoPayload.methodName="*getCredentials*" OR protoPayload.methodName="io.k8s.core.v1.secrets*"
+    OR text="*container.clusters.get*"
+
+    | table _time, protoPayload.methodName, protoPayload.authenticationInfo.principalEmail, protoPayload.requestMetadata.callerIp,
+    resource.type, severity
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1078/004/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+description: container.clusters.getCredentials
+sourcetypes:
+- gcp:audit
