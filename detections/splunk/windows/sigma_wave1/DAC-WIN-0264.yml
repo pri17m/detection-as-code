@@ -1,0 +1,48 @@
+severity: medium
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon)
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/registry/registry_delete/registry_delete_schtasks_hide_task_via_sd_value_removal.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_delete/registry_delete_schtasks_hide_task_via_sd_value_removal.yml
+- https://attack.mitre.org/techniques/T1053/005/
+- https://attack.mitre.org/techniques/T1685/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/registry/registry_delete/registry_delete_schtasks_hide_task_via_sd_value_removal.yml
+title: Removal Of SD Value to Hide Schedule Task - Registry
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0264
+description: Remove SD (Security Descriptor) value in \Schedule\TaskCache\Tree registry hive to hide schedule
+  task. This technique is used by Tarrask malware
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1053.005
+  - T1685
+required_fields:
+- EventCode
+false_positives:
+- Unknown
+status: experimental
