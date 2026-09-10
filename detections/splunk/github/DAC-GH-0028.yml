@@ -1,0 +1,38 @@
+query:
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
+
+    | search action IN ("secret_scanning_push_protection.bypass","repository_secret_scanning.disable","org.disable_secret_scanning")
+
+    | table _time, actor, action, org, repo, actor_ip, user_agent
+
+    '
+id: DAC-GH-0028
+title: 'GitHub: Push protection bypassed or disabled for org/repo'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- github:audit
+- github:cloud:audit
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+telemetry_validated: false
+required_fields:
+- actor
+- action
+- org
+- repo
+- actor_ip
+references:
+- https://attack.mitre.org/techniques/T1552/001/
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1552.001
+author: Detection Engineer
+status: experimental
+description: secret_scanning_push_protection disabled / bypass
