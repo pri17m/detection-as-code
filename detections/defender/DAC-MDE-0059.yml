@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1574/002/
+title: 'MDE: unsigned DLL sideload into signed process'
+description: DeviceImageLoadEvents
+severity: medium
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0059
+status: experimental
+tags:
+- wave-a
+- P1
+- parity:DAC-CS-0060
+query:
+  defender: 'DeviceProcessEvents
+
+    | where ProcessCommandLine has "*"
+
+    // Experimental stub: MDE: unsigned DLL sideload into signed process
+
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1574.002
