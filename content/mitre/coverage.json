@@ -1,13 +1,13 @@
 {
   "summary": {
-    "detections_total": 660,
-    "detections_with_mitre": 660,
+    "detections_total": 652,
+    "detections_with_mitre": 652,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 144,
     "platform_counts": {
       "crowdstrike": 62,
       "defender": 62,
-      "splunk": 536
+      "splunk": 528
     }
   },
   "techniques": {
@@ -32,7 +32,6 @@
       "DAC-MDE-0014",
       "DAC-MDE-0015",
       "DAC-MDE-0018",
-      "DAC-WIN-0001",
       "DAC-WIN-0100",
       "DAC-WIN-0115",
       "DAC-WIN-0116",
@@ -71,7 +70,6 @@
     "T1003.003": [
       "DAC-CS-0016",
       "DAC-MDE-0016",
-      "DAC-WIN-0005",
       "DAC-WIN-0104",
       "DAC-WIN-0276"
     ],
@@ -79,7 +77,6 @@
       "DAC-WIN-0276"
     ],
     "T1003.006": [
-      "DAC-WIN-0002",
       "DAC-WIN-0101",
       "DAC-WIN-0201",
       "DAC-WIN-0202"
@@ -109,7 +106,6 @@
       "DAC-CS-0042",
       "DAC-MDE-0040",
       "DAC-MDE-0041",
-      "DAC-WIN-0007",
       "DAC-WIN-0106",
       "DAC-WIN-0118",
       "DAC-WIN-0119",
@@ -233,7 +229,6 @@
       "DAC-MDE-0033",
       "DAC-MDE-0034",
       "DAC-SIG-0001",
-      "DAC-WIN-0008",
       "DAC-WIN-0029",
       "DAC-WIN-0031",
       "DAC-WIN-0032",
@@ -710,7 +705,6 @@
       "DAC-CS-0027",
       "DAC-MDE-0007",
       "DAC-MDE-0027",
-      "DAC-WIN-0007",
       "DAC-WIN-0046",
       "DAC-WIN-0071",
       "DAC-WIN-0120",
@@ -797,7 +791,6 @@
     "T1550.002": [
       "DAC-MDE-0021",
       "DAC-MDE-0022",
-      "DAC-WIN-0006",
       "DAC-WIN-0105",
       "DAC-WIN-0118",
       "DAC-WIN-0128",
@@ -873,7 +866,6 @@
       "DAC-WIN-0129"
     ],
     "T1558.003": [
-      "DAC-WIN-0003",
       "DAC-WIN-0102",
       "DAC-WIN-0123",
       "DAC-WIN-0194",
@@ -881,7 +873,6 @@
       "DAC-WIN-0284"
     ],
     "T1558.004": [
-      "DAC-WIN-0004",
       "DAC-WIN-0103",
       "DAC-WIN-0168",
       "DAC-WIN-0208"
