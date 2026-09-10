@@ -3,7 +3,7 @@
 ## Sourcetype allowlist (→ `config/sourcetype_map.yaml`)
 **Macros (preferred):** `windows_security` · `windows_system` · `windows_powershell_operational` · `windows_powershell_classic` · `windows_sysmon`
 
-**Strings:**  
+**Strings: *  
 `WinEventLog:Security` / `XmlWinEventLog:Security` · `WinEventLog:System` / `XmlWinEventLog:System` ·  
 `…PowerShell/Operational` (Win+Xml) · `…Windows PowerShell` (Win+Xml) ·  
 `XmlWinEventLog:Microsoft-Windows-Sysmon/Operational` (+ WinEventLog Sysmon, legacy `sysmon`/`sysmon:*`) ·  
@@ -40,31 +40,3 @@ Variants: classic `Account_Name` vs XML `TargetUserName`/`SubjectUserName`; CIM 
 
 **Full doc:** `/workspace/dac-windows-splunk-telemetry.md` (= `docs/telemetry/windows-splunk.md`)  
 **Map:** `/workspace/config/sourcetype_map.yaml`
-
-## Phase-1 expansion (gap Event IDs)
-
-| ID | Must-have |
-| --- | --- |
-| 4104 | ScriptBlockText, ScriptBlockId, Path, MessageNumber/Total, User* |
-| 4662 | SubjectUser*, ObjectDN/GUID/Type, Properties, AccessMask |
-| 4702 | TaskName, SubjectUser*, TaskContent |
-| 4719 | SubjectUser*, CategoryId, SubcategoryId/Guid, AuditPolicyChanges |
-| 4724 | SubjectUser*, TargetUserName/Domain |
-| 4738 | SubjectUser*, TargetUser*, UAC/PasswordLastSet/SidHistory deltas |
-| 4740 | TargetUserName, CallerComputerName |
-| 4741 | TargetUserName (computer$), SubjectUser*, SPNs if present |
-| 4886–4888 | RequestId, Requester, Attributes/Subject (+ Status on 4888) |
-| 5136 | SubjectUser*, ObjectDN/GUID/Class, AttributeLDAPDisplayName, AttributeValue, OperationType |
-| 5137 | SubjectUser*, ObjectDN/GUID/Class |
-| 5145 | SubjectUser*, ShareName, RelativeTargetName, AccessMask, IpAddress |
-| Sysmon4 | State (+ Version/SchemaVersion) |
-| Sysmon6 | ImageLoaded, Hashes, Signed/Signature* |
-| Sysmon8 | SourceImage, TargetImage, StartModule/Function, StartAddress |
-| Sysmon16 | Configuration, ConfigurationFileHash |
-| Sysmon17/18 | PipeName, Image, User |
-| Sysmon19 | EventNamespace, Name, Query, User, Operation |
-| Sysmon20 | Name, Type, Destination, User, Operation |
-| Sysmon21 | Consumer, Filter, User, Operation |
-| Sysmon25 | Image, Type, User, ProcessGuid |
-
-Also: 4104 → `windows_powershell_operational`; AD CS 4886–4888 need CA audit onboarded; Sysmon 17–21/25 often disabled in config — treat missing telemetry as data gap.
