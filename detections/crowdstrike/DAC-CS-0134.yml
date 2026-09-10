@@ -1,0 +1,54 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: "UserLogonFailed2 aggregated by UserName across many distinct aids \u2014 password spray\
+  \ pattern (same\naccount, many endpoints).\n"
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0134
+query:
+  crowdstrike: '#event_simpleName=UserLogonFailed2 event_platform=Win
+
+    | UserName=/^[A-Za-z0-9._-]{1,64}$/
+
+    | UserName!=/^SYSTEM$|^LOCAL SERVICE$|^NETWORK SERVICE$/i
+
+    | groupBy([UserName, LogonType], function=[count(as=FailCount), count(aid, distinct=true, as=HostCount),
+    collect([ComputerName], limit=25)])
+
+    | FailCount>10
+
+    | HostCount>3
+
+    | sort(HostCount, order=desc)
+
+    '
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1110.003
+title: 'Falcon: UserLogonFailed2 Password Spray Across Hosts'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1110/003/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Failed_User_Logon_Thresholding.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Failed_User_Logon_Thresholding.yml
+- esn:UserLogonFailed2
+severity: high
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- LogonType
+- UserName
+- aid
+- event_platform
