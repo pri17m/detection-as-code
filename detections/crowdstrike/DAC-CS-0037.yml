@@ -1,0 +1,33 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1218/
+title: 'Falcon: InstallUtil or Regasm/Regsvcs unusual'
+description: installutil/regasm from user path
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0037
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0189
+query:
+  crowdstrike: 'ImageFileName IN ["InstallUtil.exe","RegAsm.exe","RegSvcs.exe"] AND CommandLine CONTAINS_ANY
+    ["\\Users\\","\\Temp\\","\\AppData\\"]
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218
