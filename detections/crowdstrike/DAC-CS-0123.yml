@@ -1,0 +1,55 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'RegGenericValue writes under Windows Defender / Security Center policy paths that disable
+  real-time
+
+  protection or related AV settings.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0123
+query:
+  crowdstrike: '#event_simpleName=RegGenericValue
+
+    | RegObjectName=/\\(Windows Defender|Windows Defender Security Center|Policies\\Microsoft\\Windows
+    Defender)/i
+
+    | RegValueName=/(DisableAntiSpyware|DisableRealtimeMonitoring|DisableBehaviorMonitoring|DisableIOAVProtection|DisableOnAccessProtection|TamperProtection)/i
+
+    | groupBy([aid, ComputerName, RegObjectName, RegValueName, RegStringValue, RegNumericValue], function=count())
+
+    '
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.001
+  - T1112
+title: 'Falcon: Security Service Disable via RegGenericValue'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/techniques/T1112/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Suspicious_Registry_Modifications.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Suspicious_Registry_Modifications.yml
+- esn:RegGenericValue
+severity: high
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- RegNumericValue
+- RegObjectName
+- RegStringValue
+- RegValueName
+- aid
