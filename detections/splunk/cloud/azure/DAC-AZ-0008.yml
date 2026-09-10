@@ -1,0 +1,39 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- operationName
+- caller
+- callerIpAddress
+- resourceId
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562
+id: DAC-AZ-0008
+status: experimental
+title: 'Azure: NSG rule allow 0.0.0.0/0 to management ports'
+query:
+  splunk: '(sourcetype=azure:monitor:activity OR sourcetype=azure:activity OR sourcetype=azure:insights:activitylogs)
+
+    | search operationName="Microsoft.Network/networkSecurityGroups/securityRules/write"
+
+    | search properties="*0.0.0.0/0*" properties="*22*" OR properties="*3389*"
+
+    | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1562/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-related
+description: securityRules * 0.0.0.0/0 22/3389
+sourcetypes:
+- azure:monitor:activity
