@@ -1,0 +1,35 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1021/002/
+title: 'Falcon: Impacket-style smbexec/atexec cmdline'
+description: svcctl/cmd.exe /c patterns
+severity: medium
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0042
+status: experimental
+tags:
+- wave-a
+- P1
+query:
+  crowdstrike: '# Experimental Custom IOA sketch for Falcon: Impacket-style smbexec/atexec cmdline
+
+    CommandLine="*"
+
+    # TODO: refine with Falcon event fields after Telemetry map
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021.002
