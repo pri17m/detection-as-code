@@ -1,0 +1,39 @@
+id: DAC-WIN-0194
+title: Kerberos service ticket from unusual client
+description: 4769 rare Client Address for SPN
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Credential Access
+  techniques:
+  - T1558.003
+  - T1078.002
+severity: medium
+false_positives:
+- Mobile admins
+references:
+- https://attack.mitre.org/techniques/T1558/003/
+- https://attack.mitre.org/techniques/T1078/002/
+telemetry_validated: false
+required_fields:
+- EventCode
+- TargetUserName
+- ServiceName
+- IpAddress
+- TicketEncryptionType
+- Status
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- ad-auth
