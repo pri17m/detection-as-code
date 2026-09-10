@@ -1,0 +1,47 @@
+id: DAC-WIN-0003
+title: Brute force followed by successful logon (same source)
+description: Detects a pattern of multiple 4625 failures followed by a 4624 success
+  from the same source IP to the same host within a short window.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1110
+severity: high
+false_positives:
+- Users mistyping then succeeding; shared jump hosts.
+references:
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624
+telemetry_validated: false
+required_fields:
+- EventCode
+- IpAddress
+- TargetUserName
+- host
+query:
+  splunk: 'sourcetype=WinEventLog:Security (EventCode=4625 OR EventCode=4624)
+
+    | eval src_ip=coalesce(IpAddress, src, src_ip)
+
+    | eval user=coalesce(TargetUserName, Account_Name, user)
+
+    | eval outcome=if(EventCode=4624,"success","failure")
+
+    | transaction src_ip, user, host maxspan=15m
+
+    | search outcome="failure" outcome="success"
+
+    | eval failures=mvcount(mvfilter(outcome="failure"))
+
+    | eval successes=mvcount(mvfilter(outcome="success"))
+
+    | where failures >= 10 AND successes >= 1
+
+    '
