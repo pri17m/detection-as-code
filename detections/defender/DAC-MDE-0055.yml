@@ -1,0 +1,37 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1528/
+title: 'MDE: anomalous token replay indicators'
+description: IdentityLogonEvents non-interactive
+severity: medium
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0055
+status: experimental
+tags:
+- wave-a
+- P1
+- phase2-top5
+query:
+  defender: 'IdentityLogonEvents
+
+    | where LogonType has_any ("Token","OAuth","NonInteractive")
+
+    | project Timestamp, AccountName, Application, IPAddress, LogonType
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1528
