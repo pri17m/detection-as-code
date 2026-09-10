@@ -1,49 +1,54 @@
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- aid
+- event_platform
+status: experimental
+author: Detection Engineer
+description: Detects wmic.exe process call create (remote/local process creation via WMI). Query-Hub LOLBin_WMIC
+  ImageFileName gate plus concrete CommandLine predicate from prior IOA intent (avoids ImageFileName-only
+  weakness).
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0113
+- enhance-tp
+- tp-quality-v2
+- processrollup2
+- esn:ProcessRollup2
+- esn:ProcessBlocked
+- qh:LOLBin_WMIC.yml
 mitre:
   tactics:
   - execution
   techniques:
   - T1047
-severity: high
-required_fields:
-- ImageFileName
-- CommandLine
-- ParentBaseFileName
-- aid
-- ComputerName
-- TargetProcessId
+id: DAC-CS-0038
 query:
-  crowdstrike: '#event_simpleName=ProcessRollup2
+  crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
 
-    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
+    | event_platform=Win
 
-    // prior: ImageFileName="wmic.exe" AND CommandLine CONTAINS "process call create"
+    | ImageFileName=/wmic\.exe$/i
 
-    // --- src: LOLBin_WMIC.yml (Falcon: LOLBin WMIC) ---
-
-    | event_platform=Win and ImageFileName=/wmic.exe/i
+    | CommandLine=/process\s+call\s+create/i
 
     | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
 
     '
-tags:
-- wave-a
-- P0
-- parity:DAC-WIN-0113
-- enhance-01b
-- processrollup2
-- qh:LOLBin_WMIC.yml
-sourcetypes:
-- falcon:process
-telemetry_validated: false
-references:
-- https://attack.mitre.org/techniques/T1047/
+severity: high
+title: 'Falcon: wmic process call create'
+false_positives:
+- "Legitimate admin/WMI automation using process call create \u2014 allowlist known management parents."
+- Monitoring agents; baseline CommandLine before promote.
 platforms:
 - crowdstrike
-false_positives:
-- Tune after baselining; experimental sketch may be noisy.
-- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
-id: DAC-CS-0038
-title: 'Falcon: wmic process call create'
-author: Detection Engineer
-status: experimental
-description: wmic process call Enhanced with Query-Hub ProcessRollup2 patterns (LOLBin_WMIC.yml).
+references:
+- https://attack.mitre.org/techniques/T1047/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/LOLBin_WMIC.yml
