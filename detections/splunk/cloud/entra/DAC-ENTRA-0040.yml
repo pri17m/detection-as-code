@@ -1,0 +1,38 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName IN ("Add user to access package","Add member to privileged access group") OR
+    ActivityDisplayName="*access package*"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0040
+title: 'Entra: Privileged Access Group or access package assignment anomalous'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P1
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1098/003/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098.003
+author: Detection Engineer
+status: experimental
+description: Entitlement management / PAG assignment
