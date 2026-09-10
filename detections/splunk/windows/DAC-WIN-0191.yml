@@ -1,0 +1,38 @@
+id: DAC-WIN-0191
+title: LogonType 10 concurrent many hosts for one user
+description: 4624 Type10 many hosts one Tier-0 user
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Lateral Movement
+  techniques:
+  - T1021.001
+  - T1078.002
+severity: medium
+false_positives:
+- Jump box admin
+references:
+- https://attack.mitre.org/techniques/T1021/001/
+- https://attack.mitre.org/techniques/T1078/002/
+telemetry_validated: false
+required_fields:
+- EventCode
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- logon
