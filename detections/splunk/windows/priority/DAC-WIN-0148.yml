@@ -1,0 +1,37 @@
+id: DAC-WIN-0148
+title: Mshta executing remote or script content
+description: Sysmon 1 mshta.js/.vbs/http
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1218.005
+severity: high
+false_positives:
+- Legacy HTA LOB
+references:
+- https://attack.mitre.org/techniques/T1218/005/
+telemetry_validated: false
+required_fields:
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P1
+- defense-evasion
+- remapped_from:DAC-WIN-0049
