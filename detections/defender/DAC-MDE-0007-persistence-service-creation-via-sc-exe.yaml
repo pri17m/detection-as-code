@@ -1,0 +1,34 @@
+id: DAC-MDE-0007
+title: 'Persistence: service creation via sc.exe'
+description: Detects service creation using sc.exe, a common persistence method.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1543.003
+severity: high
+false_positives:
+- Legitimate installs and admin operations.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table
+telemetry_validated: false
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName =~ "sc.exe"
+
+    | where ProcessCommandLine has "create"
+
+    | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+
+    '

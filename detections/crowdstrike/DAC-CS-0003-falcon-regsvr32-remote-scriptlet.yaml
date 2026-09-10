@@ -1,0 +1,30 @@
+id: DAC-CS-0003
+title: 'Falcon: regsvr32 remote scriptlet'
+description: Starter Falcon IOA/correlation rule candidate.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - execution
+  - defense-evasion
+  techniques:
+  - T1218.010
+severity: medium
+false_positives:
+- Tune to your environment and allowlist known tooling.
+references:
+- https://www.crowdstrike.com/
+telemetry_validated: false
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+query:
+  crowdstrike: 'falcon_ioa_pattern: ImageFileName="regsvr32.exe" AND CommandLine CONTAINS_ANY
+    ["http://","https://",".sct","scrobj.dll"]
+
+    '

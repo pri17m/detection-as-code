@@ -1,0 +1,34 @@
+id: DAC-MDE-0005
+title: 'Defense evasion: disable firewall via netsh'
+description: Detects attempts to disable Windows firewall via netsh.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.004
+severity: high
+false_positives:
+- Legitimate troubleshooting by admins; tune by accounts/devices.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table
+telemetry_validated: false
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName =~ "netsh.exe"
+
+    | where ProcessCommandLine has_all ("advfirewall","state","off")
+
+    | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+
+    '

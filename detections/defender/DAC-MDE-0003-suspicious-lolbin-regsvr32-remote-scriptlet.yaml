@@ -1,0 +1,35 @@
+id: DAC-MDE-0003
+title: 'Suspicious LOLBin: regsvr32 remote scriptlet'
+description: Detects regsvr32 being used with remote URLs or scriptlets, a signed-binary
+  proxy execution pattern.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218.010
+severity: high
+false_positives:
+- Rare legitimate use; validate command line and source.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table
+telemetry_validated: false
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName =~ "regsvr32.exe"
+
+    | where ProcessCommandLine has_any ("http://","https://",".sct","scrobj.dll")
+
+    | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, InitiatingProcessFileName
+
+    '

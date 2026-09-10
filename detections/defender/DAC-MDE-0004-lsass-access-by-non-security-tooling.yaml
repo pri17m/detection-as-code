@@ -1,0 +1,36 @@
+id: DAC-MDE-0004
+title: LSASS access by non-security tooling
+description: Detects potential credential dumping by identifying processes accessing
+  LSASS or creating memory dumps.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003
+severity: critical
+false_positives:
+- Security tools may legitimately access LSASS; tune by signer/allowlists.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table
+telemetry_validated: false
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+query:
+  defender: 'DeviceProcessEvents
+
+    | where ProcessCommandLine has_any ("lsass.exe","comsvcs.dll","minidump","procdump")
+
+    | where FileName in~ ("rundll32.exe","procdump.exe","taskmgr.exe","werfault.exe","powershell.exe")
+
+    | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, InitiatingProcessFileName,
+    InitiatingProcessCommandLine
+
+    '

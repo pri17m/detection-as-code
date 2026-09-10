@@ -1,0 +1,35 @@
+id: DAC-MDE-0009
+title: Certutil used to download or decode
+description: Detects certutil used with urlcache/decode flags often used for tool
+  transfer.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1105
+severity: medium
+false_positives:
+- Legitimate certificate operations.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table
+telemetry_validated: false
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName =~ "certutil.exe"
+
+    | where ProcessCommandLine has_any ("-urlcache","-decode","-encode")
+
+    | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+
+    '

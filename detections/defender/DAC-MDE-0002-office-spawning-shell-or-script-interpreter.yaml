@@ -1,0 +1,37 @@
+id: DAC-MDE-0002
+title: Office spawning shell or script interpreter
+description: Detects Office processes spawning cmd/powershell/wscript/cscript; common
+  in macro-based initial execution.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1204
+severity: high
+false_positives:
+- Legitimate add-ins or automation workflows.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table
+telemetry_validated: false
+required_fields:
+- DeviceName
+- InitiatingProcessFileName
+- FileName
+- ProcessCommandLine
+query:
+  defender: 'DeviceProcessEvents
+
+    | where InitiatingProcessFileName in~ ("winword.exe","excel.exe","powerpnt.exe","outlook.exe")
+
+    | where FileName in~ ("cmd.exe","powershell.exe","pwsh.exe","wscript.exe","cscript.exe")
+
+    | project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, InitiatingProcessCommandLine,
+    FileName, ProcessCommandLine
+
+    '

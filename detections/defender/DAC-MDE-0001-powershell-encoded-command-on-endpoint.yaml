@@ -1,0 +1,37 @@
+id: DAC-MDE-0001
+title: PowerShell encoded command on endpoint
+description: Detects PowerShell executions using EncodedCommand, a common obfuscation
+  and payload staging pattern.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+severity: high
+false_positives:
+- Legitimate admin scripts may use encoded commands.
+references:
+- https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table
+telemetry_validated: false
+required_fields:
+- DeviceName
+- ProcessCommandLine
+- FileName
+- InitiatingProcessFileName
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName in~ ("powershell.exe","pwsh.exe")
+
+    | where ProcessCommandLine has_any ("-enc","-encodedcommand")
+
+    | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, InitiatingProcessFileName,
+    InitiatingProcessCommandLine
+
+    '

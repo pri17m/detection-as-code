@@ -1,0 +1,29 @@
+id: DAC-CS-0002
+title: 'Falcon: Office spawning shell'
+description: Detects Office processes spawning cmd/powershell/script interpreters.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1204
+severity: high
+false_positives:
+- Legitimate add-ins; tune by user/group and doc origin.
+references:
+- https://www.crowdstrike.com/
+telemetry_validated: false
+required_fields:
+- ImageFileName
+- ParentBaseFileName
+- CommandLine
+query:
+  crowdstrike: 'falcon_ioa_pattern: ParentBaseFileName in ["winword.exe","excel.exe","powerpnt.exe","outlook.exe"]
+    AND ImageFileName in ["cmd.exe","powershell.exe","pwsh.exe","wscript.exe","cscript.exe"]
+
+    '
