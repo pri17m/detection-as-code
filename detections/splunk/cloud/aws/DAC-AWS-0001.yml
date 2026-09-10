@@ -1,0 +1,39 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098.003
+id: DAC-AWS-0001
+status: experimental
+title: 'AWS: IAM AttachUserPolicy or AttachRolePolicy with AdministratorAccess'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("AttachUserPolicy","AttachRolePolicy","AttachGroupPolicy")
+
+    | search requestParameters.policyArn="*AdministratorAccess*" OR requestParameters.policyArn="*Admin*"
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1098/003/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-top5
+description: eventName Attach*Policy PolicyArn */AdministratorAccess
+sourcetypes:
+- aws:cloudtrail
