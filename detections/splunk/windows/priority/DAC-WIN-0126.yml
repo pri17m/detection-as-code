@@ -1,0 +1,36 @@
+id: DAC-WIN-0126
+title: Scheduled task updated (4702) suspicious content
+description: Security 4702 TaskContent change
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1053.005
+severity: medium
+false_positives:
+- Software updaters
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+telemetry_validated: false
+required_fields:
+- TaskName
+- SubjectUserName
+- SubjectDomainName
+- TaskContent
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P0
+- persistence
+- remapped_from:DAC-WIN-0027
