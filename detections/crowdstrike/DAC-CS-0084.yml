@@ -1,0 +1,47 @@
+references:
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Rare_Windows_Shell_Parent.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `Rare_Windows_Shell_Parent.yml`\
+    \ \u2014 experimental sketch; not raw dump\n| case { in(field=FileName, values=[\"powershell.exe\"\
+    , \"cmd.exe\", \"pwsh.exe\"]) | IsChild := \"1\"; * | IsChild := \"0\" }\n| case { IsChild = \"1\"\
+    \ | ProcId := ParentProcessId | ChildProcess := FileName | ChildCommandLine := CommandLine;\n| IsChild\
+    \ = \"0\" | ProcId := TargetProcessId | ParentCommandLine := CommandLine | ParentFileName := FileName\
+    \ | ParentFilePath := FilePath | ParentSHA256HashData := SHA256HashData; }\n| groupBy([aid, ComputerName,\
+    \ ImageFileName, CommandLine], function=count())\n"
+title: 'Falcon: Rare windows shell parent process'
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+description: This hunting query is designed to detect rare shell parent processes.
+id: DAC-CS-0084
+sourcetypes:
+- falcon:process
+platforms:
+- crowdstrike
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059
+severity: medium
+author: Detection Engineer
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:Rare_Windows_Shell_Parent.yml
+telemetry_validated: false
+required_fields:
+- CommandLine
+- ComputerName
+- FileName
+- FilePath
+- ParentProcessId
+- SHA256HashData
+- TargetProcessId
+- ImageFileName
+- aid
+status: experimental
