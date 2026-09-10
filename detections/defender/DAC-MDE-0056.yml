@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1071/
+title: 'MDE: outbound network from Office/script engines rare dest'
+description: DeviceNetworkEvents
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0056
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-MDE-0010
+query:
+  defender: 'DeviceProcessEvents
+
+    | where InitiatingProcessFileName in~ ("WINWORD.EXE","EXCEL.EXE","OUTLOOK.EXE","POWERPNT.EXE")
+
+    | where FileName in~ ("powershell.exe","pwsh.exe","cmd.exe","mshta.exe")
+
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1071
