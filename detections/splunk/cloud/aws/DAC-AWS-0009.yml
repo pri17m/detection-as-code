@@ -1,0 +1,39 @@
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+required_fields:
+- eventName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+telemetry_validated: false
+author: Detection Engineer
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1548.005
+id: DAC-AWS-0009
+status: experimental
+title: 'AWS: STS AssumeRole temporary elevated access anomalous'
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName="AssumeRole"
+
+    | search requestParameters.roleArn="*admin*" OR requestParameters.roleArn="*Admin*" OR resources{}.ARN="*admin*"
+
+    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
+
+    '
+severity: high
+references:
+- https://attack.mitre.org/techniques/T1548/005/
+platforms:
+- splunk
+tags:
+- wave-c
+- P0
+- phase2-top5
+description: AssumeRole to admin role outside change / novel actor
+sourcetypes:
+- aws:cloudtrail
