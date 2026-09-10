@@ -1,0 +1,55 @@
+severity: medium
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=7
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/image_load/image_load_scrcons_wmi_scripteventconsumer.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/image_load/image_load_scrcons_wmi_scripteventconsumer.yml
+- https://attack.mitre.org/techniques/T1047/
+- https://attack.mitre.org/techniques/T1574/
+- https://attack.mitre.org/techniques/T1546/003/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P1
+- windows_sysmon
+- sigma:rules/windows/image_load/image_load_scrcons_wmi_scripteventconsumer.yml
+title: WMI ActiveScriptEventConsumers Activity Via Scrcons.EXE DLL Load
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0292
+description: Detects signs of the WMI script host process "scrcons.exe" loading scripting DLLs which could
+  indicates WMI ActiveScriptEventConsumers EventConsumers activity.
+mitre:
+  tactics:
+  - execution
+  - persistence
+  techniques:
+  - T1047
+  - T1574
+  - T1546.003
+required_fields:
+- EventCode
+- Image
+- ImageLoaded
+false_positives:
+- Legitimate event consumers
+- Dell computers on some versions register an event consumer that is known to cause false positives when
+  brightness is changed by the corresponding keyboard button
+status: experimental
