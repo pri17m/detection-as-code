@@ -1,0 +1,83 @@
+platforms:
+- crowdstrike
+author: Detection Engineer
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Detects low-jitter outbound IPv4 connection cadence consistent with C2 beaconing (regular
+  intervals,
+
+  CoV < 0.10, >=8 beacons) excluding RFC1918 and noisy ports.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0109
+query:
+  crowdstrike: '#event_simpleName=NetworkConnectIP4
+
+    | !cidr(RemoteAddressIP4, subnet=["10.0.0.0/8","172.16.0.0/12","192.168.0.0/16","127.0.0.0/8","169.254.0.0/16","224.0.0.0/4","0.0.0.0/8","100.64.0.0/10"])
+
+    | !in(RemotePort, values=[53,123,137,138,443,80])
+
+    | ConnKey := format(format="%s:%s", field=[RemoteAddressIP4, RemotePort])
+
+    | ts := @timestamp
+
+    | sort(field=[aid, ConnKey, ts], order=[asc, asc, asc], limit=max)
+
+    | neighbor(include=[ts, aid, ConnKey], prefix=prev, direction=preceding)
+
+    | test(aid == prev.aid)
+
+    | test(ConnKey == prev.ConnKey)
+
+    | Delta := (ts - prev.ts) / 1000
+
+    | Delta >= 1
+
+    | groupBy([aid, ComputerName, RemoteAddressIP4, RemotePort], function=[count(as=Beacons), avg(Delta,
+    as=AvgInterval), stdDev(field=Delta, as=JitterStdDev)], limit=max)
+
+    | CoV := JitterStdDev / AvgInterval
+
+    | Beacons >= 8
+
+    | AvgInterval >= 10
+
+    | AvgInterval <= 86400
+
+    | CoV < 0.10
+
+    | sort(field=CoV, order=asc)
+
+    '
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1071
+  - T1571
+  - T1041
+title: 'Falcon: C2 Beaconing Cadence on NetworkConnectIP4'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1071/
+- https://attack.mitre.org/techniques/T1571/
+- https://attack.mitre.org/techniques/T1041/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/c2_beaconing_detection.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:c2_beaconing_detection.yml
+- esn:NetworkConnectIP4
+severity: high
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- RemoteAddressIP4
+- RemotePort
+- aid
