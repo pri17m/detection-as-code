@@ -1,31 +1,71 @@
-author: Detection Engineer
-references:
-- https://attack.mitre.org/techniques/T1490/
-title: 'Falcon: bcdedit disable recovery'
-description: bcdedit recoveryenabled no
-severity: high
-telemetry_validated: false
-platforms:
-- crowdstrike
-required_fields:
-- ImageFileName
-- CommandLine
-- ParentBaseFileName
-false_positives:
-- Tune after baselining; experimental sketch may be noisy.
-id: DAC-CS-0047
-status: experimental
-tags:
-- wave-a
-- P0
-query:
-  crowdstrike: 'ImageFileName="bcdedit.exe" AND CommandLine CONTAINS_ANY ["recoveryenabled","bootstatuspolicy"]
-
-    '
-sourcetypes:
-- falcon:process
 mitre:
   tactics:
   - impact
   techniques:
   - T1490
+severity: high
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- aid
+- ComputerName
+- TargetProcessId
+query:
+  crowdstrike: '#event_simpleName=ProcessRollup2
+
+    // Enhanced from Query-Hub ProcessRollup patterns (01b); keep prior intent
+
+    // prior: ImageFileName="bcdedit.exe" AND CommandLine CONTAINS_ANY ["recoveryenabled","bootstatuspolicy"]
+
+    // --- src: ransomware_precursors.yml (Falcon: Ransomware Precursors) ---
+
+    | CmdLower := lower("CommandLine")
+
+    | ImageFileName=/\\vssadmin\.exe$/i
+
+    | ImageFileName=/\\vssadmin\.exe$/i
+
+    | ImageFileName=/\\wmic\.exe$/i
+
+    | ImageFileName=/\\(powershell|powershell_ise|pwsh)\.exe$/i
+
+    | ImageFileName=/\\wbadmin\.exe$/i
+
+    | ImageFileName=/\\bcdedit\.exe$/i
+
+    | ImageFileName=/\\fsutil\.exe$/i
+
+    // --- src: shadow_mcp_server_activity_via_common_runtime_interpreters.yml (Falcon: Shadow MCP Server
+    Activity via Common Runtime Interp) ---
+
+    | FileName = /(?i)^(node|node\.exe|npx|npx\.cmd|python|python\.exe|python3|uv|uvx|docker|docker\.exe)$/
+
+    | CommandLine = /(?i)(server-filesystem|server-github|server-postgres|server-sqlite|server-puppeteer|server-brave|modelcontext|mcp)/
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
+
+    '
+tags:
+- wave-a
+- P0
+- enhance-01b
+- processrollup2
+- qh:ransomware_precursors.yml
+- qh:shadow_mcp_server_activity_via_common_runtime_interpreters.yml
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+references:
+- https://attack.mitre.org/techniques/T1490/
+platforms:
+- crowdstrike
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+- ProcessRollup2 field patterns may be noisy until tenant baselined; keep telemetry_validated=false.
+id: DAC-CS-0047
+title: 'Falcon: bcdedit disable recovery'
+author: Detection Engineer
+status: experimental
+description: bcdedit recoveryenabled no Enhanced with Query-Hub ProcessRollup2 patterns (ransomware_precursors.yml,
+  shadow_mcp_server_activity_via_common_runtime_interpreters.yml).
