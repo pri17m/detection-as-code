@@ -1,0 +1,39 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+title: 'MDE: schtasks create with LOLBin or SYSTEM'
+description: "extend beyond 0006 \u2014 TaskContent/cmdline"
+severity: high
+telemetry_validated: false
+platforms:
+- defender
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-MDE-0025
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:DAC-WIN-0110
+query:
+  defender: 'DeviceProcessEvents
+
+    | where FileName =~ "schtasks.exe" and ProcessCommandLine has "/create"
+
+    | where ProcessCommandLine has_any ("powershell","-enc","cmd.exe","mshta")
+
+    | project Timestamp, DeviceName, ProcessCommandLine, InitiatingProcessFileName
+
+    '
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1053.005
