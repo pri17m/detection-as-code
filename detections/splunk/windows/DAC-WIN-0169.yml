@@ -1,0 +1,37 @@
+id: DAC-WIN-0169
+title: Critical binary masquerading outside System32
+description: Sysmon 1 svchost.exe NOT System32
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Defense Evasion
+  techniques:
+  - T1036.005
+severity: high
+false_positives:
+- WinSxS edge cases
+references:
+- https://attack.mitre.org/techniques/T1036/005/
+telemetry_validated: false
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+- User
+- ProcessGuid
+- Hashes
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- defense-evasion
