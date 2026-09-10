@@ -1,0 +1,51 @@
+references:
+- https://attack.mitre.org/techniques/T1204/001/
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/leaknet_campaign_deno_runtime_klist_suspicious_execution_detection.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n// Enhanced from Query-Hub `leaknet_campaign_deno_runtime_klist_suspicious_execution_detection.yml`\
+    \ \u2014 experimental sketch; not raw dump\n| ImageFileName=/\\\\deno(\\.exe)?$/i\n| AND ImageFileName=/\\\
+    \\(Users\\\\[^\\\\]+\\\\AppData\\\\(Local|Roaming)|Temp|ProgramData)\\\\/i\n| ImageFileName=/\\\\\
+    klist\\.exe$/i\n| AND ParentBaseFileName=/^(cmd|powershell|pwsh|wscript|cscript|mshta)\\.exe$/i\n\
+    | ParentBaseFileName=/^deno(\\.exe)?$/i\n| AND ImageFileName=/\\\\(cmd|powershell|pwsh|net|net1|whoami|hostname|nltest|dsquery|quser|qwinsta|vssadmin|wbadmin|reg|wevtutil|ipconfig|systeminfo|tasklist|qprocess|schtasks|wmic|bitsadmin|certutil)\\\
+    .exe$/i\n| ImageFileName=/\\\\deno(\\.exe)?$/i\n| AND CommandLine=/(eval|--allow-all|--allow-net|--allow-run|https?:\\\
+    /\\/|atob\\(|base64|WebSocket|fetch\\()/i\n| ImageFileName=/\\\\deno(\\.exe)?$/i\n| AND ImageFileName=/\\\
+    \\(Program Files|Program Files \\(x86\\)|tools|dev|repos|source|git)\\\\/i\n| groupBy([aid, ComputerName,\
+    \ ImageFileName, CommandLine], function=count())\n"
+title: 'Falcon: LeakNet Campaign: Deno Runtime & Klist Suspicious Execution Detection'
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+description: Detects indicators of the LeakNet campaign (analyzed by ReliaQuest, March 2026), which uses
+  ClickFix a social engineering tactic where compromised websites display fake error dialo
+id: DAC-CS-0080
+sourcetypes:
+- falcon:process
+platforms:
+- crowdstrike
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1204.001
+  - T1059
+severity: medium
+author: Detection Engineer
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:leaknet_campaign_deno_runtime_klist_suspicious_execution_detection.yml
+telemetry_validated: false
+required_fields:
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- SHA256HashData
+- TargetProcessId
+- UserName
+- aid
+status: experimental
