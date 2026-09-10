@@ -1,0 +1,55 @@
+severity: medium
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=4769
+
+    | search TicketEncryptionType="0x17"
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/win_security_kerberoasting_activity.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_kerberoasting_activity.yml
+- https://attack.mitre.org/techniques/T1558/003/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_security
+- sigma:rules/windows/builtin/security/win_security_kerberoasting_activity.yml
+title: Kerberoasting Activity - Initial Query
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0207
+description: 'This rule will collect the data needed to start looking into possible kerberoasting activity.
+
+  Further analysis or computation within the query is needed focusing on requests from one specific host/IP
+  towards multiple service names within a time period of 5 seconds.
+
+  You can then set a threshold for the number of requests and time between the requests to turn this into
+  an alert.'
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1558.003
+required_fields:
+- EventCode
+- ServiceName
+- TargetUserName
+- TicketEncryptionType
+false_positives:
+- Legacy applications.
+status: experimental
