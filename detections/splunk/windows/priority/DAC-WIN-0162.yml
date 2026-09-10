@@ -1,0 +1,38 @@
+id: DAC-WIN-0162
+title: LogonType 3 from new workstation for privileged user
+description: 4624 Type3 privileged first-seen WorkstationName
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - Lateral Movement
+  techniques:
+  - T1078.002
+  - T1021.002
+severity: medium
+false_positives:
+- New VDI pools
+references:
+- https://attack.mitre.org/techniques/T1078/002/
+- https://attack.mitre.org/techniques/T1021/002/
+telemetry_validated: false
+required_fields:
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
+query:
+  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P1
+- logon
+- remapped_from:DAC-WIN-0063
