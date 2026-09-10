@@ -1,0 +1,42 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName="Consent to application" OR ActivityDisplayName="Consent to application"
+
+    | search ResultReason="*Admin*" OR InitiatedBy="*admin*" OR ConsentType="AllPrincipals"
+
+    | search Scope="*Directory.*" OR Scope="*RoleManagement.*" OR Scope="*.ReadWrite.All*"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0008
+title: 'Entra: Admin consent granted to application with high Graph scopes'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+- phase2-top5
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1671/
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1671
+author: Detection Engineer
+status: experimental
+description: Consent to application admin Directory.ReadWrite.All etc
