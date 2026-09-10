@@ -1,0 +1,32 @@
+author: Detection Engineer
+references:
+- https://attack.mitre.org/techniques/T1547/001/
+title: 'Falcon: Startup folder payload drop'
+description: file create under Startup
+severity: high
+telemetry_validated: false
+platforms:
+- crowdstrike
+required_fields:
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+id: DAC-CS-0024
+status: experimental
+tags:
+- wave-a
+- P0
+- parity:WIN
+query:
+  crowdstrike: 'TargetFileName CONTAINS "\\Start Menu\\Programs\\Startup\\"
+
+    '
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1547.001
