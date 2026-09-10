@@ -1,0 +1,49 @@
+severity: high
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+    OR sourcetype=sysmon) EventCode=10
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/process_access/proc_access_win_lsass_python_based_tool.yml;
+    fieldsummary before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_access/proc_access_win_lsass_python_based_tool.yml
+- https://attack.mitre.org/techniques/T1003/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_sysmon
+- sigma:rules/windows/process_access/proc_access_win_lsass_python_based_tool.yml
+title: Credential Dumping Activity By Python Based Tool
+author: Detection Engineer
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+id: DAC-WIN-0246
+description: Detects LSASS process access for potential credential dumping by a Python-like tool such
+  as LaZagne or Pypykatz.
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.001
+required_fields:
+- EventCode
+- SourceImage
+- TargetImage
+- GrantedAccess
+false_positives:
+- Unknown
+status: experimental
