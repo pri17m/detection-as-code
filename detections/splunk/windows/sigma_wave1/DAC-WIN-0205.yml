@@ -1,0 +1,48 @@
+severity: high
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode IN (5136,5145)
+
+    | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
+
+    | eval process=coalesce(Image, NewProcessName, process)
+
+    | eval cmdline=coalesce(CommandLine, process_command_line, cmdline)
+
+    | table _time host EventCode user process cmdline
+
+    | `comment("sigma-wave1 from rules/windows/builtin/security/win_security_gpo_scheduledtasks.yml; fieldsummary
+    before telemetry_validated")`
+
+    '
+telemetry_validated: false
+references:
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_gpo_scheduledtasks.yml
+- https://attack.mitre.org/techniques/T1053/005/
+- https://attack.mitre.org/techniques/T1484/001/
+platforms:
+- splunk
+tags:
+- sigma-wave1
+- P0
+- windows_security
+- sigma:rules/windows/builtin/security/win_security_gpo_scheduledtasks.yml
+title: Persistence and Execution at Scale via GPO Scheduled Task
+author: Detection Engineer
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+id: DAC-WIN-0205
+description: Detect lateral movement using GPO scheduled task, usually used to deploy ransomware at scale
+mitre:
+  tactics:
+  - persistence
+  - defense-evasion
+  techniques:
+  - T1053.005
+  - T1484.001
+required_fields:
+- EventCode
+false_positives:
+- If the source IP is not localhost then it's super suspicious, better to monitor both local and remote
+  changes to GPO scheduled tasks.
+status: experimental
