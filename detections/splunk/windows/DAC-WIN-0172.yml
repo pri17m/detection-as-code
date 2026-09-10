@@ -1,0 +1,34 @@
+id: DAC-WIN-0172
+title: DLL dropped beside application directory
+description: Sysmon 11 *.dll under Program Files
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - Persistence
+  techniques:
+  - T1574.001
+severity: medium
+false_positives:
+- Legit updates
+references:
+- https://attack.mitre.org/techniques/T1574/001/
+telemetry_validated: false
+required_fields:
+- EventCode
+- Image
+- TargetFilename
+- User
+query:
+  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+
+    | table _time host'
+tags:
+- phase1
+- windows
+- P2
+- persistence
