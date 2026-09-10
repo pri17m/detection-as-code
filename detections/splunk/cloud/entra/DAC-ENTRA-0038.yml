@@ -1,0 +1,41 @@
+query:
+  splunk: 'sourcetype=azure:monitor:aad
+
+    | search operationName="Consent to application"
+
+    | search ConsentType="Principal" OR ResultReason="*User*"
+
+    | search Scope="*Mail.*" OR Scope="*Files.*" OR Scope="*RoleManagement*"
+
+    | table _time, operationName, ActivityDisplayName, initiatedBy, targetResources, Result, ipAddress,
+    userPrincipalName
+
+    '
+id: DAC-ENTRA-0038
+title: 'Entra: Application consent policy or user consent settings relaxed'
+false_positives:
+- Tune after baselining; experimental sketch may be noisy.
+severity: high
+sourcetypes:
+- azure:monitor:aad
+platforms:
+- splunk
+tags:
+- wave-b
+- P0
+telemetry_validated: false
+required_fields:
+- operationName
+- initiatedBy
+- ipAddress
+- userPrincipalName
+references:
+- https://attack.mitre.org/techniques/T1671/
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1671
+author: Detection Engineer
+status: experimental
+description: Update authorization policy allow user consent
