@@ -1,16 +1,16 @@
 id: DAC-AWS-0048
 title: 'AWS: ConsoleLogin success without MFA (MFAUsed=No)'
 description: 'Primary console MFA signal per Telemetry: eventName=ConsoleLogin with additionalEventData.MFAUsed=No
-  and successful login. Complements DAC-AWS-0045 (sessionCredentialFromConsole / session mfaAuthenticated
-  on follow-on APIs). Values are Yes/No strings.'
-author: Threat detection Engineer
+  and responseElements.ConsoleLogin=Success. Complements DAC-AWS-0045 (sessionCredentialFromConsole /
+  session mfaAuthenticated on follow-on APIs). Values are Yes/No strings. Tightens Wave C DAC-AWS-0011.
+
+  '
+author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - aws:cloudtrail
-- aws:cloudtrail:json
-- aws:cloudtrail:event
 mitre:
   tactics:
   - initial-access
@@ -18,8 +18,9 @@ mitre:
   - T1078.004
 severity: high
 false_positives:
-- "Break-glass IAM users without MFA \u2014 allowlist. Some federated/SSO flows may emit MFAUsed=No; baseline\
+- "Break-glass IAM users without MFA \u2014 allowlist. Some federated/SSO flows emit MFAUsed=No; baseline\
   \ IdP."
+- "Failed logons can still carry MFAUsed=No \u2014 this variant requires ConsoleLogin=Success only."
 references:
 - https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
 - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-aws-console-sign-in-events.html
@@ -27,11 +28,14 @@ references:
 telemetry_validated: false
 required_fields:
 - eventName
+- eventSource
 - additionalEventData.MFAUsed
-- userIdentity.arn
-- sourceIPAddress
-- awsRegion
 - responseElements.ConsoleLogin
+- userIdentity.arn
+- userIdentity.type
+- sourceIPAddress
+- userAgent
+- awsRegion
 tags:
 - cloudtrail-ir-part1
 - scenario-2
@@ -41,11 +45,14 @@ tags:
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName="ConsoleLogin" additionalEventData.MFAUsed="No"
+    | search eventSource=signin.amazonaws.com eventName=ConsoleLogin additionalEventData.MFAUsed="No"
 
-    | search responseElements.ConsoleLogin="Success" OR errorCode="success" OR (errorCode="" OR isnull(errorCode))
+    | search responseElements.ConsoleLogin="Success" OR errorCode="success"
 
-    | table _time, eventName, userIdentity.arn, userIdentity.type, userIdentity.userName, additionalEventData.MFAUsed,
-    responseElements.ConsoleLogin, sourceIPAddress, awsRegion, userAgent, errorCode
+    | stats count values(userIdentity.type) as user_type values(userIdentity.userName) as userName values(sourceIPAddress)
+    as sourceIPAddress values(userAgent) as userAgent values(awsRegion) as awsRegion min(_time) as first_seen
+    max(_time) as last_seen by userIdentity.arn
+
+    | where count>=1
 
     '
