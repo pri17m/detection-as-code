@@ -1,0 +1,57 @@
+id: DAC-AWS-0051
+title: 'AWS: Non-read AssumedRole API activity with IMDSv1 ec2RoleDelivery 1.0'
+description: 'Broader Part 2 signal: any non-read CloudTrail management call from AssumedRole credentials
+  delivered via IMDSv1 (ec2RoleDelivery=1.0). High-fidelity companion to 0050 for post-harvest use beyond
+  IAM. Prefer pairing with instance-id session names (i-*).'
+mitre:
+  tactics:
+  - credential-access
+  - lateral-movement
+  techniques:
+  - T1552.005
+  - T1078.004
+severity: medium
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-2/
+- https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html
+- https://attack.mitre.org/techniques/T1552/005/
+required_fields:
+- userIdentity.ec2RoleDelivery
+- userIdentity.type
+- userIdentity.arn
+- eventName
+- eventSource
+- readOnly
+- sourceIPAddress
+- awsRegion
+tags:
+- cloudtrail-ir-part2
+- scenario-3
+- P0
+- tp-quality
+- imdsv1
+false_positives:
+- "Legacy fleets still on IMDSv1 will be noisy \u2014 use as hunting until IMDSv2 enforced; allowlist\
+  \ known automation roles temporarily."
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search userIdentity.type="AssumedRole" (''userIdentity.ec2RoleDelivery''="1.0" OR userIdentity.ec2RoleDelivery=1.0)
+
+    | search readOnly=false OR readOnly="false"
+
+    | eval session_name=mvindex(split(userIdentity.arn, "/"), -1)
+
+    | table _time, eventSource, eventName, errorCode, userIdentity.arn, session_name, userIdentity.ec2RoleDelivery,
+    userIdentity.sessionContext.sessionIssuer.userName, sourceIPAddress, awsRegion, userAgent, readOnly
+
+    '
+author: Threat detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+- aws:cloudtrail:json
+- aws:cloudtrail:event
+telemetry_validated: false
