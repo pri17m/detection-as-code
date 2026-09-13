@@ -1,0 +1,66 @@
+id: DAC-AWS-0044
+title: 'AWS: S3 steal-then-destroy CopyObject or GetObject then DeleteObject'
+description: "IR Part 1 Scenario 1 exfil-before-delete: CopyObject or GetObject on an object or prefix\
+  \ followed by DeleteObject or DeleteObjects from the same principal within 15 minutes. Requires S3 data\
+  \ events on aws:cloudtrail (or a tenant-specific S3 data sourcetype \u2014 Telemetry map update if segregated).\n"
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+mitre:
+  tactics:
+  - exfiltration
+  - impact
+  techniques:
+  - T1537
+  - T1485
+severity: critical
+false_positives:
+- "Application migrate-and-purge jobs copy then delete the same keys \u2014 allowlist known ETL roles."
+- Silent if S3 data events are off; confirm trail selectors before promote.
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
+- https://attack.mitre.org/techniques/T1537/
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html
+telemetry_validated: false
+required_fields:
+- eventName
+- eventSource
+- userIdentity.arn
+- sourceIPAddress
+- requestParameters.bucketName
+- requestParameters.key
+- requestParameters.x-amz-copy-source
+- recipientAccountId
+tags:
+- cloudtrail-ir-part1
+- P0
+- tp-quality
+- scenario-1
+- needs-s3-data-events
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource=s3.amazonaws.com eventName IN ("CopyObject", "GetObject", "DeleteObject", "DeleteObjects")
+
+    | eval bucket=coalesce(''requestParameters.bucketName'',''requestParameters.bucket'',"")
+
+    | eval obj=coalesce(''requestParameters.key'',''requestParameters.Key'',''requestParameters.x-amz-copy-source'',"")
+
+    | eval obj_norm=lower(replace(obj, "^[^/]+/", ""))
+
+    | eval is_exfil=if(eventName IN ("CopyObject", "GetObject"), 1, 0)
+
+    | eval is_del=if(eventName IN ("DeleteObject", "DeleteObjects"), 1, 0)
+
+    | bin _time span=15m
+
+    | stats sum(is_exfil) as exfil_n sum(is_del) as del_n dc(eventName) as evs values(eventName) as eventNames
+    values(sourceIPAddress) as sourceIPAddress values(recipientAccountId) as recipientAccountId by _time,
+    userIdentity.arn, bucket, obj_norm
+
+    | where exfil_n>=1 AND del_n>=1 AND obj_norm!=""
+
+    '
