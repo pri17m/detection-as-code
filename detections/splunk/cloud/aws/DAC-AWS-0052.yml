@@ -43,9 +43,9 @@ query:
     | eval ec2_session=if(match(session_name, "^i-[0-9a-f]+$") OR match(userIdentity.principalId, ":i-[0-9a-f]+$"),
     "true", "false")
 
-    | table _time, eventName, userIdentity.arn, session_name, ec2_session, userIdentity.ec2RoleDelivery,
-    additionalEventData.MFAUsed, responseElements.ConsoleLogin, sourceIPAddress, awsRegion, userAgent,
-    userIdentity.sessionContext.attributes.mfaAuthenticated
+    | table _time, eventName, userIdentity.arn, session_name, ec2_session, userIdentity.sessionContext.ec2RoleDelivery,
+    userIdentity.ec2RoleDelivery, additionalEventData.MFAUsed, responseElements.ConsoleLogin, sourceIPAddress,
+    awsRegion, userAgent, userIdentity.sessionContext.attributes.mfaAuthenticated
 
     '
 author: Threat detection Engineer
