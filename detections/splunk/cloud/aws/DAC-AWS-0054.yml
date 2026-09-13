@@ -1,0 +1,53 @@
+id: DAC-AWS-0054
+title: 'AWS: Bedrock Converse or InvokeModel active model use'
+description: 'Part 2 Event 4: Active Bedrock model invocation via Converse, InvokeModel, or InvokeModelWithResponseStream.
+  Surfaces modelId and token counts when logged in additionalEventData. High priority for unauthorized
+  AI usage / cost harvesting.'
+mitre:
+  tactics:
+  - impact
+  - collection
+  techniques:
+  - T1496
+  - T1530
+severity: high
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-2/
+- https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-cloudtrail.html
+- https://attack.mitre.org/techniques/T1496/
+required_fields:
+- eventSource
+- eventName
+- requestParameters.modelId
+- userIdentity.arn
+- awsRegion
+- sourceIPAddress
+- additionalEventData.inputTokens
+- additionalEventData.outputTokens
+tags:
+- cloudtrail-ir-part2
+- scenario-3
+- P0
+- tp-quality
+- bedrock
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource="bedrock.amazonaws.com" eventName IN ("Converse","ConverseStream","InvokeModel","InvokeModelWithResponseStream")
+
+    | table _time, eventName, requestParameters.modelId, additionalEventData.inputTokens, additionalEventData.outputTokens,
+    userIdentity.type, userIdentity.arn, userIdentity.ec2RoleDelivery, sessionCredentialFromConsole, sourceIPAddress,
+    awsRegion, userAgent, errorCode, readOnly
+
+    '
+author: Threat detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+- aws:cloudtrail:json
+- aws:cloudtrail:event
+telemetry_validated: false
+false_positives:
+- Tune after baselining legitimate workload roles and Regions; experimental until tenant field confirm.
