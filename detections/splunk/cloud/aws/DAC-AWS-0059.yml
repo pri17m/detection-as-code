@@ -1,0 +1,54 @@
+id: DAC-AWS-0059
+title: 'AWS: Same AssumedRole Bedrock activity across multiple Regions in short window'
+description: "Part 2 defense-evasion: same AssumedRole ARN performs Bedrock APIs in >=2 awsRegion values\
+  \ within 2h (Region hop us-east-1\u2192us-east-2 pattern)."
+mitre:
+  tactics:
+  - defense-evasion
+  - discovery
+  techniques:
+  - T1496
+  - T1526
+severity: high
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-2/
+required_fields:
+- eventSource
+- eventName
+- userIdentity.arn
+- awsRegion
+- sourceIPAddress
+tags:
+- cloudtrail-ir-part2
+- scenario-3
+- P0
+- tp-quality
+- bedrock
+- region-hop
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource="bedrock.amazonaws.com" userIdentity.type="AssumedRole"
+
+    | bin _time span=2h
+
+    | stats dc(awsRegion) as regions values(awsRegion) as region_list values(eventName) as eventNames
+    values(sourceIPAddress) as sourceIPAddress values(sessionCredentialFromConsole) as from_console by
+    _time, userIdentity.arn
+
+    | where regions>=2
+
+    | table _time, userIdentity.arn, regions, region_list, eventNames, sourceIPAddress, from_console
+
+    '
+author: Threat detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+- aws:cloudtrail:json
+- aws:cloudtrail:event
+telemetry_validated: false
+false_positives:
+- Tune after baselining legitimate workload roles and Regions; experimental until tenant field confirm.
