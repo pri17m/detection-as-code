@@ -1,0 +1,51 @@
+id: DAC-AWS-0049
+title: 'AWS: Burst S3 DeleteObject or DeleteObjects from single principal (data events required)'
+description: High-rate object deletion from one principal/IP in a short window (Scenario 1 13-second scripted
+  delete pattern). Requires S3 data events. Management-only trails will not see DeleteObject.
+author: Threat detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+- aws:cloudtrail:json
+- aws:cloudtrail:event
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1485
+severity: high
+false_positives:
+- "Bulk lifecycle jobs and data-retention wipers \u2014 allowlist known roles; tune threshold after baselining."
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
+- https://attack.mitre.org/techniques/T1485/
+telemetry_validated: false
+required_fields:
+- eventName
+- eventSource
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+tags:
+- cloudtrail-ir-part1
+- scenario-1
+- P0
+- tp-quality
+- requires-s3-data-events
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource="s3.amazonaws.com" eventName IN ("DeleteObject","DeleteObjects")
+
+    | bin _time span=1m
+
+    | stats count AS deletes, dc(requestParameters.key) AS keys, values(requestParameters.bucketName)
+    AS buckets by _time, userIdentity.arn, sourceIPAddress, awsRegion
+
+    | where deletes>=3
+
+    | table _time, userIdentity.arn, sourceIPAddress, awsRegion, deletes, keys, buckets
+
+    '
