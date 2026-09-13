@@ -354,6 +354,7 @@
       "DAC-AWS-0041",
       "DAC-AWS-0045",
       "DAC-AWS-0046",
+      "DAC-AWS-0048",
       "DAC-AZ-0021",
       "DAC-AZ-0028",
       "DAC-AZ-0040",
@@ -656,7 +657,6 @@
       "DAC-AWS-0040",
       "DAC-AWS-0043",
       "DAC-AWS-0044",
-      "DAC-AWS-0048",
       "DAC-AWS-0049",
       "DAC-AZ-0037",
       "DAC-AZ-0039",
@@ -706,7 +706,6 @@
       "DAC-AWS-0015",
       "DAC-AWS-0031",
       "DAC-AWS-0044",
-      "DAC-AWS-0048",
       "DAC-AZ-0011",
       "DAC-AZ-0012",
       "DAC-AZ-0031",
@@ -1025,7 +1024,8 @@
       "DAC-GCP-0017"
     ],
     "T1580": [
-      "DAC-AWS-0042"
+      "DAC-AWS-0042",
+      "DAC-AWS-0049"
     ],
     "T1584": [
       "DAC-AWS-0039"
