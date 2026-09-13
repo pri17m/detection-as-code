@@ -1,13 +1,13 @@
 {
   "summary": {
-    "detections_total": 661,
-    "detections_with_mitre": 661,
+    "detections_total": 671,
+    "detections_with_mitre": 671,
     "detections_with_mitre_percent": 100.0,
-    "unique_techniques": 147,
+    "unique_techniques": 150,
     "platform_counts": {
       "crowdstrike": 62,
       "defender": 62,
-      "splunk": 537
+      "splunk": 547
     }
   },
   "techniques": {
@@ -161,6 +161,8 @@
       "DAC-WIN-0302"
     ],
     "T1036.005": [
+      "DAC-AWS-0056",
+      "DAC-AWS-0057",
       "DAC-CS-0061",
       "DAC-MDE-0060",
       "DAC-WIN-0169",
@@ -293,6 +295,10 @@
       "DAC-WIN-0017",
       "DAC-WIN-0190"
     ],
+    "T1069": [
+      "DAC-AWS-0050",
+      "DAC-AWS-0055"
+    ],
     "T1070": [
       "DAC-WIN-0069",
       "DAC-WIN-0183",
@@ -355,6 +361,10 @@
       "DAC-AWS-0045",
       "DAC-AWS-0046",
       "DAC-AWS-0048",
+      "DAC-AWS-0050",
+      "DAC-AWS-0051",
+      "DAC-AWS-0052",
+      "DAC-AWS-0058",
       "DAC-AZ-0021",
       "DAC-AZ-0028",
       "DAC-AZ-0040",
@@ -427,6 +437,7 @@
       "DAC-AWS-0030",
       "DAC-AWS-0032",
       "DAC-AWS-0037",
+      "DAC-AWS-0057",
       "DAC-AZ-0001",
       "DAC-AZ-0002",
       "DAC-AZ-0003",
@@ -524,6 +535,7 @@
     ],
     "T1136.003": [
       "DAC-AWS-0023",
+      "DAC-AWS-0056",
       "DAC-ENTRA-0035",
       "DAC-GCP-0005"
     ],
@@ -684,7 +696,16 @@
       "DAC-WIN-0225"
     ],
     "T1496": [
-      "DAC-AWS-0047"
+      "DAC-AWS-0047",
+      "DAC-AWS-0054",
+      "DAC-AWS-0055",
+      "DAC-AWS-0058",
+      "DAC-AWS-0059"
+    ],
+    "T1526": [
+      "DAC-AWS-0053",
+      "DAC-AWS-0055",
+      "DAC-AWS-0059"
     ],
     "T1528": [
       "DAC-ENTRA-0011",
@@ -695,6 +716,7 @@
     "T1530": [
       "DAC-AWS-0035",
       "DAC-AWS-0042",
+      "DAC-AWS-0054",
       "DAC-GCP-0027"
     ],
     "T1531": [
@@ -827,6 +849,10 @@
       "DAC-GH-0027",
       "DAC-GH-0028",
       "DAC-GH-0029"
+    ],
+    "T1552.005": [
+      "DAC-AWS-0050",
+      "DAC-AWS-0051"
     ],
     "T1552.006": [
       "DAC-WIN-0256",
@@ -1025,7 +1051,8 @@
     ],
     "T1580": [
       "DAC-AWS-0042",
-      "DAC-AWS-0049"
+      "DAC-AWS-0049",
+      "DAC-AWS-0053"
     ],
     "T1584": [
       "DAC-AWS-0039"
