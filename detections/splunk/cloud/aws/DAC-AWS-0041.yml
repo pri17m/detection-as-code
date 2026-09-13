@@ -1,10 +1,9 @@
 id: DAC-AWS-0041
 title: 'AWS: Cross-account AssumeRole with masquerade sessionName'
-description: 'IR Part 1 Scenario 1: STS AssumeRole where the caller account does not match the role or
-  resource account (recipientAccountId vs userIdentity.accountId or role ARN account) and the roleSessionName
-  looks like a masquerade (admin, root, SSO-looking, or short hex). Tightens DAC-AWS-0009 (admin ARN-only).
-
-  '
+description: "IR Part 1 Scenario 1: STS AssumeRole where the caller account does not match the role or\
+  \ resource account (recipientAccountId vs userIdentity.accountId or role ARN account) and the roleSessionName\
+  \ looks like a masquerade (admin, root, SSO-looking, or short hex). Tightens DAC-AWS-0009 (admin ARN-only).\n\
+  \ Masquerade sessionName patterns include migration/dev/script (AWS IR Part 1 Scenario 1) plus admin/root/breakglass."
 author: Detection Engineer
 status: experimental
 platforms:
@@ -62,7 +61,7 @@ query:
     | eval cross_account=if(recipientAccountId!=caller_account OR (isnotnull(role_account) AND role_account!=""
     AND role_account!=caller_account AND match(role_account, "^[0-9]{12}$")), "true", "false")
 
-    | eval masquerade=if(match(session_name, "(?i)(admin|administrator|root|breakglass|awsreserved|[0-9a-f]{8,16}$)"),
+    | eval masquerade=if(match(session_name, "(?i)(migration|dev[-_]|script|temp[-_]|threat|attacker|recon|admin|administrator|root|breakglass)"),
     "true", "false")
 
     | search cross_account=true OR masquerade=true
