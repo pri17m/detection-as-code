@@ -1,0 +1,61 @@
+id: DAC-AWS-0052
+title: 'AWS: ConsoleLogin AssumedRole without MFA after EC2 instance-profile session'
+description: 'Part 2 Event 2: ConsoleLogin Success with additionalEventData.MFAUsed=No where userIdentity.type=AssumedRole
+  (often session name i-* from EC2 instance profile). Complements DAC-AWS-0048 (generic MFAUsed=No) with
+  AssumedRole/EC2 pivot specificity from Scenario 3.'
+mitre:
+  tactics:
+  - initial-access
+  - defense-evasion
+  techniques:
+  - T1078.004
+severity: high
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-2/
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-aws-console-sign-in-events.html
+- https://attack.mitre.org/techniques/T1078/004/
+required_fields:
+- eventName
+- eventSource
+- additionalEventData.MFAUsed
+- responseElements.ConsoleLogin
+- userIdentity.type
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+tags:
+- cloudtrail-ir-part2
+- scenario-3
+- P0
+- tp-quality
+- console-login
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource="signin.amazonaws.com" eventName="ConsoleLogin" userIdentity.type="AssumedRole"
+
+    | search additionalEventData.MFAUsed="No"
+
+    | search responseElements.ConsoleLogin="Success" OR errorCode="success"
+
+    | eval session_name=mvindex(split(userIdentity.arn, "/"), -1)
+
+    | eval ec2_session=if(match(session_name, "^i-[0-9a-f]+$") OR match(userIdentity.principalId, ":i-[0-9a-f]+$"),
+    "true", "false")
+
+    | table _time, eventName, userIdentity.arn, session_name, ec2_session, userIdentity.ec2RoleDelivery,
+    additionalEventData.MFAUsed, responseElements.ConsoleLogin, sourceIPAddress, awsRegion, userAgent,
+    userIdentity.sessionContext.attributes.mfaAuthenticated
+
+    '
+author: Threat detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+- aws:cloudtrail:json
+- aws:cloudtrail:event
+telemetry_validated: false
+false_positives:
+- Tune after baselining legitimate workload roles and Regions; experimental until tenant field confirm.
