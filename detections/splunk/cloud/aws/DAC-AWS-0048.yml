@@ -1,9 +1,8 @@
 id: DAC-AWS-0048
-title: 'AWS: S3 CopyObject or GetObject then DeleteObject steal-then-destroy (data events required)'
-description: "Scenario 1 steal-then-destroy chain on object APIs. REQUIRES S3 CloudTrail data events (or\
-  \ equivalent) \u2014 CopyObject/DeleteObject/GetObject are NOT in management-only trails. telemetry_validated=false\
-  \ until tenant enables data events; sourcetype still aws:cloudtrail* when data events land in same index/sourcetype\
-  \ family."
+title: 'AWS: ConsoleLogin success without MFA (MFAUsed=No)'
+description: 'Primary console MFA signal per Telemetry: eventName=ConsoleLogin with additionalEventData.MFAUsed=No
+  and successful login. Complements DAC-AWS-0045 (sessionCredentialFromConsole / session mfaAuthenticated
+  on follow-on APIs). Values are Yes/No strings.'
 author: Threat detection Engineer
 status: experimental
 platforms:
@@ -14,48 +13,39 @@ sourcetypes:
 - aws:cloudtrail:event
 mitre:
   tactics:
-  - exfiltration
-  - impact
+  - initial-access
   techniques:
-  - T1537
-  - T1485
-severity: critical
+  - T1078.004
+severity: high
 false_positives:
-- "App lifecycle rewrite/delete patterns \u2014 require data-event enablement and path allowlists before\
-  \ promote."
+- "Break-glass IAM users without MFA \u2014 allowlist. Some federated/SSO flows may emit MFAUsed=No; baseline\
+  \ IdP."
 references:
 - https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
-- https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html
-- https://attack.mitre.org/techniques/T1485/
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-aws-console-sign-in-events.html
+- https://attack.mitre.org/techniques/T1078/004/
 telemetry_validated: false
 required_fields:
 - eventName
-- eventSource
+- additionalEventData.MFAUsed
 - userIdentity.arn
-- requestParameters.bucketName
-- requestParameters.key
 - sourceIPAddress
 - awsRegion
+- responseElements.ConsoleLogin
 tags:
 - cloudtrail-ir-part1
-- scenario-1
+- scenario-2
 - P0
 - tp-quality
-- requires-s3-data-events
+- console-login
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventSource="s3.amazonaws.com" eventName IN ("CopyObject","GetObject","DeleteObject","DeleteObjects")
+    | search eventName="ConsoleLogin" additionalEventData.MFAUsed="No"
 
-    | eval actor=coalesce(userIdentity.arn, userIdentity.principalId)
+    | search responseElements.ConsoleLogin="Success" OR errorCode="success" OR (errorCode="" OR isnull(errorCode))
 
-    | eval obj=coalesce(requestParameters.key, requestParameters.Key, resources{}.ARN)
-
-    | transaction actor obj maxspan=30m startswith=(eventName IN ("CopyObject","GetObject")) endswith=(eventName
-    IN ("DeleteObject","DeleteObjects"))
-
-    | search eventcount>=2
-
-    | table _time, actor, obj, eventcount, sourceIPAddress, awsRegion, userAgent, recipientAccountId
+    | table _time, eventName, userIdentity.arn, userIdentity.type, userIdentity.userName, additionalEventData.MFAUsed,
+    responseElements.ConsoleLogin, sourceIPAddress, awsRegion, userAgent, errorCode
 
     '
