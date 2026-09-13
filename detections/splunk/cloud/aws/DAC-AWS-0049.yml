@@ -1,7 +1,8 @@
 id: DAC-AWS-0049
-title: 'AWS: Burst S3 DeleteObject or DeleteObjects from single principal (data events required)'
-description: High-rate object deletion from one principal/IP in a short window (Scenario 1 13-second scripted
-  delete pattern). Requires S3 data events. Management-only trails will not see DeleteObject.
+title: 'AWS: S3 ListBuckets then DeleteBucket by same principal (management-plane)'
+description: 'Management-plane impact chain when S3 data events are unavailable: ListBuckets recon followed
+  by DeleteBucket from the same actor within 60m. Object DeleteObject remains DAC-AWS-0043 (needs data
+  events).'
 author: Threat detection Engineer
 status: experimental
 platforms:
@@ -13,11 +14,13 @@ sourcetypes:
 mitre:
   tactics:
   - impact
+  - discovery
   techniques:
   - T1485
+  - T1580
 severity: high
 false_positives:
-- "Bulk lifecycle jobs and data-retention wipers \u2014 allowlist known roles; tune threshold after baselining."
+- "Bucket teardown automation \u2014 allowlist destroy roles."
 references:
 - https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
 - https://attack.mitre.org/techniques/T1485/
@@ -33,19 +36,18 @@ tags:
 - scenario-1
 - P0
 - tp-quality
-- requires-s3-data-events
+- management-plane
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventSource="s3.amazonaws.com" eventName IN ("DeleteObject","DeleteObjects")
+    | search eventSource="s3.amazonaws.com" eventName IN ("ListBuckets","DeleteBucket")
 
-    | bin _time span=1m
+    | eval actor=coalesce(userIdentity.arn, userIdentity.principalId)
 
-    | stats count AS deletes, dc(requestParameters.key) AS keys, values(requestParameters.bucketName)
-    AS buckets by _time, userIdentity.arn, sourceIPAddress, awsRegion
+    | transaction actor maxspan=60m startswith=(eventName="ListBuckets") endswith=(eventName="DeleteBucket")
 
-    | where deletes>=3
+    | search eventcount>=2
 
-    | table _time, userIdentity.arn, sourceIPAddress, awsRegion, deletes, keys, buckets
+    | table _time, actor, eventcount, sourceIPAddress, awsRegion, userIdentity.type, userAgent
 
     '
