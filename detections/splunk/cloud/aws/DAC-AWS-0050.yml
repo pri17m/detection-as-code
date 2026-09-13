@@ -2,7 +2,8 @@ id: DAC-AWS-0050
 title: 'AWS: IAM write AccessDenied from IMDSv1 AssumedRole (ec2RoleDelivery 1.0)'
 description: "Part 2 Scenario 3 Event 1: AssumedRole (often EC2 instance profile) attempting IAM persistence/probe\
   \ (CreateUser/CreateRole/CreateAccessKey/Attach*Policy) that fails with AccessDenied, with userIdentity.ec2RoleDelivery=1.0\
-  \ confirming IMDSv1-delivered credentials (SSRF\u2192IMDS harvest path)."
+  \ confirming IMDSv1-delivered credentials (SSRF\u2192IMDS harvest path). Prefer userIdentity.sessionContext.ec2RoleDelivery=1.0\
+  \ (AWS docs); also match blog-style userIdentity.ec2RoleDelivery when present (tenant-confirm)."
 mitre:
   tactics:
   - credential-access
@@ -29,6 +30,7 @@ required_fields:
 - sourceIPAddress
 - awsRegion
 - requestParameters.userName
+- userIdentity.sessionContext.ec2RoleDelivery
 tags:
 - cloudtrail-ir-part2
 - scenario-3
@@ -42,11 +44,11 @@ query:
 
     | search errorCode="AccessDenied" OR errorCode="Client.UnauthorizedOperation" OR errorCode="AccessDeniedException"
 
-    | search userIdentity.type="AssumedRole" (''userIdentity.ec2RoleDelivery''="1.0" OR userIdentity.ec2RoleDelivery=1.0
-    OR userIdentity.ec2RoleDelivery="1")
+    | search userIdentity.type="AssumedRole" (''userIdentity.sessionContext.ec2RoleDelivery''="1.0" OR
+    userIdentity.sessionContext.ec2RoleDelivery="1.0" OR ''userIdentity.ec2RoleDelivery''="1.0" OR userIdentity.ec2RoleDelivery="1.0")
 
-    | table _time, eventName, errorCode, errorMessage, userIdentity.arn, userIdentity.principalId, userIdentity.ec2RoleDelivery,
-    userIdentity.sessionContext.sessionIssuer.userName, userIdentity.sessionContext.attributes.mfaAuthenticated,
+    | table _time, eventName, errorCode, errorMessage, userIdentity.arn, userIdentity.principalId, userIdentity.sessionContext.ec2RoleDelivery,
+    userIdentity.ec2RoleDelivery, userIdentity.sessionContext.sessionIssuer.userName, userIdentity.sessionContext.attributes.mfaAuthenticated,
     requestParameters.userName, requestParameters.roleName, sourceIPAddress, awsRegion, userAgent, readOnly
 
     '
