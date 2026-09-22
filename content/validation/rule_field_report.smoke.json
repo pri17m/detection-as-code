@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-09-22T05:51:42.677099+00:00",
+  "generated_at": "2026-09-22T06:00:31.285262+00:00",
   "catalog_version": 1,
   "question_set_version": "field_grounding.v1",
   "jev_model": "jev-1.13.0",
   "summary": {
-    "PASS": 2,
+    "PASS": 1,
     "FAIL": 0,
-    "NEEDS_REVIEW": 1,
+    "NEEDS_REVIEW": 2,
     "TELEMETRY_GAP": 0,
     "SKIP": 0
   },
@@ -53,10 +53,43 @@
       ],
       "verdict": "PASS",
       "reasons": [
-        "all tables/fields resolved in catalog"
+        "all tables/fields resolved in catalog",
+        "jev safe_to_import=0.88 conf=0.97 grounding=1.98"
       ],
       "content_hash": "798c1f2a81800c811bc839fe76dfabf03eab45f7dd08730a52587bfef2753e94",
-      "jev": null
+      "jev": {
+        "tables_exist": {
+          "noul": 0.96,
+          "confidence": 0.0
+        },
+        "fields_exist": {
+          "noul": 0.95,
+          "confidence": 0.0
+        },
+        "platform_fit": {
+          "choice": "cloudtrail",
+          "confidence": 1.0,
+          "probabilities": {
+            "unknown": 0.0,
+            "cloudtrail": 1.0,
+            "windows": 0.0,
+            "other": 0.0
+          }
+        },
+        "grounding_quality": {
+          "score": 1.98,
+          "confidence": 0.97,
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.02,
+            "2": 0.98
+          }
+        },
+        "safe_to_import": {
+          "noul": 0.88,
+          "confidence": 0.0
+        }
+      }
     },
     {
       "id": "ra-smoke-cloudtrail-imds",
@@ -87,12 +120,45 @@
           "source": "required_fields"
         }
       ],
-      "verdict": "PASS",
+      "verdict": "NEEDS_REVIEW",
       "reasons": [
-        "all tables/fields resolved in catalog"
+        "all tables/fields resolved in catalog",
+        "jev mid-band safe_to_import=0.56"
       ],
       "content_hash": "3464822b8e39058307069b49eb55348569eadf945d00c6dbe5927c6516db340b",
-      "jev": null
+      "jev": {
+        "tables_exist": {
+          "noul": 0.96,
+          "confidence": 0.0
+        },
+        "fields_exist": {
+          "noul": 0.93,
+          "confidence": 0.0
+        },
+        "platform_fit": {
+          "choice": "cloudtrail",
+          "confidence": 1.0,
+          "probabilities": {
+            "windows": 0.0,
+            "other": 0.0,
+            "cloudtrail": 1.0,
+            "unknown": 0.0
+          }
+        },
+        "grounding_quality": {
+          "score": 1.55,
+          "confidence": 0.33,
+          "probabilities": {
+            "0": 0.02,
+            "1": 0.41,
+            "2": 0.57
+          }
+        },
+        "safe_to_import": {
+          "noul": 0.56,
+          "confidence": 0.0
+        }
+      }
     },
     {
       "id": "ra-smoke-sigma-ps",
@@ -103,16 +169,6 @@
       ],
       "in_scope": true,
       "tables": [
-        {
-          "name": "security",
-          "status": "unknown",
-          "table_id": null
-        },
-        {
-          "name": "windows",
-          "status": "unknown",
-          "table_id": null
-        },
         {
           "name": "windows_security",
           "status": "valid",
@@ -135,10 +191,43 @@
       ],
       "verdict": "NEEDS_REVIEW",
       "reasons": [
-        "1 alias field(s) need confirmation"
+        "1 alias field(s) need confirmation",
+        "jev mid-band safe_to_import=0.60"
       ],
-      "content_hash": "1aabade402e1dc2bf1537be3d0a1d06f198b0fe935929a8533020079c645beee",
-      "jev": null
+      "content_hash": "169fa3605432de72a00bdf547c7b9d022e20fc766af23d48f7e80507fa879ffc",
+      "jev": {
+        "tables_exist": {
+          "noul": 0.95,
+          "confidence": 0.0
+        },
+        "fields_exist": {
+          "noul": 0.94,
+          "confidence": 0.0
+        },
+        "platform_fit": {
+          "choice": "windows",
+          "confidence": 1.0,
+          "probabilities": {
+            "unknown": 0.0,
+            "windows": 1.0,
+            "cloudtrail": 0.0,
+            "other": 0.0
+          }
+        },
+        "grounding_quality": {
+          "score": 1.45,
+          "confidence": 0.18,
+          "probabilities": {
+            "0": 0.04,
+            "1": 0.46,
+            "2": 0.5
+          }
+        },
+        "safe_to_import": {
+          "noul": 0.6,
+          "confidence": 0.0
+        }
+      }
     }
   ]
 }

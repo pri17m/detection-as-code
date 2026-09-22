@@ -1079,6 +1079,8 @@
           "names": [
             "`aws_cloudtrail`",
             "aws_cloudtrail",
+            "`cloudtrail`",
+            "cloudtrail",
             "aws:cloudtrail",
             "aws:cloudtrail:json",
             "aws:cloudtrail:event",

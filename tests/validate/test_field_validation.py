@@ -35,6 +35,10 @@ class CatalogTests(unittest.TestCase):
         self.assertIsNotNone(t)
         assert t is not None
         self.assertEqual(t.id, "aws_cloudtrail")
+        t2 = self.catalog.resolve_table("`cloudtrail`")
+        self.assertIsNotNone(t2)
+        assert t2 is not None
+        self.assertEqual(t2.id, "aws_cloudtrail")
 
     def test_resolve_field_alias(self) -> None:
         status, canonical = self.catalog.resolve_field(
@@ -122,6 +126,29 @@ class ValidateDetectionTests(unittest.TestCase):
         )
         self.assertEqual(rv.verdict, "TELEMETRY_GAP")
 
+    def test_jev_policy_pass_uses_grounding_confidence_for_noul(self) -> None:
+        """NoulAnswer has no confidence; grounding_quality.confidence gates PASS."""
+        det = {
+            "id": "DAC-AWS-PASS-JEV",
+            "title": "mfa",
+            "sourcetypes": ["aws:cloudtrail"],
+            "required_fields": ["eventName", "additionalEventData.MFAUsed"],
+            "query": {"splunk": "sourcetype=aws:cloudtrail eventName=ConsoleLogin"},
+        }
+        rv = validate_detection(det, self.catalog)
+        self.assertEqual(rv.verdict, "PASS")
+        rv = apply_jev_policy(
+            rv,
+            {
+                "safe_to_import": {"noul": 0.88, "confidence": 0.0},
+                "fields_exist": {"noul": 0.95, "confidence": 0.0},
+                "tables_exist": {"noul": 0.96, "confidence": 0.0},
+                "grounding_quality": {"score": 1.98, "confidence": 0.97},
+            },
+        )
+        self.assertEqual(rv.verdict, "PASS")
+        self.assertTrue(any("jev safe_to_import=0.88" in r for r in rv.reasons))
+
 
 class CandidateTests(unittest.TestCase):
     @classmethod
@@ -150,6 +177,37 @@ class CandidateTests(unittest.TestCase):
         self.assertTrue(cand["id"].startswith("ra-"))
         self.assertEqual(cand["source_id"], "splunk")
         self.assertIn("T1078.004", cand["mitre"])
+
+    def test_escu_cloudtrail_macro_candidate(self) -> None:
+        cand = {
+            "id": "ra-escu-ct",
+            "title": "UpdateTrail",
+            "logic": "`cloudtrail` eventName=UpdateTrail eventSource=cloudtrail.amazonaws.com",
+            "source_id": "splunk",
+            "telemetry": {"data_source": ["AWS CloudTrail UpdateTrail"]},
+        }
+        rv = validate_candidate(cand, self.catalog)
+        self.assertTrue(rv.in_scope)
+        self.assertEqual(rv.verdict, "PASS", msg=rv.reasons)
+
+    def test_sigma_detection_only_cloudtrail(self) -> None:
+        cand = {
+            "id": "ra-sigma-ct",
+            "title": "CloudTrail Important Change",
+            "language": "Sigma",
+            "logsource": {"product": "aws", "service": "cloudtrail"},
+            "logic": (
+                "detection:\n"
+                "  selection_source:\n"
+                "    eventSource: cloudtrail.amazonaws.com\n"
+                "    eventName:\n"
+                "    - StopLogging\n"
+                "  condition: selection_source\n"
+            ),
+        }
+        rv = validate_candidate(cand, self.catalog)
+        self.assertTrue(rv.in_scope)
+        self.assertIn(rv.verdict, {"PASS", "NEEDS_REVIEW"}, msg=rv.reasons)
 
 
 if __name__ == "__main__":

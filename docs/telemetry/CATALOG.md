@@ -15,7 +15,7 @@ Human research notes under `docs/telemetry/*.md` remain useful for authoring, bu
 | Family | Tables / macros |
 | --- | --- |
 | Windows | `windows_security`, `windows_system`, `windows_powershell_operational`, `windows_powershell_classic`, `windows_sysmon` |
-| CloudTrail | `aws_cloudtrail` (`aws:cloudtrail`, `aws:cloudtrail:json`, `aws:cloudtrail:event`) |
+| CloudTrail | `aws_cloudtrail` (also `cloudtrail`, `aws:cloudtrail`, `aws:cloudtrail:json`, `aws:cloudtrail:event`) |
 
 ## Validate locally
 

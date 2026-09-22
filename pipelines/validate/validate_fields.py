@@ -293,7 +293,8 @@ def validate_detection(
             table_ids.append(tr.id)
         else:
             # ignore pure SPL noise macros that are not telemetry (rare)
-            if tname.lower() in _SPL_KEYWORDS:
+            low_name = tname.lower().strip("`")
+            if low_name in _SPL_KEYWORDS or low_name.endswith("_filter"):
                 continue
             result.tables.append(TableFinding(name=tname, status="unknown", table_id=None))
 
@@ -357,20 +358,94 @@ def validate_detection(
     return result
 
 
+def _tables_from_logsource(logsource: Dict[str, Any]) -> Set[str]:
+    tables: Set[str] = set()
+    if not isinstance(logsource, dict):
+        return tables
+    product = str(logsource.get("product") or "").lower()
+    service = str(logsource.get("service") or "").lower()
+    category = str(logsource.get("category") or "").lower()
+    if service == "cloudtrail" or (product == "aws" and service == "cloudtrail"):
+        tables.add("aws:cloudtrail")
+    if product == "cloudtrail":
+        tables.add("aws:cloudtrail")
+    if product == "windows":
+        if service in {"sysmon", "sysmon-operational"} or category == "process_creation":
+            tables.add("windows_sysmon" if service.startswith("sysmon") else "windows_security")
+        elif service in {"security", "system", "powershell", "powershell-classic"}:
+            mapping = {
+                "security": "windows_security",
+                "system": "windows_system",
+                "powershell": "windows_powershell_operational",
+                "powershell-classic": "windows_powershell_classic",
+            }
+            tables.add(mapping.get(service, "windows_security"))
+        else:
+            tables.add("windows_security")
+    if product == "sysmon" or service == "sysmon":
+        tables.add("windows_sysmon")
+    return tables
+
+
+def _tables_from_telemetry(telemetry: Dict[str, Any]) -> Set[str]:
+    tables: Set[str] = set()
+    if not isinstance(telemetry, dict):
+        return tables
+    product = str(telemetry.get("product") or "").lower()
+    service = str(telemetry.get("service") or "").lower()
+    if product or service:
+        tables |= _tables_from_logsource({"product": product, "service": service})
+    for ds in telemetry.get("data_source") or []:
+        if not isinstance(ds, str):
+            continue
+        dsl = ds.lower()
+        if "cloudtrail" in dsl:
+            tables.add("aws:cloudtrail")
+        if "sysmon" in dsl:
+            tables.add("windows_sysmon")
+        if "windows security" in dsl or "wineventlog:security" in dsl:
+            tables.add("windows_security")
+    return tables
+
+
 def validate_candidate(candidate: Dict[str, Any], catalog: TelemetryCatalog) -> RuleValidation:
     """Validate a RuleAtlas-normalized candidate object."""
     logic = str(candidate.get("logic") or "")
     low = logic.lower()
-    is_sigma = "logsource:" in low or logic.lstrip().startswith("title:")
+    language = str(candidate.get("language") or "").lower()
+    logsource = candidate.get("logsource") if isinstance(candidate.get("logsource"), dict) else {}
+    telemetry = candidate.get("telemetry") if isinstance(candidate.get("telemetry"), dict) else {}
+
+    is_sigma = (
+        language == "sigma"
+        or "logsource:" in low
+        or logic.lstrip().startswith("title:")
+        or logic.lstrip().startswith("detection:")
+    )
 
     tables: Set[str] = set()
     fields: Set[str] = set()
+    tables |= _tables_from_logsource(logsource)
+    tables |= _tables_from_telemetry(telemetry)
+
     if is_sigma:
-        tables, fields = extract_from_sigma(logic)
+        t2, fields = extract_from_sigma(logic)
+        tables |= t2
+        # RuleAtlas often ships detection-only YAML; recover platform from content.
+        if "eventsource" in low and "cloudtrail.amazonaws.com" in low:
+            tables.add("aws:cloudtrail")
         if "sysmon" in low:
             tables.add("windows_sysmon")
-        elif "windows" in low or "security" in low:
-            tables.add("windows_security")
+        elif "eventid" in low or "eventcode" in low:
+            if "windows" in low or "security" in low or not tables:
+                tables.add("windows_security")
+        # Drop sigma product/service tokens that are not catalog table names once mapped.
+        tables = {
+            t
+            for t in tables
+            if catalog.resolve_table(t) is not None
+            or t in {"aws:cloudtrail", "windows_security", "windows_sysmon", "windows_system"}
+        }
         det = {
             "id": candidate.get("id") or candidate.get("content_hash") or "candidate",
             "title": candidate.get("title") or "",
@@ -380,8 +455,14 @@ def validate_candidate(candidate: Dict[str, Any], catalog: TelemetryCatalog) -> 
         }
         return validate_detection(det, catalog, logic_override="")
 
-    tables, fields = extract_from_spl(logic)
-    if "aws:cloudtrail" in low or "`aws_cloudtrail`" in low:
+    tables_spl, fields = extract_from_spl(logic)
+    tables |= tables_spl
+    if (
+        "aws:cloudtrail" in low
+        or "`aws_cloudtrail`" in low
+        or "`cloudtrail`" in low
+        or "cloudtrail.amazonaws.com" in low
+    ):
         tables.add("aws:cloudtrail")
     elif "useridentity." in low and "eventname" in low:
         tables.add("aws:cloudtrail")
@@ -408,6 +489,10 @@ def apply_jev_policy(result: RuleValidation, jev_answers: Dict[str, Any]) -> Rul
       - safe_to_import >= 0.85 + high confidence + no invalid → PASS
       - mid → NEEDS_REVIEW
       - low → FAIL
+
+    Note: typesafe-sdk NoulAnswer has no confidence field (only noul). Prefer an
+    explicit safe_to_import.confidence when present; otherwise use
+    grounding_quality.confidence as the high-confidence gate.
     """
     result.jev = jev_answers
     if result.verdict == "TELEMETRY_GAP":
@@ -418,16 +503,21 @@ def apply_jev_policy(result: RuleValidation, jev_answers: Dict[str, Any]) -> Rul
         return result
 
     safe = float(jev_answers.get("safe_to_import", {}).get("noul", 0.0))
-    safe_conf = float(jev_answers.get("safe_to_import", {}).get("confidence", 0.0))
+    safe_conf = float(jev_answers.get("safe_to_import", {}).get("confidence", 0.0) or 0.0)
+    grounding_conf = float(
+        jev_answers.get("grounding_quality", {}).get("confidence", 0.0) or 0.0
+    )
+    # Noul answers historically lack confidence; fall back to grounding confidence.
+    conf = safe_conf if safe_conf > 0.0 else grounding_conf
     fields_exist = float(jev_answers.get("fields_exist", {}).get("noul", 0.0))
     tables_exist = float(jev_answers.get("tables_exist", {}).get("noul", 0.0))
     grounding = jev_answers.get("grounding_quality", {}).get("score")
 
-    if safe >= 0.85 and safe_conf >= 0.7 and fields_exist >= 0.8 and tables_exist >= 0.8:
+    if safe >= 0.85 and conf >= 0.7 and fields_exist >= 0.8 and tables_exist >= 0.8:
         if result.verdict in {"NEEDS_REVIEW", "PASS"}:
             result.verdict = "PASS"
             result.reasons.append(
-                f"jev safe_to_import={safe:.2f} conf={safe_conf:.2f} grounding={grounding}"
+                f"jev safe_to_import={safe:.2f} conf={conf:.2f} grounding={grounding}"
             )
     elif safe >= 0.5 or result.verdict == "NEEDS_REVIEW":
         result.verdict = "NEEDS_REVIEW"

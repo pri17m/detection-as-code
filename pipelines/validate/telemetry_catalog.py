@@ -17,7 +17,7 @@ WINDOWS_HINTS = (
     "windows_powershell",
     "windows_sysmon",
 )
-CLOUDTRAIL_HINTS = ("aws:cloudtrail", "aws_cloudtrail")
+CLOUDTRAIL_HINTS = ("aws:cloudtrail", "aws_cloudtrail", "cloudtrail")
 
 
 @dataclass(frozen=True)

@@ -38,16 +38,34 @@ def normalize_record(record: Dict[str, Any]) -> Dict[str, Any]:
     path = str(record.get("path") or record.get("file_path") or record.get("filepath") or "")
     permalink = str(
         record.get("permalink")
+        or record.get("source_url")
         or record.get("revision_url")
         or record.get("html_url")
         or record.get("url")
         or ""
     )
-    mitre = record.get("mitre") or record.get("techniques") or record.get("attack") or []
+    mitre = (
+        record.get("mitre")
+        or record.get("techniques")
+        or record.get("attack")
+        or record.get("attack_ids")
+        or []
+    )
     if isinstance(mitre, str):
         mitre = [mitre]
     if isinstance(mitre, dict):
         mitre = mitre.get("techniques") or mitre.get("ids") or []
+
+    metadata = record.get("metadata") if isinstance(record.get("metadata"), dict) else {}
+    logsource = (
+        record.get("logsource")
+        or metadata.get("logsource")
+        or {}
+    )
+    if not isinstance(logsource, dict):
+        logsource = {}
+    telemetry = record.get("telemetry") if isinstance(record.get("telemetry"), dict) else {}
+    language = str(record.get("language") or record.get("kind") or "")
 
     content_hash = _sha256(f"{source_id}\0{path}\0{logic}")
     return {
@@ -59,6 +77,9 @@ def normalize_record(record: Dict[str, Any]) -> Dict[str, Any]:
         "path": path,
         "permalink": permalink,
         "content_hash": content_hash,
+        "language": language,
+        "logsource": logsource,
+        "telemetry": telemetry,
         "raw_keys": sorted(record.keys()),
     }
 
