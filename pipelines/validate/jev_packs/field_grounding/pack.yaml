@@ -1,0 +1,51 @@
+# Jev field-grounding question pack (SPEC-like, consumed by jev_field_grounding.py)
+version: 1
+id: field_grounding
+question_set_version: field_grounding.v1
+model: jev-1.13.0
+description: >
+  Atomic judgments for whether a detection rule's tables/fields are grounded
+  in the provided telemetry catalog slice. Deterministic catalog misses remain
+  authoritative; Jev only soft-matches aliases and ambiguous names.
+
+questions:
+  tables_exist:
+    type: noul
+    instructions: >
+      Given telemetry_catalog_slice and rule.extracted_tables, is it true that
+      every referenced table/sourcetype/macro exists in the catalog slice
+      (including known alternate names)? Answer yes only if all are present.
+
+  fields_exist:
+    type: noul
+    instructions: >
+      Given telemetry_catalog_slice and rule.extracted_fields, is it true that
+      every field either matches a catalog field name or a listed alias?
+      Treat dotted CloudTrail paths as exact names. Do not invent fields.
+
+  platform_fit:
+    type: choice
+    instructions: >
+      Which telemetry family best fits this rule based on its tables/fields?
+    criteria:
+      windows: Windows Security, Sysmon, or PowerShell event telemetry
+      cloudtrail: AWS CloudTrail management/API telemetry
+      other: A different supported family not in this slice
+      unknown: Cannot determine from the provided state
+
+  grounding_quality:
+    type: score
+    instructions: >
+      How well is this rule grounded in the catalogued telemetry
+      (tables + fields), without inventing missing telemetry?
+    criteria:
+      - ungrounded
+      - partial
+      - solid
+
+  safe_to_import:
+    type: noul
+    instructions: >
+      Is it safe to import this rule into Detection-as-Code without inventing
+      tables or fields, given the catalog slice and extracted references?
+      Prefer no when required fields are missing from the catalog.

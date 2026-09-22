@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-09-22T05:51:42.677099+00:00",
+  "catalog_version": 1,
+  "question_set_version": "field_grounding.v1",
+  "jev_model": "jev-1.13.0",
+  "summary": {
+    "PASS": 2,
+    "FAIL": 0,
+    "NEEDS_REVIEW": 1,
+    "TELEMETRY_GAP": 0,
+    "SKIP": 0
+  },
+  "results": [
+    {
+      "id": "ra-smoke-cloudtrail-mfa",
+      "title": "AWS Console Login Without MFA",
+      "path": null,
+      "families": [
+        "cloudtrail"
+      ],
+      "in_scope": true,
+      "tables": [
+        {
+          "name": "aws:cloudtrail",
+          "status": "valid",
+          "table_id": "aws_cloudtrail"
+        },
+        {
+          "name": "aws_cloudtrail",
+          "status": "valid",
+          "table_id": "aws_cloudtrail"
+        }
+      ],
+      "fields": [
+        {
+          "name": "additionalEventData.MFAUsed",
+          "status": "valid",
+          "canonical": "additionalEventData.MFAUsed",
+          "source": "required_fields"
+        },
+        {
+          "name": "eventName",
+          "status": "valid",
+          "canonical": "eventName",
+          "source": "required_fields"
+        },
+        {
+          "name": "responseElements.ConsoleLogin",
+          "status": "valid",
+          "canonical": "responseElements.ConsoleLogin",
+          "source": "required_fields"
+        }
+      ],
+      "verdict": "PASS",
+      "reasons": [
+        "all tables/fields resolved in catalog"
+      ],
+      "content_hash": "798c1f2a81800c811bc839fe76dfabf03eab45f7dd08730a52587bfef2753e94",
+      "jev": null
+    },
+    {
+      "id": "ra-smoke-cloudtrail-imds",
+      "title": "AWS IMDSv1 Role Delivery",
+      "path": null,
+      "families": [
+        "cloudtrail"
+      ],
+      "in_scope": true,
+      "tables": [
+        {
+          "name": "aws:cloudtrail",
+          "status": "valid",
+          "table_id": "aws_cloudtrail"
+        }
+      ],
+      "fields": [
+        {
+          "name": "userIdentity.sessionContext.ec2RoleDelivery",
+          "status": "valid",
+          "canonical": "userIdentity.sessionContext.ec2RoleDelivery",
+          "source": "required_fields"
+        },
+        {
+          "name": "userIdentity.type",
+          "status": "valid",
+          "canonical": "userIdentity.type",
+          "source": "required_fields"
+        }
+      ],
+      "verdict": "PASS",
+      "reasons": [
+        "all tables/fields resolved in catalog"
+      ],
+      "content_hash": "3464822b8e39058307069b49eb55348569eadf945d00c6dbe5927c6516db340b",
+      "jev": null
+    },
+    {
+      "id": "ra-smoke-sigma-ps",
+      "title": "Suspicious PowerShell EncodedCommand",
+      "path": null,
+      "families": [
+        "windows"
+      ],
+      "in_scope": true,
+      "tables": [
+        {
+          "name": "security",
+          "status": "unknown",
+          "table_id": null
+        },
+        {
+          "name": "windows",
+          "status": "unknown",
+          "table_id": null
+        },
+        {
+          "name": "windows_security",
+          "status": "valid",
+          "table_id": "windows_security"
+        }
+      ],
+      "fields": [
+        {
+          "name": "CommandLine",
+          "status": "valid",
+          "canonical": "CommandLine",
+          "source": "required_fields"
+        },
+        {
+          "name": "EventID",
+          "status": "alias",
+          "canonical": "EventCode",
+          "source": "required_fields"
+        }
+      ],
+      "verdict": "NEEDS_REVIEW",
+      "reasons": [
+        "1 alias field(s) need confirmation"
+      ],
+      "content_hash": "1aabade402e1dc2bf1537be3d0a1d06f198b0fe935929a8533020079c645beee",
+      "jev": null
+    }
+  ]
+}

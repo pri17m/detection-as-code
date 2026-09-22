@@ -21,9 +21,23 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r pipelines/validate/requirements.txt
 
-      - name: Schema + portability validation
+      - name: Schema + portability + catalog field validation
         run: |
           python pipelines/validate/validate_repo.py
+
+      - name: Telemetry field report (in-repo Windows + CloudTrail)
+        run: |
+          python pipelines/validate/validate_fields.py --in-repo --report content/validation/rule_field_report.json
+
+      - name: Unit tests (catalog + field validation)
+        run: |
+          python -m unittest discover -s tests/validate -v
+
+      - name: Smoke candidates (deterministic, no RuleAtlas/Jev network)
+        run: |
+          python pipelines/validate/validate_fields.py \
+            --candidates content/validation/candidates.smoke.json \
+            --report content/validation/rule_field_report.smoke.json
 
       - name: Rebuild MITRE coverage
         run: |
