@@ -1,0 +1,37 @@
+id: DAC-VMW-0018
+title: ESXi esxcli system get or list by a user
+description: Detects esxcli system get or list commands attributed to a user, excluding filesystem queries. This is host reconnaissance after access.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1082
+severity: low
+false_positives:
+- Routine inventory jobs. High volume is expected; use it as context next to a lockdown, SSH, or VIB alert on the same host.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_system_information_discovery.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*system*" Message="*esxcli*" Message IN ("*get*","*list*") Message="*user=*" NOT Message="*filesystem*"
+
+    | rex field=_raw "user=(?<user>\w+)\]\s+Dispatch\s+(?<command>[^\s]+)"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(command) as command by dest user
+
+    '

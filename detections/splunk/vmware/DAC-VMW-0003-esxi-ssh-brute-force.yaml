@@ -1,0 +1,41 @@
+id: DAC-VMW-0003
+title: ESXi SSH authentication failures burst
+description: Detects more than 10 ESXi SSH authentication failures for the same user and source IP against one host inside a 5 minute window.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1110
+severity: high
+false_positives:
+- A misconfigured monitoring probe or a user with a stale password can produce a short burst. Threshold is 10 failures in 5 minutes per user, source, and host.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_ssh_brute_force.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*Authentication failure for*"
+
+    | rex field=Message "for (?<user>[\w]+) from (?<src_ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | bin _time span=5m
+
+    | stats count min(_time) as firstTime max(_time) as lastTime by user src_ip dest
+
+    | where count > 10
+
+    '
