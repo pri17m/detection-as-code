@@ -1,0 +1,30 @@
+id: DAC-VMW-0004
+title: ESXi root login from a non-private address
+description: Detects an ESXi root login whose source address is not loopback and not RFC1918. Direct root from the internet bypasses named admin accounts.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - defense-evasion
+  - initial-access
+  techniques:
+  - T1078
+severity: high
+false_positives:
+- A jump host with a public address that is supposed to administer ESXi. Add that address to a local allowlist rather than dropping the rule.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_external_root_login_activity.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: "(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message=\"*root*\" Message=\"*logged in*\"\n| rex field=_raw \"root@(?<src_ip>\\d{1,3}(?:\\.\\d{1,3}){3})\"\n| rex field=_raw \"Z (?<dest>[\\w\\.]+)\\s\"\n| where isnotnull(src_ip) AND src_ip!=\"127.0.0.1\"\n    AND NOT cidrmatch(\"10.0.0.0/8\", src_ip)\n    AND NOT cidrmatch(\"172.16.0.0/12\", src_ip)\n    AND NOT cidrmatch(\"192.168.0.0/16\", src_ip)\n| stats count min(_time) as firstTime max(_time) as lastTime by dest src_ip\n"

@@ -1,0 +1,37 @@
+id: DAC-VMW-0002
+title: ESXi Shell access enabled
+description: Detects the ESXi host message that the ESXi Shell has been enabled. Shell access is the local console attackers use before they run esxcli or plant a reverse shell.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021
+severity: medium
+false_positives:
+- ESXi administrators enabling the service for break-glass troubleshooting. Confirm the change was expected on that host.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_shell_access_enabled.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*ESXi Shell*" Message="*has been enabled*"
+
+    | rex field=_raw "''''(?<user>\w+)@"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(Message) as Message by dest user
+
+    '

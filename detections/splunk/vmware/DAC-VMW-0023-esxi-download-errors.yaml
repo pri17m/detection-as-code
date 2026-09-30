@@ -1,0 +1,36 @@
+id: DAC-VMW-0023
+title: ESXi file download failures
+description: Detects ESXi messages that a file download failed. Failed downloads show up when a malicious VIB or payload fetch is blocked or incomplete.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1601.001
+  - T1685
+severity: low
+false_positives:
+- Ordinary patch or content download failures. Use alongside a VIB acceptance or forced-install alert on the same host.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_download_errors.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message IN ("*Download failed*","*Failed to download file*","*File download error*","*Could not download*")
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(Message) as Message by dest
+
+    '

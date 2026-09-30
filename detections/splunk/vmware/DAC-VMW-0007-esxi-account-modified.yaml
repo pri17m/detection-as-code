@@ -1,0 +1,37 @@
+id: DAC-VMW-0007
+title: ESXi local account created or modified
+description: Detects esxcli system account used with an account id, which creates or changes a local ESXi user. Shell-echo lines are excluded.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1136.001
+  - T1098
+  - T1078
+severity: medium
+false_positives:
+- Planned maintenance or host rebuilds. Confirm the actor and change window.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_account_modified.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*esxcli system account*" Message IN ("*-i *","*--id*") NOT Message="*[shell*"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s.*: \[(?<actor>\w+)\]:\s.+-i[d]*\s(?<modified_user>[\w_\-0-9]+)"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime by dest actor modified_user
+
+    '

@@ -1,0 +1,35 @@
+id: DAC-VMW-0008
+title: ESXi lockdown mode disabled
+description: Detects lockdown mode being disabled, or the host message that administrator access to the host has been enabled. Lockdown is what keeps direct host access off when vCenter is the management path.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685
+severity: high
+false_positives:
+- Planned maintenance or host rebuilds. Confirm the actor and change window.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_lockdown_mode_disabled.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message IN ("*lockdownmode.disabled*", "*Administrator access to the host has been enabled*")
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(Message) as Message by dest
+
+    '
