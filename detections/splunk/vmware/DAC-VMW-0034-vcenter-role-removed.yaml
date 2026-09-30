@@ -1,0 +1,36 @@
+id: DAC-VMW-0034
+title: vCenter role removed
+description: Detects vCenter vpxd RoleRemovedEvent. Removals are often administrative but can also disrupt auditing of custom privilege sets.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmware:vclog
+- vmware:vclog:*
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098
+severity: medium
+false_positives:
+- vCenter administrators creating or adjusting roles and permissions during change windows. Confirm the actor and the target object.
+references:
+- https://knowledge.broadcom.com/external/article/432327/identifying-audit-and-security-logs-to-f.html
+- https://github.com/Azure/Azure-Sentinel/blob/master/Solutions/VMware%20vCenter/Parsers/vCenter.yaml
+- https://splunkbase.splunk.com/app/5601
+- https://splunk.github.io/splunk-connect-for-syslog/3.11.0/sources/vendor/VMWare/vsphere/
+telemetry_validated: false
+required_fields:
+- _raw
+tags:
+- vmware
+- vcenter
+- vclog
+query:
+  splunk: '(sourcetype=vmware:vclog OR sourcetype=vmware:vclog:*) (Message="*vim.event.RoleRemovedEvent*" OR _raw="*vim.event.RoleRemovedEvent*")
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(_raw) as sample by host
+
+    '
