@@ -1,6 +1,6 @@
 id: DAC-VMW-0025
-title: Windows net.exe creates the ESX Admins group
-description: Detects net.exe or net1.exe adding a group whose name is ESX Admins, from Security 4688 or Sysmon process creation. That is the command-line form of the CVE-2024-37085 group recreate.
+title: Windows net1.exe creates the ESX Admins group
+description: Detects net1.exe, or a process whose original file name is net1.exe, adding a group named ESX Admins. Security 4688 and Sysmon process creation are both covered. net.exe is included as well, because Windows often logs the stub under that name; the ESCU macro itself matches only net1.exe. This is the command-line form of the CVE-2024-37085 group recreate.
 author: DaC
 status: experimental
 platforms:
@@ -28,6 +28,7 @@ telemetry_validated: false
 required_fields:
 - EventCode
 - CommandLine
+- OriginalFileName
 tags:
 - vmware
 - esx-admins
@@ -38,10 +39,12 @@ query:
 
     | eval proc=lower(coalesce(NewProcessName, Image, process_path))
 
+    | eval orig=lower(coalesce(OriginalFileName, original_file_name))
+
     | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
 
-    | where match(proc, "(^|\\)net1?\.exe$") AND match(cmd, "group") AND match(cmd, "esx admins") AND match(cmd, "/add")
+    | where (match(proc, "(^|\\)net1?\.exe$") OR orig="net1.exe" OR orig="net.exe") AND match(cmd, "group") AND match(cmd, "esx admins") AND match(cmd, "/add")
 
-    | stats count min(_time) as firstTime max(_time) as lastTime values(cmd) as commands values(proc) as processes by host, SubjectUserName, User
+    | stats count min(_time) as firstTime max(_time) as lastTime values(cmd) as commands values(proc) as processes values(orig) as original_file by host, SubjectUserName, User
 
     '
