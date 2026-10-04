@@ -1,8 +1,10 @@
 # Detection-as-Code (DaC)
 
-Plug-and-play Detection-as-Code for orgs adopting an in-house SOC. This repo ships:
+Experimental Detection-as-Code library for orgs adopting (or building) an in-house SOC. This repo includes:
 
 **Status**: experimental (APIs, schemas, and detection content may change without notice).
+
+**Public disclaimer**: Treat all detections as **unvalidated drafts** unless explicitly marked otherwise. Many rules require org-specific telemetry onboarding, field normalization, and tuning before they will work. Coverage metrics are an inventory signal, **not** a production-readiness claim.
 
 - **Org-portable detection content** for Splunk, CrowdStrike Falcon, and Microsoft Defender.
 - **A unified detection metadata schema** (validated in CI).
