@@ -27,7 +27,10 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r pipelines/validate/requirements.txt
 python pipelines/validate/validate_repo.py
+python pipelines/validate/validate_fields.py --in-repo
 ```
+
+For Windows / CloudTrail rules, `required_fields` must exist in `content/telemetry/catalog.json` (see `docs/telemetry/CATALOG.md`).
 
 ## Style guide (detections)
 

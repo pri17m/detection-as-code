@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CloudTrail Jev field validation — review</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #171d25;
+    --panel2: #1c2430;
+    --text: #e7ecf3;
+    --muted: #93a0b4;
+    --line: #2a3444;
+    --pass: #1f6f4a;
+    --pass-bg: #143528;
+    --review: #8a6a12;
+    --review-bg: #3a3010;
+    --gap: #3d5a80;
+    --gap-bg: #1a2838;
+    --fail: #8b2e2e;
+    --fail-bg: #3a1616;
+    --skip: #5a6577;
+    --accent: #6cb6ff;
+    --ok: #3ecf8e;
+    --warn: #e6b84d;
+    --bad: #f07178;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font: 14px/1.45 "IBM Plex Sans", "Segoe UI", sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #1a2a40 0%, transparent 55%),
+      radial-gradient(900px 500px at 100% 0%, #1e2430 0%, transparent 50%),
+      var(--bg);
+    min-height: 100vh;
+  }
+  header.hero {
+    padding: 28px 28px 12px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
+  }
+  header.hero h1 {
+    margin: 0 0 6px;
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-weight: 600;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+  }
+  header.hero p { margin: 0; color: var(--muted); max-width: 820px; }
+  .stats {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px;
+  }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    min-width: 110px;
+  }
+  .stat b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat.PASS b { color: var(--ok); }
+  .stat.NEEDS_REVIEW b { color: var(--warn); }
+  .stat.TELEMETRY_GAP b { color: var(--accent); }
+  .stat.FAIL b { color: var(--bad); }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    padding: 14px 28px; position: sticky; top: 0; z-index: 5;
+    background: rgba(15,20,25,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .toolbar input, .toolbar select {
+    background: var(--panel2); color: var(--text);
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 10px; font: inherit;
+  }
+  .toolbar input { min-width: 240px; flex: 1; }
+  .toolbar label { color: var(--muted); font-size: 12px; display: flex; gap: 6px; align-items: center; }
+  main { padding: 18px 28px 48px; display: grid; gap: 14px; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card > header {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel2);
+  }
+  .title-row { display: flex; gap: 10px; align-items: flex-start; }
+  .title-row h3 { margin: 0; font-size: 16px; font-weight: 600; }
+  .meta { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: 12px; }
+  .meta a { color: var(--accent); }
+  .meta code { color: #c9d4e4; }
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.03em; padding: 3px 8px; border-radius: 999px;
+    white-space: nowrap; margin-top: 2px;
+  }
+  .badge.PASS { background: var(--pass-bg); color: #7dffa8; border: 1px solid var(--pass); }
+  .badge.NEEDS_REVIEW { background: var(--review-bg); color: #ffd978; border: 1px solid var(--review); }
+  .badge.TELEMETRY_GAP { background: var(--gap-bg); color: #9cc7ff; border: 1px solid var(--gap); }
+  .badge.FAIL { background: var(--fail-bg); color: #ff9a9a; border: 1px solid var(--fail); }
+  .badge.SKIP { background: #222831; color: #aab4c3; border: 1px solid var(--skip); }
+  .grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  }
+  .grid > section { padding: 12px 16px; border-top: 1px solid var(--line); }
+  .grid > section:nth-child(1) { border-right: 1px solid var(--line); }
+  .grid > section.wide { grid-column: 1 / -1; border-right: none; }
+  h4 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  ul { margin: 0 0 12px; padding-left: 18px; }
+  ul.tags { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  ul.tags li {
+    background: #121820; border: 1px solid var(--line); border-radius: 6px;
+    padding: 3px 8px; font-size: 12px;
+  }
+  ul.tags li em { color: var(--muted); font-style: normal; margin-left: 4px; }
+  ul.tags li.valid { border-color: #255f42; }
+  ul.tags li.alias { border-color: #6a5a20; }
+  ul.tags li.unknown { border-color: #6a3030; }
+  ul.fix li { margin-bottom: 4px; }
+  pre {
+    margin: 0; padding: 10px 12px; overflow: auto; max-height: 180px;
+    background: #0c1016; border: 1px solid var(--line); border-radius: 8px;
+    font: 12px/1.4 ui-monospace, "IBM Plex Mono", Menlo, monospace;
+    color: #d5deea; white-space: pre-wrap;
+  }
+  .path { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+  .muted { color: var(--muted); }
+  .empty { padding: 40px; text-align: center; color: var(--muted); }
+  footer {
+    padding: 8px 28px 24px; color: var(--muted); font-size: 12px;
+  }
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; }
+    .grid > section:nth-child(1) { border-right: none; }
+    header.hero, .toolbar, main, footer { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
+</head>
+<body>
+  <header class="hero">
+    <h1>CloudTrail Jev field validation</h1>
+    <p>
+      Local review of RuleAtlas seed candidates filtered to CloudTrail.
+      Model <strong>jev-1.13.0</strong>,
+      catalog v1,
+      generated 2026-09-22T06:00:49.696748+00:00.
+      Only <strong>PASS</strong> should be imported into <code>detections/</code>.
+    </p>
+    <div class="stats">
+      <div class="stat"><b>31</b><span>CloudTrail rules</span></div>
+      <div class="stat PASS"><b>8</b><span>PASS</span></div>
+      <div class="stat NEEDS_REVIEW"><b>7</b><span>NEEDS_REVIEW</span></div>
+      <div class="stat TELEMETRY_GAP"><b>15</b><span>TELEMETRY_GAP</span></div>
+      <div class="stat FAIL"><b>1</b><span>FAIL</span></div>
+    </div>
+  </header>
+  <div class="toolbar">
+    <input id="q" type="search" placeholder="Filter by title, id, path, field…" />
+    <label>Verdict
+      <select id="verdict">
+        <option value="">All</option>
+        <option>PASS</option>
+        <option>NEEDS_REVIEW</option>
+        <option>TELEMETRY_GAP</option>
+        <option>FAIL</option>
+      </select>
+    </label>
+    <label>Source
+      <select id="source">
+        <option value="">All</option>
+        <option>sigma</option>
+        <option>splunk</option>
+      </select>
+    </label>
+    <span class="muted" id="shown"></span>
+  </div>
+  <main id="list">
+    
+<article class="card" data-verdict="PASS" data-source="splunk" id="ra-ef5b617eef47">
+  <header>
+    <div class="title-row">
+      <span class="badge PASS">PASS</span>
+      <h3>AWS Bedrock High Number List Foundation Model Failures</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-ef5b617eef47</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_bedrock_high_number_list_foundation_model_failures.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev safe_to_import=0.88 conf=0.80 grounding=1.87</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.88 · tables=0.97 · fields=0.97 · grounding=1.87 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1580</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">errorCode <em>valid</em></li><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Import-ready for DaC (after human review of detection logic/false positives).</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventSource=bedrock.amazonaws.com eventName=ListFoundationModels errorCode=AccessDenied  | rename user_name as user | stats count min(_time) as firstTime max(_time) as lastTime values(errorCode) as errorCodes values(errorMessage) as errorMessages by src user user_agent vendor_account vendor_product dest signature vendor_region | where count &gt; 9 | `security_content_ctime(firstTime)` | `security_content_ctime(lastTime)` | `aws_bedrock_high_number_list_foundation_model_failures_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_bedrock_high_number_list_foundation_model_failures.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="PASS" data-source="sigma" id="ra-bef057698fb5">
+  <header>
+    <div class="title-row">
+      <span class="badge PASS">PASS</span>
+      <h3>AWS CloudTrail Important Change</h3>
+    </div>
+    <div class="meta">
+      <span>sigma</span>
+      <code>ra-bef057698fb5</code>
+      <a href="https://github.com/SigmaHQ/sigma/blob/2e8fd89f82d9104c1b30321a307254ddeea17de2/rules/cloud/aws/cloudtrail/aws_cloudtrail_disable_logging.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev safe_to_import=0.92 conf=0.98 grounding=1.99</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.92 · tables=0.97 · fields=0.97 · grounding=1.99 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1685.002</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Import-ready for DaC (after human review of detection logic/false positives).</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>detection:
+  selection_source:
+    eventSource: cloudtrail.amazonaws.com
+    eventName:
+    - StopLogging
+    - UpdateTrail
+    - DeleteTrail
+  condition: selection_source
+</pre>
+      <p class="path"><code>rules/cloud/aws/cloudtrail/aws_cloudtrail_disable_logging.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="PASS" data-source="splunk" id="ra-d2d55f4ff8cc">
+  <header>
+    <div class="title-row">
+      <span class="badge PASS">PASS</span>
+      <h3>AWS Console Login Failed During MFA Challenge</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-d2d55f4ff8cc</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_console_login_failed_during_mfa_challenge.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev safe_to_import=0.87 conf=0.91 grounding=1.94</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.87 · tables=0.97 · fields=0.96 · grounding=1.94 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1586.003, T1621</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">additionalEventData.MFAUsed <em>valid</em></li><li class="valid">errorMessage <em>valid</em></li><li class="valid">eventName <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Import-ready for DaC (after human review of detection logic/false positives).</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName= ConsoleLogin errorMessage=&quot;Failed authentication&quot; additionalEventData.MFAUsed = &quot;Yes&quot;
+  | rename user_name as user
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY signature dest user
+       user_agent src vendor_account
+       vendor_region vendor_product additionalEventData.MFAUsed
+       errorMessage
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_console_login_failed_during_mfa_challenge_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_console_login_failed_during_mfa_challenge.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="PASS" data-source="splunk" id="ra-176cf39040c4">
+  <header>
+    <div class="title-row">
+      <span class="badge PASS">PASS</span>
+      <h3>AWS Credential Access Failed Login</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-176cf39040c4</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_credential_access_failed_login.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev safe_to_import=0.87 conf=0.95 grounding=1.96</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.87 · tables=0.97 · fields=0.97 · grounding=1.96 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1110.001, T1586.003</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">errorMessage <em>valid</em></li><li class="valid">eventName <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Import-ready for DaC (after human review of detection logic/false positives).</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName = ConsoleLogin errorMessage=&quot;Failed authentication&quot;
+  | rename user_name as user
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY signature dest user
+       user_agent src vendor_account
+       vendor_region vendor_product
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_credential_access_failed_login_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_credential_access_failed_login.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="PASS" data-source="splunk" id="ra-5517d4b3deb1">
+  <header>
+    <div class="title-row">
+      <span class="badge PASS">PASS</span>
+      <h3>AWS Defense Evasion Delete Cloudtrail</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-5517d4b3deb1</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_defense_evasion_delete_cloudtrail.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev safe_to_import=0.87 conf=0.95 grounding=1.97</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.87 · tables=0.96 · fields=0.97 · grounding=1.97 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1685.002</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">errorCode <em>valid</em></li><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li><li class="valid">userAgent <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Import-ready for DaC (after human review of detection logic/false positives).</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName = DeleteTrail eventSource = cloudtrail.amazonaws.com userAgent !=console.amazonaws.com errorCode = success
+  | rename user_name as user
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY signature dest user
+       user_agent src vendor_account
+       vendor_region vendor_product
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_defense_evasion_delete_cloudtrail_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_defense_evasion_delete_cloudtrail.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="PASS" data-source="splunk" id="ra-655744d79281">
+  <header>
+    <div class="title-row">
+      <span class="badge PASS">PASS</span>
+      <h3>AWS Defense Evasion Stop Logging Cloudtrail</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-655744d79281</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_defense_evasion_stop_logging_cloudtrail.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev safe_to_import=0.89 conf=0.90 grounding=1.93</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.89 · tables=0.97 · fields=0.97 · grounding=1.93 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1685.002</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">errorCode <em>valid</em></li><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li><li class="valid">userAgent <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Import-ready for DaC (after human review of detection logic/false positives).</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName = StopLogging eventSource = cloudtrail.amazonaws.com userAgent!=console.amazonaws.com errorCode = success
+  | rename user_name as user
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY signature dest user
+       user_agent src vendor_account
+       vendor_region vendor_product
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_defense_evasion_stop_logging_cloudtrail_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_defense_evasion_stop_logging_cloudtrail.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="PASS" data-source="splunk" id="ra-00c212ca5325">
+  <header>
+    <div class="title-row">
+      <span class="badge PASS">PASS</span>
+      <h3>AWS Defense Evasion Update Cloudtrail</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-00c212ca5325</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_defense_evasion_update_cloudtrail.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev safe_to_import=0.92 conf=0.99 grounding=1.99</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.92 · tables=0.97 · fields=0.97 · grounding=1.99 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1685.002</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">errorCode <em>valid</em></li><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li><li class="valid">userAgent <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Import-ready for DaC (after human review of detection logic/false positives).</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName = UpdateTrail eventSource = cloudtrail.amazonaws.com userAgent !=console.amazonaws.com errorCode = success
+  | rename user_name as user
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY signature dest user
+       user_agent src vendor_account
+       vendor_region vendor_product
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_defense_evasion_update_cloudtrail_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_defense_evasion_update_cloudtrail.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="PASS" data-source="sigma" id="ra-470129fe59eb">
+  <header>
+    <div class="title-row">
+      <span class="badge PASS">PASS</span>
+      <h3>AWS Successful Console Login Without MFA</h3>
+    </div>
+    <div class="meta">
+      <span>sigma</span>
+      <code>ra-470129fe59eb</code>
+      <a href="https://github.com/SigmaHQ/sigma/blob/2e8fd89f82d9104c1b30321a307254ddeea17de2/rules/cloud/aws/cloudtrail/aws_cloudtrail_console_login_success_without_mfa.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev safe_to_import=0.86 conf=0.87 grounding=1.92</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.86 · tables=0.97 · fields=0.96 · grounding=1.92 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1078.004</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">additionalEventData.MFAUsed <em>valid</em></li><li class="valid">eventName <em>valid</em></li><li class="valid">responseElements.ConsoleLogin <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Import-ready for DaC (after human review of detection logic/false positives).</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>detection:
+  selection:
+    eventName: ConsoleLogin
+    additionalEventData.MFAUsed: &#x27;NO&#x27;
+    responseElements.ConsoleLogin: Success
+  condition: selection
+</pre>
+      <p class="path"><code>rules/cloud/aws/cloudtrail/aws_cloudtrail_console_login_success_without_mfa.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="NEEDS_REVIEW" data-source="sigma" id="ra-3be49ba808f8">
+  <header>
+    <div class="title-row">
+      <span class="badge NEEDS_REVIEW">NEEDS_REVIEW</span>
+      <h3>AWS ConsoleLogin Failed Authentication</h3>
+    </div>
+    <div class="meta">
+      <span>sigma</span>
+      <code>ra-3be49ba808f8</code>
+      <a href="https://github.com/SigmaHQ/sigma/blob/2e8fd89f82d9104c1b30321a307254ddeea17de2/rules/cloud/aws/cloudtrail/aws_cloudtrail_console_login_failed_authentication.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev mid-band safe_to_import=0.81</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.81 · tables=0.97 · fields=0.97 · grounding=1.91 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1110</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">errorMessage <em>valid</em></li><li class="valid">eventName <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Jev safe_to_import=0.81 mid/low — tighten field extraction or improve catalog coverage, then re-run `--jev`.</li><li>Do not auto-import; human confirms grounding then promote to PASS path.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>detection:
+  selection:
+    eventName: ConsoleLogin
+    errorMessage: Failed authentication
+  condition: selection
+</pre>
+      <p class="path"><code>rules/cloud/aws/cloudtrail/aws_cloudtrail_console_login_failed_authentication.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="NEEDS_REVIEW" data-source="splunk" id="ra-d02b1f743fd7">
+  <header>
+    <div class="title-row">
+      <span class="badge NEEDS_REVIEW">NEEDS_REVIEW</span>
+      <h3>AWS CreateLoginProfile</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-d02b1f743fd7</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_createloginprofile.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev mid-band safe_to_import=0.57</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.57 · tables=0.97 · fields=0.98 · grounding=1.78 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1136.003</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">eventName <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Jev safe_to_import=0.57 mid/low — tighten field extraction or improve catalog coverage, then re-run `--jev`.</li><li>Do not auto-import; human confirms grounding then promote to PASS path.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName = CreateLoginProfile
+  | rename requestParameters.userName as new_login_profile
+  | table src_ip eventName new_login_profile userIdentity.userName
+  | join new_login_profile src_ip [
+  | search `cloudtrail` eventName = ConsoleLogin
+  | rename userIdentity.userName  as new_login_profile
+  | stats count values(eventName) min(_time) as firstTime max(_time) as lastTime
+    BY eventSource aws_account_id errorCode
+       user_agent eventID awsRegion
+       userIdentity.principalId user_arn new_login_profile
+       src_ip dest vendor_account
+       vendor_region vendor_product
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`]
+  | rename user_arn as user
+  | `aws_createloginprofile_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_createloginprofile.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="NEEDS_REVIEW" data-source="splunk" id="ra-42b640225b1c">
+  <header>
+    <div class="title-row">
+      <span class="badge NEEDS_REVIEW">NEEDS_REVIEW</span>
+      <h3>AWS Defense Evasion Delete CloudWatch Log Group</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-42b640225b1c</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_defense_evasion_delete_cloudwatch_log_group.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev mid-band safe_to_import=0.83</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.83 · tables=0.96 · fields=0.97 · grounding=1.9 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1685.002</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">errorCode <em>valid</em></li><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li><li class="valid">userAgent <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Jev safe_to_import=0.83 mid/low — tighten field extraction or improve catalog coverage, then re-run `--jev`.</li><li>Do not auto-import; human confirms grounding then promote to PASS path.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName = DeleteLogGroup eventSource = logs.amazonaws.com userAgent !=console.amazonaws.com errorCode = success
+  | rename user_name as user
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY signature dest user
+       user_agent src vendor_account
+       vendor_region vendor_product
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_defense_evasion_delete_cloudwatch_log_group_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_defense_evasion_delete_cloudwatch_log_group.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="NEEDS_REVIEW" data-source="sigma" id="ra-76430c56da68">
+  <header>
+    <div class="title-row">
+      <span class="badge NEEDS_REVIEW">NEEDS_REVIEW</span>
+      <h3>AWS IAM S3Browser LoginProfile Creation</h3>
+    </div>
+    <div class="meta">
+      <span>sigma</span>
+      <code>ra-76430c56da68</code>
+      <a href="https://github.com/SigmaHQ/sigma/blob/2e8fd89f82d9104c1b30321a307254ddeea17de2/rules/cloud/aws/cloudtrail/aws_iam_s3browser_loginprofile_creation.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev mid-band safe_to_import=0.77</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.77 · tables=0.97 · fields=0.98 · grounding=1.86 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1059.009, T1078.004</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li><li class="valid">userAgent <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Jev safe_to_import=0.77 mid/low — tighten field extraction or improve catalog coverage, then re-run `--jev`.</li><li>Do not auto-import; human confirms grounding then promote to PASS path.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>detection:
+  selection:
+    eventSource: iam.amazonaws.com
+    eventName:
+    - GetLoginProfile
+    - CreateLoginProfile
+    userAgent|contains: S3 Browser
+  condition: selection
+</pre>
+      <p class="path"><code>rules/cloud/aws/cloudtrail/aws_iam_s3browser_loginprofile_creation.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="NEEDS_REVIEW" data-source="sigma" id="ra-5e3b9d64c45a">
+  <header>
+    <div class="title-row">
+      <span class="badge NEEDS_REVIEW">NEEDS_REVIEW</span>
+      <h3>AWS IAM S3Browser User or AccessKey Creation</h3>
+    </div>
+    <div class="meta">
+      <span>sigma</span>
+      <code>ra-5e3b9d64c45a</code>
+      <a href="https://github.com/SigmaHQ/sigma/blob/2e8fd89f82d9104c1b30321a307254ddeea17de2/rules/cloud/aws/cloudtrail/aws_iam_s3browser_user_or_accesskey_creation.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev mid-band safe_to_import=0.77</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.77 · tables=0.97 · fields=0.97 · grounding=1.79 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1059.009, T1078.004</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li><li class="valid">userAgent <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Jev safe_to_import=0.77 mid/low — tighten field extraction or improve catalog coverage, then re-run `--jev`.</li><li>Do not auto-import; human confirms grounding then promote to PASS path.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>detection:
+  selection:
+    eventSource: iam.amazonaws.com
+    eventName:
+    - CreateUser
+    - CreateAccessKey
+    userAgent|contains: S3 Browser
+  condition: selection
+</pre>
+      <p class="path"><code>rules/cloud/aws/cloudtrail/aws_iam_s3browser_user_or_accesskey_creation.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="NEEDS_REVIEW" data-source="sigma" id="ra-f55e558f3367">
+  <header>
+    <div class="title-row">
+      <span class="badge NEEDS_REVIEW">NEEDS_REVIEW</span>
+      <h3>AWS Root Credentials</h3>
+    </div>
+    <div class="meta">
+      <span>sigma</span>
+      <code>ra-f55e558f3367</code>
+      <a href="https://github.com/SigmaHQ/sigma/blob/2e8fd89f82d9104c1b30321a307254ddeea17de2/rules/cloud/aws/cloudtrail/aws_root_account_usage.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev mid-band safe_to_import=0.80</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.80 · tables=0.97 · fields=0.98 · grounding=1.89 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1078.004</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">eventType <em>valid</em></li><li class="valid">userIdentity.type <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Jev safe_to_import=0.80 mid/low — tighten field extraction or improve catalog coverage, then re-run `--jev`.</li><li>Do not auto-import; human confirms grounding then promote to PASS path.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>detection:
+  selection_usertype:
+    userIdentity.type: Root
+  selection_eventtype:
+    eventType: AwsServiceEvent
+  condition: selection_usertype and not selection_eventtype
+</pre>
+      <p class="path"><code>rules/cloud/aws/cloudtrail/aws_root_account_usage.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="NEEDS_REVIEW" data-source="splunk" id="ra-46992a30f777">
+  <header>
+    <div class="title-row">
+      <span class="badge NEEDS_REVIEW">NEEDS_REVIEW</span>
+      <h3>AWS Successful Single-Factor Authentication</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-46992a30f777</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_successful_single_factor_authentication.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev mid-band safe_to_import=0.69</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.69 · tables=0.96 · fields=0.96 · grounding=1.78 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1078.004, T1586.003</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">errorCode <em>valid</em></li><li class="valid">eventName <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Jev safe_to_import=0.69 mid/low — tighten field extraction or improve catalog coverage, then re-run `--jev`.</li><li>Do not auto-import; human confirms grounding then promote to PASS path.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName= ConsoleLogin errorCode=success &quot;additionalEventData.MFAUsed&quot;=No
+  | rename user_name as user
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY signature dest user
+       user_agent src vendor_account
+       vendor_region vendor_product
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_successful_single_factor_authentication_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_successful_single_factor_authentication.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-ef97823ff0e2">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>ASL AWS Create Policy Version to allow all resources</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-ef97823ff0e2</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/asl_aws_create_policy_version_to_allow_all_resources.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: Action, Resource, api.operation, input</li><li>unknown tables: amazon_security_lake</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1078.004</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="unknown">amazon_security_lake <em>unknown</em></li><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="unknown">Action <em>unknown</em></li><li class="unknown">Resource <em>unknown</em></li><li class="unknown">api.operation <em>unknown</em></li><li class="unknown">input <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add catalog table/macro aliases for: amazon_security_lake (or map them to `aws_cloudtrail` / drop non-telemetry macros).</li><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: Action, Resource, api.operation, input.</li><li>ASL/OCSF rules are out of CloudTrail MVP — either skip import or extend catalog with ASL tables.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`amazon_security_lake` api.operation=CreatePolicy
+  | spath input=api.request.data
+  | spath input=policyDocument
+  | regex Statement{}.Action=&quot;\*&quot;
+  | regex Statement{}.Resource=&quot;\*&quot;
+  | fillnull
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY actor.user.uid api.operation api.service.name
+       http_request.user_agent src_endpoint.ip actor.user.account.uid
+       cloud.provider cloud.region api.request.data
+  | rename actor.user.uid as user api.operation as action api.service.name as dest http_request.user_agent as user_agent src_endpoint.ip as src actor.user.account.uid as vendor_account cloud.provider as vendor_product cloud.region as vendor_region
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `asl_aws_create_policy_version_to_allow_all_resources_filter`</pre>
+      <p class="path"><code>detections/cloud/asl_aws_create_policy_version_to_allow_all_resources.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-8517022eb418">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>ASL AWS Defense Evasion Delete Cloudtrail</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-8517022eb418</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/asl_aws_defense_evasion_delete_cloudtrail.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: api.operation</li><li>unknown tables: amazon_security_lake</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1685.002</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="unknown">amazon_security_lake <em>unknown</em></li><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="unknown">api.operation <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add catalog table/macro aliases for: amazon_security_lake (or map them to `aws_cloudtrail` / drop non-telemetry macros).</li><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: api.operation.</li><li>ASL/OCSF rules are out of CloudTrail MVP — either skip import or extend catalog with ASL tables.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`amazon_security_lake` api.operation=DeleteTrail
+  | fillnull
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY actor.user.uid api.operation api.service.name
+       http_request.user_agent src_endpoint.ip actor.user.account.uid
+       cloud.provider cloud.region
+  | rename actor.user.uid as user api.operation as action api.service.name as dest http_request.user_agent as user_agent src_endpoint.ip as src actor.user.account.uid as vendor_account cloud.provider as vendor_product cloud.region as vendor_region
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `asl_aws_defense_evasion_delete_cloudtrail_filter`</pre>
+      <p class="path"><code>detections/cloud/asl_aws_defense_evasion_delete_cloudtrail.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-91c97a4beef4">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>ASL AWS Defense Evasion Stop Logging Cloudtrail</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-91c97a4beef4</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/asl_aws_defense_evasion_stop_logging_cloudtrail.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: api.operation</li><li>unknown tables: amazon_security_lake</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1685.002</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="unknown">amazon_security_lake <em>unknown</em></li><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="unknown">api.operation <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add catalog table/macro aliases for: amazon_security_lake (or map them to `aws_cloudtrail` / drop non-telemetry macros).</li><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: api.operation.</li><li>ASL/OCSF rules are out of CloudTrail MVP — either skip import or extend catalog with ASL tables.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`amazon_security_lake` api.operation=StopLogging
+  | fillnull
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY actor.user.uid api.operation api.service.name
+       http_request.user_agent src_endpoint.ip actor.user.account.uid
+       cloud.provider cloud.region
+  | rename actor.user.uid as user api.operation as action api.service.name as dest http_request.user_agent as user_agent src_endpoint.ip as src actor.user.account.uid as vendor_account cloud.provider as vendor_product cloud.region as vendor_region
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `asl_aws_defense_evasion_stop_logging_cloudtrail_filter`</pre>
+      <p class="path"><code>detections/cloud/asl_aws_defense_evasion_stop_logging_cloudtrail.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-33f8027d0cda">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>ASL AWS Defense Evasion Update Cloudtrail</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-33f8027d0cda</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/asl_aws_defense_evasion_update_cloudtrail.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: api.operation</li><li>unknown tables: amazon_security_lake</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1685.002</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="unknown">amazon_security_lake <em>unknown</em></li><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="unknown">api.operation <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add catalog table/macro aliases for: amazon_security_lake (or map them to `aws_cloudtrail` / drop non-telemetry macros).</li><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: api.operation.</li><li>ASL/OCSF rules are out of CloudTrail MVP — either skip import or extend catalog with ASL tables.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`amazon_security_lake` api.operation=UpdateTrail
+  | fillnull
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY actor.user.uid api.operation api.service.name
+       http_request.user_agent src_endpoint.ip actor.user.account.uid
+       cloud.provider cloud.region
+  | rename actor.user.uid as user api.operation as action api.service.name as dest http_request.user_agent as user_agent src_endpoint.ip as src actor.user.account.uid as vendor_account cloud.provider as vendor_product cloud.region as vendor_region
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `asl_aws_defense_evasion_update_cloudtrail_filter`</pre>
+      <p class="path"><code>detections/cloud/asl_aws_defense_evasion_update_cloudtrail.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-cfc645dad742">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>ASL AWS IAM Assume Role Policy Brute Force</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-cfc645dad742</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/asl_aws_iam_assume_role_policy_brute_force.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: api.operation, span</li><li>unknown tables: amazon_security_lake</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1110, T1580</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="unknown">amazon_security_lake <em>unknown</em></li><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="unknown">api.operation <em>unknown</em></li><li class="unknown">span <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add catalog table/macro aliases for: amazon_security_lake (or map them to `aws_cloudtrail` / drop non-telemetry macros).</li><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: api.operation, span.</li><li>ASL/OCSF rules are out of CloudTrail MVP — either skip import or extend catalog with ASL tables.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`amazon_security_lake` api.operation=&quot;AssumeRole&quot; &quot;api.response.error&quot;=AccessDenied
+  | bucket _time span=1h
+  | stats count as failures min(_time) as firstTime max(_time) as lastTime values(api.operation) as api.operation values(api.service.name) as api.service.name values(http_request.user_agent) as http_request.user_agent values(src_endpoint.ip) as src_ip values(actor.user.account.uid) as actor.user.account.uid values(cloud.provider) as cloud.provider values(cloud.region) as cloud.region
+    BY _time actor.user.uid
+  | where failures &gt;= 3
+  | rename actor.user.uid as user api.operation as action api.service.name as dest http_request.user_agent as user_agent src_endpoint.ip as src actor.user.account.uid as vendor_account cloud.provider as vendor_product cloud.region as vendor_region
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `asl_aws_iam_assume_role_policy_brute_force_filter`</pre>
+      <p class="path"><code>detections/cloud/asl_aws_iam_assume_role_policy_brute_force.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-994f56516737">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>AWS Create Policy Version to allow all resources</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-994f56516737</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_create_policy_version_to_allow_all_resources.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: input, key_policy_action_1, output</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1078.004</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">errorCode <em>valid</em></li><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li><li class="unknown">input <em>unknown</em></li><li class="unknown">key_policy_action_1 <em>unknown</em></li><li class="unknown">output <em>unknown</em></li><li class="valid">path <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: input, key_policy_action_1, output.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName=CreatePolicyVersion eventSource = iam.amazonaws.com errorCode = success
+  | spath input=requestParameters.policyDocument output=key_policy_statements path=Statement{}
+  | mvexpand key_policy_statements
+  | spath input=key_policy_statements output=key_policy_action_1 path=Action
+  | where key_policy_action_1 = &quot;*&quot;
+  | rename user_name as user
+  | stats count min(_time) as firstTime max(_time) as lastTime values(key_policy_statements) as policy_added
+    BY signature dest user
+       user_agent src vendor_account
+       vendor_region vendor_product
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_create_policy_version_to_allow_all_resources_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_create_policy_version_to_allow_all_resources.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-87df97b0db7a">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>AWS Defense Evasion PutBucketLifecycle</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-87df97b0db7a</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_defense_evasion_putbucketlifecycle.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: output, user_type</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1485.001, T1685.002</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">errorCode <em>valid</em></li><li class="valid">eventName <em>valid</em></li><li class="unknown">output <em>unknown</em></li><li class="valid">path <em>valid</em></li><li class="unknown">user_type <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: output, user_type.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName=PutBucketLifecycle user_type=IAMUser errorCode=success
+  | spath path=requestParameters{}.LifecycleConfiguration{}.Rule{}.Expiration{}.Days output=expiration_days
+  | spath path=requestParameters{}.bucketName output=bucket_name
+  | rename user_name as user
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY signature dest user
+       user_agent src vendor_account
+       vendor_region vendor_product bucket_name
+       expiration_days
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_defense_evasion_putbucketlifecycle_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_defense_evasion_putbucketlifecycle.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-1999fb407915">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>AWS EC2 Snapshot Shared Externally</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-1999fb407915</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_ec2_snapshot_shared_externally.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: requested_account_id</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1537</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">eventName <em>valid</em></li><li class="unknown">requested_account_id <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: requested_account_id.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName=ModifySnapshotAttribute
+  | rename requestParameters.createVolumePermission.add.items{}.userId as requested_account_id
+  | search requested_account_id != NULL
+  | eval match=if(requested_account_id==aws_account_id,&quot;Match&quot;,&quot;No Match&quot;)
+  | where match = &quot;No Match&quot;
+  | rename user_name as user
+  | stats count min(_time) as firstTime max(_time) as lastTime
+    BY signature dest user
+       user_agent src vendor_account
+       vendor_region vendor_product requested_account_id
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_ec2_snapshot_shared_externally_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_ec2_snapshot_shared_externally.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="sigma" id="ra-e8eb936af1f1">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>AWS EC2 Startup Shell Script Change</h3>
+    </div>
+    <div class="meta">
+      <span>sigma</span>
+      <code>ra-e8eb936af1f1</code>
+      <a href="https://github.com/SigmaHQ/sigma/blob/2e8fd89f82d9104c1b30321a307254ddeea17de2/rules/cloud/aws/cloudtrail/aws_ec2_startup_script_change.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: requestParameters.attribute</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1059.001, T1059.003, T1059.004</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li><li class="unknown">requestParameters.attribute <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: requestParameters.attribute.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>detection:
+  selection_source:
+    eventSource: ec2.amazonaws.com
+    requestParameters.attribute: userData
+    eventName: ModifyInstanceAttribute
+  condition: selection_source
+</pre>
+      <p class="path"><code>rules/cloud/aws/cloudtrail/aws_ec2_startup_script_change.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-0d1974073fe9">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>AWS High Number Of Failed Authentications For User</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-0d1974073fe9</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_high_number_of_failed_authentications_for_user.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: action, span</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1201</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="unknown">action <em>unknown</em></li><li class="valid">eventName <em>valid</em></li><li class="unknown">span <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: action, span.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName=ConsoleLogin action=failure
+  | bucket span=10m _time
+  | rename user_name as user
+  | stats dc(_raw) AS failed_attempts values(src) as src values(user_agent) as user_agent
+    BY _time, user, signature,
+       dest, vendor_account vendor_region,
+       vendor_product
+  | where failed_attempts &gt; 20
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_high_number_of_failed_authentications_for_user_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_high_number_of_failed_authentications_for_user.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-f7a58e843d7b">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>AWS High Number Of Failed Authentications From Ip</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-f7a58e843d7b</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_high_number_of_failed_authentications_from_ip.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: action, span</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1110.003, T1110.004</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="unknown">action <em>unknown</em></li><li class="valid">eventName <em>valid</em></li><li class="unknown">span <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: action, span.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName=ConsoleLogin action=failure
+  | bucket span=10m _time
+  | rename user_name as user
+  | stats dc(_raw) AS failed_attempts values(user) as user values(user_agent) as user_agent
+    BY _time, src, signature,
+       dest, vendor_account vendor_region,
+       vendor_product
+  | where failed_attempts &gt; 20
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_high_number_of_failed_authentications_from_ip_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_high_number_of_failed_authentications_from_ip.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="sigma" id="ra-c9846cf65f96">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>AWS IAM S3Browser Templated S3 Bucket Policy Creation</h3>
+    </div>
+    <div class="meta">
+      <span>sigma</span>
+      <code>ra-c9846cf65f96</code>
+      <a href="https://github.com/SigmaHQ/sigma/blob/2e8fd89f82d9104c1b30321a307254ddeea17de2/rules/cloud/aws/cloudtrail/aws_iam_s3browser_templated_s3_bucket_policy_creation.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: requestParameters</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1059.009, T1078.004</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li><li class="unknown">requestParameters <em>unknown</em></li><li class="valid">userAgent <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: requestParameters.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>detection:
+  selection:
+    eventSource: iam.amazonaws.com
+    eventName: PutUserPolicy
+    userAgent|contains: S3 Browser
+    requestParameters|contains|all:
+    - &#x27;&quot;arn:aws:s3:::&lt;YOUR-BUCKET-NAME&gt;/*&quot;&#x27;
+    - &#x27;&quot;s3:GetObject&quot;&#x27;
+    - &#x27;&quot;Allow&quot;&#x27;
+  condition: selection
+</pre>
+      <p class="path"><code>rules/cloud/aws/cloudtrail/aws_iam_s3browser_templated_s3_bucket_policy_creation.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-ec8e90ad9564">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>AWS Multiple Failed MFA Requests For User</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-ec8e90ad9564</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_multiple_failed_mfa_requests_for_user.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: span</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1586.003, T1621</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">errorMessage <em>valid</em></li><li class="valid">eventName <em>valid</em></li><li class="unknown">span <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: span.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName= ConsoleLogin &quot;additionalEventData.MFAUsed&quot;=Yes errorMessage=&quot;Failed authentication&quot;
+  | bucket span=5m _time
+  | rename user_name as user
+  | stats dc(_raw) as mfa_prompts min(_time) as firstTime max(_time) as lastTime values(user_agent) as user_agent values(src) as src values(dest) as dest
+    BY _time user signature
+       vendor_account vendor_region vendor_product
+       errorMessage
+  | where mfa_prompts &gt; 10
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_multiple_failed_mfa_requests_for_user_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_multiple_failed_mfa_requests_for_user.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="sigma" id="ra-49f9b9640a51">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>AWS STS AssumeRole Misuse</h3>
+    </div>
+    <div class="meta">
+      <span>sigma</span>
+      <code>ra-49f9b9640a51</code>
+      <a href="https://github.com/SigmaHQ/sigma/blob/2e8fd89f82d9104c1b30321a307254ddeea17de2/rules/cloud/aws/cloudtrail/aws_sts_assumerole_misuse.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: userIdentity.sessionContext.sessionIssuer.type</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1548, T1550, T1550.001</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="unknown">userIdentity.sessionContext.sessionIssuer.type <em>unknown</em></li><li class="valid">userIdentity.type <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: userIdentity.sessionContext.sessionIssuer.type.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>detection:
+  selection:
+    userIdentity.type: AssumedRole
+    userIdentity.sessionContext.sessionIssuer.type: Role
+  condition: selection
+</pre>
+      <p class="path"><code>rules/cloud/aws/cloudtrail/aws_sts_assumerole_misuse.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="TELEMETRY_GAP" data-source="splunk" id="ra-0af3f6630a6c">
+  <header>
+    <div class="title-row">
+      <span class="badge TELEMETRY_GAP">TELEMETRY_GAP</span>
+      <h3>AWS Successful Console Authentication From Multiple IPs</h3>
+    </div>
+    <div class="meta">
+      <span>splunk</span>
+      <code>ra-0af3f6630a6c</code>
+      <a href="https://github.com/splunk/security_content/blob/1a41f94ca5c6efede6a61cf83e75527ed84a8e1d/detections/cloud/aws_successful_console_authentication_from_multiple_ips.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>unknown required_fields: span</li></ul>
+      <h4>Jev</h4>
+      <p><span class="muted">not called</span></p>
+      <h4>MITRE</h4>
+      <p>T1535, T1586</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li><li class="valid">cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">eventName <em>valid</em></li><li class="unknown">span <em>unknown</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Add missing CloudTrail fields to `content/telemetry/catalog.json` under `aws_cloudtrail`: span.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>`cloudtrail` eventName = ConsoleLogin
+  | bin span=5m _time
+  | rename user_name as user
+  | stats  dc(src) as distinct_ip_count values(src) as src values(user_agent) as user_agent values(dest) as dest
+    BY _time, user, signature,
+       vendor_account, vendor_region, vendor_product
+  | where distinct_ip_count&gt;1
+  | `security_content_ctime(firstTime)`
+  | `security_content_ctime(lastTime)`
+  | `aws_successful_console_authentication_from_multiple_ips_filter`</pre>
+      <p class="path"><code>detections/cloud/aws_successful_console_authentication_from_multiple_ips.yml</code></p>
+    </section>
+  </div>
+</article>
+<article class="card" data-verdict="FAIL" data-source="sigma" id="ra-8cf33e1acc5b">
+  <header>
+    <div class="title-row">
+      <span class="badge FAIL">FAIL</span>
+      <h3>AWS SAML Provider Deletion Activity</h3>
+    </div>
+    <div class="meta">
+      <span>sigma</span>
+      <code>ra-8cf33e1acc5b</code>
+      <a href="https://github.com/SigmaHQ/sigma/blob/2e8fd89f82d9104c1b30321a307254ddeea17de2/rules/cloud/aws/cloudtrail/aws_delete_saml_provider.yml" target="_blank" rel="noopener">upstream</a>
+    </div>
+  </header>
+  <div class="grid">
+    <section>
+      <h4>Reasons</h4>
+      <ul><li>all tables/fields resolved in catalog</li><li>jev low safe_to_import=0.21</li></ul>
+      <h4>Jev</h4>
+      <p>safe=0.21 · tables=0.94 · fields=0.11 · grounding=0.79 · platform=cloudtrail</p>
+      <h4>MITRE</h4>
+      <p>T1078.004, T1531</p>
+    </section>
+    <section>
+      <h4>Tables</h4>
+      <ul class="tags"><li class="valid">aws:cloudtrail <em>valid</em></li></ul>
+      <h4>Fields</h4>
+      <ul class="tags"><li class="valid">eventName <em>valid</em></li><li class="valid">eventSource <em>valid</em></li><li class="valid">status <em>valid</em></li></ul>
+    </section>
+    <section class="wide">
+      <h4>How to fix</h4>
+      <ul class="fix"><li>Jev rejected import (safe_to_import=0.21). Fix unknown/ambiguous tables/fields or exclude rule.</li></ul>
+      <h4>Logic excerpt</h4>
+      <pre>detection:
+  selection:
+    eventSource: iam.amazonaws.com
+    eventName: DeleteSAMLProvider
+    status: success
+  condition: selection
+</pre>
+      <p class="path"><code>rules/cloud/aws/cloudtrail/aws_delete_saml_provider.yml</code></p>
+    </section>
+  </div>
+</article>
+    <div class="empty" id="empty" hidden>No rules match this filter.</div>
+  </main>
+  <footer>
+    Open this file in a browser. Artifact also at
+    <code>/workspace/content/validation/cloudtrail_jev_review.html</code>
+    and <code>/opt/cursor/artifacts/cloudtrail_jev_review.html</code>.
+  </footer>
+<script>
+const q = document.getElementById('q');
+const verdict = document.getElementById('verdict');
+const source = document.getElementById('source');
+const shown = document.getElementById('shown');
+const empty = document.getElementById('empty');
+const cards = [...document.querySelectorAll('.card')];
+function apply() {
+  const needle = q.value.trim().toLowerCase();
+  const v = verdict.value;
+  const s = source.value;
+  let n = 0;
+  for (const c of cards) {
+    const okV = !v || c.dataset.verdict === v;
+    const okS = !s || c.dataset.source === s;
+    const okQ = !needle || c.textContent.toLowerCase().includes(needle);
+    const show = okV && okS && okQ;
+    c.hidden = !show;
+    if (show) n++;
+  }
+  shown.textContent = n + ' shown';
+  empty.hidden = n > 0;
+}
+[q, verdict, source].forEach(el => el.addEventListener('input', apply));
+apply();
+</script>
+</body>
+</html>

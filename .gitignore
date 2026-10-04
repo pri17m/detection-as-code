@@ -35,3 +35,19 @@ __pycache__/
 /*validation*report*.html
 /.DS_Store
 config/org.yaml
+
+# RuleAtlas local index/cache (synced public detection content)
+/data/ruleatlas/
+!/data/ruleatlas/.gitkeep
+
+# Jev answer cache may contain model outputs; keep directory, ignore payloads
+/content/validation/cache/*
+!/content/validation/cache/.gitkeep
+
+# Generated full field report (CI regenerates); keep smoke fixture report
+/content/validation/rule_field_report.json
+/content/validation/candidates.json
+
+# Local secrets
+.env
+.env.*

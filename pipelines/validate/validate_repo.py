@@ -227,6 +227,39 @@ def _validate_id_uniqueness(detections: Iterable[Tuple[Path, Dict[str, Any]]]) -
     return errors
 
 
+def _validate_catalog_fields(
+    flattened: List[Tuple[Path, Dict[str, Any]]],
+    *,
+    root: Path,
+) -> List[str]:
+    """Enforce telemetry catalog membership for Windows + CloudTrail required_fields."""
+    catalog_path = root / "content" / "telemetry" / "catalog.json"
+    if not catalog_path.exists():
+        return [f"Missing telemetry catalog: {catalog_path}"]
+
+    # Import sibling module when running as a script
+    validate_dir = Path(__file__).resolve().parent
+    if str(validate_dir) not in sys.path:
+        sys.path.insert(0, str(validate_dir))
+    from telemetry_catalog import TelemetryCatalog  # noqa: WPS433
+    from validate_fields import validate_detection  # noqa: WPS433
+
+    catalog = TelemetryCatalog.load(catalog_path)
+    errors: List[str] = []
+    for path, det in flattened:
+        rv = validate_detection(det, catalog, path=path)
+        if not rv.in_scope:
+            continue
+        unknown_required = [
+            f.name for f in rv.fields if f.status == "unknown" and f.source == "required_fields"
+        ]
+        if unknown_required:
+            errors.append(
+                f"{path}: required_fields not in telemetry catalog: {', '.join(unknown_required)}"
+            )
+    return errors
+
+
 def main() -> int:
     root = _repo_root()
     detections_root = root / "detections"
@@ -271,6 +304,7 @@ def main() -> int:
             all_errors.extend(_validate_portability(det, path=path))
 
     all_errors.extend(_validate_id_uniqueness(flattened))
+    all_errors.extend(_validate_catalog_fields(flattened, root=root))
 
     if all_errors:
         print("\n".join(all_errors), file=sys.stderr)

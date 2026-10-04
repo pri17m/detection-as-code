@@ -1,0 +1,35 @@
+{
+  "count": 3,
+  "candidates": [
+    {
+      "id": "ra-smoke-cloudtrail-mfa",
+      "source_id": "splunk",
+      "title": "AWS Console Login Without MFA",
+      "logic": "`aws_cloudtrail` eventName=ConsoleLogin additionalEventData.MFAUsed=No responseElements.ConsoleLogin=Success | table _time, userIdentity.arn, sourceIPAddress, awsRegion",
+      "mitre": ["T1078.004"],
+      "path": "detections/cloud/aws_console_login_without_mfa.yml",
+      "permalink": "https://github.com/splunk/security_content",
+      "content_hash": "smoke001cloudtrailmfa000000000000000000000000000000000000000000001"
+    },
+    {
+      "id": "ra-smoke-cloudtrail-imds",
+      "source_id": "splunk",
+      "title": "AWS IMDSv1 Role Delivery",
+      "logic": "sourcetype=aws:cloudtrail userIdentity.type=AssumedRole userIdentity.sessionContext.ec2RoleDelivery=\"1.0\" | stats count by userIdentity.arn, eventName, awsRegion",
+      "mitre": ["T1552.005"],
+      "path": "detections/cloud/aws_imdsv1.yml",
+      "permalink": "https://github.com/splunk/security_content",
+      "content_hash": "smoke002cloudtrailimds000000000000000000000000000000000000000000002"
+    },
+    {
+      "id": "ra-smoke-sigma-ps",
+      "source_id": "sigma",
+      "title": "Suspicious PowerShell EncodedCommand",
+      "logic": "title: Suspicious PowerShell EncodedCommand\nlogsource:\n  product: windows\n  service: security\ndetection:\n  selection:\n    EventID: 4688\n    CommandLine|contains: -EncodedCommand\n  condition: selection\n",
+      "mitre": ["T1059.001"],
+      "path": "rules/windows/process_creation/proc_creation_win_powershell_encoded.yml",
+      "permalink": "https://github.com/SigmaHQ/sigma",
+      "content_hash": "smoke003sigmapowershell0000000000000000000000000000000000000000003"
+    }
+  ]
+}

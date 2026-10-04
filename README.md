@@ -10,6 +10,7 @@ Experimental Detection-as-Code library for orgs adopting (or building) an in-hou
 - **A unified detection metadata schema** (validated in CI).
 - **MITRE ATT&CK coverage reporting** generated from rule metadata.
 - **Sourcetype portability enforcement**: detections must not hardcode `index=...`.
+- **Telemetry catalog + field grounding**: machine-readable Windows/CloudTrail tables/fields, optional RuleAtlas open-source search, and Jev soft-match validation.
 
 ## Core principles
 
@@ -57,13 +58,16 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r pipelines/validate/requirements.txt
 python pipelines/validate/validate_repo.py
+python pipelines/validate/validate_fields.py --in-repo
 ```
 
 CI runs the same validations:
 - Detection metadata schema validation
 - Query linting (forbids `index=` and other portability violations)
+- Telemetry catalog checks for Windows + AWS CloudTrail `required_fields`
 - MITRE coverage regeneration and diff check
 
+Telemetry catalog docs: `docs/telemetry/CATALOG.md`. RuleAtlas bridge: `pipelines/ruleatlas/README.md`.
 5. **Deploy**
 
 See platform docs:
@@ -93,20 +97,25 @@ See platform docs:
     sigma/
   docs/
     backlog/             # priority-100.csv + Phase-1 guides
-    telemetry/           # windows-splunk.md, required fields
+    telemetry/           # windows-splunk.md, CATALOG.md, CloudTrail fields
   content/
     mitre/
       coverage.json
       gaps.md
+    telemetry/
+      catalog.json       # machine-readable tables/fields (Windows + CloudTrail)
+    validation/
+      candidates.smoke.json
   schemas/
     detection.schema.json
   pipelines/
-    validate/
+    validate/            # schema + telemetry field + optional Jev grounding
+    ruleatlas/           # open-source rule search bridge
     convert/
     deploy/
   tests/
     fixtures/
-    unit/
+    validate/
   .github/workflows/
     validate.yml
     coverage-report.yml
