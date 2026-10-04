@@ -2,6 +2,8 @@
 
 Plug-and-play Detection-as-Code for orgs adopting an in-house SOC. This repo ships:
 
+**Status**: experimental (APIs, schemas, and detection content may change without notice).
+
 - **Org-portable detection content** for Splunk, CrowdStrike Falcon, and Microsoft Defender.
 - **A unified detection metadata schema** (validated in CI).
 - **MITRE ATT&CK coverage reporting** generated from rule metadata.
@@ -28,7 +30,7 @@ Splunk Free (or a single-instance trial) is enough to validate this repo:
 1. **Clone**
 
 ```bash
-git clone <this-repo>
+git clone https://github.com/pri17m/detection-as-code
 cd detection-as-code
 ```
 
