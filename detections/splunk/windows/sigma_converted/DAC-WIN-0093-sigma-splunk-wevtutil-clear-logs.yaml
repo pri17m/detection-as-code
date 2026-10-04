@@ -33,4 +33,4 @@ query:
 
     '
 sigma:
-  path: /workspace/detections/sigma/DAC-SIG-0009-wevtutil-clear-logs.yaml
+  path: SigmaHQ:windows/process_creation/wevtutil_clear.yml

@@ -133,9 +133,9 @@ Before merging a Windows Splunk detection:
 
 ---
 
-## 5. Repo placement (greenfield)
+## 5. Repo placement
 
-Repo currently has README only. Recommended paths:
+Recommended paths:
 
 - `config/sourcetype_map.yaml` — canonical allowlist (this pack)  
 - `docs/telemetry/windows-splunk.md` — this document  
@@ -146,7 +146,7 @@ Repo currently has README only. Recommended paths:
 - Exact WEF/`ForwardedEvents` sourcetype strings vary by org (`XmlWinEventLog:ForwardedEvents` vs custom); not in first allowlist — add when WEF is in scope.  
 - Collapsed `WinEventLog` / `XmlWinEventLog` alone are allowlisted so TA≥5 sites work, but rules using them **must** also filter `source=` or EventCode carefully to avoid cross-channel bleed.  
 - CIM alias availability depends on TA version (Windows TA field mapping changed across releases; Sysmon TA 10.6.2 → 1.0.1 renamed/removed several fields). Org validation (checklist #4) is mandatory.  
-- Private repo empty — no existing macros to reconcile yet.
+- Macro naming and field aliases vary by org/TA version — validate with real tenant telemetry before relying on a field name in a shared detection.
 
 ---
 

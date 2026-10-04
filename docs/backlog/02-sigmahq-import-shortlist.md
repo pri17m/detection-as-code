@@ -5,7 +5,7 @@
 **Shortlist count:** 139
 
 
-Prefer macros from `/workspace/dac-telemetry-windows/config/sourcetype_map.yaml`.
+Prefer macros from `config/sourcetype_map.yaml`.
 
 **NEEDS_FIELD_GROUNDING:** 4662/5145/4104/4886/5136/Sysmon 4/8/16/17–21/25.
 
