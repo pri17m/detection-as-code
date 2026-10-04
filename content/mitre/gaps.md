@@ -11,7 +11,7 @@ source_pack: "dac-phase1-windows-ad-attack-pack.md"
 
 # MITRE ATT&CK Coverage Gaps — Phase 1
 
-**Purpose:** Document where public Sigma Windows packs and greenfield DaC content leave blind spots for Debarshi’s Detection-as-Code Phase 1 (Windows Host + AD). Actionable for rule authors and for Platform to enable audit/telemetry before rules can fire.
+**Purpose:** Document where public Sigma Windows packs and early-stage DaC content leave blind spots for this project’s Phase 1 (Windows Host + AD). Actionable for rule authors and for Platform to enable audit/telemetry before rules can fire.
 
 **Constraint:** Defensive only — collection, policy names, and analytic coverage. No attack procedures.
 
@@ -37,7 +37,7 @@ Public SigmaHQ Windows packs typically cover process-creation LOLBins, simple Ru
 | G10 | **PowerShell depth** (4103/4104 assumed; cmdline-only rules brittle) | T1059.001 | Encoded / IEX / ADSI mass enum missed if only 4688 or process name collected | Require Module + Script Block logging; pair 4104 tokens with Sysmon 1 parent-child (Office→powershell) |
 | G11 | **Tamper canaries under-scoped** | T1562.001 (P1) | AV/EDR/Sysmon/audit disable precedes ransomware; pack analytics go dark first | Collect Sysmon 4/16/255, Security 1102, 4719; alert policy/service stop especially on DCs |
 
-**Repo note:** `pri17m/detection-as-code` is greenfield (README only as of 2026-09-10). Treat the full Phase-1 pack as backlog; prefer sourcetype-portable Sigma → Splunk pipelines (no index-hardcoded SPL).
+**Repo note:** Treat the Phase‑1 pack as backlog/planning. Coverage metrics should not be interpreted as production readiness; prioritize sourcetype‑portable content and avoid hardcoded `index=` in shared detections.
 
 ---
 

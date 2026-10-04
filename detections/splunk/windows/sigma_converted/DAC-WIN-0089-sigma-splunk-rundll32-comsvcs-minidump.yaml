@@ -33,4 +33,4 @@ query:
 
     '
 sigma:
-  path: /workspace/detections/sigma/DAC-SIG-0005-rundll32-comsvcs-minidump.yaml
+  path: SigmaHQ:windows/process_creation/rundll32_comsvcs_minidump.yml

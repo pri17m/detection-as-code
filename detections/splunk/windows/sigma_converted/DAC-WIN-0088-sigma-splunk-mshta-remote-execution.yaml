@@ -27,4 +27,4 @@ query:
     \ Process_Command_Line, cmdline))\n| where match(cmd,\"mshta\\\\.exe.*(http|https|javascript:|vbscript:)\"\
     ) \n| stats count values(cmd) as commands by host, SubjectUserName\n"
 sigma:
-  path: /workspace/detections/sigma/DAC-SIG-0004-mshta-remote-execution.yaml
+  path: SigmaHQ:windows/process_creation/mshta_remote.yml

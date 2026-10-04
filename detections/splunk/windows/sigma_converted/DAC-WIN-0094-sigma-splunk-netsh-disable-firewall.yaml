@@ -33,4 +33,4 @@ query:
 
     '
 sigma:
-  path: /workspace/detections/sigma/DAC-SIG-0010-netsh-disable-firewall.yaml
+  path: SigmaHQ:windows/process_creation/netsh_firewall_off.yml
