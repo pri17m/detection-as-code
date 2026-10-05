@@ -1,0 +1,29 @@
+id: DAC-VMW-0015
+title: ESXi encryption or execInstalledOnly enforcement changed
+description: Detects esxcli system settings encryption set touching secure boot or execInstalledOnly, excluding shell-echo lines. Disabling those checks lets unsigned code run on the host.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685
+severity: high
+false_positives:
+- Planned maintenance or host rebuilds. Confirm the actor and change window.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_encryption_settings_modified.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: "(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message=\"*system settings encryption set*\" NOT Message=\"*shell.*\"\n    Message IN (\"* -e *\",\"* -s *\",\"*--require-secure-boot*\",\"*execInstalledOnly*\",\"*require-exec-installed-only*\")\n| rex field=_raw \"Z (?<dest>[\\w\\.]+)\\s.*\\]: \\[(?<user>\\w+)\\]:(?<command>.+)\"\n| stats count min(_time) as firstTime max(_time) as lastTime values(command) as command by dest user\n"

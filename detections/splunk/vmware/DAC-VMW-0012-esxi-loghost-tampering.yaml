@@ -1,0 +1,37 @@
+id: DAC-VMW-0012
+title: ESXi Syslog.global log host or log directory changed
+description: Detects a hostd configuration set of Syslog.global.logHost or Syslog.global.logdir. That is the setting that decides where ESXi forwards logs.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685
+severity: high
+false_positives:
+- Planned maintenance or host rebuilds. Confirm the actor and change window.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_loghost_config_tampering.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*Set called with key*" (Message="*Syslog.global.logHost*" OR Message="*Syslog.global.logdir*")
+
+    | rex field=Message "key ''(?<key>[^'']+)'', value \"(?<value>[^\"]+)\""
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(Message) as Message by dest key value
+
+    '

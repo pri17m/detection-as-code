@@ -1,0 +1,54 @@
+id: DAC-AWS-0056
+title: 'AWS: CreateUser lookalike or HIDDEN_DUE_TO_SECURITY_REASONS username'
+description: 'Part 2 advanced evasion: CreateUser (success or attempt) with lookalike admin names (adm1n,
+  administrator variants) or literal HIDDEN_DUE_TO_SECURITY_REASONS, or IAM userName exactly root (not
+  Root userIdentity.type).'
+mitre:
+  tactics:
+  - persistence
+  - defense-evasion
+  techniques:
+  - T1136.003
+  - T1036.005
+severity: high
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-2/
+- https://attack.mitre.org/techniques/T1036/005/
+required_fields:
+- eventName
+- eventSource
+- requestParameters.userName
+- userIdentity.arn
+- errorCode
+- sourceIPAddress
+- awsRegion
+tags:
+- cloudtrail-ir-part2
+- P0
+- tp-quality
+- evasion
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource="iam.amazonaws.com" eventName="CreateUser"
+
+    | eval uname=coalesce(''requestParameters.userName'', "")
+
+    | where match(uname, "(?i)^(adm[i1l]n|administrator|HIDDEN_DUE_TO_SECURITY_REASONS|root)$") OR match(uname,
+    "(?i)HIDDEN_DUE_TO_SECURITY_REASONS") OR match(uname, "(?i)adm[i1l]n")
+
+    | table _time, eventName, requestParameters.userName, errorCode, errorMessage, userIdentity.arn, userIdentity.type,
+    userIdentity.ec2RoleDelivery, sourceIPAddress, awsRegion, userAgent
+
+    '
+author: Threat detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+- aws:cloudtrail:json
+- aws:cloudtrail:event
+telemetry_validated: false
+false_positives:
+- Tune after baselining legitimate workload roles and Regions; experimental until tenant field confirm.

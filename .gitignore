@@ -2,5 +2,36 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+/.mypy_cache/
+/.ruff_cache/
+/.tox/
+/.nox/
+/.coverage
+/htmlcov/
+/coverage.xml
+/.hypothesis/
+/.cache/
+/.pytest_tmp/
+/*.egg-info/
+/dist/
+/build/
+/.pdm-python
+/.pdm-build/
+/.python-version
+
+# Local env files (never commit secrets)
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Generated validation / CI artifacts
+/reports/
+/report/
+/validation_reports/
+/validation-reports/
+/*validation*report*.json
+/*validation*report*.md
+/*validation*report*.html
 /.DS_Store
 config/org.yaml

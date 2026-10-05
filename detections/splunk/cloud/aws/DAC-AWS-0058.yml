@@ -1,0 +1,53 @@
+id: DAC-AWS-0058
+title: 'AWS: Bedrock invocation with console-issued credentials (sessionCredentialFromConsole)'
+description: "Part 2: Bedrock ListFoundationModels/Converse/Invoke* where sessionCredentialFromConsole=true\
+  \ \u2014 ties AI misuse to a console session (Event 2\u21923/4 chain) rather than pure instance-role\
+  \ API keys alone."
+mitre:
+  tactics:
+  - impact
+  - collection
+  techniques:
+  - T1496
+  - T1078.004
+severity: high
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-2/
+- https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-cloudtrail.html
+required_fields:
+- eventSource
+- eventName
+- sessionCredentialFromConsole
+- userIdentity.arn
+- awsRegion
+- sourceIPAddress
+- requestParameters.modelId
+tags:
+- cloudtrail-ir-part2
+- scenario-3
+- P0
+- tp-quality
+- bedrock
+- console-pivot
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource="bedrock.amazonaws.com" eventName IN ("ListFoundationModels","Converse","ConverseStream","InvokeModel","InvokeModelWithResponseStream")
+
+    | search sessionCredentialFromConsole="true" OR sessionCredentialFromConsole=true
+
+    | table _time, eventName, requestParameters.modelId, additionalEventData.inputTokens, additionalEventData.outputTokens,
+    userIdentity.arn, sessionCredentialFromConsole, sourceIPAddress, awsRegion, userAgent, errorCode
+
+    '
+author: Threat detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+- aws:cloudtrail:json
+- aws:cloudtrail:event
+telemetry_validated: false
+false_positives:
+- Tune after baselining legitimate workload roles and Regions; experimental until tenant field confirm.

@@ -33,4 +33,4 @@ query:
 
     '
 sigma:
-  path: /workspace/detections/sigma/DAC-SIG-0008-vssadmin-delete-shadows.yaml
+  path: SigmaHQ:windows/process_creation/vssadmin_delete_shadows.yml

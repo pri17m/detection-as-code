@@ -10,7 +10,7 @@ required_fields:
 - aid
 - event_platform
 status: experimental
-author: Detection Engineer
+author: DaC
 description: Detects PowerShell executions using encoded command patterns (-e/-enc/-encodedcommand), with
   CI-safe base64 extract via regexExtract (no splitString index). Ported from Query-Hub Detect_and_Decode
   / Suspicious_PowerShell / length-anomaly ImageFileName gates.

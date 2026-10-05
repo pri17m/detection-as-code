@@ -1,0 +1,59 @@
+id: DAC-AWS-0060
+title: 'AWS: Same AssumedRole active in two or more Regions within 2 hours'
+description: "Part 2 defense-evasion complement to Bedrock-only DAC-AWS-0059: any AssumedRole principal\
+  \ generating CloudTrail events in >=2 awsRegion values within a 2h window (IAM\u2192Bedrock Region hop\
+  \ and broader lateral movement)."
+author: Threat detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+- aws:cloudtrail:json
+- aws:cloudtrail:event
+mitre:
+  tactics:
+  - defense-evasion
+  - lateral-movement
+  techniques:
+  - T1078.004
+  - T1526
+severity: medium
+false_positives:
+- "Global automation roles that naturally touch many Regions \u2014 allowlist known multi-Region deploy\
+  \ roles and raise region threshold."
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-2/
+- https://attack.mitre.org/techniques/T1078/004/
+telemetry_validated: false
+required_fields:
+- userIdentity.type
+- userIdentity.arn
+- awsRegion
+- eventSource
+- eventName
+- sourceIPAddress
+tags:
+- cloudtrail-ir-part2
+- scenario-3
+- P0
+- tp-quality
+- region-hop
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search userIdentity.type="AssumedRole"
+
+    | eval actor=coalesce(userIdentity.arn, userIdentity.principalId)
+
+    | bin _time span=2h
+
+    | stats dc(awsRegion) as regions values(awsRegion) as region_list dc(eventSource) as sources values(eventSource)
+    as eventSources values(eventName) as eventNames values(sourceIPAddress) as sourceIPAddress by _time,
+    actor
+
+    | where regions>=2
+
+    | table _time, actor, regions, region_list, sources, eventSources, eventNames, sourceIPAddress
+
+    '

@@ -1,0 +1,43 @@
+id: DAC-VMW-0005
+title: ESXi root logins from more than one address
+description: Detects the ESXi root account logging in from more than one source address, excluding loopback, inside a 15 minute window. Shared or stolen root shows up as concurrent source IPs.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1078
+severity: high
+false_positives:
+- Two administrators using the same root account from different consoles in the same quarter hour. Prefer named accounts so this stays rare.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_shared_or_stolen_root_account.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*root*" Message="*logged in*" NOT Message="*root@127.0.0.1*"
+
+    | rex field=_raw "root@(?<src_ip>\d{1,3}(?:\.\d{1,3}){3})"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | where isnotnull(src_ip)
+
+    | bin _time span=15m
+
+    | stats min(_time) as firstTime max(_time) as lastTime dc(src_ip) as distinct_ip_count values(src_ip) as src_ips by dest
+
+    | where distinct_ip_count > 1
+
+    '

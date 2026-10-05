@@ -10,7 +10,7 @@ required_fields:
 - aid
 - event_platform
 status: experimental
-author: Detection Engineer
+author: DaC
 description: 'Detects regsvr32 loading scrobj.dll with /i: (remote scriptlet / Squiblydoo-style proxy
   execution). Direct Query-Hub LOLBin_Regsvr32 port.'
 tags:

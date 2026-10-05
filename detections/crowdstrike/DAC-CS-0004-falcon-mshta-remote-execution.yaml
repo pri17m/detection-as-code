@@ -10,7 +10,7 @@ required_fields:
 - aid
 - event_platform
 status: experimental
-author: Detection Engineer
+author: DaC
 description: Detects mshta.exe executing remote HTA/HTTP/javascript/vbscript payloads. Combines prior
   IOA remote predicates with Query-Hub LOLBin_Mshta HTA path extract.
 tags:

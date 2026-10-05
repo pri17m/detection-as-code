@@ -1,0 +1,64 @@
+id: DAC-AWS-0049
+title: 'AWS: S3 ListBuckets then DeleteBucket by same principal (management-plane)'
+description: 'Management-plane impact chain when S3 data events are unavailable: ListBuckets recon followed
+  by DeleteBucket from the same actor in a 60-minute window. Object DeleteObject burst remains DAC-AWS-0043
+  (needs data events). Replaces the PR #6 0049 burst-delete that overlapped 0043.
+
+  '
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+mitre:
+  tactics:
+  - discovery
+  - impact
+  techniques:
+  - T1580
+  - T1485
+severity: high
+false_positives:
+- "Bucket teardown automation and account-offboarding jobs list then delete \u2014 allowlist destroy roles."
+- ListBuckets is frequent; the DeleteBucket join is the high-fidelity gate.
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
+- https://attack.mitre.org/techniques/T1485/
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html
+telemetry_validated: false
+required_fields:
+- eventName
+- eventSource
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+- requestParameters.bucketName
+tags:
+- cloudtrail-ir-part1
+- scenario-1
+- P0
+- tp-quality
+- management-plane
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource=s3.amazonaws.com eventName IN ("ListBuckets", "DeleteBucket")
+
+    | eval actor=coalesce(''userIdentity.arn'',''userIdentity.principalId'')
+
+    | eval bucket=coalesce(''requestParameters.bucketName'',"")
+
+    | eval is_list=if(eventName="ListBuckets", 1, 0)
+
+    | eval is_del=if(eventName="DeleteBucket", 1, 0)
+
+    | bin _time span=60m
+
+    | stats sum(is_list) as lists sum(is_del) as deletes dc(eventName) as evs values(bucket) as buckets
+    values(sourceIPAddress) as sourceIPAddress values(userAgent) as userAgent values(awsRegion) as awsRegion
+    by _time, actor
+
+    | where lists>=1 AND deletes>=1
+
+    '

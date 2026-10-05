@@ -37,4 +37,4 @@ query:
 
     '
 sigma:
-  path: /workspace/detections/sigma/DAC-SIG-0002-office-spawns-command-interpreter.yaml
+  path: SigmaHQ:windows/process_creation/office_spawns_shell.yml

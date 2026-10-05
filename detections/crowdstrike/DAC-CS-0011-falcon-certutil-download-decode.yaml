@@ -10,7 +10,7 @@ required_fields:
 - aid
 - event_platform
 status: experimental
-author: Detection Engineer
+author: DaC
 description: Detects certutil used to download (urlcache/http) or decode payloads. Merges prior -urlcache/-decode
   IOA intent with Query-Hub LOLBin_Certutil https CommandLine gate.
 tags:

@@ -1,0 +1,37 @@
+id: DAC-VMW-0011
+title: ESXi syslog configuration changed with esxcli
+description: Detects esxcli syslog config set on an ESXi host. Changing the syslog target or options is how an attacker stops logs leaving the host.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1690
+severity: high
+false_positives:
+- Planned maintenance or host rebuilds. Confirm the actor and change window.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_syslog_config_change.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*syslog config set*" Message="*esxcli*"
+
+    | rex field=_raw "\[(?<user>[^\]]+)\]:\s(?<command>.*syslog config set.*)"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(command) as command by dest user
+
+    '

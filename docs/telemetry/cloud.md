@@ -1,8 +1,8 @@
-# Cloud telemetry (roadmap)
+# Cloud telemetry (experimental)
 
-This repo aims to support cloud control-plane detections across Splunk, CrowdStrike, and Defender/Sentinel.
+This repo includes early-stage cloud control-plane detections across Splunk, CrowdStrike, and Defender/Sentinel.
 
-For Phase‑1, cloud packs are **stubs** (folder structure + schema examples) and will be filled as tenants onboard:
+Cloud content is **experimental** and may be incomplete; expect gaps as tenants onboard telemetry and detections are implemented/validated.
 
 - `detections/splunk/cloud/`
 - `detections/defender/` (KQL)

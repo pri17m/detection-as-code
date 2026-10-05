@@ -1,0 +1,53 @@
+id: DAC-AWS-0057
+title: 'AWS: CreateRole or CreateUser imitating AWS service-linked role names'
+description: 'Part 2 role/user name imitation: CreateRole/CreateUser with names resembling AWSServiceRole*
+  / AWSReservedSSO* but with character substitution (e.g. AWSServiceRoIe*).'
+mitre:
+  tactics:
+  - persistence
+  - defense-evasion
+  techniques:
+  - T1036.005
+  - T1098.003
+severity: high
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-2/
+- https://attack.mitre.org/techniques/T1036/005/
+required_fields:
+- eventName
+- requestParameters.roleName
+- requestParameters.userName
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+tags:
+- cloudtrail-ir-part2
+- P0
+- tp-quality
+- evasion
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource="iam.amazonaws.com" eventName IN ("CreateRole","CreateUser")
+
+    | eval name=coalesce(''requestParameters.roleName'',''requestParameters.userName'',"")
+
+    | where match(name, "(?i)AWSServiceRoIe") OR match(name, "(?i)AWSServiceR0le") OR match(name, "(?i)AWSServiceRoleFor.*[Il1].*")
+    OR (match(name, "(?i)^AWSServiceRo") AND NOT match(name, "^AWSServiceRoleFor[A-Za-z0-9-]+$")) OR match(name,
+    "(?i)^AWSReservedSSO")
+
+    | table _time, eventName, name, errorCode, userIdentity.arn, sourceIPAddress, awsRegion, userAgent,
+    requestParameters
+
+    '
+author: Threat detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+- aws:cloudtrail:json
+- aws:cloudtrail:event
+telemetry_validated: false
+false_positives:
+- Tune after baselining legitimate workload roles and Regions; experimental until tenant field confirm.

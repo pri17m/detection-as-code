@@ -10,7 +10,7 @@ required_fields:
 - aid
 - event_platform
 status: experimental
-author: Detection Engineer
+author: DaC
 description: "Detects netsh disabling or weakening the Windows firewall (advfirewall state off / firewall\
   \ set opmode disable / delete rule). SAFE ProcessRollup2 rewrite \u2014 FirewallSetRule-heavy Query-Hub\
   \ Firewall_Rule_Additions.yml is THIN; uses ImageFileName+CommandLine predicates instead."
