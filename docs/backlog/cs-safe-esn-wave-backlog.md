@@ -1,6 +1,6 @@
 # SAFE ESN expansion wave backlog (DAC-CS-0090+)
 
-**Path:** `/workspace/dac-crowdstrike/safe-esn/`  
+**Pack:** SAFE ESN expansion (`detections/crowdstrike/DAC-CS-0090.yml` … `DAC-CS-0137.yml`)  
 **Gate:** AUTHORING-STATUS.md SAFE only (mass YAML)  
 **Tags:** `safe-esn-wave`, `tp-quality-v2`  
 **telemetry_validated:** false  

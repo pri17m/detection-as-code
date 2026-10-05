@@ -1,6 +1,6 @@
 platforms:
 - crowdstrike
-author: Detection Engineer
+author: DaC
 sourcetypes:
 - falcon:process
 telemetry_validated: false
