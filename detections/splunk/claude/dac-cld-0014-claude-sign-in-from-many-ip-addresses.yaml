@@ -1,0 +1,39 @@
+id: DAC-CLD-0014
+title: Claude sign-in from many IP addresses
+description: >-
+  Alerts when one Claude account completes SSO or social sign-in from more than three IP
+  addresses. Attackers use a stolen session or a second location while the real user is also
+  signed in.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: medium
+mitre:
+  tactics:
+  - initial-access
+  techniques:
+  - T1078
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "Travel, a corporate VPN that changes egress, or a phone and a laptop. Schedule this over a day, not a few minutes."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1078/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("sso_login_succeeded", "social_login_succeeded")
+    | where isnotnull(actor_email) AND isnotnull(actor_ip_address)
+    | stats dc(actor_ip_address) as ip_count values(actor_ip_address) as source_ips values(event_type) as events by actor_email organization_id
+    | where ip_count > 3

@@ -1,0 +1,37 @@
+id: DAC-CLD-0003
+title: Claude admin, platform, service, or signing key created
+description: >-
+  Alerts when a Claude admin key, platform API key, service key, or request-signing key is
+  created. Attackers create that key so they can call the Claude API or the Compliance API after
+  the user's browser session is gone.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: high
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098.001
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "An administrator rotating a key for a known integration. Allowlist that actor_email. The new key id is not a field on this sourcetype."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1098/001/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("admin_api_key_created", "api_key_created", "platform_api_key_created", "service_key_created", "platform_signing_key_created")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id

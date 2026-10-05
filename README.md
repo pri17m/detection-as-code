@@ -6,15 +6,15 @@ Debarshi Ghosh’s public detection-engineering portfolio: a multi-platform **De
 
 All counts below are computed from `detections/**` plus `content/mitre/coverage.json` on the current `main` tip.
 
-- **Total detections**: 804
-- **Rules per platform**: Splunk 594 • CrowdStrike 146 • Defender 64
-- **Splunk pack breakdown**: Windows 331 • Cloud 180 • GitHub 46 • VMware ESXi 37
-- **ATT&CK coverage**: 197 unique techniques • 13 unique tactics (normalized from `mitre.tactics` values)
-- **ATT&CK mapping completeness**: 804/804 detections include `mitre.techniques` (100%)
+- **Total detections**: 819
+- **Rules per platform**: Splunk 609 • CrowdStrike 146 • Defender 64
+- **Splunk pack breakdown**: Windows 331 • Cloud 180 • GitHub 46 • VMware ESXi 37 • Claude compliance 15
+- **ATT&CK coverage**: 198 unique techniques • 13 unique tactics (normalized from `mitre.tactics` values)
+- **ATT&CK mapping completeness**: 819/819 detections include `mitre.techniques` (100%)
 
 | Platform | Rules | Query format |
 | --- | ---: | --- |
-| Splunk | 594 | SPL (`query.splunk`) |
+| Splunk | 609 | SPL (`query.splunk`) |
 | CrowdStrike Falcon | 146 | CQL / Falcon IOA-style patterns (`query.crowdstrike`) |
 | Microsoft Defender for Endpoint | 64 | KQL Advanced Hunting (`query.defender`) |
 | Sigma sources | 0 Sigma YAMLs under `detections/` | 10 detections carry `sigma.path` metadata (Sigma→Splunk conversions) |
