@@ -4,8 +4,7 @@
 #
 # Repo path: config/sourcetype_map.yaml
 # Companion docs:
-#   - docs/telemetry/windows-splunk.md  (recommended future home)
-#   - /workspace/dac-windows-splunk-telemetry.md (research deliverable)
+#   - docs/telemetry/windows-splunk.md
 #
 # Prefer sourcetype=… in rules. Never hardcode index=. Optional index macros
 # live in org config (see org.example.yaml placeholders below).

@@ -5,11 +5,11 @@ Cross-links:
 - Part 1 gap review: [`cloudtrail-ir-part1-gap-review.md`](./cloudtrail-ir-part1-gap-review.md)
 - Scenario source: [Incident response guide for AWS CloudTrail investigations – Part 2](https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-2/) (Scenario 3: SSRF → IMDSv1 → Bedrock)
 
-This note validates **field paths** for Detection-as-Code authoring for IR Part 2 (IMDSv1 credential harvest + multi-Region Bedrock misuse). **No Part 2 gap-review file** was present under `/workspace/dac-aws/` at authoring time.
+This note validates **field paths** for Detection-as-Code authoring for IR Part 2 (IMDSv1 credential harvest + multi-Region Bedrock misuse). **No Part 2 gap-review file** was present at authoring time.
 
 ## Sourcetype / macro (org allowlist)
 
-Same allowlist as Part 1 (`/workspace/dac-telemetry-windows/config/sourcetype_map.yaml`):
+Same allowlist as Part 1 (`config/sourcetype_map.yaml`):
 
 | Prefer | Value |
 | --- | --- |

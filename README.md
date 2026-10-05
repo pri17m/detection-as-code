@@ -1,149 +1,166 @@
-# Detection-as-Code (DaC)
+# Detection-as-Code (DaC) — Detection Engineering Portfolio
 
-Plug-and-play Detection-as-Code for orgs adopting an in-house SOC. This repo ships:
+Debarshi Ghosh’s public detection-engineering portfolio: a multi-platform **Detection-as-Code** library and CI-gated pipeline for authoring, validating, and tracking behaviour-based detections across **Splunk SPL**, **CrowdStrike Falcon** (CQL / Falcon IOA-style patterns), **Microsoft Defender for Endpoint** (KQL Advanced Hunting), and **Sigma-derived sources** (when present/converted). It’s built for detection engineers who care about **high-fidelity** signals, explicit ATT&CK mappings, **field-aware validation** (and field-validated where possible), and guardrails that fail fast in CI.
 
-- **Org-portable detection content** for Splunk, CrowdStrike Falcon, and Microsoft Defender.
-- **A unified detection metadata schema** (validated in CI).
-- **MITRE ATT&CK coverage reporting** generated from rule metadata.
-- **Sourcetype portability enforcement**: detections must not hardcode `index=...`.
+## Coverage at a glance (computed from repo content)
 
-## Core principles
+All counts below are computed from `detections/**` plus `content/mitre/coverage.json` on the current `main` tip.
 
-- **No hardcoded index names**. Queries must key off canonical telemetry types (e.g. `sourcetype=WinEventLog:Security`, `sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational`, `sourcetype=github:audit`).
-- **Config is deploy-time**. If your org requires index scoping, set it as an optional token/macro in `config/org.yaml` and apply it at deploy time.
-- **Single metadata contract** across platforms (Splunk SPL, Defender KQL, Falcon IOA/correlation stubs, Sigma sources).
+- **Total detections**: 657
+- **Rules per platform**: Splunk 564 • CrowdStrike 47 • Defender 46
+- **ATT&CK coverage**: 161 unique techniques • 13 unique tactics (normalized from `mitre.tactics` values)
+- **ATT&CK mapping completeness**: 657/657 detections include MITRE mapping (100%)
 
-## Splunk Free / PoC adopters
+| Platform | Rules | Query format |
+| --- | ---: | --- |
+| Splunk | 564 | SPL (`query.splunk`) |
+| CrowdStrike Falcon | 47 | CQL / Falcon IOA-style patterns (`query.crowdstrike`) |
+| Microsoft Defender for Endpoint | 46 | KQL Advanced Hunting (`query.defender`) |
+| Sigma sources | 0 Sigma YAMLs under `detections/` | 10 detections carry `sigma.path` metadata (Sigma→Splunk conversions) |
 
-Splunk Free (or a single-instance trial) is enough to validate this repo:
+**Tactics covered (normalized)**: `collection`, `command-and-control`, `credential-access`, `defense-evasion`, `discovery`, `execution`, `exfiltration`, `impact`, `initial-access`, `lateral-movement`, `persistence`, `privilege-escalation`, `resource-development`.
 
-1. Onboard Windows Security + Sysmon with **allowlisted sourcetypes** (see `config/sourcetype_map.yaml` and `docs/telemetry/windows-splunk.md`).
-2. Run rules **without** hardcoding `index=` — Free often uses `index=main`; set that only in `config/org.yaml` macros at deploy time.
-3. Prefer search macros such as `` `windows_security` `` / `` `windows_sysmon` `` from the sourcetype map.
-4. Stay within Free’s daily ingest cap (typically 500 MB/day) by scoping hosts and Sysmon filters — not by baking indexes into shared detections.
+### Primary telemetry / sourcetypes (by frequency in `sourcetypes`)
 
-## Quickstart (adopters)
+The `sourcetypes` field is a portability contract. For Splunk Windows/ESXi sources, it’s enforced against `config/sourcetype_map.yaml` in CI; other platforms use symbolic telemetry identifiers (e.g. `mde:advanced_hunting`, `falcon:process`).
 
+Top telemetry families referenced across the corpus:
 
-1. **Clone**
+- **Windows Sysmon**: `XmlWinEventLog:Microsoft-Windows-Sysmon/Operational` (140), `WinEventLog:Microsoft-Windows-Sysmon/Operational` (110), plus `sysmon` / `sysmon:*` (63 combined)
+- **Windows Security**: `WinEventLog:Security` (137), `XmlWinEventLog:Security` (72)
+- **Cloud audit logs**: `aws:cloudtrail` (60) + AWS CloudTrail variants, `azure:monitor:activity` (40), `azure:monitor:aad` (40), `gcp:audit` (40)
+- **GitHub audit**: `github:audit` (46), `github:cloud:audit` (40)
+- **VMware ESXi**: `vmw-syslog` (23), `vmware:esxlog*` (23)
+- **Platform-native sources**: `falcon:process` (47), `mde:advanced_hunting` (46)
 
-```bash
-git clone <this-repo>
-cd detection-as-code
+## Pipeline (Detection-as-Code)
+
+```mermaid
+flowchart LR
+  A[Author YAML detection] --> B[Schema + portability validation<br/>pipelines/validate/validate_repo.py]
+  B --> C[Coverage rebuild<br/>pipelines/validate/build_mitre_coverage.py]
+  C --> D[CI gate (GitHub Actions)]
+  D --> E[Deploy/packaging per platform<br/>docs/platforms/*]
 ```
 
-2. **Create your org config**
+## Repository layout
 
-```bash
-cp config/org.example.yaml config/org.yaml
+```text
+.
+├── config/
+│   ├── org.example.yaml
+│   └── sourcetype_map.yaml         # Splunk sourcetype/macros contract (CI-enforced for Windows/ESXi)
+├── content/
+│   └── mitre/
+│       └── coverage.json           # Generated ATT&CK coverage inventory
+├── detections/
+│   ├── splunk/                     # SPL detections (Windows, cloud, GitHub, VMware, …)
+│   ├── crowdstrike/                # Falcon IOA-style / CQL detections
+│   └── defender/                   # MDE Advanced Hunting (KQL) detections
+├── docs/
+│   ├── platforms/                  # Deployment notes per platform
+│   ├── reference/
+│   └── telemetry/                  # Telemetry onboarding + required fields guidance
+├── pipelines/
+│   └── validate/                   # CI validation + MITRE coverage generator
+├── quarantine/                     # Holding area (if present)
+├── schemas/
+│   └── detection.schema.json       # Unified detection metadata contract
+├── tests/
+├── CONTRIBUTING.md
+└── LICENSE
 ```
 
-Edit `config/org.yaml`:
-- Set tenant ids / placeholders as needed (Defender tenant, Falcon CID, Splunk app context, etc.).
-- Optionally define index tokens if your deployment requires index scoping.
+## Rule schema (unified contract)
 
-3. **Map your telemetry to canonical sourcetypes**
+Every detection is YAML validated against [`schemas/detection.schema.json`](schemas/detection.schema.json). A rule must include:
 
-Edit `config/sourcetype_map.yaml` (and read `docs/telemetry/windows-splunk.md`) to map your actual sourcetypes onto the allowlisted aliases / macros used by detections.
+- **Identity and intent**: `id`, `title`, `description`, `author`, `status`
+- **Platform targeting**: `platforms` (splunk / crowdstrike / defender)
+- **Telemetry contract**: `sourcetypes` (portable identifiers; Splunk Windows/ESXi allowlisted in CI)
+- **ATT&CK mapping**: `mitre.tactics`, `mitre.techniques`
+- **Operational metadata**: `severity`, `false_positives`, `references`, `required_fields`, `telemetry_validated`
+- **Implementation**: `query.<platform>` and/or `sigma.path` (when Sigma-derived)
 
-4. **Validate**
+### Example detection (trimmed from `detections/defender/DAC-MDE-0001-powershell-encoded-command-on-endpoint.yaml`)
+
+```yaml
+id: DAC-MDE-0001
+title: PowerShell encoded command on endpoint
+description: Detects PowerShell executions using EncodedCommand, a common obfuscation and payload staging pattern.
+author: DaC
+status: experimental
+platforms: [defender]
+sourcetypes: [mde:advanced_hunting]
+mitre:
+  tactics: [execution]
+  techniques: [T1059.001]
+severity: high
+false_positives:
+  - Legitimate admin scripts may use encoded commands.
+references:
+  - https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table
+telemetry_validated: false
+required_fields: [DeviceName, ProcessCommandLine, FileName, InitiatingProcessFileName]
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName in~ ("powershell.exe","pwsh.exe")
+    | where ProcessCommandLine has_any ("-enc","-encodedcommand")
+```
+
+## Validate, test, and deploy
+
+### Local validation (same checks as CI)
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r pipelines/validate/requirements.txt
 python pipelines/validate/validate_repo.py
+python pipelines/validate/build_mitre_coverage.py
 ```
 
-CI runs the same validations:
-- Detection metadata schema validation
-- Query linting (forbids `index=` and other portability violations)
-- MITRE coverage regeneration and diff check
+CI will fail if `content/mitre/coverage.json` changes and isn’t committed.
 
-5. **Deploy**
+### Platform deployment notes
 
-See platform docs:
-- `docs/platforms/splunk.md`
-- `docs/platforms/crowdstrike.md`
-- `docs/platforms/defender.md`
+- Splunk: `docs/platforms/splunk.md`
+- CrowdStrike: `docs/platforms/crowdstrike.md`
+- Defender: `docs/platforms/defender.md`
 
-## Repository layout
+## Quality bar and maturity model
 
-```text
-/
-  README.md
-  CONTRIBUTING.md
-  LICENSE
-  config/
-    org.example.yaml
-    sourcetype_map.yaml
-  detections/
-    splunk/
-      windows/           # security/, priority/ (DAC-WIN-0100+), sigma_wave1/ (0200+), …
-      active_directory/
-      cloud/
-      github/
-      host/
-    crowdstrike/
-    defender/
-    sigma/
-  docs/
-    backlog/             # priority-100.csv + Phase-1 guides
-    telemetry/           # windows-splunk.md, required fields
-  content/
-    mitre/
-      coverage.json
-      gaps.md
-  schemas/
-    detection.schema.json
-  pipelines/
-    validate/
-    convert/
-    deploy/
-  tests/
-    fixtures/
-    unit/
-  .github/workflows/
-    validate.yml
-    coverage-report.yml
-  docs/
-    telemetry/
-    platforms/
-```
+This repo is intentionally conservative about what it claims.
 
-## Detection format
+- **Schema-gated content**: every detection must validate against `schemas/detection.schema.json`.
+- **Portability guardrails**:
+  - Splunk queries are rejected if they contain `index=` (deploy-time concern).
+  - Splunk queries must include a `sourcetype=` constraint (or an approved telemetry macro).
+  - Windows/ESXi Splunk sourcetypes are allowlisted and enforced via `config/sourcetype_map.yaml`.
+- **Field validation**: `required_fields` should reflect vendor-documented fields and/or fields observed in representative telemetry.
+- **ATT&CK mapping discipline**: `mitre.tactics` + `mitre.techniques` are required for every rule (coverage is inventory, not efficacy).
+- **False-positive posture**: `false_positives` is part of each rule; tuning guidance should be explicit (parent process, signer, allowlists, environment constraints).
+- **`telemetry_validated` meaning**:
+  - `true`: query fields + log source assumptions have been validated against vendor documentation and/or representative telemetry.
+  - `false`: rule is still experimental and may require field mapping and tuning.
 
-Detections are YAML files with unified metadata + a platform-native query, e.g. a Splunk rule:
+Rules should be treated as **experimental until validated in a real tenant** (environment-specific baselines, suppressions, and ingestion differences matter).
 
-```yaml
-id: DAC-WIN-0001
-title: "Excessive failed logons from single source"
-description: "Detects bursts of EventCode 4625 that can indicate password spraying."
-author: "DaC"
-status: experimental
-platforms: [splunk]
-sourcetypes: ["WinEventLog:Security"]
-mitre:
-  tactics: ["TA0006"]
-  techniques: ["T1110"]
-severity: medium
-false_positives:
-  - "Legitimate user mistyping password or misconfigured service accounts"
-references:
-  - "https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625"
-telemetry_validated: false
-required_fields: ["EventCode", "Account_Name", "src_ip"]
-query:
-  splunk: |
-    sourcetype=WinEventLog:Security EventCode=4625
-    | stats count dc(user) as users values(user) as users by src_ip, host
-    | where count >= 20
-```
+## Roadmap
 
-## Sigma ingest
+- Daily additions / iterative hardening of rule content
+- Purple-team validation lab using Atomic Red Team (and other reproducible emulation) to raise confidence in behaviour-based detections
+- Expand platform coverage and converters (more source formats → validated multi-platform outputs)
 
-Sigma sources live under `detections/sigma/`. See `pipelines/convert/README.md` for how to pull SigmaHQ and run a converter stub that produces Splunk/Defender/CrowdStrike stubs and normalized metadata.
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## License
 
-Apache-2.0 (see `LICENSE`).
+Apache-2.0. See [`LICENSE`](LICENSE).
+
+## About / Author
+
+Built and maintained by **Debarshi Ghosh**. GitHub: [`pri17m`](https://github.com/pri17m)

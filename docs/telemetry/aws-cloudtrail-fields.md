@@ -4,7 +4,7 @@ Cross-link: scenario coverage and detection gaps live in [`cloudtrail-ir-part1-g
 
 ## Sourcetype / macro (org allowlist)
 
-From `/workspace/dac-telemetry-windows/config/sourcetype_map.yaml`:
+From `config/sourcetype_map.yaml`:
 
 | Prefer | Value |
 | --- | --- |
