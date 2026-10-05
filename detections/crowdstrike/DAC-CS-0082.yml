@@ -1,0 +1,67 @@
+id: DAC-CS-0082
+status: experimental
+severity: medium
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: Correlates remote interactive logons (UserLogon, LogonType=10) occurring during overnight
+  hours with suspicious process execution (ProcessRollup2) from the same logon session, with
+platforms:
+- crowdstrike
+title: 'Falcon: Overnight Post-RDP Activity Detection'
+mitre:
+  tactics:
+  - lateral-movement
+  - execution
+  techniques:
+  - T1021.001
+  - T1033
+  - T1087.001
+  - T1087.002
+references:
+- https://attack.mitre.org/techniques/T1021/001/
+- https://attack.mitre.org/techniques/T1033/
+- https://attack.mitre.org/techniques/T1087/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/overnight-post-rdp-activity.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| ImageFileName=/\\\\(cmd|powershell|pwsh|wscript|cscript|mshta|rundll32|regsvr32|wmic|certutil|bitsadmin|schtasks|sc|net|net1|nltest|whoami|quser|systeminfo|hostname|tasklist|netstat|ipconfig|curl|wget|rclone|psexec|paexec|winrs)\\\
+    .exe$/i\n| case {\n    CommandLine=/\\b(whoami|quser|query\\s+user|net1?(\\.exe)?\"?\\s+(users?|group|localgroup|session)|nltest|ipconfig\\\
+    s+\\/all|systeminfo|hostname|tasklist|wmic|netstat)\\b/i | SignalType:=\"Enumeration\";\n    CommandLine=/\\\
+    b(Get-Process|Get-NetTCPConnection|Get-SmbShare|Get-ADUser|Get-ADComputer)\\b/i | SignalType:=\"PowerShell\
+    \ Enumeration\";\n    CommandLine=/\\b(rclone|curl|wget|scp|sftp|ftp|bitsadmin|certutil|makecab|7z|rar|winrar)\\\
+    b/i | SignalType:=\"Transfer or Archive\";\n    CommandLine=/\\b(Invoke-WebRequest|Invoke-RestMethod|Start-BitsTransfer)\\\
+    b/i | SignalType:=\"PowerShell Transfer\";\n    ImageFileName=/\\\\(cmd|powershell|pwsh)\\.exe$/i\
+    \ AND CommandLine=/\\s-(?:enc|encodedcommand)(?:\\s|$|:)/i | SignalType:=\"Encoded Shell\";\n    *\
+    \ | SignalType:=\"Other\";\n  }\n| SignalType!=\"Other\"\n| join({#event_simpleName=UserLogon event_platform=Win\
+    \ LogonType=10}, field=[aid, AuthenticationId], include=[UserPrincipal, RemoteAddressIP4, LogonType,\
+    \ LogonTime])\n| table([aid, ComputerName, UserName, UserPrincipal, LogonType, RemoteAddressIP4, SignalType,\
+    \ ImageFileName, CommandLine, ParentBaseFileName])\n"
+required_fields:
+- '#event_simpleName'
+- AuthenticationId
+- CommandLine
+- ComputerName
+- ImageFileName
+- LogonTime
+- LogonType
+- ParentBaseFileName
+- RemoteAddressIP4
+- UserName
+- UserPrincipal
+- aid
+- event_platform
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:overnight-post-rdp-activity.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2
+- esn:UserLogon

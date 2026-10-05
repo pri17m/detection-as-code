@@ -1,0 +1,51 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Identifies DnsRequest events resolving well-known DoH provider domains (Cloudflare, Google,
+  Quad9,
+
+  Mozilla, NextDNS, OpenDNS).
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0104
+query:
+  crowdstrike: '#event_simpleName=DnsRequest
+
+    | in(field=DomainName, values=["cloudflare-dns.com","dns.google","dns.quad9.net","mozilla.cloudflare-dns.com","dns.nextdns.io","doh.opendns.com"])
+
+    | groupBy([aid, ComputerName, DomainName, ContextBaseFileName], function=count())
+
+    '
+mitre:
+  tactics:
+  - command-and-control
+  - defense-evasion
+  techniques:
+  - T1071.004
+  - T1568
+title: 'Falcon: DNS over HTTPS Provider Resolutions'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1071/004/
+- https://attack.mitre.org/techniques/T1568/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/DoH_traffic.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:DoH_traffic.yml
+- esn:DnsRequest
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- ContextBaseFileName
+- DomainName
+- aid

@@ -1,0 +1,56 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: "DnsRequest with unusually long DomainName (>=60 chars) from non-browser ContextBaseFileName\
+  \ \u2014\npossible DNS tunneling / DGA staging.\n"
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0136
+query:
+  crowdstrike: '#event_simpleName=DnsRequest
+
+    | DomainName=*
+
+    | length(DomainName, as=DomainLen)
+
+    | DomainLen>=60
+
+    | DomainName!=/\.(microsoft\.com|windows\.com|office\.com|live\.com|azure\.com|amazonaws\.com|google\.com|apple\.com)$/i
+
+    | !in(field=ContextBaseFileName, values=["msedge.exe","chrome.exe","firefox.exe","brave.exe","svchost.exe"],
+    ignoreCase=true)
+
+    | groupBy([aid, ComputerName, DomainName, ContextBaseFileName, DomainLen], function=count())
+
+    '
+mitre:
+  tactics:
+  - command-and-control
+  - exfiltration
+  techniques:
+  - T1071.004
+  - T1568.002
+title: 'Falcon: DnsRequest Suspicious Long Subdomain'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1071/004/
+- https://attack.mitre.org/techniques/T1568/002/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/DoH_traffic.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:DoH_traffic.yml
+- esn:DnsRequest
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- ContextBaseFileName
+- DomainName
+- aid

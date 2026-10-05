@@ -1,0 +1,54 @@
+id: DAC-CS-0065
+status: experimental
+severity: high
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: Detects the execution of Remote Monitoring & Management (RMM) and remote access tools such
+  as AnyDesk, TeamViewer, ScreenConnect, Atera, Splashtop, RustDesk, and others. Threat act
+platforms:
+- crowdstrike
+title: 'Falcon: Unauthorized RMM Tool Usage'
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1219
+references:
+- https://attack.mitre.org/techniques/T1219/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/unauthorized_rmm_tool_usage.yml
+query:
+  crowdstrike: "in(#event_simpleName, values=[\"ProcessRollup2\",\"SyntheticProcessRollup2\"])\n| ImageFileName=/(\\\
+    \\|\\/)(?<FileName>[^\\\\\\/]+)$/\n| case {\n    FileName=/^anydesk(_custom)?(\\.exe)?$/i | RMMTool:=\"\
+    AnyDesk\";\n    FileName=/^(teamviewer(_service|_desktop)?|tv_w32|tv_x64)(\\.exe)?$/i | RMMTool:=\"\
+    TeamViewer\";\n    FileName=/^(screenconnect|connectwise)[\\w.]*(\\.exe)?$/i | RMMTool:=\"ScreenConnect\"\
+    ;\n    FileName=/^(ateraagent|atera[\\w.]*)(\\.exe)?$/i | RMMTool:=\"Atera\";\n    FileName=/^(splashtop[\\\
+    w.]*|srservice|strwinclt)(\\.exe)?$/i | RMMTool:=\"Splashtop\";\n    FileName=/^rustdesk(\\.exe)?$/i\
+    \ | RMMTool:=\"RustDesk\";\n    FileName=/^meshagent(\\.exe)?$/i | RMMTool:=\"MeshCentral\";\n   \
+    \ FileName=/^(ngrok|frpc|frps)(\\.exe)?$/i | RMMTool:=\"Tunneling\";\n    FileName=/^(logmein[\\w.]*|lmiguardiansvc)(\\\
+    .exe)?$/i | RMMTool:=\"LogMeIn\";\n    FileName=/^radmin[\\w.]*(\\.exe)?$/i | RMMTool:=\"Radmin\"\
+    ;\n    * | RMMTool:=\"none\";\n  }\n| RMMTool!=\"none\"\n| groupBy([RMMTool, aid, ComputerName, UserName],\
+    \ function=[count(as=Executions), collect([ImageFileName, CommandLine], limit=10)])\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- FileName
+- ImageFileName
+- UserName
+- aid
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P0
+- src:unauthorized_rmm_tool_usage.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2
+- esn:SyntheticProcessRollup2

@@ -1,0 +1,53 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: "DriverLoad where FilePath indicates AppData/Temp/Users Desktop/Downloads \u2014 suspicious\
+  \ for BYOVD\nstaging.\n"
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0125
+query:
+  crowdstrike: '#event_simpleName=DriverLoad event_platform=Win
+
+    | FileName=/\.sys$/i
+
+    | FilePath=/(AppData|\\Temp\\|Downloads|Users\\.*\\Desktop|ProgramData\\)/i
+
+    | FilePath!=/\\Windows\\(System32|SysWOW64)\\drivers\\/i
+
+    | groupBy([aid, ComputerName, FileName, FilePath, ImageFileName], function=count())
+
+    '
+mitre:
+  tactics:
+  - privilege-escalation
+  - defense-evasion
+  techniques:
+  - T1014
+  - T1068
+title: 'Falcon: DriverLoad from User-Writable Path'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1014/
+- https://attack.mitre.org/techniques/T1068/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/byovd_driver_load_with_edr_av_process_termination_medusa_ransomware.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:byovd_driver_load_with_edr_av_process_termination_medusa_ransomware.yml
+- esn:DriverLoad
+severity: high
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- FileName
+- FilePath
+- ImageFileName
+- aid
+- event_platform

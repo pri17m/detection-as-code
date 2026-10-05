@@ -1,30 +1,51 @@
-id: DAC-CS-0004
-title: 'Falcon: mshta remote execution'
-description: Starter Falcon IOA/correlation rule candidate.
-author: DaC
-status: experimental
-platforms:
-- crowdstrike
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- aid
+- event_platform
+status: experimental
+author: DaC
+description: Detects mshta.exe executing remote HTA/HTTP/javascript/vbscript payloads. Combines prior
+  IOA remote predicates with Query-Hub LOLBin_Mshta HTA path extract.
+tags:
+- enhance-tp
+- tp-quality-v2
+- processrollup2
+- esn:ProcessRollup2
+- esn:ProcessBlocked
+- qh:LOLBin_Mshta.yml
 mitre:
   tactics:
   - execution
   - defense-evasion
   techniques:
   - T1218.005
-severity: medium
-false_positives:
-- Tune to your environment and allowlist known tooling.
-references:
-- https://www.crowdstrike.com/
-telemetry_validated: false
-required_fields:
-- ImageFileName
-- CommandLine
-- ParentBaseFileName
+id: DAC-CS-0004
 query:
-  crowdstrike: 'falcon_ioa_pattern: ImageFileName="mshta.exe" AND CommandLine CONTAINS_ANY
-    ["http://","https://","javascript:","vbscript:"]
+  crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+
+    | event_platform=Win
+
+    | ImageFileName=/mshta\.exe$/i
+
+    | CommandLine=/(https?:\/\/|\.hta\b|javascript:|vbscript:)/i
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
 
     '
+severity: medium
+title: 'Falcon: mshta remote execution'
+false_positives:
+- "Legacy enterprise HTA helpers launched via mshta \u2014 allowlist known HTA paths."
+- Software packaging that still uses local .hta; tune ParentBaseFileName.
+platforms:
+- crowdstrike
+references:
+- https://attack.mitre.org/techniques/T1218/005/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/LOLBin_Mshta.yml

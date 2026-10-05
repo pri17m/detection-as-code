@@ -1,0 +1,69 @@
+id: DAC-CS-0064
+status: experimental
+severity: high
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: This query identifies potential lateral movement activities by detecting remote connections
+  and credential usage patterns across multiple hosts.
+platforms:
+- crowdstrike
+title: 'Falcon: Lateral Movement Detection'
+mitre:
+  tactics:
+  - lateral-movement
+  - discovery
+  techniques:
+  - T1021.001
+  - T1021.002
+  - T1135
+references:
+- https://attack.mitre.org/techniques/T1021/001/
+- https://attack.mitre.org/techniques/T1021/002/
+- https://attack.mitre.org/techniques/T1135/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Lateral_Movement_Detection.yml
+query:
+  crowdstrike: '#event_simpleName=NetworkConnectIP4
+
+    | in(RemotePort, values=[445, 3389, 5985])
+
+    | !cidr(RemoteAddressIP4, subnet=["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "127.0.0.0/8"])
+
+    | join({#event_simpleName=ProcessRollup2}, field=[aid, ContextProcessId], key=[aid, TargetProcessId],
+    include=[ImageFileName, CommandLine, ParentBaseFileName, AuthenticationId])
+
+    | join({#event_simpleName=UserIdentity}, field=AuthenticationId, include=[UserName])
+
+    | table([aid, ComputerName, UserName, ImageFileName, CommandLine, ParentBaseFileName, RemoteAddressIP4,
+    RemotePort])
+
+    '
+required_fields:
+- '#event_simpleName'
+- AuthenticationId
+- CommandLine
+- ComputerName
+- ContextProcessId
+- ImageFileName
+- ParentBaseFileName
+- RemoteAddressIP4
+- RemotePort
+- TargetProcessId
+- UserName
+- aid
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P0
+- src:Lateral_Movement_Detection.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:NetworkConnectIP4
+- esn:ProcessRollup2
+- esn:UserIdentity

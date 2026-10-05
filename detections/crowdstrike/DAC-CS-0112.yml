@@ -1,0 +1,64 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'NetworkConnectIP4 to non-RFC1918 destinations joined to ProcessRollup2 where ImageFileName
+  is
+
+  powershell/cmd/wscript/cscript/mshta/python.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0112
+query:
+  crowdstrike: '#event_simpleName=NetworkConnectIP4
+
+    | !cidr(RemoteAddressIP4, subnet=["10.0.0.0/8","172.16.0.0/12","192.168.0.0/16","127.0.0.0/8","169.254.0.0/16"])
+
+    | !in(RemotePort, values=[53,123])
+
+    | join({#event_simpleName=ProcessRollup2 | ImageFileName=/\\(powershell|pwsh|cmd|wscript|cscript|mshta|python|pythonw|ruby|perl)\.exe$/i},
+    key=TargetProcessId, field=ContextProcessId, include=[ImageFileName, CommandLine, ParentBaseFileName],
+    tip="aid=aid")
+
+    | groupBy([aid, ComputerName, RemoteAddressIP4, RemotePort, ImageFileName, CommandLine, ParentBaseFileName],
+    function=count())
+
+    '
+mitre:
+  tactics:
+  - command-and-control
+  - execution
+  techniques:
+  - T1071
+  - T1059
+title: 'Falcon: Scripting Engine Outbound NetworkConnectIP4'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1071/
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/External_Connectons_with_Process.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:External_Connectons_with_Process.yml
+- esn:NetworkConnectIP4
+- esn:ProcessRollup2
+severity: high
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ContextProcessId
+- ImageFileName
+- ParentBaseFileName
+- RemoteAddressIP4
+- RemotePort
+- TargetProcessId
+- aid

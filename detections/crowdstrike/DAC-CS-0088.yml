@@ -1,0 +1,56 @@
+id: DAC-CS-0088
+status: experimental
+severity: medium
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: Detects hosts that establish network connections across a large number of unique ports within
+  a given period. This behavior may indicate port scanning, network reconnaissance, or p
+platforms:
+- crowdstrike
+title: 'Falcon: Systems Initiating Connections to a High Number of Ports'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1595
+  - T1046
+references:
+- https://attack.mitre.org/techniques/T1595/
+- https://attack.mitre.org/techniques/T1046/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/systems_initiating_connections_to_a_high_number_of_ports.yml
+query:
+  crowdstrike: "(#event_simpleName=NetworkConnectIP4 OR #event_simpleName=ProcessRollup2)\n| falconPID:=TargetProcessId\
+    \ | falconPID:=ContextProcessId\n| selfJoinFilter(field=[aid, falconPID], where=[{#event_simpleName=NetworkConnectIP4\
+    \ | RemotePort=*}, {#event_simpleName=ProcessRollup2 | ImageFileName=/\\\\[^\\\\]+\\.exe$/i}])\n|\
+    \ groupBy([aid, ComputerName, falconPID], function=([\n    collect([ImageFileName, CommandLine, UserName,\
+    \ UserSid]),\n    count(RemotePort, distinct=true, as=uniquePortCount),\n    collect([RemotePort],\
+    \ limit=25),\n    count(RemoteAddressIP4, distinct=true, as=remoteIPcount)\n  ]), limit=max)\n| uniquePortCount>25\n\
+    | ImageFileName=/\\\\[^\\\\]+\\.exe$/i\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ContextProcessId
+- ImageFileName
+- RemoteAddressIP4
+- RemotePort
+- TargetProcessId
+- UserName
+- UserSid
+- aid
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:systems_initiating_connections_to_a_high_number_of_ports.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:NetworkConnectIP4
+- esn:ProcessRollup2

@@ -1,0 +1,53 @@
+id: DAC-CS-0080
+status: experimental
+severity: medium
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: Detects indicators of the LeakNet campaign (analyzed by ReliaQuest, March 2026), which uses
+  ClickFix a social engineering tactic where compromised websites display fake error dialo
+platforms:
+- crowdstrike
+title: 'Falcon: LeakNet Campaign: Deno Runtime & Klist Suspicious Execution Detection'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1204.001
+  - T1059
+references:
+- https://attack.mitre.org/techniques/T1204/001/
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/leaknet_campaign_deno_runtime_klist_suspicious_execution_detection.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n| (\n    (ImageFileName=/\\\\deno(\\.exe)?$/i AND ImageFileName=/\\\
+    \\(Users\\\\[^\\\\]+\\\\AppData\\\\(Local|Roaming)|Temp|ProgramData)\\\\/i)\n    OR (ImageFileName=/\\\
+    \\klist\\.exe$/i AND ParentBaseFileName=/^(cmd|powershell|pwsh|wscript|cscript|mshta)\\.exe$/i)\n\
+    \    OR (ParentBaseFileName=/^deno(\\.exe)?$/i AND ImageFileName=/\\\\(cmd|powershell|pwsh|net|net1|whoami|hostname|nltest|dsquery|quser|vssadmin|wbadmin|reg|wevtutil|ipconfig|systeminfo|tasklist|schtasks|wmic|bitsadmin|certutil)\\\
+    .exe$/i)\n    OR (ImageFileName=/\\\\deno(\\.exe)?$/i AND CommandLine=/(eval|--allow-all|--allow-net|--allow-run|https?:\\\
+    /\\/|atob\\(|base64|WebSocket|fetch\\()/i)\n  )\n| !(ImageFileName=/\\\\deno(\\.exe)?$/i AND ImageFileName=/\\\
+    \\(Program Files|Program Files \\(x86\\)|tools|dev|repos|source|git)\\\\/i)\n| table([@timestamp,\
+    \ aid, ComputerName, UserName, ParentBaseFileName, ImageFileName, CommandLine, SHA256HashData])\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- SHA256HashData
+- UserName
+- aid
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:leaknet_campaign_deno_runtime_klist_suspicious_execution_detection.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2

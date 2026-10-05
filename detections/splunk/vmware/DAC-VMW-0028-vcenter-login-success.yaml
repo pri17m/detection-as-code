@@ -1,0 +1,39 @@
+id: DAC-VMW-0028
+title: vCenter login success
+description: Detects vCenter vpxd UserLoginSessionEvent lines. Low severity for correlation and hunting, not a page on every successful login. Optional rex of User <principal>@<ip> logged in as enriches when that tail is present and does not drop events that lack it.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmware:vclog
+- vmware:vclog:*
+mitre:
+  tactics:
+  - initial-access
+  - persistence
+  techniques:
+  - T1078
+severity: low
+false_positives:
+- Normal administrator and service account logins. Volume is high; use for correlation rather than standalone alerting.
+references:
+- https://docs.cyderes.cloud/parser-knowledge-base/vmware/
+- https://github.com/Azure/Azure-Sentinel/blob/master/Solutions/VMware%20vCenter/Parsers/vCenter.yaml
+- https://splunkbase.splunk.com/app/5601
+- https://splunk.github.io/splunk-connect-for-syslog/3.11.0/sources/vendor/VMWare/vsphere/
+telemetry_validated: false
+required_fields:
+- _raw
+tags:
+- vmware
+- vcenter
+- vclog
+query:
+  splunk: '(sourcetype=vmware:vclog OR sourcetype=vmware:vclog:*) (Message="*vim.event.UserLoginSessionEvent*" OR _raw="*vim.event.UserLoginSessionEvent*")
+
+    | rex field=_raw "User (?<user>[^\s@]+)@(?<src>\d{1,3}(?:\.\d{1,3}){3}) logged in as"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(user) as user values(src) as src by host
+
+    '
