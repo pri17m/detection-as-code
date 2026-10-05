@@ -1,0 +1,46 @@
+id: DAC-MDE-0063
+title: Browser extension with proxy, webRequestAuthProvider, and all_urls permissions
+description: "Uses Defender Vulnerability Management browser-extension tables to surface installed extensions that simultaneously request proxy, webRequestAuthProvider (or webRequest), and broad host permissions (<all_urls> / *://*/*) — high-risk permission set for traffic interception (T1176.001 / T1185)."
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - persistence
+  - collection
+  techniques:
+  - T1176.001
+  - T1185
+severity: high
+false_positives:
+- Corporate proxy/SSO browser extensions that legitimately need these permissions — maintain an ExtensionId allowlist.
+- "Tuning knob: alert only on ExtensionRisk High/Critical; join InstallationTime for first-seen baselining."
+references:
+- "https://learn.microsoft.com/defender-xdr/advanced-hunting-devicetvmbrowserextensions-table"
+- "https://learn.microsoft.com/defender-xdr/advanced-hunting-devicetvmbrowserextensionskb-table"
+- "https://attack.mitre.org/techniques/T1176/001/"
+- "https://attack.mitre.org/techniques/T1185/"
+telemetry_validated: false
+required_fields:
+- DeviceName
+- ExtensionId
+- ExtensionName
+- PermissionName
+- ExtensionRisk
+- BrowserName
+- InstallationTime
+tags:
+- wave1
+- browser-extension
+query:
+  defender: |
+    DeviceTvmBrowserExtensions
+    | join kind=inner (DeviceTvmBrowserExtensionsKB | where PermissionName has_any ("proxy","webRequestAuthProvider","webRequest","*://*/*","<all_urls>","all_urls")) on ExtensionId
+    | summarize Permissions=make_set(PermissionName), Risk=any(ExtensionRisk), Name=any(ExtensionName), Browser=any(BrowserName), Install=any(InstallationTime) by DeviceId, DeviceName, ExtensionId
+    | where Permissions has "proxy"
+    | where Permissions has_any ("webRequestAuthProvider","webRequest")
+    | where Permissions has_any ("<all_urls>","*://*/*","all_urls")
+    | project DeviceName, ExtensionId, Name, Browser, Risk, Install, Permissions

@@ -1,0 +1,52 @@
+id: DAC-WIN-0330
+title: Skeleton Key style suspicious LSASS process access on a domain controller
+description: Detects Sysmon EventCode 10 process access targeting lsass.exe on hosts that look like domain controllers, with GrantedAccess masks commonly used for memory patching/injection (e.g. 0x1010, 0x1410, 0x143a, 0x1fffff) from non-security SourceImage paths — Skeleton Key / LSASS tampering signal (T1556.001).
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+- "WinEventLog:Microsoft-Windows-Sysmon/Operational"
+- sysmon
+mitre:
+  tactics:
+  - credential-access
+  - defense-evasion
+  techniques:
+  - T1556.001
+  - T1055
+severity: critical
+false_positives:
+- EDR/AV and Windows Defender processes accessing LSASS — allowlist signed security SourceImage paths.
+- "Tuning knob: tighten Computer DC naming; restrict GrantedAccess set; require SourceUser not SYSTEM."
+references:
+- "https://learn.microsoft.com/sysinternals/downloads/sysmon"
+- "https://attack.mitre.org/techniques/T1556/001/"
+- "https://attack.mitre.org/techniques/T1055/"
+telemetry_validated: false
+required_fields:
+- EventCode
+- TargetImage
+- SourceImage
+- GrantedAccess
+- User
+- host
+tags:
+- wave1
+- skeleton-key
+- lsass
+query:
+  splunk: |
+    (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype=sysmon)
+    EventCode=10
+    | eval TargetImage=lower(coalesce(TargetImage, Target_Image))
+    | eval SourceImage=lower(coalesce(SourceImage, Source_Image))
+    | eval GrantedAccess=lower(coalesce(GrantedAccess, Granted_Access))
+    | eval hostn=lower(coalesce(Computer, host, dest))
+    | where match(TargetImage, "\\\\lsass\\.exe$")
+    | where match(hostn, "(dc|domaincontroller|adds)") OR match(hostn, "^[a-z0-9-]*dc[0-9]*")
+    | where match(GrantedAccess, "(0x1fffff|0x143a|0x1410|0x1010|0x40|0x1038)")
+    | where NOT match(SourceImage, "(\\\\windows\\\\system32\\\\|\\\\program files\\\\windows defender\\\\|\\\\crowdstrike\\\\|\\\\sentinel\\\\|\\\\carbonblack\\\\|csfalcon|msmpeng|sense\\.exe)")
+    | stats count values(SourceImage) as sources values(GrantedAccess) as access values(User) as users by hostn
+    | where count>=1

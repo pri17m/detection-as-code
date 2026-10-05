@@ -1,0 +1,46 @@
+id: DAC-CS-0209
+title: Volume shadow or ntdsutil IFM access targeting NTDS.dit
+description: |
+  Detects vssadmin/diskshadow/wbadmin/ntdsutil process command lines associated with shadow-copy creation or Install From Media (IFM) that reference ntds.dit — an offline credential-dump alternative to DCSync (T1003.003).
+author: DaC
+status: experimental
+platforms:
+  - crowdstrike
+sourcetypes:
+  - falcon:process
+mitre:
+  tactics:
+    - credential-access
+  techniques:
+    - T1003.003
+severity: critical
+false_positives:
+  - Authorized DC backup/DR jobs using Windows Server Backup or ntdsutil IFM — allowlist scheduled backup accounts.
+  - 'Tuning knob: require ComputerName DC pattern; exclude known backup parent processes.'
+references:
+  - https://attack.mitre.org/techniques/T1003/003/
+telemetry_validated: false
+required_fields:
+  - '#event_simpleName'
+  - event_platform
+  - aid
+  - ComputerName
+  - ImageFileName
+  - CommandLine
+  - ParentBaseFileName
+tags:
+  - wave1
+  - ad
+  - credential-access
+  - tp-quality
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+    | event_platform=Win
+    | (
+        (ImageFileName=/\\(vssadmin|diskshadow|wbadmin|ntdsutil)\.exe$/i AND CommandLine=/(create\s+shadow|shadow\s+copy|ntds\.dit|\bifm\b|full\s+backup|catalog)/i)
+        OR CommandLine=/(ntds\.dit|\\\\ntds\\\\ntds\.dit)/i
+      )
+    | ParentBaseFileName!=/^(MsMpEng|CSFalconService)\.exe$/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
+    

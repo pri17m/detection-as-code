@@ -1,0 +1,52 @@
+id: DAC-CS-0203
+title: Scheduled task registration on a DC preceding DCSync tooling
+description: |
+  Correlates a Windows ScheduledTaskRegistered event with a subsequent ProcessRollup2 on the same aid that matches DCSync/credential-dump tooling (secretsdump, mimikatz dcsync, ntdsutil IFM) within a short window — a common smash-prep pattern on domain controllers.
+author: DaC
+status: experimental
+platforms:
+  - crowdstrike
+sourcetypes:
+  - falcon:process
+mitre:
+  tactics:
+    - persistence
+    - credential-access
+    - execution
+  techniques:
+    - T1053.005
+    - T1003.006
+severity: critical
+false_positives:
+  - DC maintenance scripts that register tasks and later run approved backup/IFM tooling — allowlist TaskName and ImageFileName.
+  - 'Tuning knob: tighten ComputerName DC naming pattern; adjust time window via search
+  interval.'
+references:
+  - https://attack.mitre.org/techniques/T1053/005/
+  - https://attack.mitre.org/techniques/T1003/006/
+telemetry_validated: false
+required_fields:
+  - '#event_simpleName'
+  - event_platform
+  - aid
+  - ComputerName
+  - TaskName
+  - TaskExecCommand
+  - TaskExecArguments
+  - ImageFileName
+  - CommandLine
+  - ParentBaseFileName
+tags:
+  - wave1
+  - ad
+  - dcsync
+  - schtask
+  - tp-quality
+query:
+  crowdstrike: |
+    #event_simpleName=ScheduledTaskRegistered event_platform=Win
+    | ComputerName=/DC|DOMAIN|ADDS/i OR TaskName=/\\/i
+    | TaskName!=/^\\?Microsoft\\Windows\\/i
+    | join({in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"]) | event_platform=Win | CommandLine=/(secretsdump|lsadump::dcsync|ntdsutil.*ifm|ntds\.dit|--just-dc)/i OR ImageFileName=/\\(secretsdump|mimikatz|ntdsutil)\.exe$/i}, key=aid, field=aid, include=[ImageFileName, CommandLine, ParentBaseFileName], limit=20000)
+    | groupBy([aid, ComputerName, TaskName, TaskExecCommand, TaskExecArguments, ImageFileName, CommandLine], function=count())
+    

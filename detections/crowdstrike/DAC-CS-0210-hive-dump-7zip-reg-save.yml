@@ -1,0 +1,45 @@
+id: DAC-CS-0210
+title: SAM SECURITY SYSTEM hive extract via 7-Zip or reg.exe save
+description: |
+  Detects reg.exe save/export or 7-Zip/tar archiving of Windows registry hives SAM, SECURITY, or SYSTEM (and related paths under \Windows\System32\config\) — credential material staging (T1003.002).
+author: DaC
+status: experimental
+platforms:
+  - crowdstrike
+sourcetypes:
+  - falcon:process
+mitre:
+  tactics:
+    - credential-access
+  techniques:
+    - T1003.002
+severity: high
+false_positives:
+  - Forensic acquisition or backup agents that archive config hives — allowlist those ImageFileName paths.
+  - 'Tuning knob: require output path under \Users\Public, \Temp, or removable drive for
+  higher fidelity.'
+references:
+  - https://attack.mitre.org/techniques/T1003/002/
+telemetry_validated: false
+required_fields:
+  - '#event_simpleName'
+  - event_platform
+  - aid
+  - ComputerName
+  - ImageFileName
+  - CommandLine
+  - ParentBaseFileName
+tags:
+  - wave1
+  - credential-access
+  - tp-quality
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+    | event_platform=Win
+    | (
+        (ImageFileName=/\\reg\.exe$/i AND CommandLine=/\bsave\b/i AND CommandLine=/\b(HKLM\\(SAM|SECURITY|SYSTEM)|\\\\Windows\\\\System32\\\\config\\\\(SAM|SECURITY|SYSTEM))\b/i)
+        OR (ImageFileName=/\\(7z|7za|7zr|tar)\.exe$/i AND CommandLine=/\\Windows\\System32\\config\\(SAM|SECURITY|SYSTEM)/i)
+      )
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
+    

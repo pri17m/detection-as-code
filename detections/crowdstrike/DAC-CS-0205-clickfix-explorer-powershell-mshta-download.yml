@@ -1,0 +1,50 @@
+id: DAC-CS-0205
+title: |
+  ClickFix chain: explorer or Run-dialog spawned powershell/mshta with download-exec
+description: |
+  Detects PowerShell or mshta processes whose parent is explorer.exe (Run dialog / ClickFix social-engineering chain) and whose command line includes download cradles (DownloadString/WebClient/IWR/curl/mshta http) plus execution markers (IEX, Invoke-Expression, -enc).
+author: DaC
+status: experimental
+platforms:
+  - crowdstrike
+sourcetypes:
+  - falcon:process
+mitre:
+  tactics:
+    - execution
+    - user-execution
+  techniques:
+    - T1204.004
+    - T1059.001
+    - T1059.005
+severity: high
+false_positives:
+  - Rare admin Run-dialog one-liners for troubleshooting — allowlist managed admin users and signed scripts.
+  - 'Tuning knob: require both download AND exec tokens (default); drop -enc-only matches
+  if noisy.'
+references:
+  - https://attack.mitre.org/techniques/T1204/004/
+  - https://attack.mitre.org/techniques/T1059/001/
+telemetry_validated: false
+required_fields:
+  - '#event_simpleName'
+  - event_platform
+  - aid
+  - ComputerName
+  - ImageFileName
+  - CommandLine
+  - ParentBaseFileName
+tags:
+  - wave1
+  - clickfix
+  - tp-quality
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+    | event_platform=Win
+    | ParentBaseFileName=/^explorer\.exe$/i
+    | ImageFileName=/\\(powershell|pwsh|mshta|cmd)\.exe$/i
+    | CommandLine=/(downloadstring|downloadfile|invoke-webrequest|\biwr\b|net\.webclient|curl\.exe|wget|mshta\s+https?:)/i
+    | CommandLine=/(iex|invoke-expression|frombase64string|-enc\b|-encodedcommand|bypass|hidden)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
+    

@@ -1,0 +1,50 @@
+id: DAC-CS-0208
+title: Java server process spawning shell or LOLBin (Log4Shell-style)
+description: |
+  Detects java/javaw processes spawning interactive shells or LOLBins (cmd, powershell, bash, curl, certutil), optionally joined to outbound LDAP/RMI/DNS-like network activity — behaviour consistent with JNDI injection post-exploitation such as Log4Shell (T1190).
+author: DaC
+status: experimental
+platforms:
+  - crowdstrike
+sourcetypes:
+  - falcon:process
+mitre:
+  tactics:
+    - initial-access
+    - execution
+  techniques:
+    - T1190
+    - T1059
+severity: critical
+false_positives:
+  - Application installers or JVM tooling that shell out during upgrades — allowlist known service accounts and install paths.
+  - 'Tuning knob: require NetworkConnectIP4 to ports 1389/1099/389 (default join) for
+  higher precision.'
+references:
+  - https://attack.mitre.org/techniques/T1190/
+  - https://attack.mitre.org/techniques/T1059/
+telemetry_validated: false
+required_fields:
+  - '#event_simpleName'
+  - event_platform
+  - aid
+  - ComputerName
+  - ImageFileName
+  - CommandLine
+  - ParentBaseFileName
+  - TargetProcessId
+  - ContextProcessId
+  - RemoteAddressIP4
+  - RemotePort
+tags:
+  - wave1
+  - log4shell
+  - tp-quality
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+    | ParentBaseFileName=/^(java|javaw|java\.exe|javaw\.exe)$/i
+    | ImageFileName=/\\(cmd|powershell|pwsh|bash|sh|curl|wget|certutil|mshta|python)\.exe$/i OR ImageFileName=/\/(bash|sh|curl|wget|python3?)$/i
+    | join({#event_simpleName=NetworkConnectIP4 | in(RemotePort, values=[1389,1099,389,636,53,80,443])}, key=aid, field=aid, include=[RemoteAddressIP4, RemotePort], limit=20000)
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName, RemoteAddressIP4, RemotePort], function=count())
+    

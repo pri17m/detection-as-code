@@ -1,0 +1,49 @@
+id: DAC-CS-0202
+title: GPO persistence via SYSVOL ScheduledTasks.xml or GptTmpl.inf write
+description: |
+  Detects file-write events under SYSVOL Policies paths targeting ScheduledTasks.xml or SecEdit\GptTmpl.inf, which adversaries abuse to plant immediate scheduled tasks or local-admin group membership via Group Policy. Uses Falcon FileWritten-family events. Allowlist DFS-R and GPMC operators.
+author: DaC
+status: experimental
+platforms:
+  - crowdstrike
+sourcetypes:
+  - falcon:process
+mitre:
+  tactics:
+    - persistence
+    - privilege-escalation
+    - defense-evasion
+  techniques:
+    - T1484.001
+    - T1053.005
+severity: high
+false_positives:
+  - Legitimate GPO edits via GPMC or configuration-as-code pipelines writing ScheduledTasks.xml / GptTmpl.inf.
+  - 'Tuning knob: exclude ImageFileName/dfsrs.exe and known admin automation aids; require
+  non-SYSTEM UserName.'
+references:
+  - https://attack.mitre.org/techniques/T1484/001/
+  - https://attack.mitre.org/techniques/T1053/005/
+  - https://github.com/CrowdStrike/logscale-community-content/wiki/LogScale-Query-Primer
+telemetry_validated: false
+required_fields:
+  - '#event_simpleName'
+  - event_platform
+  - aid
+  - ComputerName
+  - TargetFileName
+  - ContextProcessId
+  - SHA256HashData
+  - UserName
+tags:
+  - wave1
+  - ad
+  - gpo
+  - tp-quality
+query:
+  crowdstrike: |
+    #event_simpleName=/FileWritten/i event_platform=Win
+    | TargetFileName=/\\SYSVOL\\.*\\Policies\\.*\\(Preferences\\ScheduledTasks\\ScheduledTasks\.xml|SecEdit\\GptTmpl\.inf|GPT\.INI|Registry\.pol)$/i
+    | UserName!=/^(SYSTEM|LOCAL SERVICE|NETWORK SERVICE)$/i
+    | groupBy([aid, ComputerName, TargetFileName, UserName, ContextProcessId], function=count())
+    

@@ -1,0 +1,52 @@
+id: DAC-WIN-0332
+title: DCSync replication request via Directory Service Access 4662
+description: "Detects Windows Security 4662 events requesting DS-Replication-Get-Changes / Get-Changes-All / Filtered-Set extended rights (GUID or friendly name in Properties) with Control Access semantics, excluding legitimate DC machine accounts and MSOL_* sync accounts."
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- "WinEventLog:Security"
+- "XmlWinEventLog:Security"
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.006
+severity: critical
+false_positives:
+- Azure AD Connect / Entra Connect sync accounts (extend MSOL_/AAD_ filter) and authorized AD replication troubleshooting.
+- "Tuning knob: require AccessMask 0x100; maintain DC hostname allowlist for SubjectUserName ending in $."
+references:
+- "https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4662"
+- "https://attack.mitre.org/techniques/T1003/006/"
+telemetry_validated: false
+required_fields:
+- EventCode
+- Properties
+- AccessMask
+- ObjectType
+- ObjectName
+- SubjectUserName
+- SubjectUserSid
+- SubjectDomainName
+- Computer
+tags:
+- wave1
+- ad
+- dcsync
+query:
+  splunk: |
+    (sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode=4662
+    | eval Properties=coalesce(Properties, Property)
+    | eval AccessMask=coalesce(AccessMask, Access_Mask)
+    | eval SubjectUserName=coalesce(SubjectUserName, Subject_User_Name)
+    | eval SubjectUserSid=coalesce(SubjectUserSid, Subject_User_Sid)
+    | eval ObjectType=coalesce(ObjectType, Object_Type)
+    | eval Computer=coalesce(Computer, host, dest)
+    | where match(Properties, "(?i)(1131f6aa-9c07-11d1-f79f-00c04fc2dcd2|1131f6ad-9c07-11d1-f79f-00c04fc2dcd2|89e95b76-444d-4c62-991a-0facbeda640c|DS-Replication-Get-Changes)")
+    | where match(AccessMask, "(?i)0x100") OR AccessMask="256" OR isnull(AccessMask) OR AccessMask="-"
+    | where NOT match(SubjectUserName, "\\$$") AND NOT match(SubjectUserName, "(?i)^MSOL_|^AAD_|Sync_")
+    | where NOT match(SubjectUserSid, "^S-1-5-18$")
+    | stats count values(Properties) as props values(ObjectType) as otypes values(ObjectName) as onames by Computer SubjectUserName SubjectDomainName AccessMask
+    | where count>=1

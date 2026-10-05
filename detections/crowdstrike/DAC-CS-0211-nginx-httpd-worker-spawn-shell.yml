@@ -1,0 +1,45 @@
+id: DAC-CS-0211
+title: NGINX or httpd worker spawning shell, interpreter, or network tool
+description: |
+  Detects nginx/httpd/apache worker or master processes spawning shells (sh/bash/cmd), script interpreters, or network utilities (curl/wget/nc) — common web-shell and post-exploitation behaviour on Linux/Windows web tiers.
+author: DaC
+status: experimental
+platforms:
+  - crowdstrike
+sourcetypes:
+  - falcon:process
+mitre:
+  tactics:
+    - execution
+    - persistence
+  techniques:
+    - T1505.003
+    - T1059
+severity: high
+false_positives:
+  - CGI or app-server helpers that intentionally invoke shells — allowlist known ScriptAlias parents and args.
+  - 'Tuning knob: exclude ImageFileName matching rotatelogs/htcacheclean; require public-facing
+  ComputerName tags.'
+references:
+  - https://attack.mitre.org/techniques/T1505/003/
+  - https://attack.mitre.org/techniques/T1059/
+telemetry_validated: false
+required_fields:
+  - '#event_simpleName'
+  - event_platform
+  - aid
+  - ComputerName
+  - ImageFileName
+  - CommandLine
+  - ParentBaseFileName
+tags:
+  - wave1
+  - webshell
+  - tp-quality
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+    | ParentBaseFileName=/^(nginx|nginx\.exe|httpd|httpd\.exe|apache2|httpd\.worker)$/i
+    | ImageFileName=/\/(bash|sh|dash|zsh|python3?|perl|php|ruby|nc|ncat|curl|wget)$/i OR ImageFileName=/\\(cmd|powershell|pwsh|curl|wget|certutil|mshta)\.exe$/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
+    

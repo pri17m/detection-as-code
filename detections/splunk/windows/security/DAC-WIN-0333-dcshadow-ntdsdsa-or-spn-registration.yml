@@ -1,0 +1,53 @@
+id: DAC-WIN-0333
+title: DCShadow rogue nTDSDSA object or SPN registration indicators
+description: Detects creation of nTDSDSA directory service objects (Security 5137 ObjectClass/ObjectDN containing nTDSDSA) or computer-account changes (4742) that add GC/DNS/LDAP servicePrincipalNames on non-routine subjects — indicators of DCShadow rogue replication partner registration (T1207).
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- "WinEventLog:Security"
+- "XmlWinEventLog:Security"
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1207
+severity: critical
+false_positives:
+- Legitimate new domain controller promotions and forest prep — allowlist known DC build accounts and change windows.
+- "Tuning knob: require ObjectClass=nTDSDSA alone for highest precision; treat SPN-only 4742 as secondary signal."
+references:
+- "https://learn.microsoft.com/windows/security/threat-protection/auditing/event-5137"
+- "https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4742"
+- "https://attack.mitre.org/techniques/T1207/"
+telemetry_validated: false
+required_fields:
+- EventCode
+- ObjectDN
+- ObjectClass
+- SubjectUserName
+- TargetUserName
+- ServicePrincipalNames
+- Computer
+tags:
+- wave1
+- ad
+- dcshadow
+query:
+  splunk: |
+    (sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) (EventCode=5137 OR EventCode=4742)
+    | eval ObjectDN=coalesce(ObjectDN, Object_DN, DN)
+    | eval ObjectClass=coalesce(ObjectClass, Object_Class, Class)
+    | eval SubjectUserName=coalesce(SubjectUserName, Subject_User_Name)
+    | eval TargetUserName=coalesce(TargetUserName, Target_User_Name)
+    | eval ServicePrincipalNames=coalesce(ServicePrincipalNames, Service_Principal_Names)
+    | eval Computer=coalesce(Computer, host, dest)
+    | eval signal=case(
+        EventCode=5137 AND (match(ObjectClass,"(?i)nTDSDSA") OR match(ObjectDN,"(?i)CN=NTDS Settings")), "ntdsdsa-create",
+        EventCode=4742 AND match(ServicePrincipalNames,"(?i)(GC/|E3514235-4B06-11D1-AB04-00C04FC2DCD2|ldap/)"), "spn-dc-like",
+        true(), null())
+    | where isnotnull(signal)
+    | where NOT match(SubjectUserName, "(?i)^(SYSTEM|\\$)")
+    | stats count values(signal) as signals values(ObjectDN) as dns values(ObjectClass) as classes values(ServicePrincipalNames) as spns by Computer SubjectUserName TargetUserName
+    | where count>=1
