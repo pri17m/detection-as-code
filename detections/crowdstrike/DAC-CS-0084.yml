@@ -1,0 +1,62 @@
+id: DAC-CS-0084
+status: experimental
+severity: medium
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: This hunting query is designed to detect rare shell parent processes.
+platforms:
+- crowdstrike
+title: 'Falcon: Rare windows shell parent process'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059
+references:
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Rare_Windows_Shell_Parent.yml
+query:
+  crowdstrike: '#event_simpleName=ProcessRollup2 event_platform=Win
+
+    | ImageFileName=/\\(powershell|cmd|pwsh)\.exe$/i
+
+    | !in(field=ParentBaseFileName, values=["explorer.exe","cmd.exe","powershell.exe","pwsh.exe","services.exe","svchost.exe","userinit.exe","winlogon.exe"],
+    ignoreCase=true)
+
+    | table([aid, ComputerName, ParentBaseFileName, ImageFileName, CommandLine, ParentProcessId, TargetProcessId,
+    SHA256HashData])
+
+    | groupBy([ParentBaseFileName, SHA256HashData], function=[count(ComputerName, distinct=true, as=HostCount),
+    collect([aid, ImageFileName, CommandLine], limit=10)])
+
+    | HostCount<5
+
+    | sort(HostCount, order=asc)
+
+    '
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- ParentProcessId
+- SHA256HashData
+- TargetProcessId
+- aid
+- event_platform
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:Rare_Windows_Shell_Parent.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2

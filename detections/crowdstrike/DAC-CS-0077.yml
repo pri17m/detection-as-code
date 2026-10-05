@@ -1,0 +1,48 @@
+id: DAC-CS-0077
+status: experimental
+severity: medium
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: Detects on-host artifacts of the FalconFlank local privilege escalation exploit against the
+  CrowdStrike Falcon sensor (the FALCONFLANK named pipe, the staged bcrypt.dll under Flank
+platforms:
+- crowdstrike
+title: 'Falcon: FalconFlank Exploit Artifacts (Named Pipe and Dropped DLL)'
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1068
+references:
+- https://attack.mitre.org/techniques/T1068/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Crowdstrike_Falcon_0day_Privilege_Escalation_Vulnerability_FalconFlank.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| (\n    CommandLine=/FALCONFLANK|Flanker_|bcrypt\\\
+    .dll/i\n    OR ImageFileName=/\\\\WindowsPowerShell\\\\v1\\.0\\\\/i\n    OR (ParentBaseFileName=/^powershell\\\
+    .exe$/i AND CommandLine=/bcrypt\\.dll/i)\n  )\n| table([aid, ComputerName, UserName, ImageFileName,\
+    \ CommandLine, ParentBaseFileName, TargetProcessId])\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- TargetProcessId
+- UserName
+- aid
+- event_platform
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:Crowdstrike_Falcon_0day_Privilege_Escalation_Vulnerability_FalconFlank.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2

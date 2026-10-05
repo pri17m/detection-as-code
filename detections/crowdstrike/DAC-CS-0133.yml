@@ -1,0 +1,68 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'External NetworkConnectIP4 joined through ContextProcessId to ProcessRollup2 then
+
+  SyntheticProcessRollup2 parent SHA256 for rare-hash egress enrichment.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0133
+query:
+  crowdstrike: '#event_simpleName=NetworkConnectIP4
+
+    | !cidr(RemoteAddressIP4, subnet=["10.0.0.0/8","172.16.0.0/12","192.168.0.0/16","127.0.0.0/8"])
+
+    | !in(RemotePort, values=[53,80,443,123])
+
+    | join({#event_simpleName=ProcessRollup2 | ImageFileName=/\\(powershell|pwsh|cmd|mshta|rundll32|regsvr32)\.exe$/i},
+    key=TargetProcessId, field=ContextProcessId, include=[ImageFileName, CommandLine, ParentBaseFileName,
+    RawProcessId], tip="aid=aid")
+
+    | join({#event_simpleName=SyntheticProcessRollup2}, field=[aid, RawProcessId], include=[SHA256HashData],
+    suffix="Parent")
+
+    | groupBy([aid, ComputerName, RemoteAddressIP4, RemotePort, ImageFileName, CommandLine, ParentBaseFileName,
+    SHA256HashData], function=count())
+
+    '
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1071
+  - T1036
+title: 'Falcon: NetworkConnectIP4 Join SyntheticProcessRollup2 Rare Hash'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1071/
+- https://attack.mitre.org/techniques/T1036/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/External_Connectons_with_Process.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:External_Connectons_with_Process.yml
+- esn:NetworkConnectIP4
+- esn:ProcessRollup2
+- esn:SyntheticProcessRollup2
+severity: medium
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ContextProcessId
+- ImageFileName
+- ParentBaseFileName
+- RawProcessId
+- RemoteAddressIP4
+- RemotePort
+- SHA256HashData
+- TargetProcessId
+- aid

@@ -1,0 +1,50 @@
+id: DAC-CS-0070
+status: experimental
+severity: medium
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: This query counts the execution of discovery / reconnaissance commands.
+platforms:
+- crowdstrike
+title: 'Falcon: Count Windows Discovery Commands'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059
+references:
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/count_windows_discovery_commands.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| ImageFileName=/\\\\(?<FileName>(whoami|ping|net1?|systeminfo|quser|ipconfig)\\\
+    .exe)$/i\n| UserSid=/^S-1-5-21-/\n| case {\n    FileName=/whoami/i | whoami:=\"1\";\n    FileName=/ping/i\
+    \ | ping:=\"1\";\n    FileName=/net1?/i | net:=\"1\";\n    FileName=/systeminfo/i | systeminfo:=\"\
+    1\";\n    FileName=/quser/i | quser:=\"1\";\n    FileName=/ipconfig/i | ipconfig:=\"1\";\n  }\n| groupBy([UserName,\
+    \ UserSid, aid, ComputerName], function=([sum(whoami, as=whoami), sum(ping, as=ping), sum(net, as=net),\
+    \ sum(systeminfo, as=systeminfo), sum(quser, as=quser), sum(ipconfig, as=ipconfig), selectLast([CommandLine,\
+    \ ImageFileName])]), limit=max)\n| totalDiscovery:=whoami+ping+net+systeminfo+quser+ipconfig\n| totalDiscovery>5\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- FileName
+- ImageFileName
+- UserName
+- UserSid
+- aid
+- event_platform
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:count_windows_discovery_commands.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2

@@ -1,0 +1,35 @@
+id: DAC-VMW-0036
+title: vCenter host disconnected
+description: Detects vCenter vpxd HostDisconnectedEvent. Host disconnects can be network faults, maintenance, or an attacker isolating a hypervisor from management.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmware:vclog
+- vmware:vclog:*
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1499
+severity: medium
+false_positives:
+- Expected maintenance, host reboot, or network flaps. Correlate with change windows and physical connectivity.
+references:
+- https://knowledge.broadcom.com/external/article/432327/identifying-audit-and-security-logs-to-f.html
+- https://splunkbase.splunk.com/app/5601
+- https://splunk.github.io/splunk-connect-for-syslog/3.11.0/sources/vendor/VMWare/vsphere/
+telemetry_validated: false
+required_fields:
+- _raw
+tags:
+- vmware
+- vcenter
+- vclog
+query:
+  splunk: '(sourcetype=vmware:vclog OR sourcetype=vmware:vclog:*) (Message="*vim.event.HostDisconnectedEvent*" OR _raw="*vim.event.HostDisconnectedEvent*")
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(_raw) as sample by host
+
+    '

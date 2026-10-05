@@ -1,0 +1,58 @@
+id: DAC-CS-0072
+status: experimental
+severity: medium
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: Detects nslookup activity used for DNS-based staging, specifically targeting the pattern
+  of querying external nameservers to retrieve and execute malicious payloads, as seen in rec
+platforms:
+- crowdstrike
+title: 'Falcon: DNS Staging Detection: ClickFix-Inspired nslookup Execution'
+mitre:
+  tactics:
+  - command-and-control
+  - execution
+  techniques:
+  - T1071.004
+  - T1059.001
+  - T1204.002
+references:
+- https://attack.mitre.org/techniques/T1071/004/
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1204/002/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/dns_staging_detection_clickfix_inspired_nslookup_execution.yml
+query:
+  crowdstrike: '#event_simpleName=ProcessRollup2
+
+    | ImageFileName=/\\nslookup\.exe$/i
+
+    | CommandLine=/(nslookup|n\^s\^l\^o\^o\^k\^u\^p).*(((-q|querytype|type)=?\s*)?(txt|all)).*\|.*findstr.*\|.*for
+    \/f.*\|.*cmd/i
+
+    | ParentBaseFileName!=/^(services|monitoring_agent)\.exe$/i
+
+    | groupBy([ComputerName, UserName, ParentBaseFileName, ImageFileName, CommandLine], limit=max)
+
+    '
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- UserName
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:dns_staging_detection_clickfix_inspired_nslookup_execution.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2

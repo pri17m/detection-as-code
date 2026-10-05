@@ -1,0 +1,63 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'IPv6 NetworkConnectIP6 to non-local destinations joined to ProcessRollup2 for process attribution
+  of
+
+  IPv6 egress.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0113
+query:
+  crowdstrike: '#event_simpleName=NetworkConnectIP6
+
+    | RemoteAddressIP6!=/^::1$|^fe80:/i
+
+    | RemotePort>0
+
+    | join({#event_simpleName=ProcessRollup2 | ImageFileName=/\\(powershell|pwsh|cmd|bash|zsh|python|curl|wget|nc|ncat)\b/i
+    OR ImageFileName=/\/(curl|wget|nc|python|bash|zsh)$/}, key=TargetProcessId, field=ContextProcessId,
+    include=[ImageFileName, CommandLine, ParentBaseFileName], tip="aid=aid")
+
+    | groupBy([aid, ComputerName, RemoteAddressIP6, RemotePort, ImageFileName, CommandLine, ParentBaseFileName],
+    function=count())
+
+    '
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1071
+  - T1571
+title: 'Falcon: NetworkConnectIP6 External Egress with Process'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1071/
+- https://attack.mitre.org/techniques/T1571/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/snowman.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:snowman.yml
+- esn:NetworkConnectIP6
+- esn:ProcessRollup2
+severity: medium
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ContextProcessId
+- ImageFileName
+- ParentBaseFileName
+- RemoteAddressIP6
+- RemotePort
+- TargetProcessId
+- aid

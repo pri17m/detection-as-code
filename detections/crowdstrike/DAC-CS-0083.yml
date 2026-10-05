@@ -1,0 +1,56 @@
+id: DAC-CS-0083
+status: experimental
+severity: medium
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: "RoKRAT Malware \u2013 Injection & Steganography "
+platforms:
+- crowdstrike
+title: 'Falcon: ROKRAT Malware APT 37'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059
+references:
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/ROKRAT_Malware_APT_37.yml
+query:
+  crowdstrike: "case {\n  #event_simpleName=ProcessRollup2\n  | in(field=SHA256HashData, values=[\"3fa06c290c477c133ca58512c7852fc998632721f2dc3a0984f18fbe86451e18\"\
+    ,\"ccb6ca4cb385db50dad2e3b7c68a90ddee62398edb0fd41afdb793287cfbe8e6\",\"9eca7ab62e3ad40b79116ad713462e3ae4d9610345952e5dd279f0b481870d4f\"\
+    ,\"7ee4326c5d0e6a30c1a9bdec045d670758fa1b36477992d61b03cb270113b196\",\"e27467f7fdfa721e917384542ce10cc6108dfd78df14e23872cf8df916e0b8c6\"\
+    ,\"7d514021c472e6e17f587ed30555d3f120653e6c7f8dc25d2331514b92ffd7bc\",\"41d9b6d8cf0fff85bf35327d4b94db629cd9f754c487672911b7f701fe8c5539\"\
+    ,\"6a2d984ef3fa0de9b9feb5f558381201e6dff42ef5efe4867fb24e47c6a2aade\",\"bf7d5020dcd7777509b7b542255814cd61bfb1599d532dd2fdbb50de2ad70bc5\"\
+    ,\"90bf1f20f962d04f8ae3f936d0f9046da28a75fa2fb37f267ff0453f272c60a0\",\"ca56720610400d6da773ffa4cce5b2447d4a665087604c9c6e1c9e71c048ccfc\"\
+    ], ignoreCase=true)\n  | Hit:=\"ROKRAT_hash\";\n  #event_simpleName=ProcessRollup2\n  | ImageFileName=/mspaint\\\
+    .exe/i\n  | in(field=ParentBaseFileName, values=[\"cmd.exe\",\"powershell.exe\"], ignoreCase=true)\n\
+    \  | Hit:=\"mspaint_from_shell\";\n  #event_simpleName=DnsRequest\n  | in(field=DomainName, values=[\"\
+    api.dropboxapi.com\",\"dropboxapi.com\",\"cloud-api.yandex.net\",\"api.pcloud.com\"], ignoreCase=true)\n\
+    \  | (ContextBaseFileName=/mspaint\\.exe/i OR ContextBaseFileName=/notepad\\.exe/i OR ContextBaseFileName=/rundll32\\\
+    .exe/i)\n  | Hit:=\"ROKRAT_dns\";\n}\n| groupBy([ComputerName, Hit, ImageFileName, CommandLine, DomainName,\
+    \ ContextBaseFileName, ParentBaseFileName, SHA256HashData], function=count())\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ContextBaseFileName
+- DomainName
+- ImageFileName
+- ParentBaseFileName
+- SHA256HashData
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:ROKRAT_Malware_APT_37.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2
+- esn:DnsRequest

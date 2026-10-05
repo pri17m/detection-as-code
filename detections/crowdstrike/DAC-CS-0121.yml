@@ -1,0 +1,61 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'RegGenericValue modifications under Run/RunOnce/Winlogon/AppInit_DLLs/Image File Execution
+  Options
+
+  persistence paths, excluding common benign value names.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0121
+query:
+  crowdstrike: '#event_simpleName=RegGenericValue
+
+    | RegObjectName=/\\(CurrentVersion\\Run|CurrentVersion\\RunOnce|Winlogon|AppInit_DLLs|Image File Execution
+    Options)\\/i
+
+    | RegValueName!=/^(ctfmon|SecurityHealth|OneDriveSetup|Steam|Discord|Skype|Spotify)$/i
+
+    | RegStringValue=/(\.exe|\\\\|%|[A-Za-z]:\\)/i
+
+    | groupBy([aid, ComputerName, RegObjectName, RegValueName, RegStringValue], function=count())
+
+    '
+mitre:
+  tactics:
+  - persistence
+  - defense-evasion
+  techniques:
+  - T1547.001
+  - T1112
+  - T1546.008
+  - T1546.010
+title: 'Falcon: Suspicious ASEP Registry via RegGenericValue'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1547/001/
+- https://attack.mitre.org/techniques/T1112/
+- https://attack.mitre.org/techniques/T1546/008/
+- https://attack.mitre.org/techniques/T1546/010/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Suspicious_Registry_Modifications.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Suspicious_Registry_Modifications.yml
+- esn:RegGenericValue
+severity: high
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- RegObjectName
+- RegStringValue
+- RegValueName
+- aid

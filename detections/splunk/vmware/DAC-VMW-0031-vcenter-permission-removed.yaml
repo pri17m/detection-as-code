@@ -1,0 +1,35 @@
+id: DAC-VMW-0031
+title: vCenter permission removed
+description: Detects vCenter vpxd PermissionRemovedEvent. Removals can be legitimate cleanup or an attacker covering tracks after misuse.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmware:vclog
+- vmware:vclog:*
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098
+severity: medium
+false_positives:
+- vCenter administrators creating or adjusting roles and permissions during change windows. Confirm the actor and the target object.
+references:
+- https://knowledge.broadcom.com/external/article/432327/identifying-audit-and-security-logs-to-f.html
+- https://splunkbase.splunk.com/app/5601
+- https://splunk.github.io/splunk-connect-for-syslog/3.11.0/sources/vendor/VMWare/vsphere/
+telemetry_validated: false
+required_fields:
+- _raw
+tags:
+- vmware
+- vcenter
+- vclog
+query:
+  splunk: '(sourcetype=vmware:vclog OR sourcetype=vmware:vclog:*) (Message="*vim.event.PermissionRemovedEvent*" OR _raw="*vim.event.PermissionRemovedEvent*")
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(_raw) as sample by host
+
+    '

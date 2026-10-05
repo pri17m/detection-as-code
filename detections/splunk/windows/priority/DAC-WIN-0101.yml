@@ -42,8 +42,7 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security` EventCode=4662
+  splunk: '`windows_security` EventCode=4662
 
     | eval SubjectUserName=coalesce(SubjectUserName, Account_Name, user)
 
@@ -54,7 +53,7 @@ query:
     | eval ObjectName=coalesce(ObjectName, ObjectDN, Object_Name)
 
     | search (Properties="*1131f6aa-9c07-11d1-f79f-00c04fc2dcd2*" OR Properties="*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2*"
-    OR Properties="*89e95b76-444d-4c62-991a-0bb64e7babf0*")
+    OR Properties="*89e95b76-444d-4c62-991a-0facbeda640c*")
 
     | search NOT SubjectUserName="*$"
 

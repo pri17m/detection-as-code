@@ -1,0 +1,50 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'CommandHistory containing encoded PowerShell (-enc/-encodedcommand), FromBase64String, or
+  IEX
+
+  cradles.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0116
+query:
+  crowdstrike: '#event_simpleName=CommandHistory
+
+    | CommandHistory=/(-enc(odedcommand)?\b|-e\s+[A-Za-z0-9+\/=]{20,}|FromBase64String|Invoke-Expression|\bIEX\b)/i
+
+    | groupBy([aid, ComputerName, CommandHistory], function=count())
+
+    '
+mitre:
+  tactics:
+  - execution
+  - defense-evasion
+  techniques:
+  - T1059.001
+  - T1027
+title: 'Falcon: Encoded or Obfuscated CommandHistory'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1027/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Command_History_with_Process_Tree.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Command_History_with_Process_Tree.yml
+- esn:CommandHistory
+severity: high
+required_fields:
+- '#event_simpleName'
+- CommandHistory
+- ComputerName
+- aid
