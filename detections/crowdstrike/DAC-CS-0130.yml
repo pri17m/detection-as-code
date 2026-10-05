@@ -1,0 +1,56 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'ProcessBlocked OR ProcessRollup2 for certutil.exe with URLCache/decode/http CommandLine.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0130
+query:
+  crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+
+    | event_platform=Win
+
+    | ImageFileName=/\\certutil\.exe$/i
+
+    | CommandLine=/(urlcache|verifyctl|-decode|-encode|https?:\/\/)/i
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName, #event_simpleName],
+    function=count())
+
+    '
+mitre:
+  tactics:
+  - defense-evasion
+  - command-and-control
+  techniques:
+  - T1105
+  - T1140
+title: 'Falcon: ProcessBlocked Certutil Download Pattern'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1105/
+- https://attack.mitre.org/techniques/T1140/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/LOLBin_Certutil.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:LOLBin_Certutil.yml
+- esn:ProcessBlocked
+- esn:ProcessRollup2
+severity: high
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- aid
+- event_platform

@@ -1,0 +1,58 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Surfaces UserLogon events where UserIsAdmin=1 and LogonType is Interactive (2) or RemoteInteractive
+
+  (10) for privileged session monitoring.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0102
+query:
+  crowdstrike: '#event_simpleName=UserLogon
+
+    | UserSid=/^S-1-5-21-/
+
+    | UserIsAdmin=1
+
+    | in(LogonType, values=["2","10"])
+
+    | groupBy([aid, ComputerName, UserName, UserSid, LogonType, UserIsAdmin], function=[count(), max(PasswordLastSet,
+    as=PasswordLastSet)])
+
+    '
+mitre:
+  tactics:
+  - privilege-escalation
+  - lateral-movement
+  techniques:
+  - T1078
+  - T1021.001
+title: 'Falcon: Admin Interactive or RDP Logon Details'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1078/
+- https://attack.mitre.org/techniques/T1021/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/user_logon_details__time__type__location__last_password_change_.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:user_logon_details__time__type__location__last_password_change_.yml
+- esn:UserLogon
+severity: low
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- LogonType
+- PasswordLastSet
+- UserIsAdmin
+- UserName
+- UserSid
+- aid

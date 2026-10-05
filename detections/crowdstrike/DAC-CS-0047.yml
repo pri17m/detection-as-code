@@ -1,31 +1,60 @@
-author: Detection Engineer
-references:
-- https://attack.mitre.org/techniques/T1490/
-title: 'Falcon: bcdedit disable recovery'
-description: bcdedit recoveryenabled no
-severity: high
+sourcetypes:
+- falcon:process
 telemetry_validated: false
-platforms:
-- crowdstrike
 required_fields:
-- ImageFileName
+- '#event_simpleName'
 - CommandLine
+- ComputerName
+- ImageFileName
 - ParentBaseFileName
-false_positives:
-- Tune after baselining; experimental sketch may be noisy.
-id: DAC-CS-0047
+- UserName
+- aid
+- event_platform
 status: experimental
+author: DaC
+description: Detects ransomware recovery-inhibition precursors including bcdedit recoveryenabled/bootstatuspolicy
+  tamper, vssadmin/wmic shadow delete, wbadmin backup delete, and fsutil USN deletejournal. Primary port
+  of Query-Hub ransomware_precursors (T1490); keeps prior bcdedit IOA intent.
 tags:
 - wave-a
 - P0
-query:
-  crowdstrike: 'ImageFileName="bcdedit.exe" AND CommandLine CONTAINS_ANY ["recoveryenabled","bootstatuspolicy"]
-
-    '
-sourcetypes:
-- falcon:process
+- enhance-tp
+- tp-quality-v2
+- processrollup2
+- esn:ProcessRollup2
+- qh:ransomware_precursors.yml
+- qh:shadow_mcp_server_activity_via_common_runtime_interpreters.yml
 mitre:
   tactics:
   - impact
   techniques:
   - T1490
+id: DAC-CS-0047
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| CmdLower := lower(CommandLine)\n\
+    | case {\n    ImageFileName=/\\\\vssadmin\\.exe$/i AND CmdLower=/delete\\s+shadows/\n      | Hypothesis\
+    \ := \"H1_VSSADMIN_SHADOW_DELETE\";\n    ImageFileName=/\\\\vssadmin\\.exe$/i AND CmdLower=/resize\\\
+    s+shadowstorage/\n      | Hypothesis := \"H2_VSSADMIN_SHADOWSTORAGE_RESIZE\";\n    ImageFileName=/\\\
+    \\wmic\\.exe$/i AND CmdLower=/shadowcopy/ AND CmdLower=/delete/\n      | Hypothesis := \"H3_WMIC_SHADOW_DELETE\"\
+    ;\n    ImageFileName=/\\\\(powershell|powershell_ise|pwsh)\\.exe$/i\n      AND CmdLower=/win32_shadowcopy|get-wmiobject.{0,40}shadowcopy|get-ciminstance.{0,40}shadowcopy/\n\
+    \      AND CmdLower=/delete|remove/\n      | Hypothesis := \"H4_POWERSHELL_SHADOW_DELETE\";\n    ImageFileName=/\\\
+    \\wbadmin\\.exe$/i AND CmdLower=/delete\\s+(catalog|systemstatebackup|backup)/\n      | Hypothesis\
+    \ := \"H5_WBADMIN_BACKUP_DELETE\";\n    ImageFileName=/\\\\bcdedit\\.exe$/i\n      AND CmdLower=/recoveryenabled\\\
+    s+(no|off)|bootstatuspolicy\\s+ignoreallfailures/\n      | Hypothesis := \"H6_BCDEDIT_RECOVERY_TAMPER\"\
+    ;\n    ImageFileName=/\\\\fsutil\\.exe$/i AND CmdLower=/usn\\s+deletejournal/\n      | Hypothesis\
+    \ := \"H7_FSUTIL_USN_DELETE\";\n    ImageFileName=/\\\\(node|npx|python|python3|uv|uvx|docker)(\\\
+    .exe|\\.cmd)?$/i\n      AND CommandLine=/(server-filesystem|server-github|server-postgres|server-sqlite|server-puppeteer|server-brave|modelcontext|\\\
+    bmcp\\b)/i\n      | Hypothesis := \"H8_SHADOW_MCP_RUNTIME\";\n    * | Hypothesis := \"NO_MATCH\";\n\
+    \  }\n| Hypothesis != \"NO_MATCH\"\n| groupBy([aid, ComputerName, Hypothesis, ImageFileName, CommandLine,\
+    \ ParentBaseFileName, UserName], function=count())\n"
+severity: high
+title: 'Falcon: bcdedit disable recovery'
+false_positives:
+- "Backup/DR admins deleting shadow copies or toggling recovery \u2014 allowlist change windows and parents."
+- Disk-maintenance fsutil USN operations; tune Confidence/Hypothesis before promote.
+platforms:
+- crowdstrike
+references:
+- https://attack.mitre.org/techniques/T1490/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/ransomware_precursors.yml
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/shadow_mcp_server_activity_via_common_runtime_interpreters.yml

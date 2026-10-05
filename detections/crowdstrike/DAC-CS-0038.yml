@@ -1,32 +1,54 @@
-author: Detection Engineer
-references:
-- https://attack.mitre.org/techniques/T1047/
-title: 'Falcon: wmic process call create'
-description: wmic process call
-severity: high
+sourcetypes:
+- falcon:process
 telemetry_validated: false
-platforms:
-- crowdstrike
 required_fields:
-- ImageFileName
+- '#event_simpleName'
 - CommandLine
+- ComputerName
+- ImageFileName
 - ParentBaseFileName
-false_positives:
-- Tune after baselining; experimental sketch may be noisy.
-id: DAC-CS-0038
+- aid
+- event_platform
 status: experimental
+author: DaC
+description: Detects wmic.exe process call create (remote/local process creation via WMI). Query-Hub LOLBin_WMIC
+  ImageFileName gate plus concrete CommandLine predicate from prior IOA intent (avoids ImageFileName-only
+  weakness).
 tags:
 - wave-a
 - P0
 - parity:DAC-WIN-0113
-query:
-  crowdstrike: 'ImageFileName="wmic.exe" AND CommandLine CONTAINS "process call create"
-
-    '
-sourcetypes:
-- falcon:process
+- enhance-tp
+- tp-quality-v2
+- processrollup2
+- esn:ProcessRollup2
+- esn:ProcessBlocked
+- qh:LOLBin_WMIC.yml
 mitre:
   tactics:
   - execution
   techniques:
   - T1047
+id: DAC-CS-0038
+query:
+  crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+
+    | event_platform=Win
+
+    | ImageFileName=/wmic\.exe$/i
+
+    | CommandLine=/process\s+call\s+create/i
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
+
+    '
+severity: high
+title: 'Falcon: wmic process call create'
+false_positives:
+- "Legitimate admin/WMI automation using process call create \u2014 allowlist known management parents."
+- Monitoring agents; baseline CommandLine before promote.
+platforms:
+- crowdstrike
+references:
+- https://attack.mitre.org/techniques/T1047/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/LOLBin_WMIC.yml

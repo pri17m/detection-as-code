@@ -1,0 +1,50 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'ClassifiedModuleLoad where ModuleLoadTelemetryClassification indicates ORIGINAL_FILENAME_MISMATCH
+
+  (256) or combined first-load+mismatch (257).
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0126
+query:
+  crowdstrike: '#event_simpleName=ClassifiedModuleLoad
+
+    | in(ModuleLoadTelemetryClassification, values=[256,257])
+
+    | groupBy([aid, ComputerName, FileName, ImageFileName, ModuleLoadTelemetryClassification], function=count())
+
+    '
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1036
+  - T1574.002
+title: 'Falcon: ClassifiedModuleLoad Original Filename Mismatch'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1036/
+- https://attack.mitre.org/techniques/T1574/002/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Dll-Side_Loading_Detection_Query.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Dll-Side_Loading_Detection_Query.yml
+- esn:ClassifiedModuleLoad
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- FileName
+- ImageFileName
+- ModuleLoadTelemetryClassification
+- aid

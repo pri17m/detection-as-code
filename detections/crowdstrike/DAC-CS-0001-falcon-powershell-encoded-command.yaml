@@ -1,30 +1,63 @@
-id: DAC-CS-0001
-title: 'Falcon: PowerShell encoded command'
-description: Detects PowerShell executions using encoded command patterns (Custom
-  IOA candidate).
-author: DaC
-status: experimental
-platforms:
-- crowdstrike
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- aid
+- event_platform
+status: experimental
+author: DaC
+description: Detects PowerShell executions using encoded command patterns (-e/-enc/-encodedcommand), with
+  CI-safe base64 extract via regexExtract (no splitString index). Ported from Query-Hub Detect_and_Decode
+  / Suspicious_PowerShell / length-anomaly ImageFileName gates.
+tags:
+- enhance-tp
+- tp-quality-v2
+- processrollup2
+- esn:ProcessRollup2
+- esn:ProcessBlocked
+- qh:Detect_and_Decode_Base64-Encoded_PowerShell_Commands.yml
+- qh:Detect_and_Decode_Base64-Encoded_PowerShell_Commands-http.yml
+- qh:Suspicious_PowerShell_Execution.yml
+- qh:Hunting_Powershell_Command_Length_Anomaly.yml
+- qh:applications_spawning_cmd_or_powershell.yml
 mitre:
   tactics:
   - execution
   techniques:
   - T1059.001
-severity: high
-false_positives:
-- Legitimate automation; tune by parent process or signer.
-references:
-- https://www.crowdstrike.com/
-telemetry_validated: false
-required_fields:
-- ImageFileName
-- CommandLine
-- ParentBaseFileName
+id: DAC-CS-0001
 query:
-  crowdstrike: 'falcon_ioa_pattern: ImageFileName in ["powershell.exe","pwsh.exe"]
-    AND CommandLine CONTAINS_ANY ["-enc","-encodedcommand"]
+  crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+
+    | event_platform=Win
+
+    | ImageFileName=/\\(powershell(_ise)?|pwsh)\.exe$/i
+
+    | CommandLine=/\s-([eE^]{1,2}|[eE][nN][cC]|[eE][nN][cC][oO][dD][eE][dD]([cC][oO][mM][mM][aA][nN][dD])?)\s/i
+
+    | EncodedString := regexExtract("CommandLine", regex="(?i)-(?:e|enc|encoded|encodedcommand)\\s+([A-Za-z0-9+/=]{20,})")
+
+    | cmdLength := length(CommandLine)
+
+    | cmdLength > 40
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
 
     '
+severity: high
+title: 'Falcon: PowerShell encoded command'
+false_positives:
+- "Legitimate automation and software installers using encoded PowerShell \u2014 baseline ParentBaseFileName/signer\
+  \ before promote."
+- Admin scripts with -EncodedCommand for Unicode-safe payloads; tune allowlists by aid or parent.
+platforms:
+- crowdstrike
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Detect_and_Decode_Base64-Encoded_PowerShell_Commands.yml
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Suspicious_PowerShell_Execution.yml
