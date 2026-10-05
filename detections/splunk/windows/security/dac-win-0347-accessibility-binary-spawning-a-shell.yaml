@@ -1,6 +1,12 @@
 id: DAC-WIN-0347
 title: accessibility binary spawning a shell
-description: "Detects sethc, utilman, osk, magnify, or narrator spawning cmd or PowerShell. That is the execution half of an accessibility-feature backdoor. Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  If an accessibility binary such as sethc or utilman starts cmd or PowerShell, the sticky-keys
+  backdoor is in use (T1546.008). A hit is that parent-child pair. Explorer starting cmd does not
+  match. Telemetry is Windows Security 4688 or Sysmon event 1. Classic and XML field names are
+  coalesced (CommandLine, NewProcessName, Image, ParentProcessName). Offline command-line samples
+  were replayed: the documented malicious lines match and the documented benign lines do not.
+  telemetry_validated stays false until this search is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

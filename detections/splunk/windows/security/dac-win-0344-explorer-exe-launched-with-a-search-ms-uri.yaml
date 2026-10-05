@@ -1,6 +1,13 @@
 id: DAC-WIN-0344
 title: explorer.exe launched with a search-ms URI
-description: "Detects explorer.exe started with a search-ms: URI, which opens a remote search window used in phishing. Normal Explorer path launches do not match. Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  explorer.exe started with a search-ms: URI opens a Windows Search window, often pointed at a
+  remote share, which phishing has used as the lure (T1204.001). A hit is explorer.exe plus that
+  URI. Opening a folder path does not match. Telemetry is Windows Security 4688 or Sysmon event 1.
+  Classic and XML field names are coalesced (CommandLine, NewProcessName, Image,
+  ParentProcessName). Offline command-line samples were replayed: the documented malicious lines
+  match and the documented benign lines do not. telemetry_validated stays false until this search
+  is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

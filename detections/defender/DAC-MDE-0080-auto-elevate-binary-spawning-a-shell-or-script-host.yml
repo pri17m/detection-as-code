@@ -1,6 +1,13 @@
 id: DAC-MDE-0080
 title: auto-elevate binary spawning a shell or script host
-description: "DeviceProcessEvents where fodhelper, computerdefaults, sdclt, or eventvwr starts cmd, PowerShell, wscript, cscript, mshta, rundll32, or regsvr32. mmc and SystemSettings children are not in the list. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  fodhelper, computerdefaults, sdclt, and eventvwr are auto-elevate binaries. The UAC bypass
+  (T1548.002) is visible when one of them starts cmd, PowerShell, wscript, cscript, mshta,
+  rundll32, or regsvr32. eventvwr starting mmc, and fodhelper starting SystemSettings, do not
+  match. Telemetry is Defender Advanced Hunting DeviceProcessEvents: FileName, ProcessCommandLine,
+  and InitiatingProcessFileName. Offline command-line samples were replayed: the documented
+  malicious lines match and the documented benign lines do not. telemetry_validated stays false
+  until this search is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

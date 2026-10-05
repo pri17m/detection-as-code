@@ -1,6 +1,13 @@
 id: DAC-WIN-0339
 title: IFEO debugger on an accessibility binary
-description: "Sysmon 13 Debugger value under Image File Execution Options for sethc, utilman, osk, magnify, narrator, displayswitch, or atbroker. Other IFEO keys, including notepad, do not match. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  Setting the Debugger value under Image File Execution Options makes Windows launch that debugger
+  instead of sethc, utilman, osk, magnify, narrator, displayswitch, or atbroker. At the logon
+  screen that yields a SYSTEM shell (T1546.008). A hit is that Debugger value on one of those
+  binaries. An IFEO key for notepad, or GlobalFlag on sethc, does not match. Telemetry is Sysmon
+  event 13, a registry value set. The search keys off TargetObject, Details, and Image. Offline
+  command-line samples were replayed: the documented malicious lines match and the documented
+  benign lines do not. telemetry_validated stays false until this search is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

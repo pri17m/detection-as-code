@@ -1,6 +1,14 @@
 id: DAC-WIN-0336
 title: esentutl copy of NTDS or registry hive
-description: "Detects esentutl.exe /y copy mode aimed at ntds.dit, the NTDS directory, a VSS copy, or the SAM/SYSTEM/SECURITY hives under config\\. Bare system32 paths are not enough. Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  esentutl.exe /y copies a database, including a locked file when /vss is set. Attackers use it to
+  copy ntds.dit or the SAM, SYSTEM, and SECURITY hives (T1003.003). A hit requires /y and one of
+  those targets. Repair mode (/r) and copies of an ordinary mailbox .edb do not match, and a bare
+  System32 path is not treated as the SYSTEM hive. Telemetry is Windows Security 4688 or Sysmon
+  event 1. Classic and XML field names are coalesced (CommandLine, NewProcessName, Image,
+  ParentProcessName). Offline command-line samples were replayed: the documented malicious lines
+  match and the documented benign lines do not. telemetry_validated stays false until this search
+  is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

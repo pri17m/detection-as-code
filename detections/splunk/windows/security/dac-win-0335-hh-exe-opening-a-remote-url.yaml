@@ -1,6 +1,13 @@
 id: DAC-WIN-0335
 title: hh.exe opening a remote URL
-description: "Detects hh.exe (HTML Help) launched with an http, https, or ftp URL. Local CHM opens are ignored. Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  hh.exe is HTML Help. Opening a local CHM is normal. Opening an http, https, or ftp URL lets it
+  fetch a remote CHM or script (T1218.001). A hit requires the image to be hh.exe and the command
+  line to contain one of those URL schemes. A path such as C:\Windows\Help\aclui.chm does not
+  match. Telemetry is Windows Security 4688 or Sysmon event 1. Classic and XML field names are
+  coalesced (CommandLine, NewProcessName, Image, ParentProcessName). Offline command-line samples
+  were replayed: the documented malicious lines match and the documented benign lines do not.
+  telemetry_validated stays false until this search is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

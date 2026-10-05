@@ -1,6 +1,12 @@
 id: DAC-WIN-0343
 title: msdt invoked via the ms-msdt protocol
-description: "Detects msdt.exe launched with the ms-msdt: protocol handler used by the Follina diagnostic abuse. Ordinary troubleshooter launches of msdt.exe /id are ignored. Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  CVE-2022-30190 (Follina) launches msdt.exe through the ms-msdt: protocol (T1203). A hit requires
+  that protocol string. The normal troubleshooter command msdt.exe /id PCWDiagnostic does not
+  match. Telemetry is Windows Security 4688 or Sysmon event 1. Classic and XML field names are
+  coalesced (CommandLine, NewProcessName, Image, ParentProcessName). Offline command-line samples
+  were replayed: the documented malicious lines match and the documented benign lines do not.
+  telemetry_validated stays false until this search is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

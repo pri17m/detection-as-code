@@ -1,6 +1,13 @@
 id: DAC-WIN-0342
 title: wsl.exe running curl, wget, or a /dev/tcp redirect
-description: "Detects wsl.exe whose command line combines curl or wget with an http(s) URL, or a /dev/tcp redirect. Plain wsl status and listing commands do not match. Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  wsl.exe can run a Linux command from a Windows process creation event (T1059.004). A hit is
+  wsl.exe whose command line pairs curl or wget with http(s), or contains /dev/tcp/. wsl --status
+  and wsl -l do not match. Curl inside an already-running distro is a different event and is not
+  this rule. Telemetry is Windows Security 4688 or Sysmon event 1. Classic and XML field names are
+  coalesced (CommandLine, NewProcessName, Image, ParentProcessName). Offline command-line samples
+  were replayed: the documented malicious lines match and the documented benign lines do not.
+  telemetry_validated stays false until this search is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

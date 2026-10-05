@@ -1,6 +1,13 @@
 id: DAC-WIN-0346
 title: auto-elevate binary spawning a shell or script host
-description: "Detects fodhelper, computerdefaults, sdclt, or eventvwr spawning cmd, PowerShell, wscript, cscript, mshta, rundll32, or regsvr32. eventvwr spawning mmc, and fodhelper spawning SystemSettings, do not match. Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  fodhelper, computerdefaults, sdclt, and eventvwr are auto-elevate binaries. The UAC bypass
+  (T1548.002) is visible when one of them starts cmd, PowerShell, wscript, cscript, mshta,
+  rundll32, or regsvr32. eventvwr starting mmc, and fodhelper starting SystemSettings, do not
+  match. Telemetry is Windows Security 4688 or Sysmon event 1. Classic and XML field names are
+  coalesced (CommandLine, NewProcessName, Image, ParentProcessName). Offline command-line samples
+  were replayed: the documented malicious lines match and the documented benign lines do not.
+  telemetry_validated stays false until this search is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

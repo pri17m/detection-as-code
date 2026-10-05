@@ -1,6 +1,13 @@
 id: DAC-MDE-0079
 title: Add-MpPreference exclusion
-description: "DeviceProcessEvents for powershell.exe or pwsh.exe calling Add-MpPreference with ExclusionPath, ExclusionProcess, ExclusionExtension, or ExclusionIpAddress. DisableRealtimeMonitoring is a separate rule. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  Add-MpPreference can add a path, process, extension, or IP exclusion so Defender stops scanning
+  it (T1562.001). A hit is powershell.exe or pwsh.exe with Add-MpPreference and one of those
+  exclusion parameters. Set-MpPreference -DisableRealtimeMonitoring is a different rule and does
+  not match here. Telemetry is Defender Advanced Hunting DeviceProcessEvents: FileName,
+  ProcessCommandLine, and InitiatingProcessFileName. Offline command-line samples were replayed:
+  the documented malicious lines match and the documented benign lines do not. telemetry_validated
+  stays false until this search is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

@@ -1,6 +1,13 @@
 id: DAC-CS-0217
 title: auto-elevate binary spawning a shell or script host
-description: "ProcessRollup2 where ParentBaseFileName is fodhelper, computerdefaults, sdclt, or eventvwr and the child is a shell or script host. ParentBaseFileName is the base name, not a path. mmc is not a child. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  fodhelper, computerdefaults, sdclt, and eventvwr are auto-elevate binaries. The UAC bypass
+  (T1548.002) is visible when one of them starts cmd, PowerShell, wscript, cscript, mshta,
+  rundll32, or regsvr32. eventvwr starting mmc, and fodhelper starting SystemSettings, do not
+  match. Telemetry is Falcon ProcessRollup2 and ProcessBlocked on event_platform=Win.
+  ImageFileName is the full path. ParentBaseFileName is the parent file name only. Offline
+  command-line samples were replayed: the documented malicious lines match and the documented
+  benign lines do not. telemetry_validated stays false until this search is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

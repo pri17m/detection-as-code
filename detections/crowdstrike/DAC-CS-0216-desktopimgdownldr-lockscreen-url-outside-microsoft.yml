@@ -1,6 +1,15 @@
 id: DAC-CS-0216
 title: desktopimgdownldr lockscreen URL outside Microsoft
-description: "ProcessRollup2 for desktopimgdownldr.exe /lockscreenurl excluding Microsoft Spotlight hosts. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  desktopimgdownldr.exe downloads a lock-screen image. Windows Spotlight calls Microsoft hosts.
+  The LOLBAS abuse points /lockscreenurl at an attacker host (T1105). A hit is this image plus
+  lockscreenurl, unless the host is microsoft.com, windows.com, live.com, bing.com, msn.com,
+  azureedge.net, or microsoftonline.com, including subdomains. A lookalike such as
+  microsoft.com.evil.test still matches. Telemetry is Falcon ProcessRollup2 and ProcessBlocked on
+  event_platform=Win. ImageFileName is the full path. ParentBaseFileName is the parent file name
+  only. Offline command-line samples were replayed: the documented malicious lines match and the
+  documented benign lines do not. telemetry_validated stays false until this search is replayed on
+  a tenant.
 author: Detection Engineer
 status: experimental
 platforms:

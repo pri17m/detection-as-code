@@ -1,6 +1,12 @@
 id: DAC-CS-0221
 title: msdt invoked via the ms-msdt protocol
-description: "ProcessRollup2 for msdt.exe with ms-msdt:. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+description: >-
+  CVE-2022-30190 (Follina) launches msdt.exe through the ms-msdt: protocol (T1203). A hit requires
+  that protocol string. The normal troubleshooter command msdt.exe /id PCWDiagnostic does not
+  match. Telemetry is Falcon ProcessRollup2 and ProcessBlocked on event_platform=Win.
+  ImageFileName is the full path. ParentBaseFileName is the parent file name only. Offline
+  command-line samples were replayed: the documented malicious lines match and the documented
+  benign lines do not. telemetry_validated stays false until this search is replayed on a tenant.
 author: Detection Engineer
 status: experimental
 platforms:
