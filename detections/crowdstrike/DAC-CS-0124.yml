@@ -1,0 +1,53 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Detects DriverLoad of commonly abused vulnerable drivers (gdrv.sys, msio64.sys, physmem.sys,
+
+  mhyprot2.sys, etc.). TerminateProcess join deferred (THIN ESN).
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0124
+query:
+  crowdstrike: '#event_simpleName=DriverLoad event_platform=Win
+
+    | in(field=FileName, values=["gdrv.sys","msio64.sys","ntiolib.sys","kprocesshacker.sys","physmem.sys","dbk64.sys","procexp152.sys","AsrDrv104.sys","mhyprot2.sys","capcom.sys","iqvw64e.sys","RTCore64.sys"],
+    ignoreCase=true)
+
+    | groupBy([aid, ComputerName, FileName, FilePath, ImageFileName], function=count())
+
+    '
+mitre:
+  tactics:
+  - privilege-escalation
+  - defense-evasion
+  techniques:
+  - T1068
+  - T1014
+title: 'Falcon: BYOVD Known Vulnerable DriverLoad'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1068/
+- https://attack.mitre.org/techniques/T1014/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/byovd_driver_load_with_edr_av_process_termination_medusa_ransomware.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:byovd_driver_load_with_edr_av_process_termination_medusa_ransomware.yml
+- esn:DriverLoad
+severity: critical
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- FileName
+- FilePath
+- ImageFileName
+- aid
+- event_platform

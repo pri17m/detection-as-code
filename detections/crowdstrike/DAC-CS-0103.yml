@@ -1,0 +1,54 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Detects UserIdentity events with LogonType=3 (Network) excluding well-known service accounts,
+
+  aggregated for lateral-movement baselines.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0103
+query:
+  crowdstrike: '#event_simpleName=UserIdentity
+
+    | LogonType=3
+
+    | UserName!=/^SYSTEM$|^LOCAL SERVICE$|^NETWORK SERVICE$/i
+
+    | groupBy([aid, ComputerName, UserName, LogonDomain, LogonType], function=count())
+
+    | _count>20
+
+    '
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021.002
+  - T1078
+title: 'Falcon: Network Logon Type 3 via UserIdentity'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1021/002/
+- https://attack.mitre.org/techniques/T1078/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/remote_interactive_logons__rdp_.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:remote_interactive_logons__rdp_.yml
+- esn:UserIdentity
+severity: low
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- LogonDomain
+- LogonType
+- UserName
+- aid

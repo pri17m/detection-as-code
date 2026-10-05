@@ -1,0 +1,51 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Detects CommandHistory entries containing Invoke-WebRequest, Net.WebClient, or Start-BitsTransfer
+
+  download patterns.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0115
+query:
+  crowdstrike: '#event_simpleName=CommandHistory
+
+    | CommandHistory=/(Invoke-WebRequest|Invoke-RestMethod|Net\.WebClient|Start-BitsTransfer|DownloadString|DownloadFile)/i
+
+    | regexExtract("(?<URL>https?://[^''\"\\s]+)", field=CommandHistory)
+
+    | groupBy([aid, ComputerName, CommandHistory, URL], function=count())
+
+    '
+mitre:
+  tactics:
+  - execution
+  - command-and-control
+  techniques:
+  - T1059.001
+  - T1105
+title: 'Falcon: PowerShell Downloads via CommandHistory'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1105/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Powershell_Downloads.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Powershell_Downloads.yml
+- esn:CommandHistory
+severity: high
+required_fields:
+- '#event_simpleName'
+- CommandHistory
+- ComputerName
+- aid

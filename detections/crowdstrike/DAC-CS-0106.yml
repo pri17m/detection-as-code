@@ -1,0 +1,53 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Detects DNS resolutions to common remote monitoring and management (RMM) vendor domains
+  (AnyDesk,
+
+  TeamViewer, ScreenConnect, RustDesk, etc.).
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0106
+query:
+  crowdstrike: '#event_simpleName=DnsRequest
+
+    | DomainName=/anydesk\.com|action1\.com|rustdesk\.com|teamviewer\.com|screenconnect\.com|fixme\.it|splashtop\.com|bomgar\.com|beyondtrust\.com|logmein\.com|getscreen\.me|dwservice\.net|fleetdeck\.io|tailscale\.com|n-able\.com|datto\.com|pulseway\.com/i
+
+    | groupBy([DomainName, ContextBaseFileName], function=[count(aid, distinct=true, as=HostCount), collect([ComputerName],
+    limit=20)])
+
+    | sort(HostCount, order=asc)
+
+    '
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1219
+  - T1219.002
+title: 'Falcon: RMM Tool DNS Resolutions'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1219/
+- https://attack.mitre.org/techniques/T1219/002/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/detect_rmm_dns.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:detect_rmm_dns.yml
+- esn:DnsRequest
+severity: medium
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- ContextBaseFileName
+- DomainName
+- aid

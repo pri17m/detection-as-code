@@ -1,0 +1,52 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Identifies DNS requests to common generative-AI service domains for shadow-IT and data-exfiltration
+
+  monitoring.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0105
+query:
+  crowdstrike: '#event_simpleName=DnsRequest
+
+    | DomainName=/(openai\.com|chatgpt\.com|anthropic\.com|claude\.ai|gemini\.google\.com|bard\.google\.com|copilot\.microsoft\.com|perplexity\.ai|mistral\.ai|huggingface\.co|midjourney\.com|stability\.ai|cohere\.ai|grok\.x\.ai|x\.ai|deepseek\.ai|cursor\.so)/i
+
+    | groupBy([DomainName, ComputerName, event_platform, aid], function=count())
+
+    | sort(field=_count, type=number, order=desc)
+
+    '
+mitre:
+  tactics:
+  - exfiltration
+  - command-and-control
+  techniques:
+  - T1048
+  - T1071.004
+title: 'Falcon: GenAI Service DNS Usage'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1048/
+- https://attack.mitre.org/techniques/T1071/004/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/GenAI_Usage.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:GenAI_Usage.yml
+- esn:DnsRequest
+severity: low
+required_fields:
+- '#event_simpleName'
+- ComputerName
+- DomainName
+- aid
+- event_platform

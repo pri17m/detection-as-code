@@ -1,0 +1,51 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'Joins CommandHistory to ProcessRollup2 on aid+TargetProcessId to attribute shell history
+  to parent
+
+  to child execution chains. Avoids splitString named-index-arg.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0117
+query:
+  crowdstrike: "in(#event_simpleName, values=[\"CommandHistory\",\"ProcessRollup2\"])\n| event_platform=Win\n\
+    | selfJoinFilter(field=[aid, TargetProcessId], where=[{#event_simpleName=ProcessRollup2}, {#event_simpleName=CommandHistory}])\n\
+    | case {\n    #event_simpleName=CommandHistory | CommandHistory=/.+/ ;\n    #event_simpleName=ProcessRollup2\
+    \ | ImageFileName=/\\\\(powershell|pwsh|cmd)\\.exe$/i | ExecutionChain := format(format=\"%s -> %s\"\
+    , field=[ParentBaseFileName, ImageFileName]) ;\n  }\n| groupBy([aid, ComputerName, TargetProcessId],\
+    \ function=[selectLast(ExecutionChain), selectLast(CommandHistory)], limit=max)\n| CommandHistory=/.+/\n"
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.001
+title: 'Falcon: CommandHistory with Process Tree Join'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Command_History_with_Process_Tree.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:Command_History_with_Process_Tree.yml
+- esn:CommandHistory
+- esn:ProcessRollup2
+severity: low
+required_fields:
+- '#event_simpleName'
+- CommandHistory
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- TargetProcessId
+- aid
+- event_platform

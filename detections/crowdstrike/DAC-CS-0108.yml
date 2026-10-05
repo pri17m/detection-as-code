@@ -1,0 +1,61 @@
+platforms:
+- crowdstrike
+author: DaC
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'DnsRequest joined to ProcessRollup2 where the resolving process is
+
+  powershell/cmd/wscript/cscript/mshta/python and DomainName is a public-looking FQDN.
+
+  '
+false_positives:
+- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
+  \ promote."
+- Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
+id: DAC-CS-0108
+query:
+  crowdstrike: '#event_simpleName=DnsRequest
+
+    | DomainName=/^[a-z0-9].+\.[a-z]{2,}$/i
+
+    | DomainName!=/\.(local|lan|internal|corp)$/i
+
+    | join({#event_simpleName=ProcessRollup2 | ImageFileName=/\\(powershell|pwsh|cmd|wscript|cscript|mshta|python|pythonw)\.exe$/i},
+    key=TargetProcessId, field=ContextProcessId, include=[ImageFileName, CommandLine, ParentBaseFileName],
+    tip="aid=aid")
+
+    | groupBy([aid, ComputerName, DomainName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
+
+    '
+mitre:
+  tactics:
+  - command-and-control
+  - execution
+  techniques:
+  - T1071.004
+  - T1059
+title: 'Falcon: Suspicious DNS from Scripting Engines'
+status: experimental
+references:
+- https://attack.mitre.org/techniques/T1071/004/
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/DNS_Resolutions_from_Browser_Processes.yml
+tags:
+- cs-query-hub
+- safe-esn-wave
+- tp-quality-v2
+- src:DNS_Resolutions_from_Browser_Processes.yml
+- esn:DnsRequest
+- esn:ProcessRollup2
+severity: medium
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ContextProcessId
+- DomainName
+- ImageFileName
+- ParentBaseFileName
+- TargetProcessId
+- aid
