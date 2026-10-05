@@ -1,0 +1,35 @@
+id: DAC-VMW-0035
+title: vCenter VM deleted
+description: Detects vCenter vpxd VmRemovedEvent. That class indicates a virtual machine was removed from inventory or deleted from disk via vCenter.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmware:vclog
+- vmware:vclog:*
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1485
+severity: high
+false_positives:
+- Planned decommission or template cleanup. Confirm the change ticket and the actor.
+references:
+- https://knowledge.broadcom.com/external/article/432327/identifying-audit-and-security-logs-to-f.html
+- https://splunkbase.splunk.com/app/5601
+- https://splunk.github.io/splunk-connect-for-syslog/3.11.0/sources/vendor/VMWare/vsphere/
+telemetry_validated: false
+required_fields:
+- _raw
+tags:
+- vmware
+- vcenter
+- vclog
+query:
+  splunk: '(sourcetype=vmware:vclog OR sourcetype=vmware:vclog:*) (Message="*vim.event.VmRemovedEvent*" OR _raw="*vim.event.VmRemovedEvent*")
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(_raw) as sample by host
+
+    '

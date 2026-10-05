@@ -1,0 +1,42 @@
+id: DAC-VMW-0027
+title: vCenter failed login burst
+description: Detects more than 10 vCenter vpxd failed login events (vim.event.BadUsernameSessionEvent or Cannot login) for the same host inside a 5 minute window. Grouped by host because user and client IP are not reliably extracted without a tenant vmware:vclog sample.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmware:vclog
+- vmware:vclog:*
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1110
+severity: high
+false_positives:
+- Misconfigured monitoring probes, stale service account passwords, or AD lockout storms can produce short bursts. Threshold is more than 10 failures in 5 minutes per host.
+- A single BadUsernameSessionEvent or Cannot login line must not alert.
+references:
+- https://knowledge.broadcom.com/external/article/376043/user-ad-account-getting-locked-out-and-a.html
+- https://knowledge.broadcom.com/external/article/432327/identifying-audit-and-security-logs-to-f.html
+- https://splunkbase.splunk.com/app/5601
+- https://splunk.github.io/splunk-connect-for-syslog/3.11.0/sources/vendor/VMWare/vsphere/
+telemetry_validated: false
+required_fields:
+- _raw
+- host
+tags:
+- vmware
+- vcenter
+- vclog
+query:
+  splunk: '(sourcetype=vmware:vclog OR sourcetype=vmware:vclog:*) ((Message="*vim.event.BadUsernameSessionEvent*" OR _raw="*vim.event.BadUsernameSessionEvent*") OR (Message="*Cannot login*" OR _raw="*Cannot login*"))
+
+    | bin _time span=5m
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(_raw) as sample by host
+
+    | where count > 10
+
+    '

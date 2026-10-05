@@ -1,0 +1,35 @@
+id: DAC-VMW-0030
+title: vCenter permission updated
+description: Detects vCenter vpxd PermissionUpdatedEvent. Updating a permission can escalate privileges without creating a new assignment.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmware:vclog
+- vmware:vclog:*
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1098
+severity: high
+false_positives:
+- vCenter administrators creating or adjusting roles and permissions during change windows. Confirm the actor and the target object.
+references:
+- https://knowledge.broadcom.com/external/article/432327/identifying-audit-and-security-logs-to-f.html
+- https://splunkbase.splunk.com/app/5601
+- https://splunk.github.io/splunk-connect-for-syslog/3.11.0/sources/vendor/VMWare/vsphere/
+telemetry_validated: false
+required_fields:
+- _raw
+tags:
+- vmware
+- vcenter
+- vclog
+query:
+  splunk: '(sourcetype=vmware:vclog OR sourcetype=vmware:vclog:*) (Message="*vim.event.PermissionUpdatedEvent*" OR _raw="*vim.event.PermissionUpdatedEvent*")
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(_raw) as sample by host
+
+    '
