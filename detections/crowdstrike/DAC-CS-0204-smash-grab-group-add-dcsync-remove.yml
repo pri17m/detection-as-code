@@ -1,57 +1,63 @@
 id: DAC-CS-0204
-title: Smash-and-grab privileged group add with DCSync tooling and rapid removal
-description: |
-  Detects privileged local/domain group membership adds (Administrators RID 0x220 / Domain Admins 0x200) on a host, correlated with DCSync-style process tooling on the same aid, and a subsequent UserAccountRemovedFromGroup for the same GroupRid within the search window — classic smash-and-grab.
+title: Smash-and-grab privileged group add correlated with DCSync tooling
+description: Detects privileged group membership adds via UserAccountAddedToGroup (Domain Admins RID 512, Enterprise Admins 519, BUILTIN\Administrators 544) correlated with DCSync-style ProcessRollup2 on the same aid. GroupRid is hex; decode with parseInt radix=16 endian=big. UserAccountRemovedFromGroup is not confirmed in public Falcon content — rapid-removal stage omitted pending tenant confirmation. 512/519 changes are typically logged on DCs; 544 is local SAM Administrators via RPC.
 author: DaC
 status: experimental
 platforms:
-  - crowdstrike
+- crowdstrike
 sourcetypes:
-  - falcon:process
+- "falcon:process"
 mitre:
   tactics:
-    - persistence
-    - credential-access
-    - privilege-escalation
+  - persistence
+  - credential-access
+  - privilege-escalation
   techniques:
-    - T1098
-    - T1003.006
+  - T1098
+  - T1003.006
 severity: critical
 false_positives:
-  - Helpdesk/JIT privilege workflows that briefly add and remove admin rights — allowlist RpcClientProcessId parents and change tickets.
-  - 'Tuning knob: require ProcessRollup2 DCSync match (default) or alert on add+remove
-  alone for privileged RIDs.'
+- Helpdesk/JIT privilege workflows that briefly add admin rights — allowlist RpcClientProcessId parents and change tickets.
+- "Tenant confirmation: if UserAccountRemovedFromGroup exists, extend to require add < tool < remove by min(@timestamp) per stage."
 references:
-  - https://attack.mitre.org/techniques/T1098/
-  - https://attack.mitre.org/techniques/T1003/006/
-  - https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/User%20Added%20to%20Group.md
+- "https://attack.mitre.org/techniques/T1098/"
+- "https://attack.mitre.org/techniques/T1003/006/"
+- "https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/User%20Added%20to%20Group.md"
+- "https://learn.microsoft.com/en-us/windows/win32/secauthz/well-known-sids"
 telemetry_validated: false
 required_fields:
-  - '#event_simpleName'
-  - event_platform
-  - aid
-  - ComputerName
-  - GroupRid
-  - UserRid
-  - DomainSid
-  - RpcClientProcessId
-  - ImageFileName
-  - CommandLine
-  - TargetProcessId
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- GroupRid
+- UserRid
+- DomainSid
+- RpcClientProcessId
+- ImageFileName
+- CommandLine
+- TargetProcessId
 tags:
-  - wave1
-  - ad
-  - dcsync
-  - tp-quality
+- wave1
+- ad
+- dcsync
+- tp-quality
 query:
   crowdstrike: |
-    in(#event_simpleName, values=["UserAccountAddedToGroup","UserAccountRemovedFromGroup","ProcessRollup2"])
+    in(#event_simpleName, values=["UserAccountAddedToGroup","ProcessRollup2"])
     | event_platform=Win
     | case {
-        #event_simpleName=UserAccountAddedToGroup | parseInt(GroupRid, as="GroupRidDec", radix="16", endian="big") | in(GroupRidDec, values=[512, 519, 544]) | Stage:="group-add" ;
-        #event_simpleName=UserAccountRemovedFromGroup | parseInt(GroupRid, as="GroupRidDec", radix="16", endian="big") | in(GroupRidDec, values=[512, 519, 544]) | Stage:="group-remove" ;
-        #event_simpleName=ProcessRollup2 | (CommandLine=/(secretsdump|lsadump::dcsync|ntdsutil.*ifm|--just-dc)/i OR ImageFileName=/\\(secretsdump|mimikatz|ntdsutil)\.exe$/i) | Stage:="dcsync-tool" ;
+        #event_simpleName=UserAccountAddedToGroup
+          | parseInt(GroupRid, as="GroupRidDec", radix="16", endian="big")
+          | in(GroupRidDec, values=[512, 519, 544])
+          | TargetProcessId := RpcClientProcessId
+          | Stage := "group-add"
+          | StageTime := @timestamp ;
+        #event_simpleName=ProcessRollup2
+          | (CommandLine=/(secretsdump|lsadump::dcsync|ntdsutil.*ifm|--just-dc)/i OR ImageFileName=/\\(secretsdump|mimikatz|ntdsutil)\.exe$/i)
+          | Stage := "dcsync-tool"
+          | StageTime := @timestamp ;
       }
-    | groupBy([aid, ComputerName], function=([collect([Stage, GroupRid, UserRid, ImageFileName, CommandLine, RpcClientProcessId], limit=50), count(as=_events)]))
-    | Stage=/(group-add)/i AND Stage=/(dcsync-tool)/i AND Stage=/(group-remove)/i
-    
+    | selfJoinFilter(aid, where=[{Stage="group-add"},{Stage="dcsync-tool"}])
+    | groupBy([aid, ComputerName], function=([min(StageTime, as=t_add, condition={Stage="group-add"}), min(StageTime, as=t_tool, condition={Stage="dcsync-tool"}), collect([GroupRid, UserRid, ImageFileName, CommandLine, RpcClientProcessId], limit=40)]))
+    | t_tool > t_add

@@ -1,6 +1,6 @@
 id: DAC-MDE-0066
 title: Common RMM remote-access tool process creation outside allowlisted parents
-description: Detects creation of common remote monitoring/management tools (AnyDesk, ScreenConnect, TeamViewer, RustDesk, Splashtop, Atera, MeshAgent) when not launched from known software-distribution parents — post-compromise remote access staging (T1219).
+description: Detects creation of common remote monitoring/management tools (AnyDesk, ScreenConnect, TeamViewer, RustDesk, Splashtop, Atera, MeshAgent) when not launched from known software-distribution parents. Uses SHA1.
 author: DaC
 status: experimental
 platforms:
@@ -15,10 +15,10 @@ mitre:
   - T1219
 severity: medium
 false_positives:
-- Legitimately deployed RMM agents — maintain FolderPath/SHA256 allowlists for corporate RMM packages.
+- Legitimately deployed RMM agents — maintain FolderPath/SHA1 allowlists for corporate RMM packages.
 - "Tuning knob: raise severity when InitiatingProcessFileName is a browser/email client; first-seen by DeviceName."
 references:
-- "https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table"
 - "https://attack.mitre.org/techniques/T1219/"
 telemetry_validated: false
 required_fields:
@@ -30,7 +30,7 @@ required_fields:
 - InitiatingProcessFileName
 - InitiatingProcessFolderPath
 - AccountName
-- SHA256
+- SHA1
 tags:
 - wave1
 - rmm
@@ -41,4 +41,4 @@ query:
         or ProcessCommandLine has_any ("anydesk","screenconnect","teamviewer","rustdesk","splashtop","atera","meshagent")
     | where InitiatingProcessFileName !in~ ("msiexec.exe","setup.exe","Installer.exe","SCCMExecutor.exe","ccmexec.exe","IntuneManagementExtension.exe")
     | where not (FolderPath has_any (@"\Program Files (x86)\TeamViewer", @"\Program Files\AnyDesk", @"\Program Files (x86)\ScreenConnect"))
-    | project Timestamp, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessFolderPath, SHA256
+    | project Timestamp, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessFolderPath, SHA1

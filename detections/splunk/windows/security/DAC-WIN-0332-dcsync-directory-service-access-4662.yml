@@ -1,6 +1,6 @@
 id: DAC-WIN-0332
 title: DCSync replication request via Directory Service Access 4662
-description: "Detects Windows Security 4662 events requesting DS-Replication-Get-Changes / Get-Changes-All / Filtered-Set extended rights (GUID or friendly name in Properties) with Control Access semantics, excluding legitimate DC machine accounts and MSOL_* sync accounts."
+description: "Detects Windows Security 4662 events requesting DS-Replication-Get-Changes / Get-Changes-All / Filtered-Set extended rights (lowercase GUIDs in Properties) with AccessMask exactly 0x100 (Control Access), excluding machine accounts and MSOL_*/AAD_* sync accounts."
 author: DaC
 status: experimental
 platforms:
@@ -16,10 +16,11 @@ mitre:
 severity: critical
 false_positives:
 - Azure AD Connect / Entra Connect sync accounts (extend MSOL_/AAD_ filter) and authorized AD replication troubleshooting.
-- "Tuning knob: require AccessMask 0x100; maintain DC hostname allowlist for SubjectUserName ending in $."
+- "Tuning knob: maintain DC hostname allowlist for SubjectUserName ending in $ if those must be monitored separately."
 references:
 - "https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4662"
 - "https://attack.mitre.org/techniques/T1003/006/"
+- "https://learn.microsoft.com/en-us/windows/win32/adschema/r-ds-replication-get-changes-in-filtered-set"
 telemetry_validated: false
 required_fields:
 - EventCode
@@ -37,15 +38,15 @@ tags:
 - dcsync
 query:
   splunk: |
-    (sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode=4662
+    `windows_security` EventCode=4662 ("1131f6aa-9c07-11d1-f79f-00c04fc2dcd2" OR "1131f6ad-9c07-11d1-f79f-00c04fc2dcd2" OR "89e95b76-444d-4c62-991a-0facbeda640c")
     | eval Properties=coalesce(Properties, Property)
     | eval AccessMask=coalesce(AccessMask, Access_Mask)
     | eval SubjectUserName=coalesce(SubjectUserName, Subject_User_Name)
     | eval SubjectUserSid=coalesce(SubjectUserSid, Subject_User_Sid)
     | eval ObjectType=coalesce(ObjectType, Object_Type)
-    | eval Computer=coalesce(Computer, host, dest)
-    | where match(Properties, "(?i)(1131f6aa-9c07-11d1-f79f-00c04fc2dcd2|1131f6ad-9c07-11d1-f79f-00c04fc2dcd2|89e95b76-444d-4c62-991a-0facbeda640c|DS-Replication-Get-Changes)")
-    | where match(AccessMask, "(?i)0x100") OR AccessMask="256" OR isnull(AccessMask) OR AccessMask="-"
+    | eval Computer=coalesce(Computer, ComputerName, host, dest)
+    | where match(Properties, "(?i)(1131f6aa-9c07-11d1-f79f-00c04fc2dcd2|1131f6ad-9c07-11d1-f79f-00c04fc2dcd2|89e95b76-444d-4c62-991a-0facbeda640c)")
+    | where match(AccessMask, "^0x100$") OR AccessMask="256"
     | where NOT match(SubjectUserName, "\\$$") AND NOT match(SubjectUserName, "(?i)^MSOL_|^AAD_|Sync_")
     | where NOT match(SubjectUserSid, "^S-1-5-18$")
     | stats count values(Properties) as props values(ObjectType) as otypes values(ObjectName) as onames by Computer SubjectUserName SubjectDomainName AccessMask

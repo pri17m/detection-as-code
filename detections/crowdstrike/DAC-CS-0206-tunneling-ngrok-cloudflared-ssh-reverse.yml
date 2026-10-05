@@ -1,50 +1,49 @@
 id: DAC-CS-0206
 title: "Tunneling tool execution: ngrok, cloudflared, or SSH reverse tunnel"
-description: |
-  Detects execution of ngrok/cloudflared or OpenSSH/plink reverse/dynamic port-forward patterns (-R/-D/tcptunnel/trycloudflare) used for covert egress and remote access tunneling (T1572/T1090).
+description: Detects execution of ngrok/cloudflared or OpenSSH/plink reverse/dynamic port-forward patterns (-R/-D/RemoteForward) used for covert egress and remote access tunneling (T1572/T1090).
 author: DaC
 status: experimental
 platforms:
-  - crowdstrike
+- crowdstrike
 sourcetypes:
-  - falcon:process
+- "falcon:process"
 mitre:
   tactics:
-    - command-and-control
-    - persistence
+  - command-and-control
+  - persistence
   techniques:
-    - T1572
-    - T1090
+  - T1572
+  - T1090
 severity: high
 false_positives:
-  - Approved DevOps use of cloudflared/ngrok for staging — allowlist ImageFileName path and service accounts.
-  - 'Tuning knob: also join DnsRequest for ngrok.io / trycloudflare.com domains for higher
-  fidelity.'
+- "Approved DevOps use of cloudflared/ngrok for staging — allowlist ImageFileName path and service accounts (domains *.ngrok-free.app / *.ngrok.app)."
+- "Tuning knob: also join DnsRequest for ngrok-free.app / trycloudflare.com domains for higher fidelity."
 references:
-  - https://attack.mitre.org/techniques/T1572/
-  - https://attack.mitre.org/techniques/T1090/
+- "https://attack.mitre.org/techniques/T1572/"
+- "https://attack.mitre.org/techniques/T1090/"
+- "https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/"
+- "https://ngrok.com/docs/pricing-limits/free-plan-limits"
 telemetry_validated: false
 required_fields:
-  - '#event_simpleName'
-  - event_platform
-  - aid
-  - ComputerName
-  - ImageFileName
-  - CommandLine
-  - ParentBaseFileName
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
 tags:
-  - wave1
-  - tunneling
-  - tp-quality
+- wave1
+- tunneling
+- tp-quality
 query:
   crowdstrike: |
     in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
     | event_platform=Win
     | (
         ImageFileName=/\\(ngrok|cloudflared|bore|chisel|ligolo)\.exe$/i
-        OR (ImageFileName=/\\(ssh|ssh\.exe|plink)\.exe$/i AND CommandLine=/(\s-R\s|\s-D\s|RemoteForward|tcp\.|tunnel)/i)
+        OR (ImageFileName=/\\(ssh|plink)\.exe$/i AND CommandLine=/(\s-[RD]\s|RemoteForward)/)
         OR CommandLine=/(ngrok(\.exe)?\s+(http|tcp|start)|cloudflared(\.exe)?\s+tunnel|trycloudflare\.com)/i
       )
     | ParentBaseFileName!=/^(MsMpEng|CSFalconService)\.exe$/i
     | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
-    

@@ -1,6 +1,6 @@
 id: DAC-MDE-0063
-title: Browser extension with proxy, webRequestAuthProvider, and all_urls permissions
-description: "Uses Defender Vulnerability Management browser-extension tables to surface installed extensions that simultaneously request proxy, webRequestAuthProvider (or webRequest), and broad host permissions (<all_urls> / *://*/*) — high-risk permission set for traffic interception (T1176.001 / T1185)."
+title: Browser extension with proxy, webRequestAuthProvider, and broad host permissions
+description: "Inventory hunt using Defender Vulnerability Management browser-extension tables for extensions that request proxy / webRequestAuthProvider-class permissions (filter on PermissionId with PermissionName fallback). DeviceName is joined from DeviceInfo (TVM tables have no DeviceName). Before promote, run: DeviceTvmBrowserExtensionsKB | distinct PermissionId, PermissionName. Note: <all_urls> is a Chrome host match pattern, not an API permission; host-permission listing in MDE is unverified. TVM tables are Advanced Hunting / preview and not available in Microsoft Sentinel."
 author: DaC
 status: experimental
 platforms:
@@ -17,17 +17,20 @@ mitre:
 severity: high
 false_positives:
 - Corporate proxy/SSO browser extensions that legitimately need these permissions — maintain an ExtensionId allowlist.
-- "Tuning knob: alert only on ExtensionRisk High/Critical; join InstallationTime for first-seen baselining."
+- "Tuning knob: dump distinct PermissionId, PermissionName first and replace the provisional PermissionId list with tenant values; alert only on ExtensionRisk High/Critical."
 references:
-- "https://learn.microsoft.com/defender-xdr/advanced-hunting-devicetvmbrowserextensions-table"
-- "https://learn.microsoft.com/defender-xdr/advanced-hunting-devicetvmbrowserextensionskb-table"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicetvmbrowserextensions-table"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicetvmbrowserextensionskb-table"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceinfo-table"
+- "https://developer.chrome.com/docs/extensions/reference/permissions-list"
 - "https://attack.mitre.org/techniques/T1176/001/"
 - "https://attack.mitre.org/techniques/T1185/"
 telemetry_validated: false
 required_fields:
-- DeviceName
+- DeviceId
 - ExtensionId
 - ExtensionName
+- PermissionId
 - PermissionName
 - ExtensionRisk
 - BrowserName
@@ -37,10 +40,14 @@ tags:
 - browser-extension
 query:
   defender: |
+    let kb = DeviceTvmBrowserExtensionsKB
+    | extend VersionStr = tostring(ExtensionVersion)
+    | where PermissionId in~ ("proxy","webRequestAuthProvider","webRequest")
+        or PermissionName has_any ("proxy","authentication","all websites","web request")
+        or PermissionDescription has_any ("proxy","authentication");
     DeviceTvmBrowserExtensions
-    | join kind=inner (DeviceTvmBrowserExtensionsKB | where PermissionName has_any ("proxy","webRequestAuthProvider","webRequest","*://*/*","<all_urls>","all_urls")) on ExtensionId
-    | summarize Permissions=make_set(PermissionName), Risk=any(ExtensionRisk), Name=any(ExtensionName), Browser=any(BrowserName), Install=any(InstallationTime) by DeviceId, DeviceName, ExtensionId
-    | where Permissions has "proxy"
-    | where Permissions has_any ("webRequestAuthProvider","webRequest")
-    | where Permissions has_any ("<all_urls>","*://*/*","all_urls")
-    | project DeviceName, ExtensionId, Name, Browser, Risk, Install, Permissions
+    | join kind=inner kb on ExtensionId, BrowserName, $left.ExtensionVersion == $right.VersionStr
+    | join kind=leftouter (DeviceInfo | summarize arg_max(Timestamp, DeviceName) by DeviceId) on DeviceId
+    | summarize Perms=make_set(PermissionId), PermNames=make_set(PermissionName), Risk=any(ExtensionRisk), Name=any(ExtensionName), Install=any(InstallationTime) by DeviceId, DeviceName, ExtensionId, BrowserName
+    | where Perms has_any ("proxy","webRequestAuthProvider","webRequest") or PermNames has_any ("proxy","authentication")
+    | project DeviceName, DeviceId, ExtensionId, Name, BrowserName, Risk, Install, Perms, PermNames

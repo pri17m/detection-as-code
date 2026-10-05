@@ -1,6 +1,6 @@
 id: DAC-MDE-0065
 title: Renamed Plink or SSH reverse port-forward tunnel
-description: Detects SSH/Plink-style reverse or dynamic port forwards (-R/-D/RemoteForward) including renamed binaries (FileName not ssh/plink but ProcessCommandLine contains those switches), a common C2 tunneling pattern (T1572/T1036.003).
+description: Detects SSH/Plink-style reverse or dynamic port forwards (-R/-D/RemoteForward) including renamed binaries (FileName not ssh/plink but ProcessCommandLine matches those switches). Uses SHA1 (SHA256 is usually empty).
 author: DaC
 status: experimental
 platforms:
@@ -20,7 +20,7 @@ false_positives:
 - Admin remote-forward jump-host workflows — allowlist AccountName and destination ports.
 - "Tuning knob: alert only when FileName not in (ssh.exe,plink.exe) OR FolderPath outside Program Files."
 references:
-- "https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table"
 - "https://attack.mitre.org/techniques/T1572/"
 - "https://attack.mitre.org/techniques/T1036/003/"
 telemetry_validated: false
@@ -32,15 +32,15 @@ required_fields:
 - InitiatingProcessFileName
 - FolderPath
 - AccountName
-- SHA256
+- SHA1
 tags:
 - wave1
 - tunneling
 query:
   defender: |
     DeviceProcessEvents
-    | where ProcessCommandLine has_any (" -R ", " -D ", "RemoteForward", ":-R", "N -R", "N -D")
-    | where FileName has_any ("ssh.exe","plink.exe","ssh","plink")
-        or (ProcessCommandLine has_any (" -R "," -D ") and FileName !in~ ("ssh.exe","plink.exe","ssh","scp.exe","sftp.exe"))
+    | where ProcessCommandLine matches regex @"\s-[RD]\s" or ProcessCommandLine has "RemoteForward"
+    | where FileName in~ ("ssh.exe","plink.exe")
+        or (FileName !in~ ("ssh.exe","plink.exe","scp.exe","sftp.exe","ssh-agent.exe","ssh-add.exe"))
     | where not (FolderPath has_any (@"\Program Files\OpenSSH", @"\Program Files\PuTTY") and FileName in~ ("ssh.exe","plink.exe"))
-    | project Timestamp, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine, InitiatingProcessFileName, SHA256
+    | project Timestamp, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine, InitiatingProcessFileName, SHA1

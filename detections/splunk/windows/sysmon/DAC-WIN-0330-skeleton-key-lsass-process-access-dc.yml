@@ -1,6 +1,6 @@
 id: DAC-WIN-0330
 title: Skeleton Key style suspicious LSASS process access on a domain controller
-description: Detects Sysmon EventCode 10 process access targeting lsass.exe on hosts that look like domain controllers, with GrantedAccess masks commonly used for memory patching/injection (e.g. 0x1010, 0x1410, 0x143a, 0x1fffff) from non-security SourceImage paths — Skeleton Key / LSASS tampering signal (T1556.001).
+description: Detects Sysmon EventCode 10 process access targeting lsass.exe with GrantedAccess masks commonly used for memory patching/injection, from non-security SourceImage paths. Host scoping uses a hostname heuristic pending a domain_controllers lookup. Uses SourceUser (Sysmon EID10 has no User field).
 author: DaC
 status: experimental
 platforms:
@@ -19,9 +19,10 @@ mitre:
 severity: critical
 false_positives:
 - EDR/AV and Windows Defender processes accessing LSASS — allowlist signed security SourceImage paths.
-- "Tuning knob: tighten Computer DC naming; restrict GrantedAccess set; require SourceUser not SYSTEM."
+- "Tuning knob: replace hostname DC heuristic with domain_controllers lookup; tighten GrantedAccess set."
 references:
 - "https://learn.microsoft.com/sysinternals/downloads/sysmon"
+- "https://github.com/microsoft/SysmonCommon/blob/main/manifest.xml"
 - "https://attack.mitre.org/techniques/T1556/001/"
 - "https://attack.mitre.org/techniques/T1055/"
 telemetry_validated: false
@@ -30,7 +31,8 @@ required_fields:
 - TargetImage
 - SourceImage
 - GrantedAccess
-- User
+- SourceUser
+- SourceProcessGUID
 - host
 tags:
 - wave1
@@ -38,15 +40,15 @@ tags:
 - lsass
 query:
   splunk: |
-    (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype=sysmon)
-    EventCode=10
+    `windows_sysmon` EventCode=10
     | eval TargetImage=lower(coalesce(TargetImage, Target_Image))
     | eval SourceImage=lower(coalesce(SourceImage, Source_Image))
     | eval GrantedAccess=lower(coalesce(GrantedAccess, Granted_Access))
-    | eval hostn=lower(coalesce(Computer, host, dest))
+    | eval SourceUser=coalesce(SourceUser, Source_User)
+    | eval hostn=lower(coalesce(Computer, ComputerName, host, dest))
     | where match(TargetImage, "\\\\lsass\\.exe$")
-    | where match(hostn, "(dc|domaincontroller|adds)") OR match(hostn, "^[a-z0-9-]*dc[0-9]*")
-    | where match(GrantedAccess, "(0x1fffff|0x143a|0x1410|0x1010|0x40|0x1038)")
+    | where match(hostn, "(^|[.-_])dc[0-9]{0,3}([.-_]|$)") OR match(hostn, "domaincontroller|adds")
+    | where match(GrantedAccess, "^(0x1fffff|0x143a|0x1410|0x1010|0x40|0x1038)$")
     | where NOT match(SourceImage, "(\\\\windows\\\\system32\\\\|\\\\program files\\\\windows defender\\\\|\\\\crowdstrike\\\\|\\\\sentinel\\\\|\\\\carbonblack\\\\|csfalcon|msmpeng|sense\\.exe)")
-    | stats count values(SourceImage) as sources values(GrantedAccess) as access values(User) as users by hostn
+    | stats count values(SourceImage) as sources values(GrantedAccess) as access values(SourceUser) as users values(SourceProcessGUID) as guids by hostn
     | where count>=1

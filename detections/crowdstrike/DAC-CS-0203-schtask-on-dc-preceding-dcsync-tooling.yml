@@ -1,52 +1,61 @@
 id: DAC-CS-0203
 title: Scheduled task registration on a DC preceding DCSync tooling
-description: |
-  Correlates a Windows ScheduledTaskRegistered event with a subsequent ProcessRollup2 on the same aid that matches DCSync/credential-dump tooling (secretsdump, mimikatz dcsync, ntdsutil IFM) within a short window — a common smash-prep pattern on domain controllers.
+description: Correlates ScheduledTaskRegistered with a subsequent ProcessRollup2 matching DCSync/credential-dump tooling on the same aid, requiring task timestamp before tooling timestamp within the window. DC scoping uses ComputerName heuristics; tenants should replace with aid_master ProductType=2 when available.
 author: DaC
 status: experimental
 platforms:
-  - crowdstrike
+- crowdstrike
 sourcetypes:
-  - falcon:process
+- "falcon:process"
 mitre:
   tactics:
-    - persistence
-    - credential-access
-    - execution
+  - persistence
+  - credential-access
+  - execution
   techniques:
-    - T1053.005
-    - T1003.006
+  - T1053.005
+  - T1003.006
 severity: critical
 false_positives:
-  - DC maintenance scripts that register tasks and later run approved backup/IFM tooling — allowlist TaskName and ImageFileName.
-  - 'Tuning knob: tighten ComputerName DC naming pattern; adjust time window via search
-  interval.'
+- DC maintenance scripts that register tasks and later run approved backup/IFM tooling — allowlist TaskName and ImageFileName.
+- "Tuning knob: replace ComputerName DC heuristic with match(file=\"aid_master_main.csv\") ProductType=2 when the lookup is present."
 references:
-  - https://attack.mitre.org/techniques/T1053/005/
-  - https://attack.mitre.org/techniques/T1003/006/
+- "https://attack.mitre.org/techniques/T1053/005/"
+- "https://attack.mitre.org/techniques/T1003/006/"
+- "https://github.com/CrowdStrike/logscale-community-content/blob/main/CrowdStrike-Query-Language-Map/CrowdStrike-Query-Language/parseXml.md"
 telemetry_validated: false
 required_fields:
-  - '#event_simpleName'
-  - event_platform
-  - aid
-  - ComputerName
-  - TaskName
-  - TaskExecCommand
-  - TaskExecArguments
-  - ImageFileName
-  - CommandLine
-  - ParentBaseFileName
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- TaskName
+- TaskExecCommand
+- TaskExecArguments
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
 tags:
-  - wave1
-  - ad
-  - dcsync
-  - schtask
-  - tp-quality
+- wave1
+- ad
+- dcsync
+- schtask
+- tp-quality
 query:
   crowdstrike: |
-    #event_simpleName=ScheduledTaskRegistered event_platform=Win
-    | ComputerName=/DC|DOMAIN|ADDS/i OR TaskName=/\\/i
-    | TaskName!=/^\\?Microsoft\\Windows\\/i
-    | join({in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"]) | event_platform=Win | CommandLine=/(secretsdump|lsadump::dcsync|ntdsutil.*ifm|ntds\.dit|--just-dc)/i OR ImageFileName=/\\(secretsdump|mimikatz|ntdsutil)\.exe$/i}, key=aid, field=aid, include=[ImageFileName, CommandLine, ParentBaseFileName], limit=20000)
-    | groupBy([aid, ComputerName, TaskName, TaskExecCommand, TaskExecArguments, ImageFileName, CommandLine], function=count())
-    
+    in(#event_simpleName, values=["ScheduledTaskRegistered","ProcessRollup2","ProcessBlocked"])
+    | event_platform=Win
+    | ComputerName=/((^|[.-_])dc[0-9]{0,3}([.-_]|$)|domaincontroller|adds)/i
+    | case {
+        #event_simpleName=ScheduledTaskRegistered
+          | TaskName!=/^\\?Microsoft\\Windows\\/i
+          | Stage := "task"
+          | StageTime := @timestamp ;
+        in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+          | (CommandLine=/(secretsdump|lsadump::dcsync|ntdsutil.*ifm|ntds\.dit|--just-dc)/i OR ImageFileName=/\\(secretsdump|mimikatz|ntdsutil)\.exe$/i)
+          | Stage := "tool"
+          | StageTime := @timestamp ;
+      }
+    | selfJoinFilter(aid, where=[{Stage="task"},{Stage="tool"}])
+    | groupBy([aid, ComputerName], function=([min(StageTime, as=t_task, condition={Stage="task"}), min(StageTime, as=t_tool, condition={Stage="tool"}), collect([TaskName, TaskExecCommand, TaskExecArguments, ImageFileName, CommandLine], limit=20)]))
+    | t_tool > t_task

@@ -1,46 +1,43 @@
 id: DAC-CS-0207
 title: splunkd spawning shell or LOLBin child process
-description: |
-  Detects splunkd (or SplunkUniversalForwarder) spawning cmd/powershell/bash/sh or common LOLBins (certutil, mshta, rundll32, curl). Unexpected child processes from splunkd are a high-fidelity signal for Splunk REST/search RCE or malicious app abuse (T1190/T1059).
+description: Detects splunkd spawning cmd/powershell/bash/sh or common LOLBins (certutil, mshta, rundll32, curl, wget). Unexpected child processes from splunkd are a high-fidelity signal for malicious app abuse or post-exploitation on Splunk hosts (T1190/T1059). This is generic behaviour detection, not a CVE-specific check.
 author: DaC
 status: experimental
 platforms:
-  - crowdstrike
+- crowdstrike
 sourcetypes:
-  - falcon:process
+- "falcon:process"
 mitre:
   tactics:
-    - initial-access
-    - execution
+  - initial-access
+  - execution
   techniques:
-    - T1190
-    - T1059
+  - T1190
+  - T1059
 severity: critical
 false_positives:
-  - Custom Splunk apps that intentionally shell out — allowlist ParentBaseFileName+CommandLine pairs after review.
-  - 'Tuning knob: add Linux event_platform=Lin bash/sh children; exclude known scripted
-  inputs.'
+- Custom Splunk apps that intentionally shell out — allowlist ParentBaseFileName+CommandLine pairs after review.
+- "Tuning knob: add Linux event_platform=Lin bash/sh children; exclude known scripted inputs under $SPLUNK_HOME/bin."
 references:
-  - https://attack.mitre.org/techniques/T1190/
-  - https://attack.mitre.org/techniques/T1059/
+- "https://attack.mitre.org/techniques/T1190/"
+- "https://attack.mitre.org/techniques/T1059/"
 telemetry_validated: false
 required_fields:
-  - '#event_simpleName'
-  - event_platform
-  - aid
-  - ComputerName
-  - ImageFileName
-  - CommandLine
-  - ParentBaseFileName
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
 tags:
-  - wave1
-  - splunk-rce
-  - tp-quality
+- wave1
+- splunk-rce
+- tp-quality
 query:
   crowdstrike: |
     in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
-    | ParentBaseFileName=/^(splunkd|splunkd\.exe|splunk)$/i OR ParentBaseFileName=/splunk/i
-    | ImageFileName=/\\(cmd|powershell|pwsh|bash|sh|dash|zsh|certutil|mshta|rundll32|regsvr32|curl|wget|python|python3)\.exe$/i OR ImageFileName=/\/(bash|sh|dash|zsh|curl|wget|python3?)$/i
+    | ParentBaseFileName=/^splunkd(\.exe)?$/i
+    | ImageFileName=/\\(cmd|powershell|pwsh|bash|sh|dash|zsh|certutil|mshta|rundll32|regsvr32|curl|wget)\.exe$/i OR ImageFileName=/\/(bash|sh|dash|zsh|curl|wget)$/i
     | CommandLine!=/\b(splunk\s+cmd|instrumentation)\b/i
     | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
-    
