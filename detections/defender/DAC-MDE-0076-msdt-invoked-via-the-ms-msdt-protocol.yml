@@ -1,12 +1,8 @@
 id: DAC-MDE-0076
 title: msdt invoked via the ms-msdt protocol
 description: >-
-  CVE-2022-30190 (Follina) launches msdt.exe through the ms-msdt: protocol (T1203). A hit requires
-  that protocol string. The normal troubleshooter command msdt.exe /id PCWDiagnostic does not
-  match. Telemetry is Defender Advanced Hunting DeviceProcessEvents: FileName, ProcessCommandLine,
-  and InitiatingProcessFileName. Offline command-line samples were replayed: the documented
-  malicious lines match and the documented benign lines do not. telemetry_validated stays false
-  until this search is replayed on a tenant.
+  Alerts when msdt.exe is started with the ms-msdt: protocol. Attackers use that protocol, as in
+  Follina (CVE-2022-30190), to hand a document a path into the Microsoft Support Diagnostic Tool.
 author: Detection Engineer
 status: experimental
 platforms:

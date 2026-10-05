@@ -1,13 +1,8 @@
 id: DAC-CS-0220
 title: wsl.exe running curl, wget, or a /dev/tcp redirect
 description: >-
-  wsl.exe can run a Linux command from a Windows process creation event (T1059.004). A hit is
-  wsl.exe whose command line pairs curl or wget with http(s), or contains /dev/tcp/. wsl --status
-  and wsl -l do not match. Curl inside an already-running distro is a different event and is not
-  this rule. Telemetry is Falcon ProcessRollup2 and ProcessBlocked on event_platform=Win.
-  ImageFileName is the full path. ParentBaseFileName is the parent file name only. Offline
-  command-line samples were replayed: the documented malicious lines match and the documented
-  benign lines do not. telemetry_validated stays false until this search is replayed on a tenant.
+  Alerts when wsl.exe is started with curl or wget against a URL, or with /dev/tcp/. Attackers use
+  the Windows Subsystem for Linux to run a download from a Windows process-creation event.
 author: Detection Engineer
 status: experimental
 platforms:

@@ -1,12 +1,8 @@
 id: DAC-WIN-0340
 title: fsutil usn deletejournal
 description: >-
-  fsutil usn deletejournal removes the NTFS change journal, which wipes a forensic timeline
-  (T1070). A hit requires fsutil.exe and the usn deletejournal verb. usn readjournal and other
-  fsutil verbs do not match. Telemetry is Windows Security 4688 or Sysmon event 1. Classic and XML
-  field names are coalesced (CommandLine, NewProcessName, Image, ParentProcessName). Offline
-  command-line samples were replayed: the documented malicious lines match and the documented
-  benign lines do not. telemetry_validated stays false until this search is replayed on a tenant.
+  Alerts when fsutil.exe is started with usn deletejournal. Attackers delete the NTFS change
+  journal to wipe the record of which files were created or modified.
 author: Detection Engineer
 status: experimental
 platforms:

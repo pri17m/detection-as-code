@@ -1,13 +1,9 @@
 id: DAC-WIN-0341
 title: pcalua proxy execution of a script, DLL, or user-writable file
 description: >-
-  pcalua.exe is the Program Compatibility Assistant and can be told to launch another file with -a
-  (T1202). A hit requires -a and a DLL, CPL, script, URL, UNC path, or a file under Users, Temp,
-  Public, AppData, or ProgramData. Launching a binary from Program Files or System32 does not
-  match. Telemetry is Windows Security 4688 or Sysmon event 1. Classic and XML field names are
-  coalesced (CommandLine, NewProcessName, Image, ParentProcessName). Offline command-line samples
-  were replayed: the documented malicious lines match and the documented benign lines do not.
-  telemetry_validated stays false until this search is replayed on a tenant.
+  Alerts when pcalua.exe is told to launch a script, DLL, CPL, URL, UNC path, or a file under a
+  user-writable folder. Attackers use the Program Compatibility Assistant as a signed proxy to
+  start that payload.
 author: Detection Engineer
 status: experimental
 platforms:

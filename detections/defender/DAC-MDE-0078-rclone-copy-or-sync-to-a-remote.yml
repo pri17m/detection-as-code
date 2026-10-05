@@ -1,13 +1,8 @@
 id: DAC-MDE-0078
 title: rclone copy or sync to a remote
 description: >-
-  rclone copy, sync, rcat, or move to a remote is a common way to stage stolen files (T1567.002).
-  A hit requires the rclone.exe image, one of those verbs, and a remote marker (a colon, --config,
-  mega, or webdav). rclone version, rclone config, and rclone help copy do not match. Telemetry is
-  Defender Advanced Hunting DeviceProcessEvents: FileName, ProcessCommandLine, and
-  InitiatingProcessFileName. Offline command-line samples were replayed: the documented malicious
-  lines match and the documented benign lines do not. telemetry_validated stays false until this
-  search is replayed on a tenant.
+  Alerts when rclone.exe copies, syncs, cats, or moves data to a remote. Attackers use it to
+  exfiltrate files to cloud storage after they have collected them.
 author: Detection Engineer
 status: experimental
 platforms:

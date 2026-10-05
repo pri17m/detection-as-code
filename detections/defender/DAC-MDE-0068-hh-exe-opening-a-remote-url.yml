@@ -1,13 +1,8 @@
 id: DAC-MDE-0068
 title: hh.exe opening a remote URL
 description: >-
-  hh.exe is HTML Help. Opening a local CHM is normal. Opening an http, https, or ftp URL lets it
-  fetch a remote CHM or script (T1218.001). A hit requires the image to be hh.exe and the command
-  line to contain one of those URL schemes. A path such as C:\Windows\Help\aclui.chm does not
-  match. Telemetry is Defender Advanced Hunting DeviceProcessEvents: FileName, ProcessCommandLine,
-  and InitiatingProcessFileName. Offline command-line samples were replayed: the documented
-  malicious lines match and the documented benign lines do not. telemetry_validated stays false
-  until this search is replayed on a tenant.
+  Alerts when hh.exe is opened against an http, https, or ftp URL. Attackers use HTML Help to
+  fetch a remote compiled-help file or script while the process looks like the signed help viewer.
 author: Detection Engineer
 status: experimental
 platforms:

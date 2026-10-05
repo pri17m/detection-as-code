@@ -1,14 +1,9 @@
 id: DAC-MDE-0071
 title: UAC bypass registry hijack of ms-settings or mscfile
 description: >-
-  fodhelper, computerdefaults, and eventvwr auto-elevate and then run the command stored in HKCU
-  Software\Classes\ms-settings\shell\open\command. sdclt uses mscfile\shell\open\command
-  (T1548.002). A hit is Sysmon seeing a value set on either of those keys. Ordinary Run keys do
-  not match. Telemetry is Defender Advanced Hunting DeviceRegistryEvents: RegistryKey,
-  RegistryValueName, and RegistryValueData. ActionType is not filtered, because that enum is
-  tenant-specific. Offline command-line samples were replayed: the documented malicious lines
-  match and the documented benign lines do not. telemetry_validated stays false until this search
-  is replayed on a tenant.
+  Alerts when a command is written to the ms-settings or mscfile shell-open key in the
+  current-user registry. Attackers set that value, then start fodhelper, computerdefaults,
+  eventvwr, or sdclt so Windows auto-elevates and runs their command.
 author: Detection Engineer
 status: experimental
 platforms:

@@ -1,13 +1,9 @@
 id: DAC-MDE-0069
 title: esentutl copy of NTDS or registry hive
 description: >-
-  esentutl.exe /y copies a database, including a locked file when /vss is set. Attackers use it to
-  copy ntds.dit or the SAM, SYSTEM, and SECURITY hives (T1003.003). A hit requires /y and one of
-  those targets. Repair mode (/r) and copies of an ordinary mailbox .edb do not match, and a bare
-  System32 path is not treated as the SYSTEM hive. Telemetry is Defender Advanced Hunting
-  DeviceProcessEvents: FileName, ProcessCommandLine, and InitiatingProcessFileName. Offline
-  command-line samples were replayed: the documented malicious lines match and the documented
-  benign lines do not. telemetry_validated stays false until this search is replayed on a tenant.
+  Alerts when esentutl.exe is started with /y against ntds.dit or the SAM, SYSTEM, or SECURITY
+  hive. Attackers use that copy mode, often with /vss, to steal the Active Directory database or
+  local credential stores from a locked file.
 author: Detection Engineer
 status: experimental
 platforms:

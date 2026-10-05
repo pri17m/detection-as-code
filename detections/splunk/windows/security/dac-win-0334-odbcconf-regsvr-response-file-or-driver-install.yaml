@@ -1,14 +1,9 @@
 id: DAC-WIN-0334
 title: odbcconf REGSVR, response file, or driver install
 description: >-
-  odbcconf.exe is a signed Windows binary that can register a DLL (REGSVR), load a response file
-  (-f), or install an ODBC driver. Those arguments are the LOLBAS proxy-execution paths for
-  T1218.008. A hit means the command line contains REGSVR, INSTALLDRIVER, configsysdsn, or a -f/-F
-  response file. Plain odbcconf /S does not match. Telemetry is Windows Security 4688 or Sysmon
-  event 1. Classic and XML field names are coalesced (CommandLine, NewProcessName, Image,
-  ParentProcessName). Offline command-line samples were replayed: the documented malicious lines
-  match and the documented benign lines do not. telemetry_validated stays false until this search
-  is replayed on a tenant.
+  Alerts when odbcconf.exe is started with REGSVR, a response file (-f), INSTALLDRIVER, or
+  configsysdsn. Attackers use those arguments so this signed Windows binary loads an arbitrary DLL
+  or driver instead of a normal ODBC setup.
 author: Detection Engineer
 status: experimental
 platforms:
