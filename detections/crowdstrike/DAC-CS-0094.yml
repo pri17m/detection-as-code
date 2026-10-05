@@ -16,7 +16,7 @@ query:
 
     | TaskName!=/^\\?Microsoft\\Windows\\/i
 
-    | TaskXML=/LogonTrigger/i
+    | TaskXml=/LogonTrigger/i
 
     | groupBy([aid, ComputerName, TaskName, TaskExecCommand], function=count())
 
@@ -43,5 +43,5 @@ required_fields:
 - ComputerName
 - TaskExecCommand
 - TaskName
-- TaskXML
+- TaskXml
 - aid

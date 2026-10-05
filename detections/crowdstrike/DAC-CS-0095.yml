@@ -20,7 +20,7 @@ query:
 
     | TaskName!=/^\\?Microsoft\\Windows\\/i
 
-    | TaskXML=/(BootTrigger|StartupTrigger)/i
+    | TaskXml=/(BootTrigger|StartupTrigger)/i
 
     | groupBy([aid, ComputerName, TaskName, TaskExecCommand], function=count())
 
@@ -47,5 +47,5 @@ required_fields:
 - ComputerName
 - TaskExecCommand
 - TaskName
-- TaskXML
+- TaskXml
 - aid

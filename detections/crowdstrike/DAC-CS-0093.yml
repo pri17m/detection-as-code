@@ -19,9 +19,9 @@ query:
 
     | TaskName!=/^\\?Microsoft\\Windows\\/i
 
-    | TaskXML=/<RunLevel>\s*HighestAvailable\s*<\/RunLevel>/i
+    | TaskXml=/<RunLevel>\s*HighestAvailable\s*<\/RunLevel>/i
 
-    | groupBy([aid, ComputerName, TaskName], function=[count(), collect([TaskXML], limit=1)])
+    | groupBy([aid, ComputerName, TaskName], function=[count(), collect([TaskXml], limit=1)])
 
     '
 mitre:
@@ -46,5 +46,5 @@ required_fields:
 - '#event_simpleName'
 - ComputerName
 - TaskName
-- TaskXML
+- TaskXml
 - aid

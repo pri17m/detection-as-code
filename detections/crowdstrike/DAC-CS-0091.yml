@@ -4,7 +4,7 @@ author: DaC
 sourcetypes:
 - falcon:process
 telemetry_validated: false
-description: 'Detects registration of Windows scheduled tasks marked Hidden=true in TaskXML, a common
+description: 'Detects registration of Windows scheduled tasks marked Hidden=true in TaskXml, a common
   persistence
 
   stealth technique.
@@ -20,9 +20,9 @@ query:
 
     | TaskName!=/^\\?Microsoft\\Windows\\/i
 
-    | TaskXML=/<Hidden>\s*true\s*<\/Hidden>/i
+    | TaskXml=/<Hidden>\s*true\s*<\/Hidden>/i
 
-    | groupBy([aid, ComputerName, TaskName], function=[count(), collect([TaskXML], limit=1)])
+    | groupBy([aid, ComputerName, TaskName], function=[count(), collect([TaskXml], limit=1)])
 
     '
 mitre:
@@ -47,5 +47,5 @@ required_fields:
 - '#event_simpleName'
 - ComputerName
 - TaskName
-- TaskXML
+- TaskXml
 - aid
