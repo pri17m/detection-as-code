@@ -1,30 +1,53 @@
-id: DAC-CS-0003
-title: 'Falcon: regsvr32 remote scriptlet'
-description: Starter Falcon IOA/correlation rule candidate.
-author: DaC
-status: experimental
-platforms:
-- crowdstrike
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- aid
+- event_platform
+status: experimental
+author: DaC
+description: 'Detects regsvr32 loading scrobj.dll with /i: (remote scriptlet / Squiblydoo-style proxy
+  execution). Direct Query-Hub LOLBin_Regsvr32 port.'
+tags:
+- enhance-tp
+- tp-quality-v2
+- processrollup2
+- esn:ProcessRollup2
+- esn:ProcessBlocked
+- qh:LOLBin_Regsvr32.yml
 mitre:
   tactics:
   - execution
   - defense-evasion
   techniques:
   - T1218.010
-severity: medium
-false_positives:
-- Tune to your environment and allowlist known tooling.
-references:
-- https://www.crowdstrike.com/
-telemetry_validated: false
-required_fields:
-- ImageFileName
-- CommandLine
-- ParentBaseFileName
+id: DAC-CS-0003
 query:
-  crowdstrike: 'falcon_ioa_pattern: ImageFileName="regsvr32.exe" AND CommandLine CONTAINS_ANY
-    ["http://","https://",".sct","scrobj.dll"]
+  crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+
+    | event_platform=Win
+
+    | ImageFileName=/regsvr32\.exe$/i
+
+    | CommandLine=/scrobj\.dll/i
+
+    | CommandLine=/[\/\-]i:/i
+
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
 
     '
+severity: medium
+title: 'Falcon: regsvr32 remote scriptlet'
+false_positives:
+- Rare legitimate COM scriptlet registration; allowlist known admin tooling and parents.
+- "Software deployment that registers scriptlets from approved shares \u2014 baseline CommandLine."
+platforms:
+- crowdstrike
+references:
+- https://attack.mitre.org/techniques/T1218/010/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/LOLBin_Regsvr32.yml

@@ -1,29 +1,49 @@
-id: DAC-CS-0002
-title: 'Falcon: Office spawning shell'
-description: Detects Office processes spawning cmd/powershell/script interpreters.
-author: DaC
-status: experimental
-platforms:
-- crowdstrike
 sourcetypes:
 - falcon:process
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- aid
+- event_platform
+status: experimental
+author: DaC
+description: "Detects Office (Word/Excel/PowerPoint/Outlook) processes spawning cmd/PowerShell/script\
+  \ hosts. Keeps prior IOA intent; enriched with Query-Hub content.outlook and Outlook\u2192browser child\
+  \ ProcessRollup2 patterns."
+tags:
+- enhance-tp
+- tp-quality-v2
+- processrollup2
+- esn:ProcessRollup2
+- qh:attachments_send_by_outlook.yml
+- qh:Hunt_links_opened_from_Outlook.yml
 mitre:
   tactics:
   - execution
   techniques:
   - T1204
-severity: high
-false_positives:
-- Legitimate add-ins; tune by user/group and doc origin.
-references:
-- https://www.crowdstrike.com/
-telemetry_validated: false
-required_fields:
-- ImageFileName
-- ParentBaseFileName
-- CommandLine
+id: DAC-CS-0002
 query:
-  crowdstrike: 'falcon_ioa_pattern: ParentBaseFileName in ["winword.exe","excel.exe","powerpnt.exe","outlook.exe"]
-    AND ImageFileName in ["cmd.exe","powershell.exe","pwsh.exe","wscript.exe","cscript.exe"]
-
-    '
+  crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| case {\n    in(ParentBaseFileName,\
+    \ values=[\"winword.exe\",\"excel.exe\",\"powerpnt.exe\",\"outlook.exe\"], ignoreCase=true)\n    \
+    \  AND ImageFileName=/\\\\(cmd|powershell|pwsh|wscript|cscript|mshta)\\.exe$/i\n      | Hypothesis\
+    \ := \"H1_OFFICE_SPAWN_SHELL\";\n    ImageFileName=/\\\\(winword|excel|powerpnt)\\.exe$/i\n      AND\
+    \ CommandLine=/content\\.outlook/i\n      | Hypothesis := \"H2_OFFICE_CONTENT_OUTLOOK\";\n    ParentBaseFileName=/^outlook\\\
+    .exe$/i\n      AND ImageFileName=/\\\\(chrome|msedge|firefox|iexplore)\\.exe$/i\n      | Hypothesis\
+    \ := \"H3_OUTLOOK_SPAWN_BROWSER\";\n    * | Hypothesis := \"NO_MATCH\";\n  }\n| Hypothesis != \"NO_MATCH\"\
+    \n| groupBy([aid, ComputerName, Hypothesis, ParentBaseFileName, ImageFileName, CommandLine], function=count())\n"
+severity: high
+title: 'Falcon: Office spawning shell'
+false_positives:
+- "Legitimate Office add-ins or macros that launch helpers \u2014 tune by user/group and document origin."
+- Outlook opening attachments from content.outlook for expected workflows; baseline before promote.
+platforms:
+- crowdstrike
+references:
+- https://attack.mitre.org/techniques/T1204/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/attachments_send_by_outlook.yml
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Hunt_links_opened_from_Outlook.yml
