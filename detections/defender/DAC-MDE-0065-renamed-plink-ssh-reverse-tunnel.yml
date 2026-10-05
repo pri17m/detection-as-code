@@ -1,0 +1,46 @@
+id: DAC-MDE-0065
+title: Renamed Plink or SSH reverse port-forward tunnel
+description: Detects SSH/Plink-style reverse or dynamic port forwards (-R/-D/RemoteForward) including renamed binaries (FileName not ssh/plink but ProcessCommandLine matches those switches). Uses SHA1 (SHA256 is usually empty).
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - command-and-control
+  - defense-evasion
+  techniques:
+  - T1572
+  - T1036.003
+  - T1090
+severity: high
+false_positives:
+- Admin remote-forward jump-host workflows — allowlist AccountName and destination ports.
+- "Tuning knob: alert only when FileName not in (ssh.exe,plink.exe) OR FolderPath outside Program Files."
+references:
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table"
+- "https://attack.mitre.org/techniques/T1572/"
+- "https://attack.mitre.org/techniques/T1036/003/"
+telemetry_validated: false
+required_fields:
+- Timestamp
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+- FolderPath
+- AccountName
+- SHA1
+tags:
+- wave1
+- tunneling
+query:
+  defender: |
+    DeviceProcessEvents
+    | where ProcessCommandLine matches regex @"\s-[RD]\s" or ProcessCommandLine has "RemoteForward"
+    | where FileName in~ ("ssh.exe","plink.exe")
+        or (FileName !in~ ("ssh.exe","plink.exe","scp.exe","sftp.exe","ssh-agent.exe","ssh-add.exe"))
+    | where not (FolderPath has_any (@"\Program Files\OpenSSH", @"\Program Files\PuTTY") and FileName in~ ("ssh.exe","plink.exe"))
+    | project Timestamp, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine, InitiatingProcessFileName, SHA1

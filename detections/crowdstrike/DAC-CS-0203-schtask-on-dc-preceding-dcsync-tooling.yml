@@ -1,0 +1,63 @@
+id: DAC-CS-0203
+title: Scheduled task registration on a DC preceding DCSync tooling
+description: Correlates ScheduledTaskRegistered with a subsequent ProcessRollup2 matching DCSync/credential-dump tooling on the same aid, requiring task timestamp before tooling timestamp within the window. DC scoping uses the Falcon aid_master_main.csv lookup (ProductType=2 = domain controller).
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- "falcon:process"
+mitre:
+  tactics:
+  - persistence
+  - credential-access
+  - execution
+  techniques:
+  - T1053.005
+  - T1003.006
+severity: critical
+false_positives:
+- DC maintenance scripts that register tasks and later run approved backup/IFM tooling — allowlist TaskName and ImageFileName.
+- "Tuning knob: if aid_master_main.csv is not populated in the tenant, fall back to a ComputerName DC naming pattern."
+references:
+- "https://attack.mitre.org/techniques/T1053/005/"
+- "https://attack.mitre.org/techniques/T1003/006/"
+- "https://github.com/CrowdStrike/logscale-community-content/blob/main/CrowdStrike-Query-Language-Map/CrowdStrike-Query-Language/parseXml.md"
+telemetry_validated: false
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ProductType
+- TaskName
+- TaskExecCommand
+- TaskExecArguments
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+tags:
+- wave1
+- ad
+- dcsync
+- schtask
+- tp-quality
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ScheduledTaskRegistered","ProcessRollup2","ProcessBlocked"])
+    | event_platform=Win
+    | match(file="aid_master_main.csv", field=aid, include=[ProductType], strict=true)
+    | ProductType=2
+    | case {
+        #event_simpleName=ScheduledTaskRegistered
+          | TaskName!=/^\\?Microsoft\\Windows\\/i
+          | Stage := "task"
+          | StageTime := @timestamp ;
+        in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+          | (CommandLine=/(secretsdump|lsadump::dcsync|ntdsutil.*ifm|ntds\.dit|--just-dc)/i OR ImageFileName=/\\(secretsdump|mimikatz|ntdsutil)\.exe$/i)
+          | Stage := "tool"
+          | StageTime := @timestamp ;
+      }
+    | selfJoinFilter(aid, where=[{Stage="task"},{Stage="tool"}])
+    | groupBy([aid], function=[{Stage="task" | min(StageTime, as=t_task)}, {Stage="tool" | min(StageTime, as=t_tool)}, collect([ComputerName, TaskName, TaskExecCommand, TaskExecArguments, ImageFileName, CommandLine], limit=20)])
+    | test(t_tool > t_task)

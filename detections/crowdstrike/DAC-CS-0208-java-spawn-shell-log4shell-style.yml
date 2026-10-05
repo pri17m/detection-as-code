@@ -1,0 +1,58 @@
+id: DAC-CS-0208
+title: Java server process spawning shell or LOLBin (Log4Shell-style)
+description: Detects java/javaw processes spawning interactive shells or LOLBins, correlated with outbound LDAP/RMI-class network connections (ports 1389/1099/389/636) from the child process — behaviour consistent with JNDI injection post-exploitation such as Log4Shell (T1190).
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- "falcon:process"
+mitre:
+  tactics:
+  - initial-access
+  - execution
+  techniques:
+  - T1190
+  - T1059
+severity: critical
+false_positives:
+- Application installers or JVM tooling that shell out during upgrades — allowlist known service accounts and install paths.
+- "Tuning knob: require NetworkConnectIP4 join to ports 1389/1099/389/636 (default); widen only after baselining."
+references:
+- "https://attack.mitre.org/techniques/T1190/"
+- "https://attack.mitre.org/techniques/T1059/"
+- "https://logging.apache.org/log4j/2.x/manual/lookups.html"
+- "https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Combine%20ProcessRollup2%20and%20NetworkConnectIP4%20Events.md"
+telemetry_validated: false
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- TargetProcessId
+- ContextProcessId
+- RemoteAddressIP4
+- RemotePort
+tags:
+- wave1
+- log4shell
+- tp-quality
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked","NetworkConnectIP4"])
+    | case {
+        in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
+          | ParentBaseFileName=/^(java|javaw|java\.exe|javaw\.exe)$/i
+          | ImageFileName=/\\(cmd|powershell|pwsh|bash|sh|curl|wget|certutil|mshta)\.exe$/i OR ImageFileName=/\/(bash|sh|curl|wget)$/i
+          | falconPID := TargetProcessId
+          | Stage := "shell" ;
+        #event_simpleName=NetworkConnectIP4
+          | in(RemotePort, values=[1389,1099,389,636])
+          | falconPID := ContextProcessId
+          | Stage := "net" ;
+      }
+    | selfJoinFilter([aid, falconPID], where=[{Stage="shell"},{Stage="net"}])
+    | groupBy([aid, falconPID], function=[count(), collect([ComputerName, ImageFileName, CommandLine, ParentBaseFileName, RemoteAddressIP4, RemotePort], limit=20)])

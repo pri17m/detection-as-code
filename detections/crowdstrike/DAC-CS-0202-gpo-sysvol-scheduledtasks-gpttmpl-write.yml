@@ -1,0 +1,46 @@
+id: DAC-CS-0202
+title: GPO persistence via SYSVOL ScheduledTasks.xml or GptTmpl.inf write
+description: "Detects *FileWritten family events under SYSVOL Policies paths targeting ScheduledTasks.xml, SecEdit\\GptTmpl.inf, GPT.INI or Registry.pol. Prefer pairing with Windows 5145/5136 SYSVOL/GPO controls. Unconfirmed in tenant: whether any #event_simpleName matching /FileWritten$/ is emitted for .xml, .inf, .ini and .pol writes (ScheduledTasks.xml, GptTmpl.inf, GPT.INI, Registry.pol) under SYSVOL."
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- "falcon:process"
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  - defense-evasion
+  techniques:
+  - T1484.001
+  - T1053.005
+severity: high
+false_positives:
+- Legitimate GPO edits via GPMC or configuration-as-code pipelines.
+- "Tuning knob: allowlist dfsrs.exe via ContextProcessId→ProcessRollup2 join; do not hard-exclude SYSTEM (SMB SYSVOL writes may attribute as System)."
+- "Tenant confirmation required: confirm any *FileWritten ESN fires for ScheduledTasks.xml / GptTmpl.inf / Registry.pol."
+references:
+- "https://attack.mitre.org/techniques/T1484/001/"
+- "https://attack.mitre.org/techniques/T1053/005/"
+- "https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Files%20Written%20to%20Removable%20Media.md"
+- "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-gpsb/2362ec36-91f7-43f1-b1ad-5f634702a239"
+telemetry_validated: false
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- TargetFileName
+- ContextProcessId
+- SHA256HashData
+- UserName
+tags:
+- wave1
+- ad
+- gpo
+- tp-quality
+query:
+  crowdstrike: |
+    #event_simpleName=/FileWritten$/ event_platform=Win
+    | TargetFileName=/\\SYSVOL\\.*\\Policies\\.*\\(Preferences\\ScheduledTasks\\ScheduledTasks\.xml|SecEdit\\GptTmpl\.inf|GPT\.INI|Registry\.pol)$/i
+    | groupBy([aid, TargetFileName, UserName, ContextProcessId], function=count())
