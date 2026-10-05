@@ -1,0 +1,41 @@
+id: DAC-CS-0221
+title: msdt invoked via the ms-msdt protocol
+description: "ProcessRollup2 for msdt.exe with ms-msdt:. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: high
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1203
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "A custom protocol handler that still calls ms-msdt."
+references:
+- https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-30190
+- https://attack.mitre.org/techniques/T1203/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- parity:DAC-WIN-0343
+- parity:DAC-MDE-0076
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ImageFileName=/\\msdt\.exe$/i
+    | CommandLine=/ms-msdt:/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

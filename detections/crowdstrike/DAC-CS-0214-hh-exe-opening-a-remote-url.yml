@@ -1,0 +1,42 @@
+id: DAC-CS-0214
+title: hh.exe opening a remote URL
+description: "ProcessRollup2 for hh.exe with an http, https, or ftp URL. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218.001
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "A help desk that opens a vendor CHM over HTTPS."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Hh/
+- https://attack.mitre.org/techniques/T1218/001/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-WIN-0335
+- parity:DAC-MDE-0068
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ImageFileName=/\\hh\.exe$/i
+    | CommandLine=/(https?:\/\/|ftp:\/\/)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

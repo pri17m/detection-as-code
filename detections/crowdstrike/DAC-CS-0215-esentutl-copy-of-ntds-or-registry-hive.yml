@@ -1,0 +1,43 @@
+id: DAC-CS-0215
+title: esentutl copy of NTDS or registry hive
+description: "ProcessRollup2 for esentutl.exe /y against ntds, /vss, or the SAM/SYSTEM/SECURITY hives. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: critical
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.003
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "Domain-controller backup jobs that copy ntds.dit with esentutl."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Esentutl/
+- https://attack.mitre.org/techniques/T1003/003/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-WIN-0336
+- parity:DAC-MDE-0069
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ImageFileName=/\\esentutl\.exe$/i
+    | CommandLine=/\/y/i
+    | CommandLine=/(\/vss|ntds\.dit|\\config\\sam|\\config\\system|\\config\\security|\\ntds\\)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

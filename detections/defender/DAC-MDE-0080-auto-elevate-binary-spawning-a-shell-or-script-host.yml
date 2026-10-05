@@ -1,0 +1,36 @@
+id: DAC-MDE-0080
+title: auto-elevate binary spawning a shell or script host
+description: "DeviceProcessEvents where fodhelper, computerdefaults, sdclt, or eventvwr starts cmd, PowerShell, wscript, cscript, mshta, rundll32, or regsvr32. mmc and SystemSettings children are not in the list. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1548.002
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "A signed settings component that is supposed to open one of these children. Review the command line."
+references:
+- https://attack.mitre.org/techniques/T1548/002/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- parity:DAC-WIN-0346
+- parity:DAC-CS-0217
+query:
+  defender: |
+    DeviceProcessEvents
+    | where InitiatingProcessFileName in~ ("fodhelper.exe", "computerdefaults.exe", "sdclt.exe", "eventvwr.exe")
+    | where FileName in~ ("cmd.exe", "powershell.exe", "pwsh.exe", "wscript.exe", "cscript.exe", "mshta.exe", "rundll32.exe", "regsvr32.exe")
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

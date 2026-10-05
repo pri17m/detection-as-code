@@ -1,0 +1,42 @@
+id: DAC-WIN-0342
+title: wsl.exe running curl, wget, or a /dev/tcp redirect
+description: "Detects wsl.exe whose command line combines curl or wget with an http(s) URL, or a /dev/tcp redirect. Plain wsl status and listing commands do not match. Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.004
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- CommandLine
+- NewProcessName
+- Image
+- ParentProcessName
+telemetry_validated: false
+false_positives:
+- "Developers who curl a package from inside an explicit wsl.exe command line."
+references:
+- https://learn.microsoft.com/windows/wsl/basic-commands
+- https://attack.mitre.org/techniques/T1059/004/
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+tags:
+- quality-wave
+- parity:DAC-MDE-0075
+- parity:DAC-CS-0220
+query:
+  splunk: |
+    ((sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode=4688) OR (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+    | eval proc=lower(coalesce(NewProcessName, Image, process_path, process))
+    | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, parent_process_name, ParentImage))
+    | where match(proc, "(^|\\)wsl\.exe$") AND match(cmd, "(curl|wget).{0,80}https?://|https?://.{0,80}(curl|wget)|/dev/tcp/")
+    | stats count values(proc) as processes values(parent) as parents values(cmd) as commands by host

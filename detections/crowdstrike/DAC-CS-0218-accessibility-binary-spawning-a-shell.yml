@@ -1,0 +1,41 @@
+id: DAC-CS-0218
+title: accessibility binary spawning a shell
+description: "ProcessRollup2 where ParentBaseFileName is sethc, utilman, osk, magnify, or narrator and the child is cmd or PowerShell. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1546.008
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "Assistive technology that launches PowerShell by design."
+references:
+- https://attack.mitre.org/techniques/T1546/008/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- parity:DAC-WIN-0347
+- parity:DAC-MDE-0081
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ParentBaseFileName=/^(sethc|utilman|osk|magnify|narrator)\.exe$/i
+    | ImageFileName=/\\(cmd|powershell|pwsh)\.exe$/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

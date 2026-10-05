@@ -1,0 +1,39 @@
+id: DAC-MDE-0075
+title: wsl.exe running curl, wget, or a /dev/tcp redirect
+description: "DeviceProcessEvents for wsl.exe whose command line pairs curl or wget with http(s), or contains /dev/tcp/. Status and list commands do not match. Linux-side curl inside a distro is a different DeviceProcessEvents row and is not this rule. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: medium
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.004
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "Developers who pass curl to wsl.exe on the Windows command line."
+references:
+- https://learn.microsoft.com/windows/wsl/basic-commands
+- https://attack.mitre.org/techniques/T1059/004/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- parity:DAC-WIN-0342
+- parity:DAC-CS-0220
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName =~ "wsl.exe"
+    | where ProcessCommandLine contains "/dev/tcp/"
+        or ((ProcessCommandLine contains "curl" or ProcessCommandLine contains "wget")
+            and (ProcessCommandLine contains "http://" or ProcessCommandLine contains "https://"))
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

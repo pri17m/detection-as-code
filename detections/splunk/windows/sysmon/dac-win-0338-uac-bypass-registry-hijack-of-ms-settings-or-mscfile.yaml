@@ -1,0 +1,37 @@
+id: DAC-WIN-0338
+title: UAC bypass registry hijack of ms-settings or mscfile
+description: "Sysmon 13 value set under Software\\Classes\\ms-settings\\shell\\open\\command or mscfile\\shell\\open\\command. Those HKCU keys are the fodhelper, computerdefaults, eventvwr, and sdclt bypass. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1548.002
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- TargetObject
+- Details
+- Image
+telemetry_validated: false
+false_positives:
+- "Security test tooling that plants the bypass key in a lab. Not expected on user workstations."
+references:
+- https://attack.mitre.org/techniques/T1548/002/
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+tags:
+- quality-wave
+- parity:DAC-MDE-0071
+query:
+  splunk: |
+    sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=13
+    | eval obj=lower(coalesce(TargetObject))
+    | eval img=lower(coalesce(Image))
+    | eval details=lower(coalesce(Details))
+    | where match(obj, "\\software\\classes\\(ms-settings|mscfile)\\shell\\open\\command")
+    | stats count values(obj) as registry_paths values(details) as details values(img) as images by host, User

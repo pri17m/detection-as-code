@@ -1,0 +1,39 @@
+id: DAC-MDE-0070
+title: desktopimgdownldr lockscreen URL outside Microsoft
+description: "DeviceProcessEvents for desktopimgdownldr.exe /lockscreenurl whose host is not a Microsoft Spotlight CDN. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1105
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "A management tool that sets a custom lock-screen image host."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Desktopimgdownldr/
+- https://attack.mitre.org/techniques/T1105/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-WIN-0337
+- parity:DAC-CS-0216
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName =~ "desktopimgdownldr.exe"
+    | where ProcessCommandLine contains "lockscreenurl"
+    | where not(ProcessCommandLine matches regex @"(?i)lockscreenurl:\s*https?://([a-z0-9.-]*\.)?(microsoft\.com|windows\.com|live\.com|bing\.com|msn\.com|azureedge\.net|microsoftonline\.com)([/:?\s]|$)")
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

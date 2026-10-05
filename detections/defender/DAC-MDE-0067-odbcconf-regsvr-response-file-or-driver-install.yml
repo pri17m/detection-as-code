@@ -1,0 +1,41 @@
+id: DAC-MDE-0067
+title: odbcconf REGSVR, response file, or driver install
+description: "DeviceProcessEvents for odbcconf.exe with REGSVR, a response-file -f, INSTALLDRIVER, or configsysdsn. FileName and ProcessCommandLine are Advanced Hunting columns. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218.008
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "ODBC driver installers. Allowlist the installer SHA256."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Odbcconf/
+- https://attack.mitre.org/techniques/T1218/008/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-WIN-0334
+- parity:DAC-CS-0213
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName =~ "odbcconf.exe"
+    | where ProcessCommandLine contains "REGSVR"
+        or ProcessCommandLine contains "INSTALLDRIVER"
+        or ProcessCommandLine contains "configsysdsn"
+        or ProcessCommandLine matches regex @"(\s|^)[-/]f(\s|$)"
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

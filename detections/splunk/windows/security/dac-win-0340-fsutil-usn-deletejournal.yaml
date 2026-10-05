@@ -1,0 +1,41 @@
+id: DAC-WIN-0340
+title: fsutil usn deletejournal
+description: "Detects fsutil.exe deleting the NTFS USN change journal. Readjournal and other fsutil verbs do not match. Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1070
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- CommandLine
+- NewProcessName
+- Image
+- ParentProcessName
+telemetry_validated: false
+false_positives:
+- "Disk-maintenance scripts that rebuild the USN journal. Allowlist the maintenance host."
+references:
+- https://learn.microsoft.com/windows-server/administration/windows-commands/fsutil-usn
+- https://attack.mitre.org/techniques/T1070/
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+tags:
+- quality-wave
+- parity:DAC-MDE-0073
+query:
+  splunk: |
+    ((sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode=4688) OR (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+    | eval proc=lower(coalesce(NewProcessName, Image, process_path, process))
+    | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, parent_process_name, ParentImage))
+    | where match(proc, "(^|\\)fsutil\.exe$") AND match(cmd, "usn\s+deletejournal")
+    | stats count values(proc) as processes values(parent) as parents values(cmd) as commands by host

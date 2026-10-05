@@ -1,0 +1,37 @@
+id: DAC-MDE-0081
+title: accessibility binary spawning a shell
+description: "DeviceProcessEvents where sethc, utilman, osk, magnify, or narrator starts cmd or PowerShell. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1546.008
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "Assistive technology that launches PowerShell by design."
+references:
+- https://attack.mitre.org/techniques/T1546/008/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- parity:DAC-WIN-0347
+- parity:DAC-CS-0218
+query:
+  defender: |
+    DeviceProcessEvents
+    | where InitiatingProcessFileName in~ ("sethc.exe", "utilman.exe", "osk.exe", "magnify.exe", "narrator.exe")
+    | where FileName in~ ("cmd.exe", "powershell.exe", "pwsh.exe")
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

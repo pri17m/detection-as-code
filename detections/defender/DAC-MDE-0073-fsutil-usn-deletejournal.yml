@@ -1,0 +1,35 @@
+id: DAC-MDE-0073
+title: fsutil usn deletejournal
+description: "DeviceProcessEvents for fsutil.exe with usn deletejournal. readjournal does not match. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: medium
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1070
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "Disk-maintenance scripts that rebuild the USN journal."
+references:
+- https://learn.microsoft.com/windows-server/administration/windows-commands/fsutil-usn
+- https://attack.mitre.org/techniques/T1070/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- parity:DAC-WIN-0340
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName =~ "fsutil.exe" and ProcessCommandLine contains "usn" and ProcessCommandLine contains "deletejournal"
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

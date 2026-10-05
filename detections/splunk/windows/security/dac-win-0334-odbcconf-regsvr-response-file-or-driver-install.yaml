@@ -1,0 +1,43 @@
+id: DAC-WIN-0334
+title: odbcconf REGSVR, response file, or driver install
+description: "Detects odbcconf.exe invoked with LOLBAS proxy-execution arguments (REGSVR, response file -f, INSTALLDRIVER, configsysdsn) on Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218.008
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- CommandLine
+- NewProcessName
+- Image
+- ParentProcessName
+telemetry_validated: false
+false_positives:
+- "ODBC driver installers that call INSTALLDRIVER or configsysdsn. Allowlist the known installer image and parent."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Odbcconf/
+- https://attack.mitre.org/techniques/T1218/008/
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-MDE-0067
+- parity:DAC-CS-0213
+query:
+  splunk: |
+    ((sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode=4688) OR (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+    | eval proc=lower(coalesce(NewProcessName, Image, process_path, process))
+    | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, parent_process_name, ParentImage))
+    | where match(proc, "(^|\\)odbcconf\.exe$") AND match(cmd, "(regsvr|installdriver|configsysdsn|(^|\s)[-/]f(\s|$))")
+    | stats count values(proc) as processes values(parent) as parents values(cmd) as commands by host

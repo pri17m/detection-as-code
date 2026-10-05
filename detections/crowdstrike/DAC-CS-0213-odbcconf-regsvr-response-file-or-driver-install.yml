@@ -1,0 +1,42 @@
+id: DAC-CS-0213
+title: odbcconf REGSVR, response file, or driver install
+description: "ProcessRollup2 or ProcessBlocked for odbcconf.exe with REGSVR, -f, INSTALLDRIVER, or configsysdsn. ImageFileName and CommandLine are ProcessRollup2 fields. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218.008
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "ODBC driver installers. Allowlist the parent image."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Odbcconf/
+- https://attack.mitre.org/techniques/T1218/008/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-WIN-0334
+- parity:DAC-MDE-0067
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ImageFileName=/\\odbcconf\.exe$/i
+    | CommandLine=/(regsvr|installdriver|configsysdsn|(\s|^)[-/]f(\s|$))/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

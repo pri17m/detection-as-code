@@ -1,0 +1,43 @@
+id: DAC-CS-0219
+title: pcalua proxy execution of a script, DLL, or user-writable file
+description: "ProcessRollup2 for pcalua.exe -a against a DLL, CPL, script, UNC, URL, or user-writable directory. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1202
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "A compatibility shim that launches a vendor binary from a user-writable path."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Pcalua/
+- https://attack.mitre.org/techniques/T1202/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-WIN-0341
+- parity:DAC-MDE-0074
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ImageFileName=/\\pcalua\.exe$/i
+    | CommandLine=/(^|\s)-a(\s|$)/i
+    | CommandLine=/(\\\\|\\users\\|\\temp\\|\\public\\|\\appdata\\|\\programdata\\|https?:\/\/|\.dll\b|\.cpl\b|\.js\b|\.vbs\b|\.hta\b|\.bat\b|\.cmd\b|\.ps1\b)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

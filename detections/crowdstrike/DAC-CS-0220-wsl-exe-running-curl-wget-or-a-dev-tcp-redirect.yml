@@ -1,0 +1,41 @@
+id: DAC-CS-0220
+title: wsl.exe running curl, wget, or a /dev/tcp redirect
+description: "ProcessRollup2 for wsl.exe with curl or wget plus http(s), or /dev/tcp/. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: medium
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.004
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "Developers who pass curl to wsl.exe on the Windows command line."
+references:
+- https://learn.microsoft.com/windows/wsl/basic-commands
+- https://attack.mitre.org/techniques/T1059/004/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- parity:DAC-WIN-0342
+- parity:DAC-MDE-0075
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ImageFileName=/\\wsl\.exe$/i
+    | CommandLine=/((curl|wget).{0,80}https?:\/\/|https?:\/\/.{0,80}(curl|wget)|\/dev\/tcp\/)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

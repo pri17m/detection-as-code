@@ -1,0 +1,42 @@
+id: DAC-WIN-0346
+title: auto-elevate binary spawning a shell or script host
+description: "Detects fodhelper, computerdefaults, sdclt, or eventvwr spawning cmd, PowerShell, wscript, cscript, mshta, rundll32, or regsvr32. eventvwr spawning mmc, and fodhelper spawning SystemSettings, do not match. Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1548.002
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- CommandLine
+- NewProcessName
+- Image
+- ParentProcessName
+telemetry_validated: false
+false_positives:
+- "An accessibility or settings component that is supposed to open a signed management console other than mmc. Review the child command line."
+references:
+- https://attack.mitre.org/techniques/T1548/002/
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+tags:
+- quality-wave
+- parity:DAC-MDE-0080
+- parity:DAC-CS-0217
+query:
+  splunk: |
+    ((sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode=4688) OR (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+    | eval proc=lower(coalesce(NewProcessName, Image, process_path, process))
+    | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, parent_process_name, ParentImage))
+    | where match(parent, "(^|\\)(fodhelper|computerdefaults|sdclt|eventvwr)\.exe$") AND match(proc, "(^|\\)(cmd|powershell|pwsh|wscript|cscript|mshta|rundll32|regsvr32)\.exe$")
+    | stats count values(proc) as processes values(parent) as parents values(cmd) as commands by host

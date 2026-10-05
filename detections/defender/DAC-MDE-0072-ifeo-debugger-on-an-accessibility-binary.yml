@@ -1,0 +1,38 @@
+id: DAC-MDE-0072
+title: IFEO debugger on an accessibility binary
+description: "DeviceRegistryEvents Debugger value on Image File Execution Options for sethc, utilman, osk, magnify, narrator, displayswitch, or atbroker. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1546.008
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- RegistryKey
+- RegistryValueName
+- RegistryValueData
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "An assistive-technology vendor that installs a debugger on Narrator or Magnifier."
+references:
+- https://attack.mitre.org/techniques/T1546/008/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceregistryevents-table
+tags:
+- quality-wave
+- parity:DAC-WIN-0339
+query:
+  defender: |
+    DeviceRegistryEvents
+    | where RegistryKey contains @"\Image File Execution Options\"
+    | where RegistryValueName =~ "Debugger"
+    | where RegistryKey has_any ("sethc.exe", "utilman.exe", "osk.exe", "magnify.exe", "narrator.exe", "displayswitch.exe", "atbroker.exe")
+    | project Timestamp, DeviceName, RegistryKey, RegistryValueName, RegistryValueData, InitiatingProcessFileName

@@ -1,0 +1,36 @@
+id: DAC-MDE-0076
+title: msdt invoked via the ms-msdt protocol
+description: "DeviceProcessEvents for msdt.exe with ms-msdt:. Troubleshooter /id launches are ignored. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1203
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "A custom protocol handler that still calls ms-msdt after the 2022 hardening."
+references:
+- https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-30190
+- https://attack.mitre.org/techniques/T1203/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- parity:DAC-WIN-0343
+- parity:DAC-CS-0221
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName =~ "msdt.exe" and ProcessCommandLine contains "ms-msdt:"
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

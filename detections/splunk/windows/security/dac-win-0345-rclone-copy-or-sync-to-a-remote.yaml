@@ -1,0 +1,42 @@
+id: DAC-WIN-0345
+title: rclone copy or sync to a remote
+description: "Detects rclone.exe copy, sync, rcat, or move together with a remote (:), --config, mega, or webdav. version, help, and config-only commands do not match. Security 4688 or Sysmon 1. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - exfiltration
+  techniques:
+  - T1567.002
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- CommandLine
+- NewProcessName
+- Image
+- ParentProcessName
+telemetry_validated: false
+false_positives:
+- "Approved backup jobs that sync a directory with rclone. Allowlist the service account and remote name."
+references:
+- https://rclone.org/commands/rclone_copy/
+- https://attack.mitre.org/techniques/T1567/002/
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+tags:
+- quality-wave
+- parity:DAC-MDE-0078
+- parity:DAC-CS-0223
+query:
+  splunk: |
+    ((sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode=4688) OR (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+    | eval proc=lower(coalesce(NewProcessName, Image, process_path, process))
+    | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, parent_process_name, ParentImage))
+    | where match(proc, "(^|\\)rclone\.exe$") AND match(cmd, "(^|\s)(copy|sync|rcat|move)(\s|$)") AND match(cmd, "(:|--config\b|mega|webdav)")
+    | stats count values(proc) as processes values(parent) as parents values(cmd) as commands by host

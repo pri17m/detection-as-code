@@ -1,0 +1,42 @@
+id: DAC-MDE-0078
+title: rclone copy or sync to a remote
+description: "DeviceProcessEvents for rclone.exe copy, sync, rcat, or move with a remote, --config, mega, or webdav. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - exfiltration
+  techniques:
+  - T1567.002
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "Approved rclone backup jobs. Allowlist the account and remote."
+references:
+- https://rclone.org/commands/rclone_copy/
+- https://attack.mitre.org/techniques/T1567/002/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- parity:DAC-WIN-0345
+- parity:DAC-CS-0223
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName =~ "rclone.exe"
+    | where ProcessCommandLine has_any (" copy ", " sync ", " rcat ", " move ")
+        or ProcessCommandLine startswith "copy "
+        or ProcessCommandLine startswith "sync "
+        or ProcessCommandLine startswith "rcat "
+        or ProcessCommandLine startswith "move "
+    | where ProcessCommandLine contains ":" or ProcessCommandLine contains "--config" or ProcessCommandLine contains "mega" or ProcessCommandLine contains "webdav"
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

@@ -1,0 +1,40 @@
+id: DAC-MDE-0079
+title: Add-MpPreference exclusion
+description: "DeviceProcessEvents for powershell.exe or pwsh.exe calling Add-MpPreference with ExclusionPath, ExclusionProcess, ExclusionExtension, or ExclusionIpAddress. DisableRealtimeMonitoring is a separate rule. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.001
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "Security administrators who add Defender exclusions from PowerShell. Allowlist the management host."
+references:
+- https://learn.microsoft.com/defender-endpoint/configure-process-opened-file-exclusions-microsoft-defender-antivirus
+- https://attack.mitre.org/techniques/T1562/001/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- parity:DAC-CS-0224
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName in~ ("powershell.exe", "pwsh.exe")
+    | where ProcessCommandLine contains "Add-MpPreference"
+    | where ProcessCommandLine contains "-ExclusionPath"
+        or ProcessCommandLine contains "-ExclusionProcess"
+        or ProcessCommandLine contains "-ExclusionExtension"
+        or ProcessCommandLine contains "-ExclusionIpAddress"
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

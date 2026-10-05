@@ -1,0 +1,38 @@
+id: DAC-WIN-0339
+title: IFEO debugger on an accessibility binary
+description: "Sysmon 13 Debugger value under Image File Execution Options for sethc, utilman, osk, magnify, narrator, displayswitch, or atbroker. Other IFEO keys, including notepad, do not match. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1546.008
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- TargetObject
+- Details
+- Image
+telemetry_validated: false
+false_positives:
+- "An application-compatibility debugger attached to Narrator or Magnifier by an assistive-tech vendor. Allowlist that debugger path."
+references:
+- https://attack.mitre.org/techniques/T1546/008/
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+tags:
+- quality-wave
+- parity:DAC-MDE-0072
+query:
+  splunk: |
+    sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=13
+    | eval obj=lower(coalesce(TargetObject))
+    | eval img=lower(coalesce(Image))
+    | eval details=lower(coalesce(Details))
+    | where match(obj, "\\image file execution options\\(sethc|utilman|osk|magnify|narrator|displayswitch|atbroker)\.exe\\debugger")
+    | stats count values(obj) as registry_paths values(details) as details values(img) as images by host, User

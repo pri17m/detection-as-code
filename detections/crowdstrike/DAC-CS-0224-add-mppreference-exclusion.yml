@@ -1,0 +1,41 @@
+id: DAC-CS-0224
+title: Add-MpPreference exclusion
+description: "ProcessRollup2 for powershell.exe or pwsh.exe calling Add-MpPreference with an exclusion parameter. Predicate checked against documented malicious and benign command lines. telemetry_validated stays false until an org replays the search on its own telemetry."
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.001
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "Security administrators who add Defender exclusions from PowerShell."
+references:
+- https://learn.microsoft.com/defender-endpoint/configure-process-opened-file-exclusions-microsoft-defender-antivirus
+- https://attack.mitre.org/techniques/T1562/001/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- parity:DAC-MDE-0079
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ImageFileName=/\\(powershell|pwsh)\.exe$/i
+    | CommandLine=/add-mppreference/i
+    | CommandLine=/-(exclusionpath|exclusionprocess|exclusionextension|exclusionipaddress)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
