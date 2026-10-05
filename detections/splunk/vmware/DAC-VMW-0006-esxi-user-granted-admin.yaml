@@ -1,0 +1,41 @@
+id: DAC-VMW-0006
+title: ESXi permission set grants the Admin role
+description: Detects esxcli system permission set assigning the Admin role. That is a local privilege grant on the hypervisor.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1098
+  - T1078
+severity: high
+false_positives:
+- Planned maintenance or host rebuilds. Confirm the actor and change window.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_user_granted_admin_role.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*esxcli system permission set*" Message="*role Admin*"
+
+    | rex field=_raw "\]: \[(?<user>\w+)\]:(?<command>.+)"
+
+    | rex field=command "--id (?<target_user>\w+)"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(command) as command by dest user target_user
+
+    '

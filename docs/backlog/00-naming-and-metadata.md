@@ -2,9 +2,8 @@
 
 **Audience:** Detection Engineer → Threat Detection Engineer  
 **Repo:** https://github.com/pri17m/detection-as-code  
-**Threat Intel:** `/workspace/dac-phase1-windows-ad-attack-pack.md`  
-**Telemetry canonical:** `/workspace/dac-telemetry-windows/` (`config/sourcetype_map.yaml` + docs)  
-**Scaffold branch:** `cursor/dac-scaffold-05fa`
+**Threat Intel:** internal planning pack (not included in this repo)  
+**Telemetry canonical:** `config/sourcetype_map.yaml` + `docs/telemetry/windows-splunk.md`
 
 ---
 
@@ -38,7 +37,7 @@ Query rules: **must** use macro/`sourcetype=`; **must not** use `index=`.
 
 Also: WinEventLog / XmlWinEventLog + `source=` channel (TA≥5).
 
-Authoritative map lives under **`/workspace/dac-telemetry-windows/config/sourcetype_map.yaml`** (absorbed into scaffold `cursor/dac-scaffold-05fa`).
+Authoritative map lives under `config/sourcetype_map.yaml`.
 
 Do **not** invent TaskScheduler/WMI/TerminalServices/CA keys yet — flag `telemetry_gap`.
 
@@ -95,4 +94,4 @@ tests/windows/
 
 ## 6. required_fields
 
-Only from Telemetry map (`/workspace/dac-phase1/telemetry-required-fields-preview.md` and `/workspace/dac-telemetry-windows/`). Unknown Event IDs → `[]` + `telemetry_gap`.
+Only from the telemetry map (`config/sourcetype_map.yaml` and `docs/telemetry/*`). Unknown Event IDs → `[]` + `telemetry_gap`.

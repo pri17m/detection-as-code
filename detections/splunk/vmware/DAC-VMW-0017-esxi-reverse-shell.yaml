@@ -1,0 +1,35 @@
+id: DAC-VMW-0017
+title: ESXi reverse shell command patterns
+description: Detects bash, socat, /dev/tcp, /dev/udp, or a Python socket one-liner in an ESXi syslog message. Those strings are how a host shell is turned into a callback.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059
+severity: critical
+false_positives:
+- A lab exercise that pastes a reverse-shell string into a note or a command history. The patterns are not part of normal esxcli.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_reverse_shell_patterns.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) (Message IN ("*bash -i >&*","*/dev/tcp/*","*/dev/udp/*","*socat exec:*","*socket(S,PF_INET*") OR (Message="*python -c*" AND Message="*import socket*"))
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(Message) as Message by dest
+
+    '

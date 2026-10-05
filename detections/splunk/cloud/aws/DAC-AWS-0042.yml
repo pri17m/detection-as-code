@@ -1,0 +1,64 @@
+id: DAC-AWS-0042
+title: 'AWS: S3 ListBuckets recon by AssumedRole or rare principal'
+description: 'IR Part 1 Scenario 1 recon: S3 ListBuckets is a CloudTrail management API and is portable
+  on aws:cloudtrail without data events. Flags AssumedRole, federated callers, and CLI-like userAgents.
+  Not covered by DAC-AWS-0035.
+
+  '
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+mitre:
+  tactics:
+  - discovery
+  - collection
+  techniques:
+  - T1580
+  - T1530
+severity: medium
+false_positives:
+- "Inventory, CSPM, backup, and FinOps roles list buckets on a schedule \u2014 allowlist those role ARNs\
+  \ after baseline."
+- AWS console S3 home page issues ListBuckets; pair with AssumedRole plus unusual IP or UA to reduce FP.
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
+- https://attack.mitre.org/techniques/T1580/
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html
+telemetry_validated: false
+required_fields:
+- eventName
+- eventSource
+- userIdentity.type
+- userIdentity.arn
+- sourceIPAddress
+- userAgent
+- awsRegion
+- recipientAccountId
+tags:
+- cloudtrail-ir-part1
+- P0
+- tp-quality
+- scenario-1
+- s3-management
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource=s3.amazonaws.com eventName=ListBuckets
+
+    | search userIdentity.type IN ("AssumedRole", "IAMUser", "FederatedUser", "WebIdentityUser")
+
+    | eval ua=coalesce(userAgent, "")
+
+    | eval unusual_ua=if(match(ua, "(?i)(aws-cli|boto|python-requests|curl|Go-http-client|okhttp|powershell)")
+    AND NOT match(ua, "(?i)(console.amazonaws.com|S3Console)"), "true", "false")
+
+    | stats count dc(sourceIPAddress) as src_ips dc(awsRegion) as regions min(_time) as first_seen max(_time)
+    as last_seen values(sourceIPAddress) as sourceIPAddress values(userAgent) as userAgent values(recipientAccountId)
+    as recipientAccountId values(unusual_ua) as unusual_ua by userIdentity.arn, userIdentity.type
+
+    | where count>=1 AND (userIdentity.type="AssumedRole" OR unusual_ua="true" OR src_ips>=2)
+
+    '

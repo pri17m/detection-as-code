@@ -1,5 +1,5 @@
 # ProcessRollup family — field deep dive
-**Corpus:** [ByteRay-Labs/Query-Hub](https://github.com/ByteRay-Labs/Query-Hub) (`/workspace/Query-Hub`)
+**Corpus:** [ByteRay-Labs/Query-Hub](https://github.com/ByteRay-Labs/Query-Hub)
 **LogScale note:** filter with tagged `#event_simpleName=ProcessRollup2` (hash required for tags).
 
 

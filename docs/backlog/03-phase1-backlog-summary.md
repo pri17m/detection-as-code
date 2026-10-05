@@ -4,9 +4,8 @@
 **From:** Detection Engineer (DaC Phase-1 planning)  
 **Date:** 2026-09-10 (Asia/Kolkata)  
 **Repo:** https://github.com/pri17m/detection-as-code  
-**Scaffold branch:** `cursor/dac-scaffold-05fa`  
-**Threat Intel pack:** `/workspace/dac-phase1-windows-ad-attack-pack.md`  
-**Telemetry canonical:** `/workspace/dac-telemetry-windows/` (`config/sourcetype_map.yaml` + docs)
+**Threat Intel pack:** internal planning pack (not included in this repo)  
+**Telemetry canonical:** `config/sourcetype_map.yaml` + `docs/telemetry/windows-splunk.md`
 
 ---
 
@@ -67,7 +66,7 @@ Contract-aligned Windows backlog of **97** analytics (`DAC-WIN-0001` … `DAC-WI
 
 ## Telemetry / scaffold dependencies
 
-1. Use **`/workspace/dac-telemetry-windows/config/sourcetype_map.yaml`** (scaffold branch `cursor/dac-scaffold-05fa`).
+1. Use `config/sourcetype_map.yaml`.
 2. Expand field map for 4662, 5145, 4719, 4702, 4724, 4740/4741, 4738, 5136/5137, 4886–4888, 4104; Sysmon 4/6/8/16/17–21/25.
 3. fieldsummary before leaving draft.
 4. Tier-0 + jump-host allowlists for Valid Accounts / RDP.
@@ -78,11 +77,10 @@ Contract-aligned Windows backlog of **97** analytics (`DAC-WIN-0001` … `DAC-WI
 
 | Path |
 | --- |
-| `/workspace/dac-phase1/00-naming-and-metadata.md` |
-| `/workspace/dac-phase1/01-priority-100-windows-detections.md` |
-| `/workspace/dac-phase1/02-sigmahq-import-shortlist.md` |
-| `/workspace/dac-phase1/03-phase1-backlog-summary.md` |
-| `/workspace/dac-phase1/priority-100.csv` |
+| `docs/backlog/00-naming-and-metadata.md` |
+| `docs/backlog/02-sigmahq-import-shortlist.md` |
+| `docs/backlog/03-phase1-backlog-summary.md` |
+| `docs/backlog/priority-100.csv` |
 
 ---
 

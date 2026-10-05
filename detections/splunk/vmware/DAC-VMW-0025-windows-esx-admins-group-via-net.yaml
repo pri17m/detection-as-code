@@ -1,0 +1,50 @@
+id: DAC-VMW-0025
+title: Windows net1.exe creates the ESX Admins group
+description: Detects net1.exe, or a process whose original file name is net1.exe, adding a group named ESX Admins. Security 4688 and Sysmon process creation are both covered. net.exe is included as well, because Windows often logs the stub under that name; the ESCU macro itself matches only net1.exe. This is the command-line form of the CVE-2024-37085 group recreate.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- sysmon
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1136.001
+  - T1136.002
+severity: high
+false_positives:
+- A VMware administrator creating the ESX Admins group on purpose. CVE-2024-37085 is abused by recreating that exact group, so confirm the actor and the domain controller.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/endpoint/windows_esx_admins_group_creation_via_net.yml
+- https://www.microsoft.com/en-us/security/blog/2024/07/29/ransomware-operators-exploit-esxi-hypervisor-vulnerability-for-mass-encryption/
+- https://support.broadcom.com/web/ecx/support-content-notification/-/external/content/SecurityAdvisories/0/24505
+telemetry_validated: false
+required_fields:
+- EventCode
+- CommandLine
+- OriginalFileName
+tags:
+- vmware
+- esx-admins
+- cve-2024-37085
+- escu
+query:
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security OR sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=sysmon) (EventCode=4688 OR EventCode=1)
+
+    | eval proc=lower(coalesce(NewProcessName, Image, process_path))
+
+    | eval orig=lower(coalesce(OriginalFileName, original_file_name))
+
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+
+    | where (match(proc, "(^|\\)net1?\.exe$") OR orig="net1.exe" OR orig="net.exe") AND match(cmd, "group") AND match(cmd, "esx admins") AND match(cmd, "/add")
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(cmd) as commands values(proc) as processes values(orig) as original_file by host, SubjectUserName, User
+
+    '

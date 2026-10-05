@@ -1,0 +1,38 @@
+id: DAC-VMW-0010
+title: ESXi audit records configuration changed
+description: Detects esxcli system auditrecords pointed at remote or local storage, excluding shell-echo lines. Changing where audit records go is a way to blind the host.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1690
+  - T1070
+severity: high
+false_positives:
+- Planned maintenance or host rebuilds. Confirm the actor and change window.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_audit_tampering.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*esxcli system auditrecords*" Message IN ("*remote*","*local*") NOT Message="*[shell*"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | rex field=_raw "\[(?<user>[^\]]+)\]:\s(?<command>esxcli system auditrecords.*)"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(command) as command by dest user
+
+    '

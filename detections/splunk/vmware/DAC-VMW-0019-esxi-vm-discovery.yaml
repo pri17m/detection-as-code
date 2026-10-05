@@ -1,0 +1,37 @@
+id: DAC-VMW-0019
+title: ESXi virtual machine process list
+description: Detects esxcli vm process list. Attackers list running VMs before they export or kill them.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1673
+severity: low
+false_positives:
+- Administrators listing VMs during maintenance. Pair with VM export or bulk termination on the same host.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_vm_discovery.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*esxcli vm process*" Message="*list*"
+
+    | rex field=_raw "\]: \[(?<user>\w+)\]:(?<command>.+)"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(command) as command by dest user
+
+    '

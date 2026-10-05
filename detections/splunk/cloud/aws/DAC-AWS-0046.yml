@@ -1,0 +1,62 @@
+id: DAC-AWS-0046
+title: 'AWS: CloudShell userAgent creating stack, instance, or IAM user'
+description: 'IR Part 1 Scenario 2 console-to-CloudShell pivot: userAgent contains exec-env/CloudShell
+  (often with sessionCredentialFromConsole=true) performing CreateStack, UpdateStack, RunInstances, CreateUser,
+  or CreateAccessKey.
+
+  '
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+mitre:
+  tactics:
+  - execution
+  - persistence
+  techniques:
+  - T1059.009
+  - T1078.004
+severity: high
+false_positives:
+- "Admin troubleshooting from CloudShell is common \u2014 eventNames are already gated to privileged APIs;\
+  \ baseline CloudShell admin ARNs."
+- Custom UA spoofing can evade; pair with sessionCredentialFromConsole when present.
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
+- https://attack.mitre.org/techniques/T1059/009/
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+telemetry_validated: false
+required_fields:
+- eventName
+- userAgent
+- sessionCredentialFromConsole
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+- requestParameters.stackName
+tags:
+- cloudtrail-ir-part1
+- P0
+- tp-quality
+- scenario-2
+- cloudshell
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search userAgent="*exec-env/CloudShell*"
+
+    | search eventName IN ("CreateStack", "UpdateStack", "RunInstances", "CreateUser", "CreateAccessKey",
+    "CreateLoginProfile")
+
+    | eval from_console=if(sessionCredentialFromConsole=true OR sessionCredentialFromConsole="true", "true",
+    "false")
+
+    | stats count values(eventName) as eventNames values(requestParameters.stackName) as stackName values(sourceIPAddress)
+    as sourceIPAddress values(awsRegion) as awsRegion min(_time) as first_seen max(_time) as last_seen
+    by userIdentity.arn, userAgent, from_console
+
+    | where count>=1
+
+    '

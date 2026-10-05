@@ -1,7 +1,7 @@
 id: DAC-CS-0071
 status: experimental
 severity: medium
-author: Detection Engineer
+author: DaC
 false_positives:
 - "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
   \ before promote."

@@ -1,0 +1,74 @@
+id: DAC-AWS-0047
+title: 'AWS: CloudFormation stackName crypto/miner keywords or IAM capability from CloudShell'
+description: 'IR Part 1 Scenario 2 mining: CreateStack or UpdateStack whose requestParameters.stackName
+  matches crypto, miner, xmrig, nicehash, stratum, or CAPABILITY_IAM / CAPABILITY_NAMED_IAM issued from
+  CloudShell or a console session. Enhances thin DAC-AWS-0038 (capabilities-only).
+
+  '
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+mitre:
+  tactics:
+  - impact
+  - resource-development
+  techniques:
+  - T1496
+  - T1578
+severity: high
+false_positives:
+- "Stack names containing miner for data-mining analytics (not cryptominers) will hit \u2014 tune keyword\
+  \ list per org."
+- CAPABILITY_IAM from CloudShell may be legitimate IaC experiments; combine with stackName keywords for
+  higher fidelity.
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
+- https://attack.mitre.org/techniques/T1496/
+- https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-api-logging-cloudtrail.html
+telemetry_validated: false
+required_fields:
+- eventName
+- eventSource
+- requestParameters.stackName
+- requestParameters.capabilities
+- userAgent
+- sessionCredentialFromConsole
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+- responseElements.stackId
+tags:
+- cloudtrail-ir-part1
+- P0
+- tp-quality
+- scenario-2
+- cloudformation
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource=cloudformation.amazonaws.com eventName IN ("CreateStack", "UpdateStack")
+
+    | eval stack=coalesce(''requestParameters.stackName'', "")
+
+    | eval caps=coalesce(''requestParameters.capabilities'', "")
+
+    | eval miner_name=if(match(stack, "(?i)(crypto|cryptonight|xmrig|nicehash|stratum|minerd|monero|coinminer)"),
+    "true", "false")
+
+    | eval iam_cap=if(match(caps, "(?i)CAPABILITY_(NAMED_)?IAM"), "true", "false")
+
+    | eval cloudshell=if(match(coalesce(userAgent,""), "exec-env/CloudShell") OR sessionCredentialFromConsole=true
+    OR sessionCredentialFromConsole="true", "true", "false")
+
+    | search miner_name=true OR (iam_cap=true AND cloudshell=true)
+
+    | stats count values(eventName) as eventNames values(stack) as stackName values(caps) as capabilities
+    values(responseElements.stackId) as stackId values(sourceIPAddress) as sourceIPAddress values(userAgent)
+    as userAgent values(awsRegion) as awsRegion by userIdentity.arn, miner_name, iam_cap, cloudshell
+
+    | where count>=1
+
+    '

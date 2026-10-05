@@ -33,4 +33,4 @@ query:
 
     '
 sigma:
-  path: /workspace/detections/sigma/DAC-SIG-0007-bitsadmin-transfer.yaml
+  path: SigmaHQ:windows/process_creation/bitsadmin_transfer.yml
