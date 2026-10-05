@@ -1,0 +1,68 @@
+id: DAC-CS-0074
+status: experimental
+severity: medium
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: Detection of External Direct IP Usage
+platforms:
+- crowdstrike
+title: 'Falcon: Detection of External Direct IP Usage in CommandLine Windows and Mac'
+mitre:
+  tactics:
+  - command-and-control
+  - execution
+  techniques:
+  - T1105
+  - T1059
+  - T1071.001
+references:
+- https://attack.mitre.org/techniques/T1105/
+- https://attack.mitre.org/techniques/T1059/
+- https://attack.mitre.org/techniques/T1071/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Detection_of_External_Direct_IP_Usage_in_CommandLine_Windows_and_Mac.yml
+query:
+  crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","SyntheticProcessRollup2"])
+
+    | event_platform!=Lin
+
+    | CommandLine=/https?:\/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/i
+
+    | regex("(?<Urlink>\\bhttps?://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[^\\s]*)", field=CommandLine)
+
+    | regex("(?<Ipaddress>\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})", field=Urlink)
+
+    | !cidr(Ipaddress, subnet=["224.0.0.0/4","10.0.0.0/8","172.16.0.0/12","192.168.0.0/16","127.0.0.0/8","169.254.0.0/16","0.0.0.0/8"])
+
+    | ImageFileName=/\\(curl|wget|powershell|pwsh|cmd|certutil|bitsadmin|mshta|rundll32|python|pythonw|bash|sh|osascript)(\.exe)?$/i
+
+    | !in(field=ParentBaseFileName, values=["chrome.exe","msedge.exe","firefox.exe","Google Chrome"],
+    ignoreCase=true)
+
+    | table([aid, ComputerName, UserName, ParentBaseFileName, ImageFileName, CommandLine, Urlink, Ipaddress])
+
+    '
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- UserName
+- aid
+- event_platform
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:Detection_of_External_Direct_IP_Usage_in_CommandLine_Windows_and_Mac.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2
+- esn:SyntheticProcessRollup2

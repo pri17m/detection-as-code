@@ -1,0 +1,44 @@
+id: DAC-CS-0081
+status: experimental
+severity: medium
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: This query identifies Windows and Linux Hosts running MongoDB processes.
+platforms:
+- crowdstrike
+title: 'Falcon: MongoDB Processes on Windows & Linux Hosts (CVE-2025-14847)'
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059
+references:
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/mongodb_processes_on_windows___linux_hosts__cve_2025_14847_.yml
+query:
+  crowdstrike: "#event_simpleName=ProcessRollup2\n| (\n    (event_platform=Win AND ImageFileName=/mongod\\\
+    .exe|mongos\\.exe/i)\n    OR (event_platform=Lin AND ImageFileName=/(\\/|^)(mongod|mongos)(\\s|$)/i)\n\
+    \  )\n| table([@timestamp, aid, ComputerName, UserName, event_platform, ImageFileName, CommandLine])\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- UserName
+- aid
+- event_platform
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:mongodb_processes_on_windows___linux_hosts__cve_2025_14847_.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2

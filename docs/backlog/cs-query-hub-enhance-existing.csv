@@ -1,0 +1,19 @@
+task_id,query_hub,title,enhance_targets,event_simple_names,notes
+ENH-0093,applications_spawning_cmd_or_powershell.yml,Falcon: Applications Spawning CMD or Powershell,DAC-CS-0001,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0095,Credential_Dumping_Detection.yml,Falcon: Credential Dumping Detection,DAC-CS-0013,"ProcessRollup2,SyntheticProcessRollup2,UserIdentity",Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0096,Detect_and_Decode_Base64-Encoded_PowerShell_Commands.yml,Falcon: Detect and Decode Base64-Encoded PowerShell Commands,DAC-CS-0001,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0097,Detect_and_Decode_Base64-Encoded_PowerShell_Commands-http.yml,Falcon: Detect and Decode Base64-Encoded PowerShell Commands - http,DAC-CS-0001,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0098,Firewall_Rule_Additions.yml,Falcon: Firewall Rule Additions,DAC-CS-0010,"FirewallSetRule,ProcessRollup2",Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0099,hunting_bitsadmin_usage.yml,Falcon: Hunting Bitsadmin usage,DAC-CS-0012,"CommandHistory,ProcessRollup2,ScriptControlScanV2",Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0100,LOLBin_Certutil.yml,Falcon: LOLBin Certutil,DAC-CS-0011,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0101,LOLBin_Mshta.yml,Falcon: LOLBin Mshta,DAC-CS-0004,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0102,LOLBin_Regsvr32.yml,Falcon: LOLBin Regsvr32,DAC-CS-0003,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0103,LOLBin_Rundll32.yml,Falcon: LOLBin Rundll32,DAC-CS-0005,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0104,LOLBin_WMIC.yml,Falcon: LOLBin WMIC,DAC-CS-0038,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0105,attachments_send_by_outlook.yml,Falcon: List of attachments sent from Outlook,DAC-CS-0002,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0106,Hunt_links_opened_from_Outlook.yml,Falcon: Phishing - List of links opened from Outlook,DAC-CS-0002,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0107,Hunting_Powershell_Command_Length_Anomaly.yml,Falcon: Powershell Command Length Anomaly Detection,DAC-CS-0001,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0108,ransomware_precursors.yml,Falcon: Ransomware Precursors,DAC-CS-0047,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0109,Rundll32_Remote_UNC_DLL_Ordinal_Execution.yml,Falcon: Rundll32 Remote UNC DLL Ordinal Execution,DAC-CS-0005,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0110,shadow_mcp_server_activity_via_common_runtime_interpreters.yml,Falcon: Shadow MCP Server Activity via Common Runtime Interpreters,DAC-CS-0047,ProcessRollup2,Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID
+ENH-0111,Suspicious_PowerShell_Execution.yml,Falcon: Suspicious PowerShell Execution,DAC-CS-0001,"ProcessRollup2,UserIdentity",Update existing query.crowdstrike with #event_simpleName=ProcessRollup2 patterns; no new ID

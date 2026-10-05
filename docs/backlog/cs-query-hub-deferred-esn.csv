@@ -1,0 +1,5 @@
+old_id,title,event_simple_names,query_hub_source,reason
+DAC-CS-0063,Falcon: Dll-Side Loading Detection Query,MotwWritten,Dll-Side_Loading_Detection_Query.yml,await ESN matrix
+DAC-CS-0069,Falcon: CVE-2025-59287 - WSUS Identification+Vulnerability Query,OsVersionInfo,cve_2025_59287___wsus_identification_vulnerability_query.yml,await ESN matrix
+DAC-CS-0070,Falcon: CVE-2025-59287 vulnerable WSUS servers identification,OsVersionInfo,cve_2025_59287_vulnerable_wsus_servers_identification.yml,await ESN matrix
+DAC-CS-0094,Falcon: Charon Ransomware Detection and Correlation,CreateService,Charon_Ransomware_Detection_and_Correlation.yml,await ESN matrix

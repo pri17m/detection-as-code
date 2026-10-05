@@ -1,0 +1,55 @@
+id: DAC-CS-0075
+status: experimental
+severity: medium
+author: DaC
+false_positives:
+- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
+  \ before promote."
+- Tune ParentBaseFileName allowlists for known management tools.
+sourcetypes:
+- falcon:process
+telemetry_validated: false
+description: 'This rule detects attempts to impair defensive mechanisms by creating or modifying Quality
+  of Service (QoS) policies that specifically target Endpoint Detection and Response (EDR) '
+platforms:
+- crowdstrike
+title: 'Falcon: EDRCHOKER - QoS Policy Abuse Targeting EDR/AV Processes'
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562
+  - T1562.001
+references:
+- https://attack.mitre.org/techniques/T1562/
+- https://attack.mitre.org/techniques/T1562/001/
+- https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/edrchoker_qos_policy_abuse_targeting_edr_av_processes.yml
+query:
+  crowdstrike: "case {\n  #event_simpleName=ProcessRollup2\n  | CommandLine=/New-NetQosPolicy|Set-NetQosPolicy/i\n\
+    \  | CommandLine=/ThrottleRateActionBitsPerSecond|AppPathNameMatchCondition/i\n  | CommandLine=/(SenseIR\\\
+    .exe|MsSense\\.exe|MsMpEng\\.exe|WinDefend\\.exe|falcon-sensor\\.exe|CSFalconService\\.exe|SentinelService\\\
+    .exe|SentinelAgent\\.exe|CortexXDR\\.exe|elastic-agent\\.exe)/i\n  | SuspectActivity := \"QoS Policy\
+    \ via ProcessRollup2\";\n  #event_simpleName=RegGenericValue\n  | RegObjectName=/\\\\SOFTWARE\\\\\
+    Policies\\\\Microsoft\\\\Windows\\\\QOS/i\n  | RegStringValue=/(SenseIR\\.exe|MsSense\\.exe|MsMpEng\\\
+    .exe|WinDefend\\.exe|falcon-sensor\\.exe|CSFalconService\\.exe|SentinelService\\.exe|SentinelAgent\\\
+    .exe|CortexXDR\\.exe|elastic-agent\\.exe)/i\n  | SuspectActivity := \"QoS Registry via RegGenericValue\"\
+    ;\n}\n| groupBy([ComputerName, ImageFileName, ParentBaseFileName, CommandLine, SuspectActivity, #event_simpleName],\
+    \ function=count())\n"
+required_fields:
+- '#event_simpleName'
+- CommandLine
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- RegObjectName
+- RegStringValue
+tags:
+- cs-query-hub
+- processrollup2
+- wave-cs-qh
+- P1
+- src:edrchoker_qos_policy_abuse_targeting_edr_av_processes.yml
+- tp-rewrite
+- tp-quality-v2
+- esn:ProcessRollup2
+- esn:RegGenericValue
