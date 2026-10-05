@@ -1,7 +1,7 @@
 id: DAC-CS-0066
 status: experimental
 severity: medium
-author: Detection Engineer
+author: DaC
 false_positives:
 - "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
   \ before promote."
@@ -9,7 +9,7 @@ false_positives:
 sourcetypes:
 - falcon:process
 telemetry_validated: false
-description: Table of applications identified as potentially handling plaintext passwords.
+description: Table of applications identified as potentially handling plaintext passwords. Falcon replaces credential material it detects in a process command line with the literal token REDACTED, so CommandLine=/REDACTED/ selects processes whose command line carried a password; results are grouped by executable to find applications that accept secrets on the command line.
 platforms:
 - crowdstrike
 title: 'Falcon: Applications with plaintext passwords'

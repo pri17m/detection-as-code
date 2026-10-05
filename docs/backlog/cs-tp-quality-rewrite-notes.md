@@ -1,11 +1,11 @@
 # TP-quality rewrite notes (course correction)
 
-**Deliverable path:** `/workspace/dac-crowdstrike/tp-rewrite/` (TDE absorbs onto `feat/cs-query-hub-processrollup`).
+**Deliverable:** rewritten rules under `detections/crowdstrike/` on `feat/cs-query-hub-processrollup`.
 **Scope this pass:** DAC-CS-0063 … DAC-CS-0089 (**27**). Enhance/` DAC-CS-0001+` **deferred** (steering). No DAC-CS-0090+.
 **Tag:** `tp-rewrite` (+ `tp-quality-v2`). `telemetry_validated: false`. SAFE ESNs only.
 
 ## Gate summary
-- Zero stubs with only `ImageFileName=*` / `CommandLine=*` wildcards
+- Zero queries whose only predicate is an `ImageFileName=*` / `CommandLine=*` wildcard
 - Every query has ≥1 concrete ImageFileName / CommandLine / ParentBaseFileName (or ESN-appropriate) predicate
 - No Splunk `index=`; no `splitString(..., index=N)`
 - Joins use aid + ContextProcessId → TargetProcessId (or AuthenticationId for UserIdentity/UserLogon)

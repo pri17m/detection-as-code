@@ -2,10 +2,10 @@
 
 - Generated: 2026-09-10 12:40 IST
 - Source: ByteRay-Labs/Query-Hub `queries/` (CQL Hub) + derived ProcessRollup2-family intents
-- Future stub IDs: **DAC-CS-0063+** (do not reuse 0001–0062)
+- Future rule IDs: **DAC-CS-0063+** (do not reuse 0001–0062)
 - Scope: titles only — **no YAML** in this wave plan
-- Telemetry matrix: **FOUND** → `/workspace/dac-crowdstrike-telemetry/rollup_fields.json` (+ `EventSimpleName-inventory.csv`)
-- Deduped against: box `/workspace/dac-phase1/detections/crowdstrike/` (DAC-CS-0013…0062) + `gh` main `detections/crowdstrike/` (DAC-CS-0001…0062)
+- Telemetry matrix: internal ProcessRollup field-usage matrix (`rollup_fields.json` + `EventSimpleName-inventory.csv`; not published in this repo)
+- Deduped against: earlier draft rules DAC-CS-0013…0062 + `main` `detections/crowdstrike/` (DAC-CS-0001…0062)
 - Kept titles: **58** | Dedupe/quality drops: **21**
 
 ## Inventory header (Query-Hub map)
@@ -22,18 +22,18 @@ EventSimpleName→field docs in Query-Hub: **none** (contributing.md covers YAML
 
 ### ProcessRollup validated fields (local matrix)
 
-Path: `/workspace/dac-crowdstrike-telemetry/rollup_fields.json`
+Source: internal field-usage matrix (`rollup_fields.json`, not published).
 
 **ProcessRollup2** (top fields by Query-Hub usage): `CommandLine`, `FileName`, `ImageFileName`, `ComputerName`, `UserName`, `ParentBaseFileName`, `CmdLower`, `RemoteAddressIP4`, `RemotePort`, `ScriptContent`, `SHA256HashData`, `UserSid`, `TargetProcessId`, `TargetFileName`, `OriginalFilename`, `ParentImageFileName`, `GrandParentBaseFileName`, `ParentProcessId`, `MD5HashData`, `SignInfoFlags`, … (75 keys total; some are query-local aliases).
 
 **SyntheticProcessRollup2**: `FileName`, `ImageFileName`, `CommandLine`, `SHA256HashData`, `UserName`, `ComputerName`, `ParentImageFileName`, `RMMTool`.
 
-Also: `/workspace/dac-crowdstrike-telemetry/EventSimpleName-inventory.csv` (ProcessRollup2 hits≈84 across Query-Hub corpus).
+Also: internal `EventSimpleName-inventory.csv` (ProcessRollup2 hits≈84 across Query-Hub corpus).
 
 ### Existing DAC-CS coverage (gap context)
 
 - Remote main: **DAC-CS-0001…0062** (62 files). 0001–0012 are starter IOA/CQL candidates (encoded PS, Office→shell, regsvr32, mshta, rundll32, schtasks, sc, vssadmin, wevtutil, netsh firewall off, certutil, bitsadmin).
-- Box stubs: **DAC-CS-0013…0062** (50 YAML). Style: `query.crowdstrike` **Custom IOA / boolean Falcon sketches** (CONTAINS / IN), **not** Next-Gen SIEM CQL pipes. Sourcetype: `falcon:process`. README: experimental IOA sketches for Platform absorb.
+- Earlier drafts: **DAC-CS-0013…0062** (50 YAML). Style: `query.crowdstrike` **Custom IOA / boolean Falcon sketches** (CONTAINS / IN), **not** Next-Gen SIEM CQL pipes. Sourcetype: `falcon:process`. README: experimental IOA sketches for Platform absorb.
 - Gap for Wave D: convert/extend toward **ProcessRollup2-first CQL** where IOA is weak; fill LOLBin/discovery/RMM/ClickFix/supply-chain themes **not** already titled in 0001–0062.
 
 ## Proposed Wave D / Query-Hub themes (titles only)
@@ -143,6 +143,6 @@ Also: `/workspace/dac-crowdstrike-telemetry/EventSimpleName-inventory.csv` (Proc
 ## Next steps
 
 1. Telemetry check: confirm required fields for each backlog row against `rollup_fields.json` before authoring.
-2. Author stubs starting **DAC-CS-0063** as ProcessRollup2-oriented `query.crowdstrike` (prefer CQL-shaped filters where pack allows; keep IOA boolean only when Custom IOA is the delivery target).
+2. Author rules starting **DAC-CS-0063** as ProcessRollup2-oriented `query.crowdstrike` (prefer CQL-shaped filters where pack allows; keep IOA boolean only when Custom IOA is the delivery target).
 3. Do **not** push to GitHub from Detection Engineer — Platform absorbs.
 
