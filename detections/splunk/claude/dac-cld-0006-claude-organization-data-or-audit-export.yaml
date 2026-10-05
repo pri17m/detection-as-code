@@ -1,0 +1,37 @@
+id: DAC-CLD-0006
+title: Claude organization data or audit export
+description: >-
+  Alerts when someone starts or downloads a Claude organization data export, an audit-log export,
+  or a member-list export. Attackers use that export to take chats, files, and the member roster
+  out of the organization in one pull.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: high
+mitre:
+  tactics:
+  - collection
+  techniques:
+  - T1530
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "A legal or privacy export requested by the primary owner. Confirm actor_email before paging."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1530/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("org_data_export_started", "org_data_export_accessed", "audit_log_export_started", "audit_log_export_accessed", "org_members_exported")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id

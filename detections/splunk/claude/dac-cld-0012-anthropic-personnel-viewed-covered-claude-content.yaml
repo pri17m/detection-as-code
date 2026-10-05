@@ -1,0 +1,38 @@
+id: DAC-CLD-0012
+title: Anthropic personnel viewed covered Claude content
+description: >-
+  Alerts when the Compliance activity feed records an anthropic_access event. That event is a
+  human at Anthropic viewing prompt or response content on the Messages API or Claude Code, not a
+  member of the organization, and it does not cover claude.ai Enterprise chats.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: medium
+mitre:
+  tactics:
+  - collection
+  techniques:
+  - T1530
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "An expected safety review or incident response that Anthropic already told the account team about. This sourcetype does not keep reason_code or accessor_department."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1530/
+  - https://platform.claude.com/docs/en/manage-claude/access-transparency
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("anthropic_access")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id

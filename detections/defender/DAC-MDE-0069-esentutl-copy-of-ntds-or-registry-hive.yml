@@ -1,0 +1,47 @@
+id: DAC-MDE-0069
+title: esentutl copy of NTDS or registry hive
+description: >-
+  Alerts when esentutl.exe is started with /y against ntds.dit or the SAM, SYSTEM, or SECURITY
+  hive. Attackers use that copy mode, often with /vss, to steal the Active Directory database or
+  local credential stores from a locked file.
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: critical
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.003
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "Domain-controller backup jobs that copy ntds.dit with esentutl."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Esentutl/
+- https://attack.mitre.org/techniques/T1003/003/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-WIN-0336
+- parity:DAC-CS-0215
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName =~ "esentutl.exe"
+    | where ProcessCommandLine contains "/y"
+    | where ProcessCommandLine contains "/vss"
+        or ProcessCommandLine contains "ntds.dit"
+        or ProcessCommandLine contains @"\ntds\"
+        or ProcessCommandLine contains @"\config\SAM"
+        or ProcessCommandLine contains @"\config\SYSTEM"
+        or ProcessCommandLine contains @"\config\SECURITY"
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

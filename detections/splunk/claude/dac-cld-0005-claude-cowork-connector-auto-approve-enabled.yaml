@@ -1,0 +1,37 @@
+id: DAC-CLD-0005
+title: Claude Cowork connector auto-approve enabled
+description: >-
+  Alerts when an admin turns on Always allow for Cowork connector tools that can make changes.
+  Attackers enable that setting so a later connector call runs without a person approving each
+  use.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.001
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "An administrator who intentionally enables Always allow for a reviewed connector. The matching disable event is a separate activity type and does not clear this alert by itself."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1562/001/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("org_cowork_mcp_always_allow_enabled")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id

@@ -1,0 +1,39 @@
+id: DAC-MDE-0071
+title: UAC bypass registry hijack of ms-settings or mscfile
+description: >-
+  Alerts when a command is written to the ms-settings or mscfile shell-open key in the
+  current-user registry. Attackers set that value, then start fodhelper, computerdefaults,
+  eventvwr, or sdclt so Windows auto-elevates and runs their command.
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1548.002
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- RegistryKey
+- RegistryValueName
+- RegistryValueData
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "Lab machines where a detection engineer planted the bypass key."
+references:
+- https://attack.mitre.org/techniques/T1548/002/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceregistryevents-table
+tags:
+- quality-wave
+- parity:DAC-WIN-0338
+query:
+  defender: |
+    DeviceRegistryEvents
+    | where RegistryKey contains @"\Software\Classes\ms-settings\shell\open\command"
+        or RegistryKey contains @"\Software\Classes\mscfile\shell\open\command"
+    | project Timestamp, DeviceName, RegistryKey, RegistryValueName, RegistryValueData, InitiatingProcessFileName

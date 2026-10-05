@@ -1,0 +1,43 @@
+id: DAC-MDE-0074
+title: pcalua proxy execution of a script, DLL, or user-writable file
+description: >-
+  Alerts when pcalua.exe is told to launch a script, DLL, CPL, URL, UNC path, or a file under a
+  user-writable folder. Attackers use the Program Compatibility Assistant as a signed proxy to
+  start that payload.
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1202
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "A compatibility shim that launches a vendor binary stored under a user profile."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Pcalua/
+- https://attack.mitre.org/techniques/T1202/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-WIN-0341
+- parity:DAC-CS-0219
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName =~ "pcalua.exe"
+    | where ProcessCommandLine matches regex @"(\s|^)-a(\s|$)"
+    | where ProcessCommandLine contains @"\\"
+        or ProcessCommandLine has_any (@"\Users\", @"\Temp\", @"\Public\", @"\AppData\", @"\ProgramData\", ".dll", ".cpl", ".js", ".vbs", ".hta", ".bat", ".ps1", "http://", "https://")
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

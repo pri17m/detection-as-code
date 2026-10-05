@@ -1,0 +1,39 @@
+id: DAC-MDE-0068
+title: hh.exe opening a remote URL
+description: >-
+  Alerts when hh.exe is opened against an http, https, or ftp URL. Attackers use HTML Help to
+  fetch a remote compiled-help file or script while the process looks like the signed help viewer.
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218.001
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "A help desk that opens a vendor CHM over HTTPS."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Hh/
+- https://attack.mitre.org/techniques/T1218/001/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-WIN-0335
+- parity:DAC-CS-0214
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName =~ "hh.exe" and (ProcessCommandLine contains "http://" or ProcessCommandLine contains "https://" or ProcessCommandLine contains "ftp://")
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName

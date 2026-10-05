@@ -1,0 +1,41 @@
+id: DAC-WIN-0339
+title: IFEO debugger on an accessibility binary
+description: >-
+  Alerts when the Debugger value is set for sethc, utilman, osk, magnify, narrator, displayswitch,
+  or atbroker. Attackers replace one of those accessibility binaries so the logon screen starts a
+  SYSTEM shell instead of the real program.
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1546.008
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- TargetObject
+- Details
+- Image
+telemetry_validated: false
+false_positives:
+- "An application-compatibility debugger attached to Narrator or Magnifier by an assistive-tech vendor. Allowlist that debugger path."
+references:
+- https://attack.mitre.org/techniques/T1546/008/
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+tags:
+- quality-wave
+- parity:DAC-MDE-0072
+query:
+  splunk: |
+    sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=13
+    | eval obj=lower(coalesce(TargetObject))
+    | eval img=lower(coalesce(Image))
+    | eval details=lower(coalesce(Details))
+    | where match(obj, "\\image file execution options\\(sethc|utilman|osk|magnify|narrator|displayswitch|atbroker)\.exe\\debugger")
+    | stats count values(obj) as registry_paths values(details) as details values(img) as images by host, User

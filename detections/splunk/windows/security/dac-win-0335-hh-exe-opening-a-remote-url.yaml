@@ -1,0 +1,45 @@
+id: DAC-WIN-0335
+title: hh.exe opening a remote URL
+description: >-
+  Alerts when hh.exe is opened against an http, https, or ftp URL. Attackers use HTML Help to
+  fetch a remote compiled-help file or script while the process looks like the signed help viewer.
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218.001
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- CommandLine
+- NewProcessName
+- Image
+- ParentProcessName
+telemetry_validated: false
+false_positives:
+- "Rare help-desk tools that open a vendor CHM over HTTPS. Allowlist that host."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Hh/
+- https://attack.mitre.org/techniques/T1218/001/
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-MDE-0068
+- parity:DAC-CS-0214
+query:
+  splunk: |
+    ((sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode=4688) OR (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+    | eval proc=lower(coalesce(NewProcessName, Image, process_path, process))
+    | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, parent_process_name, ParentImage))
+    | where match(proc, "(^|\\)hh\.exe$") AND match(cmd, "(https?://|ftp://)")
+    | stats count values(proc) as processes values(parent) as parents values(cmd) as commands by host

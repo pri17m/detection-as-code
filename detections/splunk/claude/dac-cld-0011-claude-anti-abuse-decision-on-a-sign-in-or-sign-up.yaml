@@ -1,0 +1,37 @@
+id: DAC-CLD-0011
+title: Claude anti-abuse decision on a sign-in or sign-up
+description: >-
+  Alerts when Anthropic's anti-abuse service reports a consequential decision about a Claude
+  sign-in or sign-up. Attackers trigger that decision when they try a stolen account or a newly
+  created account against the organization.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: high
+mitre:
+  tactics:
+  - initial-access
+  techniques:
+  - T1078
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "A legitimate user flagged by the identity provider or by a travel sign-in. The decision detail is not kept on this sourcetype."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1078/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("abuse_decision_received")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id

@@ -1,0 +1,46 @@
+id: DAC-CS-0216
+title: desktopimgdownldr lockscreen URL outside Microsoft
+description: >-
+  Alerts when desktopimgdownldr.exe is pointed at a lock-screen URL that is not a Microsoft
+  Spotlight host. Attackers use this signed downloader to pull a payload from a server they
+  control.
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: high
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1105
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "A management tool that sets a custom lock-screen image host."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Desktopimgdownldr/
+- https://attack.mitre.org/techniques/T1105/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-WIN-0337
+- parity:DAC-MDE-0070
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ImageFileName=/\\desktopimgdownldr\.exe$/i
+    | CommandLine=/lockscreenurl/i
+    | CommandLine!=/lockscreenurl:\s*https?:\/\/([a-z0-9.-]*\.)?(microsoft\.com|windows\.com|live\.com|bing\.com|msn\.com|azureedge\.net|microsoftonline\.com)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

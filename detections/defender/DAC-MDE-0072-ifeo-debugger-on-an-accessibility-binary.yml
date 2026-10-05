@@ -1,0 +1,41 @@
+id: DAC-MDE-0072
+title: IFEO debugger on an accessibility binary
+description: >-
+  Alerts when the Debugger value is set for sethc, utilman, osk, magnify, narrator, displayswitch,
+  or atbroker. Attackers replace one of those accessibility binaries so the logon screen starts a
+  SYSTEM shell instead of the real program.
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1546.008
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- RegistryKey
+- RegistryValueName
+- RegistryValueData
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "An assistive-technology vendor that installs a debugger on Narrator or Magnifier."
+references:
+- https://attack.mitre.org/techniques/T1546/008/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceregistryevents-table
+tags:
+- quality-wave
+- parity:DAC-WIN-0339
+query:
+  defender: |
+    DeviceRegistryEvents
+    | where RegistryKey contains @"\Image File Execution Options\"
+    | where RegistryValueName =~ "Debugger"
+    | where RegistryKey has_any ("sethc.exe", "utilman.exe", "osk.exe", "magnify.exe", "narrator.exe", "displayswitch.exe", "atbroker.exe")
+    | project Timestamp, DeviceName, RegistryKey, RegistryValueName, RegistryValueData, InitiatingProcessFileName

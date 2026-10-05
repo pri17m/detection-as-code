@@ -1,0 +1,44 @@
+id: DAC-CS-0218
+title: accessibility binary spawning a shell
+description: >-
+  Alerts when sethc, utilman, osk, magnify, narrator, displayswitch, or atbroker starts cmd or
+  PowerShell. Attackers point one of those accessibility binaries at a shell so they can reach it
+  from the logon screen.
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1546.008
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "Assistive technology that launches PowerShell by design."
+references:
+- https://attack.mitre.org/techniques/T1546/008/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- parity:DAC-WIN-0347
+- parity:DAC-MDE-0081
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ParentBaseFileName=/^(sethc|utilman|osk|magnify|narrator)\.exe$/i
+    | ImageFileName=/\\(cmd|powershell|pwsh)\.exe$/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

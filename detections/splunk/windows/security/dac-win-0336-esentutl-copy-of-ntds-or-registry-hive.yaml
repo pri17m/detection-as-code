@@ -1,0 +1,46 @@
+id: DAC-WIN-0336
+title: esentutl copy of NTDS or registry hive
+description: >-
+  Alerts when esentutl.exe is started with /y against ntds.dit or the SAM, SYSTEM, or SECURITY
+  hive. Attackers use that copy mode, often with /vss, to steal the Active Directory database or
+  local credential stores from a locked file.
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: critical
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.003
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- CommandLine
+- NewProcessName
+- Image
+- ParentProcessName
+telemetry_validated: false
+false_positives:
+- "Domain-controller backup jobs that copy ntds.dit with esentutl. Allowlist the backup account and host."
+references:
+- https://lolbas-project.github.io/lolbas/Binaries/Esentutl/
+- https://attack.mitre.org/techniques/T1003/003/
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+tags:
+- quality-wave
+- lolbas
+- parity:DAC-MDE-0069
+- parity:DAC-CS-0215
+query:
+  splunk: |
+    ((sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode=4688) OR (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+    | eval proc=lower(coalesce(NewProcessName, Image, process_path, process))
+    | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, parent_process_name, ParentImage))
+    | where match(proc, "(^|\\)esentutl\.exe$") AND match(cmd, "/y") AND match(cmd, "(/vss|ntds\.dit|\\config\\sam|\\config\\system|\\config\\security|\\ntds\\)")
+    | stats count values(proc) as processes values(parent) as parents values(cmd) as commands by host

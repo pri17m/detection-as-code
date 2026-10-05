@@ -1,0 +1,41 @@
+id: DAC-MDE-0075
+title: wsl.exe running curl, wget, or a /dev/tcp redirect
+description: >-
+  Alerts when wsl.exe is started with curl or wget against a URL, or with /dev/tcp/. Attackers use
+  the Windows Subsystem for Linux to run a download from a Windows process-creation event.
+author: Detection Engineer
+status: experimental
+platforms:
+- defender
+severity: medium
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1059.004
+sourcetypes:
+- mde:advanced_hunting
+required_fields:
+- DeviceName
+- FileName
+- ProcessCommandLine
+- InitiatingProcessFileName
+telemetry_validated: false
+false_positives:
+- "Developers who pass curl to wsl.exe on the Windows command line."
+references:
+- https://learn.microsoft.com/windows/wsl/basic-commands
+- https://attack.mitre.org/techniques/T1059/004/
+- https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
+tags:
+- quality-wave
+- parity:DAC-WIN-0342
+- parity:DAC-CS-0220
+query:
+  defender: |
+    DeviceProcessEvents
+    | where FileName =~ "wsl.exe"
+    | where ProcessCommandLine contains "/dev/tcp/"
+        or ((ProcessCommandLine contains "curl" or ProcessCommandLine contains "wget")
+            and (ProcessCommandLine contains "http://" or ProcessCommandLine contains "https://"))
+    | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName
