@@ -1,0 +1,39 @@
+id: DAC-VMW-0016
+title: ESXi shell access to shadow or management config files
+description: Detects an ESXi shell command line that touches /etc/shadow, hostd.xml, vpxa.cfg, sfcb.cfg, /etc/security, krb5-affinity.conf, or vcdb.properties.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - credential-access
+  - collection
+  techniques:
+  - T1003.008
+  - T1005
+severity: high
+false_positives:
+- A support bundle or a vendor script that reads these paths. Review the user and the command, not just the path.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_sensitive_files_accessed.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*shell[*" Message IN ("*/etc/shadow*","*/etc/vmware/hostd/hostd.xml*","*/etc/vmware/vpxa/vpxa.cfg*","*/etc/sfcb/sfcb.cfg*","*/etc/security/*","*/etc/likewise/krb5-affinity.conf*","*/etc/vmware-vpx/vcdb.properties*")
+
+    | rex field=_raw "\]: \[(?<user>\w+)\]:(?<command>.+)"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(command) as command by dest user
+
+    '

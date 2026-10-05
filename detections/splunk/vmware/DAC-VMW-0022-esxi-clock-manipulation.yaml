@@ -1,0 +1,41 @@
+id: DAC-VMW-0022
+title: ESXi system clock stepped
+description: Detects the ESXi NTPClock message that the system clock was stepped. A large step is used to break log correlation and certificate checks.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1070.006
+severity: medium
+false_positives:
+- A first-boot NTP correction or a domain time jump. Large deltas outside a maintenance window are the ones to investigate.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_system_clock_manipulation.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*NTPClock*" Message="*system clock stepped*"
+
+    | rex field=Message "stepped to (?<epoch_time>\d+\.\d+),.+delta\s(?<delta>\d+)\s"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | eval epoch_time=tonumber(epoch_time), delta=tonumber(delta)
+
+    | eval direction=if(epoch_time < round(_time,0), "backward", "forward")
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(direction) as direction values(delta) as delta by dest
+
+    '

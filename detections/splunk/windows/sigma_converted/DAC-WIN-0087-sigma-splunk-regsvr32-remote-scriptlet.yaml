@@ -33,4 +33,4 @@ query:
 
     '
 sigma:
-  path: /workspace/detections/sigma/DAC-SIG-0003-regsvr32-remote-scriptlet.yaml
+  path: SigmaHQ:windows/process_creation/regsvr32_remote_sct.yml

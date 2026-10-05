@@ -1,0 +1,37 @@
+id: DAC-VMW-0013
+title: ESXi VIB acceptance level changed from the shell
+description: Detects esxcli software acceptance set run from the ESXi shell. Lowering the acceptance level is the step before an unsigned VIB will install.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1685
+severity: high
+false_positives:
+- A hardware vendor install that documents a CommunitySupported or PartnerSupported acceptance change.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_vib_acceptance_level_tampering.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*esxcli software acceptance set*" Message="*shell*"
+
+    | rex field=_raw "\]: \[(?<user>\w+)\]:(?<command>.+)"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(command) as command by dest user
+
+    '

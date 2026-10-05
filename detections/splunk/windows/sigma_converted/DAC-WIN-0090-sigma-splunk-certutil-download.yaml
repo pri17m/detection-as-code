@@ -33,4 +33,4 @@ query:
 
     '
 sigma:
-  path: /workspace/detections/sigma/DAC-SIG-0006-certutil-download.yaml
+  path: SigmaHQ:windows/process_creation/certutil_urlcache.yml

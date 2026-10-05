@@ -4,8 +4,7 @@
 #
 # Repo path: config/sourcetype_map.yaml
 # Companion docs:
-#   - docs/telemetry/windows-splunk.md  (recommended future home)
-#   - /workspace/dac-windows-splunk-telemetry.md (research deliverable)
+#   - docs/telemetry/windows-splunk.md
 #
 # Prefer sourcetype=… in rules. Never hardcode index=. Optional index macros
 # live in org config (see org.example.yaml placeholders below).
@@ -50,6 +49,10 @@ allowed_sourcetypes:
   - WinEventLog:Microsoft-Windows-Sysmon/Operational  # classic render (not preferred; TA fields incomplete)
   - sysmon
   - "sysmon:*"                  # glob form used in some orgs / legacy TAs
+
+  # --- VMware ESXi syslog (Splunk Add-on for VMware ESXi Logs) ---
+  - vmw-syslog
+  - "vmware:esxlog*"            # glob; test data also uses source=vmware:esxlog
 
 # ---------------------------------------------------------------------------
 # Optional: source= patterns that pair with collapsed sourcetypes
@@ -114,6 +117,10 @@ macros:
        OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
        OR (sourcetype=XmlWinEventLog source="*Microsoft-Windows-Sysmon/Operational")
        OR sourcetype=sysmon OR sourcetype=sysmon:*)
+
+  esxi_syslog:
+    description: VMware ESXi syslog. Match field is Message. Do not hardcode index=.
+    suggested_definition: "(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*)"
 
   # Optional INDEX macros — org-specific; NEVER hardcode index= in rule bodies
   windows_security_index:

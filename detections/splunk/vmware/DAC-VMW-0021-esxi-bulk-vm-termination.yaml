@@ -1,0 +1,45 @@
+id: DAC-VMW-0021
+title: ESXi bulk virtual machine process kill
+description: Detects pkill -9 vmx-* or the esxcli vm process list piped through awk into esxcli vm process kill. That chain is how ransomware kills every VM on a host before encryption.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1673
+  - T1529
+  - T1499
+severity: critical
+false_positives:
+- A scripted host evacuation that kills every vmx. That should be rare and tied to a change ticket.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_bulk_vm_termination.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message IN ("*pkill -9 *","*process kill*")
+
+    | rex field=_raw "\s\[(?<user>[^\]]+)\]:\s(?<shell_command>.+)$"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s.*:\s(?<esxcli_command>esxcli\s.+)"
+
+    | eval command=mvappend(esxcli_command, shell_command)
+
+    | where isnotnull(command)
+
+    | search (command="pkill -9 vmx-*") OR (command="*esxcli*" command="*--format-param*" command="*vm process list*" command="*awk*" command="*esxcli vm process kill*")
+
+    | stats min(_time) as firstTime max(_time) as lastTime values(command) as commands by dest user
+
+    '

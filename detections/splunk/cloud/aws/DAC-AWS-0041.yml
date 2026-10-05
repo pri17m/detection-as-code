@@ -1,0 +1,79 @@
+id: DAC-AWS-0041
+title: 'AWS: Cross-account AssumeRole with masquerade sessionName'
+description: "IR Part 1 Scenario 1: STS AssumeRole where the caller account does not match the role or\
+  \ resource account (recipientAccountId vs userIdentity.accountId or role ARN account) and the roleSessionName\
+  \ looks like a masquerade (admin, root, SSO-looking, or short hex). Tightens DAC-AWS-0009 (admin ARN-only).\n\
+  \ Masquerade sessionName patterns include migration/dev/script (AWS IR Part 1 Scenario 1) plus admin/root/breakglass."
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+mitre:
+  tactics:
+  - privilege-escalation
+  - initial-access
+  techniques:
+  - T1548.005
+  - T1078.004
+severity: high
+false_positives:
+- "Legitimate org cross-account break-glass or CI AssumeRole using admin-like session names \u2014 baseline\
+  \ sessionName allowlist."
+- SSO/IAM Identity Center sessions often use AWSReservedSSO_ prefixes; tune before promote.
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
+- https://attack.mitre.org/techniques/T1548/005/
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
+telemetry_validated: false
+required_fields:
+- eventName
+- userIdentity.type
+- userIdentity.arn
+- userIdentity.accountId
+- userIdentity.principalId
+- requestParameters.roleArn
+- requestParameters.roleSessionName
+- recipientAccountId
+- sourceIPAddress
+- awsRegion
+- errorCode
+tags:
+- cloudtrail-ir-part1
+- P0
+- tp-quality
+- scenario-1
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName=AssumeRole
+
+    | eval role_arn=coalesce(''requestParameters.roleArn'',"")
+
+    | eval role_account=replace(role_arn, "^arn:aws:iam::([0-9]+):.*", "\1")
+
+    | eval caller_account=coalesce(''userIdentity.accountId'',"")
+
+    | eval session_name=coalesce(''requestParameters.roleSessionName'', mvindex(split(''userIdentity.arn'',
+    "/"), -1), mvindex(split(''userIdentity.principalId'', ":"), -1))
+
+    | eval cross_account=if(recipientAccountId!=caller_account OR (isnotnull(role_account) AND role_account!=""
+    AND role_account!=caller_account AND match(role_account, "^[0-9]{12}$")), "true", "false")
+
+    | eval masquerade=if(match(session_name, "(?i)(migration|dev[-_]|script|temp[-_]|threat|attacker|recon|admin|administrator|root|breakglass)"),
+    "true", "false")
+
+    | search cross_account=true OR masquerade=true
+
+    | eval src_ip=coalesce(sourceIPAddress,"")
+
+    | search src_ip!="AWS Internal"
+
+    | stats count min(_time) as first_seen max(_time) as last_seen values(role_arn) as role_arn values(session_name)
+    as session_name values(recipientAccountId) as recipientAccountId values(sourceIPAddress) as sourceIPAddress
+    values(awsRegion) as awsRegion by userIdentity.arn, userIdentity.accountId, cross_account, masquerade
+
+    | where count>=1
+
+    '

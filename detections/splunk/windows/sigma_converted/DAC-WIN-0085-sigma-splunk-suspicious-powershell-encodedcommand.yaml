@@ -33,4 +33,4 @@ query:
 
     '
 sigma:
-  path: /workspace/detections/sigma/DAC-SIG-0001-suspicious-powershell-encodedcommand.yaml
+  path: SigmaHQ:windows/process_creation/powershell_encodedcommand.yml

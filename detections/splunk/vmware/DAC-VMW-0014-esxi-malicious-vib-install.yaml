@@ -1,0 +1,35 @@
+id: DAC-VMW-0014
+title: ESXi VIB installed with validation or signature bypassed
+description: Detects ESXi image or VIB install messages that say validation was disabled, signing and acceptance checks were bypassed, or a VIB had no valid signature.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1505.006
+severity: critical
+false_positives:
+- A documented vendor VIB installed with --force during a maintenance window. The bypass language is uncommon for a normal patch.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_malicious_vib_forced_install.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) (Message="*image profile with validation disabled*" OR Message="*bypassing signing and acceptance level verification*" OR Message="*vib without valid signature*")
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(Message) as Message by dest
+
+    '

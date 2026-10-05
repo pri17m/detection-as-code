@@ -38,8 +38,8 @@ Variants: classic `Account_Name` vs XML `TargetUserName`/`SubjectUserName`; CIM 
 ## Checklist (rule authors)
 1 Allowlisted sourcetype/macro · 2 No `index=` · 3 EventCode on right channel · 4 fieldsummary proves fields · 5 OR aliases if classic+XML · 6 Prefer Sysmon 1 if 4688 cmdline missing · 7 Prefer XML · 8 Sysmon version/renderXml · 9 FP baseline · 10 Data-gap if blind · 11 Sample event · 12 CI clean
 
-**Full doc:** `/workspace/dac-windows-splunk-telemetry.md` (= `docs/telemetry/windows-splunk.md`)  
-**Map:** `/workspace/config/sourcetype_map.yaml`
+**Full doc:** `docs/telemetry/windows-splunk.md`  
+**Map:** `config/sourcetype_map.yaml`
 
 ## Phase-1 expansion (gap Event IDs)
 

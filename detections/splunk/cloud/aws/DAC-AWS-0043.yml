@@ -1,0 +1,61 @@
+id: DAC-AWS-0043
+title: 'AWS: Burst S3 DeleteObject or DeleteObjects same principal/IP'
+description: "IR Part 1 Scenario 1 mass delete. DeleteObject and DeleteObjects are S3 data events \u2014\
+  \ they appear on aws:cloudtrail only when object-level logging is enabled on the trail. Tightens DAC-AWS-0040\
+  \ with a 5-minute burst on the same userIdentity and sourceIPAddress. telemetry_validated=false until\
+  \ tenant confirms data events.\n"
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1485
+  - T1486
+severity: high
+false_positives:
+- "Lifecycle jobs, replication teardown, and CI bucket wipes can burst-delete \u2014 allowlist those roles\
+  \ and prefixes."
+- If S3 data events are not enabled this rule will be silent (not a false negative on management-only
+  trails).
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
+- https://attack.mitre.org/techniques/T1485/
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html
+telemetry_validated: false
+required_fields:
+- eventName
+- eventSource
+- userIdentity.arn
+- sourceIPAddress
+- awsRegion
+- requestParameters.bucketName
+- requestParameters.key
+- recipientAccountId
+tags:
+- cloudtrail-ir-part1
+- P0
+- tp-quality
+- scenario-1
+- needs-s3-data-events
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource=s3.amazonaws.com eventName IN ("DeleteObject", "DeleteObjects")
+
+    | eval bucket=coalesce(''requestParameters.bucketName'',''requestParameters.bucket'',"")
+
+    | eval obj=coalesce(''requestParameters.key'',''requestParameters.Key'',"")
+
+    | bin _time span=5m
+
+    | stats count dc(obj) as objects dc(bucket) as buckets values(eventName) as eventNames values(awsRegion)
+    as awsRegion values(recipientAccountId) as recipientAccountId by _time, userIdentity.arn, sourceIPAddress
+
+    | where count>=20 OR objects>=20
+
+    '

@@ -1,0 +1,66 @@
+id: DAC-AWS-0045
+title: 'AWS: Privileged API from console session without MFA'
+description: 'IR Part 1 Scenario 2: privileged management APIs (CreateStack, RunInstances, CreateAccessKey,
+  CreateUser, and related) using console-issued credentials (sessionCredentialFromConsole=true) or a session
+  with userIdentity.sessionContext.attributes.mfaAuthenticated=false. Complements weak DAC-AWS-0011 ConsoleLogin
+  MFAUsed.
+
+  '
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+mitre:
+  tactics:
+  - initial-access
+  - privilege-escalation
+  - persistence
+  techniques:
+  - T1078.004
+  - T1556.006
+severity: high
+false_positives:
+- "Federated/SSO sessions often log mfaAuthenticated=false even when the IdP enforced MFA \u2014 confirm\
+  \ IdP MFA before paging."
+- sessionCredentialFromConsole is omitted unless true; absence is not proof of non-console.
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
+- https://attack.mitre.org/techniques/T1078/004/
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+telemetry_validated: false
+required_fields:
+- eventName
+- sessionCredentialFromConsole
+- userIdentity.sessionContext.attributes.mfaAuthenticated
+- userIdentity.arn
+- sourceIPAddress
+- userAgent
+- awsRegion
+tags:
+- cloudtrail-ir-part1
+- P0
+- tp-quality
+- scenario-2
+- console-pivot
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventName IN ("CreateStack", "UpdateStack", "RunInstances", "CreateAccessKey", "CreateUser",
+    "CreateLoginProfile", "AttachUserPolicy", "AttachRolePolicy", "PutUserPolicy", "PutRolePolicy")
+
+    | eval from_console=if(sessionCredentialFromConsole=true OR sessionCredentialFromConsole="true", "true",
+    "false")
+
+    | eval mfa_session=coalesce(''userIdentity.sessionContext.attributes.mfaAuthenticated'', "unknown")
+
+    | search from_console=true OR mfa_session="false"
+
+    | stats count values(eventName) as eventNames values(sourceIPAddress) as sourceIPAddress values(userAgent)
+    as userAgent values(awsRegion) as awsRegion min(_time) as first_seen max(_time) as last_seen by userIdentity.arn,
+    from_console, mfa_session
+
+    | where count>=1
+
+    '

@@ -1,0 +1,35 @@
+id: DAC-VMW-0001
+title: ESXi SSH access enabled
+description: Detects the ESXi host message that SSH access has been enabled. Operators and ransomware crews turn SSH on after they have a foothold so they can keep a remote shell.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021.004
+severity: medium
+false_positives:
+- ESXi administrators enabling the service for break-glass troubleshooting. Confirm the change was expected on that host.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_ssh_enabled.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*SSH access has been enabled"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(Message) as Message by dest
+
+    '

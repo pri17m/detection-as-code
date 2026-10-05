@@ -1,0 +1,39 @@
+id: DAC-VMW-0020
+title: ESXi datastore file download initiated by a remote tool
+description: Detects the ESXi message that a file download from a datastore path was initiated from a remote tool. That is the NFC-style copy used to pull VM disks off the host.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - collection
+  techniques:
+  - T1005
+severity: high
+false_positives:
+- Backup or replication products that download VMDKs. Allowlist the initiator tool and source IP if they are your backup platform.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_vm_exported_via_remote_tool.yml
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- escu
+query:
+  splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*File download from path*" Message="*was initiated from*"
+
+    | rex field=Message "from path ''\[(?<datastore>[^\]]+)\](?<vm_path>[^'']+)''"
+
+    | rex field=Message "initiated from ''(?<initiator_tool>[^/]+)/(?<tool_version>[^@]+)@(?<initiator_ip>\d{1,3}(?:\.\d{1,3}){3})''"
+
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s"
+
+    | stats count min(_time) as firstTime max(_time) as lastTime by dest datastore vm_path initiator_tool tool_version initiator_ip
+
+    '

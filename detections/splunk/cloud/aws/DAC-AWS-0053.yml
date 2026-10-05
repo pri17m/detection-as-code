@@ -1,0 +1,49 @@
+id: DAC-AWS-0053
+title: 'AWS: Bedrock ListFoundationModels reconnaissance'
+description: 'Part 2 Event 3: Amazon Bedrock ListFoundationModels (readOnly recon). Often precedes Converse/InvokeModel.
+  Watch for AssumedRole, sessionCredentialFromConsole=true, and unexpected awsRegion.'
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1526
+  - T1580
+severity: medium
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-2/
+- https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-cloudtrail.html
+- https://attack.mitre.org/techniques/T1526/
+required_fields:
+- eventSource
+- eventName
+- userIdentity.arn
+- awsRegion
+- sourceIPAddress
+- sessionCredentialFromConsole
+- readOnly
+tags:
+- cloudtrail-ir-part2
+- scenario-3
+- P0
+- tp-quality
+- bedrock
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource="bedrock.amazonaws.com" eventName IN ("ListFoundationModels","ListCustomModels","ListProvisionedModelThroughputs","ListModelInvocationJobs")
+
+    | table _time, eventName, userIdentity.type, userIdentity.arn, userIdentity.ec2RoleDelivery, sessionCredentialFromConsole,
+    readOnly, sourceIPAddress, awsRegion, userAgent, tlsDetails.clientProvidedHostHeader, errorCode
+
+    '
+author: Threat detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+- aws:cloudtrail:json
+- aws:cloudtrail:event
+telemetry_validated: false
+false_positives:
+- Tune after baselining legitimate workload roles and Regions; experimental until tenant field confirm.

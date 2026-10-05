@@ -1,0 +1,59 @@
+id: DAC-AWS-0055
+title: 'AWS: Bedrock use by AssumedRole after IAM AccessDenied (probe-then-pivot)'
+description: 'Part 2 kill-chain correlation: same AssumedRole actor generates IAM AccessDenied write attempts
+  then later Bedrock ListFoundationModels/Converse/Invoke* (often after Region change). Uses transaction
+  on actor ARN within 4h.'
+mitre:
+  tactics:
+  - discovery
+  - lateral-movement
+  - impact
+  techniques:
+  - T1069
+  - T1526
+  - T1496
+severity: critical
+references:
+- https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-2/
+- https://attack.mitre.org/techniques/T1496/
+required_fields:
+- eventName
+- eventSource
+- errorCode
+- userIdentity.arn
+- awsRegion
+- sourceIPAddress
+tags:
+- cloudtrail-ir-part2
+- scenario-3
+- P0
+- tp-quality
+- bedrock
+- correlation
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search (eventSource="iam.amazonaws.com" errorCode="AccessDenied" eventName IN ("CreateUser","CreateRole","CreateAccessKey","AttachUserPolicy","AttachRolePolicy"))
+    OR (eventSource="bedrock.amazonaws.com" eventName IN ("ListFoundationModels","Converse","ConverseStream","InvokeModel","InvokeModelWithResponseStream"))
+
+    | eval actor=coalesce(userIdentity.arn, userIdentity.principalId)
+
+    | transaction actor maxspan=4h startswith=(eventSource="iam.amazonaws.com" errorCode="AccessDenied")
+    endswith=(eventSource="bedrock.amazonaws.com")
+
+    | search eventcount>=2
+
+    | table _time, actor, eventcount, sourceIPAddress, awsRegion, userIdentity.ec2RoleDelivery, sessionCredentialFromConsole
+
+    '
+author: Threat detection Engineer
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- aws:cloudtrail
+- aws:cloudtrail:json
+- aws:cloudtrail:event
+telemetry_validated: false
+false_positives:
+- Tune after baselining legitimate workload roles and Regions; experimental until tenant field confirm.
