@@ -10,7 +10,7 @@ sourcetypes:
 - XmlWinEventLog:Security
 mitre:
   tactics:
-  - Lateral Movement
+  - lateral-movement
   techniques:
   - T1550.002
 severity: high

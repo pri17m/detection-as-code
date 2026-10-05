@@ -8,7 +8,7 @@ platforms:
 severity: medium
 mitre:
   tactics:
-  - Execution
+  - execution
   techniques:
   - T1059.001
 sourcetypes:

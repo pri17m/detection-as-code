@@ -9,7 +9,7 @@ sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 mitre:
   tactics:
-  - Execution
+  - execution
   techniques:
   - T1059
   - T1036

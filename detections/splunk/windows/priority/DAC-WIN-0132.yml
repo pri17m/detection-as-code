@@ -8,7 +8,7 @@ platforms:
 severity: medium
 mitre:
   tactics:
-  - Credential Access
+  - credential-access
   techniques:
   - T1021.001
   - T1110.003

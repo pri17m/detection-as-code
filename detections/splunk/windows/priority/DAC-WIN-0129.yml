@@ -8,7 +8,7 @@ platforms:
 severity: critical
 mitre:
   tactics:
-  - Credential Access
+  - credential-access
   techniques:
   - T1558.001
 sourcetypes:

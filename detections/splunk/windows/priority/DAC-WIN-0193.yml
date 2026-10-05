@@ -10,7 +10,7 @@ sourcetypes:
 - XmlWinEventLog:Security
 mitre:
   tactics:
-  - Execution
+  - execution
   techniques:
   - T1059
 severity: low

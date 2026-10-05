@@ -9,7 +9,7 @@ sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
 mitre:
   tactics:
-  - Execution
+  - execution
   techniques:
   - T1059.001
 severity: medium

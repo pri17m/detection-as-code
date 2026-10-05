@@ -10,7 +10,6 @@ sourcetypes:
 mitre:
   tactics:
   - execution
-  - user-execution
   techniques:
   - T1204.004
   - T1059.001

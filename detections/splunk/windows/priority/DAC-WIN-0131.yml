@@ -8,7 +8,7 @@ platforms:
 severity: medium
 mitre:
   tactics:
-  - Lateral Movement
+  - lateral-movement
   techniques:
   - T1021.001
 sourcetypes:

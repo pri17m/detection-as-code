@@ -10,7 +10,7 @@ sourcetypes:
 - XmlWinEventLog:Security
 mitre:
   tactics:
-  - Persistence
+  - persistence
   techniques:
   - T1098
 severity: medium

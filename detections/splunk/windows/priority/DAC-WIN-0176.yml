@@ -9,7 +9,7 @@ sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 mitre:
   tactics:
-  - Command and Control
+  - command-and-control
   techniques:
   - T1071.004
 severity: medium

@@ -9,7 +9,7 @@ sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 mitre:
   tactics:
-  - Credential Access
+  - credential-access
   techniques:
   - T1003.001
 severity: medium

@@ -9,7 +9,7 @@ sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 mitre:
   tactics:
-  - Defense Evasion
+  - defense-evasion
   techniques:
   - T1218.003
   - T1218.004

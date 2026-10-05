@@ -8,7 +8,7 @@ platforms:
 severity: medium
 mitre:
   tactics:
-  - Privilege Escalation
+  - privilege-escalation
   techniques:
   - T1134.001
 sourcetypes:
