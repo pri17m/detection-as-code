@@ -1,6 +1,6 @@
 # Enhance-TP (TP-quality re-port of enhance-existing)
 
-**Output:** `/workspace/dac-crowdstrike/enhance-tp/`  
+**Output:** the 11 enhanced rule files under `detections/crowdstrike/` listed below.  
 **Bar:** same as `tp-rewrite/` (gold: `DAC-CS-0063.yml`) — concrete ImageFileName/CommandLine/ParentBaseFileName predicates, proper `#event_simpleName`, no wildcard-only, no `splitString(..., index=N)` (use `regexExtract`).  
 **Tags:** `enhance-tp` + `tp-quality-v2`. `telemetry_validated: false`. `sourcetypes: [falcon:process]`.  
 **Scope:** 11 unique enhance IDs (same filenames as `enhance/`). No new IDs. No GitHub push.
@@ -32,8 +32,8 @@
 **After:** SAFE netsh `ImageFileName=/netsh\.exe$/i` + concrete firewall-disable/add-delete-rule `CommandLine` regex on ProcessRollup2/ProcessBlocked.
 
 ## Gate checklist
-- [x] 11 files in `enhance-tp/` (same filenames as `enhance/`)
-- [x] Zero wildcard-only ImageFileName/CommandLine stubs
+- [x] 11 files updated in place (same filenames as before)
+- [x] Zero wildcard-only ImageFileName/CommandLine predicates
 - [x] No `splitString(..., index=`
 - [x] `#event_simpleName` / `in(#event_simpleName, …)` present
 - [x] `enhance-tp` + `tp-quality-v2` tags

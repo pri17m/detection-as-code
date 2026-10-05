@@ -10,7 +10,7 @@ required_fields:
 - aid
 - event_platform
 status: experimental
-author: Detection Engineer
+author: DaC
 description: "Detects Office (Word/Excel/PowerPoint/Outlook) processes spawning cmd/PowerShell/script\
   \ hosts. Keeps prior IOA intent; enriched with Query-Hub content.outlook and Outlook\u2192browser child\
   \ ProcessRollup2 patterns."

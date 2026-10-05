@@ -10,7 +10,7 @@ required_fields:
 - aid
 - event_platform
 status: experimental
-author: Detection Engineer
+author: DaC
 description: Detects rundll32 launched from suspicious parents (Office/script hosts/cmd) or loading a
   remote UNC DLL by ordinal. Merges Query-Hub LOLBin_Rundll32 and Rundll32_Remote_UNC_DLL_Ordinal_Execution
   as OR hypotheses.

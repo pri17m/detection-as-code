@@ -11,7 +11,7 @@ required_fields:
 - aid
 - event_platform
 status: experimental
-author: Detection Engineer
+author: DaC
 description: Detects ransomware recovery-inhibition precursors including bcdedit recoveryenabled/bootstatuspolicy
   tamper, vssadmin/wmic shadow delete, wbadmin backup delete, and fsutil USN deletejournal. Primary port
   of Query-Hub ransomware_precursors (T1490); keeps prior bcdedit IOA intent.

@@ -12,7 +12,7 @@ required_fields:
 - aid
 - event_platform
 status: experimental
-author: Detection Engineer
+author: DaC
 description: Detects credential-dumping tooling and LSASS-targeted CommandLine/ImageFileName activity
   (mimikatz/procdump/pwdump/sekurlsa). ProcessRollup2 port of Query-Hub Credential_Dumping_Detection;
   process-access IOA preferred when available in tenant.

@@ -10,7 +10,7 @@ required_fields:
 - aid
 - event_platform
 status: experimental
-author: Detection Engineer
+author: DaC
 description: Detects bitsadmin.exe transfer/addfile/download/SetNotifyCmdLine abuse and remote URL usage.
   ProcessRollup2 port of Query-Hub hunting_bitsadmin_usage (ScriptControlScanV2/CommandHistory branch
   deferred to SAFE PR2 only).

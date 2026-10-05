@@ -10,7 +10,7 @@ required_fields:
 - aid
 - event_platform
 status: experimental
-author: Detection Engineer
+author: DaC
 description: Detects wmic.exe process call create (remote/local process creation via WMI). Query-Hub LOLBin_WMIC
   ImageFileName gate plus concrete CommandLine predicate from prior IOA intent (avoids ImageFileName-only
   weakness).
