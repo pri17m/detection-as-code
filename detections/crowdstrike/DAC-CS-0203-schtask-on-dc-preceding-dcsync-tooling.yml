@@ -1,6 +1,6 @@
 id: DAC-CS-0203
 title: Scheduled task registration on a DC preceding DCSync tooling
-description: Correlates ScheduledTaskRegistered with a subsequent ProcessRollup2 matching DCSync/credential-dump tooling on the same aid, requiring task timestamp before tooling timestamp within the window. DC scoping uses ComputerName heuristics; tenants should replace with aid_master ProductType=2 when available.
+description: Correlates ScheduledTaskRegistered with a subsequent ProcessRollup2 matching DCSync/credential-dump tooling on the same aid, requiring task timestamp before tooling timestamp within the window. DC scoping uses the Falcon aid_master_main.csv lookup (ProductType=2 = domain controller).
 author: DaC
 status: experimental
 platforms:
@@ -18,7 +18,7 @@ mitre:
 severity: critical
 false_positives:
 - DC maintenance scripts that register tasks and later run approved backup/IFM tooling — allowlist TaskName and ImageFileName.
-- "Tuning knob: replace ComputerName DC heuristic with match(file=\"aid_master_main.csv\") ProductType=2 when the lookup is present."
+- "Tuning knob: if aid_master_main.csv is not populated in the tenant, fall back to a ComputerName DC naming pattern."
 references:
 - "https://attack.mitre.org/techniques/T1053/005/"
 - "https://attack.mitre.org/techniques/T1003/006/"
@@ -29,6 +29,7 @@ required_fields:
 - event_platform
 - aid
 - ComputerName
+- ProductType
 - TaskName
 - TaskExecCommand
 - TaskExecArguments
@@ -45,7 +46,8 @@ query:
   crowdstrike: |
     in(#event_simpleName, values=["ScheduledTaskRegistered","ProcessRollup2","ProcessBlocked"])
     | event_platform=Win
-    | ComputerName=/((^|[.-_])dc[0-9]{0,3}([.-_]|$)|domaincontroller|adds)/i
+    | match(file="aid_master_main.csv", field=aid, include=[ProductType], strict=true)
+    | ProductType=2
     | case {
         #event_simpleName=ScheduledTaskRegistered
           | TaskName!=/^\\?Microsoft\\Windows\\/i
@@ -57,5 +59,5 @@ query:
           | StageTime := @timestamp ;
       }
     | selfJoinFilter(aid, where=[{Stage="task"},{Stage="tool"}])
-    | groupBy([aid, ComputerName], function=([min(StageTime, as=t_task, condition={Stage="task"}), min(StageTime, as=t_tool, condition={Stage="tool"}), collect([TaskName, TaskExecCommand, TaskExecArguments, ImageFileName, CommandLine], limit=20)]))
-    | t_tool > t_task
+    | groupBy([aid], function=[{Stage="task" | min(StageTime, as=t_task)}, {Stage="tool" | min(StageTime, as=t_tool)}, collect([ComputerName, TaskName, TaskExecCommand, TaskExecArguments, ImageFileName, CommandLine], limit=20)])
+    | test(t_tool > t_task)

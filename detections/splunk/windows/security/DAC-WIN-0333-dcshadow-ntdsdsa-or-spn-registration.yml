@@ -1,6 +1,6 @@
 id: DAC-WIN-0333
 title: DCShadow rogue nTDSDSA object or SPN registration indicators
-description: Detects creation or deletion of nTDSDSA directory service objects (5137/5141) or computer-account changes (4742) that add GC/drsuapi/LDAP servicePrincipalNames — indicators of DCShadow rogue replication partner registration (T1207). AttributeLDAPDisplayName is a 5136 field and is not used here.
+description: "Detects creation or deletion of nTDSDSA directory service objects (5137/5141) or computer-account changes (4742) that add GC/drsuapi/LDAP servicePrincipalNames — indicators of DCShadow rogue replication partner registration (T1207). AttributeLDAPDisplayName is a 5136 field and is not used here. Unconfirmed in tenant: the classic-render aliases Object_DN/DN, Object_Class/Class, Subject_User_Name, Target_User_Name and Service_Principal_Names, how 4742 ServicePrincipalNames is rendered (single string vs multivalue), and whether Computer, ComputerName or host carries the host name."
 author: DaC
 status: experimental
 platforms:

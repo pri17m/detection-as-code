@@ -1,6 +1,6 @@
 id: DAC-MDE-0063
-title: Browser extension with proxy, webRequestAuthProvider, and broad host permissions
-description: "Inventory hunt using Defender Vulnerability Management browser-extension tables for extensions that request proxy / webRequestAuthProvider-class permissions (filter on PermissionId with PermissionName fallback). DeviceName is joined from DeviceInfo (TVM tables have no DeviceName). Before promote, run: DeviceTvmBrowserExtensionsKB | distinct PermissionId, PermissionName. Note: <all_urls> is a Chrome host match pattern, not an API permission; host-permission listing in MDE is unverified. TVM tables are Advanced Hunting / preview and not available in Microsoft Sentinel."
+title: "Hunt: browser extensions holding both proxy and webRequestAuthProvider permissions"
+description: "Informational inventory hunt, not an install-time alert. Lists browser extensions from Defender Vulnerability Management whose permission set includes both proxy and webRequestAuthProvider (the combination needed to route browser traffic through an attacker proxy and answer its authentication challenges), filtering on PermissionId. <all_urls> is a Chrome host match pattern rather than an API permission, so it is reported as a BroadHostAccess flag instead of being required. DeviceTvmBrowserExtensions has no DeviceName column; the name is joined from DeviceInfo on DeviceId. TVM tables are Advanced Hunting only (preview) and return no data in Microsoft Sentinel. Before use, run DeviceTvmBrowserExtensionsKB | distinct PermissionId, PermissionName to map permission IDs and adjust the PermissionId literals if they differ. Unconfirmed in tenant: that PermissionId holds the raw Chrome manifest keys proxy and webRequestAuthProvider (Microsoft documents it only as a unique identifier), and whether host patterns such as <all_urls> appear in PermissionId at all."
 author: DaC
 status: experimental
 platforms:
@@ -14,40 +14,60 @@ mitre:
   techniques:
   - T1176.001
   - T1185
-severity: high
+severity: low
 false_positives:
-- Corporate proxy/SSO browser extensions that legitimately need these permissions — maintain an ExtensionId allowlist.
-- "Tuning knob: dump distinct PermissionId, PermissionName first and replace the provisional PermissionId list with tenant values; alert only on ExtensionRisk High/Critical."
+- Corporate proxy, VPN, or SSO browser extensions that legitimately need proxy and webRequestAuthProvider — keep an ExtensionId allowlist.
+- "Hunt workflow: review results by ExtensionId and BroadHostAccess; escalate only unknown or unapproved extensions, prioritising ExtensionRisk High/Critical."
 references:
 - "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicetvmbrowserextensions-table"
 - "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicetvmbrowserextensionskb-table"
 - "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceinfo-table"
 - "https://developer.chrome.com/docs/extensions/reference/permissions-list"
+- "https://developer.chrome.com/docs/extensions/reference/api/webRequest"
+- "https://developer.chrome.com/docs/extensions/develop/concepts/match-patterns"
 - "https://attack.mitre.org/techniques/T1176/001/"
 - "https://attack.mitre.org/techniques/T1185/"
 telemetry_validated: false
 required_fields:
 - DeviceId
+- BrowserName
 - ExtensionId
 - ExtensionName
+- ExtensionVersion
+- ExtensionVendor
+- ExtensionRisk
+- IsActivated
+- InstallationTime
 - PermissionId
 - PermissionName
-- ExtensionRisk
-- BrowserName
-- InstallationTime
 tags:
 - wave1
 - browser-extension
+- hunt
+- inventory
 query:
   defender: |
-    let kb = DeviceTvmBrowserExtensionsKB
-    | extend VersionStr = tostring(ExtensionVersion)
-    | where PermissionId in~ ("proxy","webRequestAuthProvider","webRequest")
-        or PermissionName has_any ("proxy","authentication","all websites","web request")
-        or PermissionDescription has_any ("proxy","authentication");
+    // Inventory hunt: run in Defender XDR Advanced Hunting (TVM tables are not ingested into Sentinel).
+    // Step 1, once per tenant, map permission IDs to names:
+    //   DeviceTvmBrowserExtensionsKB | distinct PermissionId, PermissionName
+    // Step 2, if the IDs differ from the Chrome manifest keys below, edit the literals.
+    let ExtPerms = DeviceTvmBrowserExtensionsKB
+        | extend ExtensionVersion = tostring(ExtensionVersion)
+        | summarize
+            ProxyHits = countif(PermissionId =~ "proxy"),
+            AuthProviderHits = countif(PermissionId =~ "webRequestAuthProvider"),
+            AllUrlsHits = countif(PermissionId =~ "<all_urls>"),
+            Perms = make_set(PermissionId),
+            PermNames = make_set(PermissionName)
+            by ExtensionId, BrowserName, ExtensionVersion
+        | where ProxyHits > 0 and AuthProviderHits > 0
+        | extend BroadHostAccess = AllUrlsHits > 0;
     DeviceTvmBrowserExtensions
-    | join kind=inner kb on ExtensionId, BrowserName, $left.ExtensionVersion == $right.VersionStr
-    | join kind=leftouter (DeviceInfo | summarize arg_max(Timestamp, DeviceName) by DeviceId) on DeviceId
-    | summarize Perms=make_set(PermissionId), PermNames=make_set(PermissionName), Risk=any(ExtensionRisk), Name=any(ExtensionName), Install=any(InstallationTime) by DeviceId, DeviceName, ExtensionId, BrowserName
-    | where Perms has_any ("proxy","webRequestAuthProvider","webRequest") or PermNames has_any ("proxy","authentication")
-    | project DeviceName, DeviceId, ExtensionId, Name, BrowserName, Risk, Install, Perms, PermNames
+    | join kind=inner ExtPerms on ExtensionId, BrowserName, ExtensionVersion
+    | join kind=leftouter (
+        DeviceInfo
+        | summarize arg_max(Timestamp, DeviceName) by DeviceId
+        ) on DeviceId
+    | project DeviceName, DeviceId, BrowserName, ExtensionId, ExtensionName, ExtensionVersion,
+        ExtensionVendor, IsActivated, InstallationTime, ExtensionRisk, BroadHostAccess, Perms, PermNames
+    | sort by BroadHostAccess desc, ExtensionId asc

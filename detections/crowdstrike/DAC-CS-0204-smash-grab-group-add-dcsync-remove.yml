@@ -1,6 +1,6 @@
 id: DAC-CS-0204
 title: Smash-and-grab privileged group add correlated with DCSync tooling
-description: Detects privileged group membership adds via UserAccountAddedToGroup (Domain Admins RID 512, Enterprise Admins 519, BUILTIN\Administrators 544) correlated with DCSync-style ProcessRollup2 on the same aid. GroupRid is hex; decode with parseInt radix=16 endian=big. UserAccountRemovedFromGroup is not confirmed in public Falcon content — rapid-removal stage omitted pending tenant confirmation. 512/519 changes are typically logged on DCs; 544 is local SAM Administrators via RPC.
+description: "Detects privileged group membership adds via UserAccountAddedToGroup (Domain Admins RID 512, Enterprise Admins 519, BUILTIN\\Administrators 544) correlated with DCSync-style ProcessRollup2 on the same aid. GroupRid is hex; decode with parseInt radix=16 endian=big. 512/519 changes are typically logged on DCs; 544 is local SAM Administrators via RPC. Unconfirmed in tenant: the UserAccountRemovedFromGroup event (so the rapid-removal stage is not implemented) and that parseInt(GroupRid, radix=16, endian=big) yields 512/519/544 on real events (no raw GroupRid sample is published)."
 author: DaC
 status: experimental
 platforms:
@@ -59,5 +59,5 @@ query:
           | StageTime := @timestamp ;
       }
     | selfJoinFilter(aid, where=[{Stage="group-add"},{Stage="dcsync-tool"}])
-    | groupBy([aid, ComputerName], function=([min(StageTime, as=t_add, condition={Stage="group-add"}), min(StageTime, as=t_tool, condition={Stage="dcsync-tool"}), collect([GroupRid, UserRid, ImageFileName, CommandLine, RpcClientProcessId], limit=40)]))
-    | t_tool > t_add
+    | groupBy([aid], function=[{Stage="group-add" | min(StageTime, as=t_add)}, {Stage="dcsync-tool" | min(StageTime, as=t_tool)}, collect([ComputerName, GroupRid, UserRid, ImageFileName, CommandLine, RpcClientProcessId], limit=40)])
+    | test(t_tool > t_add)

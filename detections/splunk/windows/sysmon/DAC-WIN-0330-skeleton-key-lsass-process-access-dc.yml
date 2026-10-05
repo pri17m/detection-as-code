@@ -1,6 +1,6 @@
 id: DAC-WIN-0330
 title: Skeleton Key style suspicious LSASS process access on a domain controller
-description: Detects Sysmon EventCode 10 process access targeting lsass.exe with GrantedAccess masks commonly used for memory patching/injection, from non-security SourceImage paths. Host scoping uses a hostname heuristic pending a domain_controllers lookup. Uses SourceUser (Sysmon EID10 has no User field).
+description: "Detects Sysmon EventCode 10 process access targeting lsass.exe with GrantedAccess masks commonly used for memory patching/injection, from non-security SourceImage paths. Host scoping uses a hostname heuristic pending a domain_controllers lookup. Uses SourceUser (Sysmon EID10 has no User field). Unconfirmed in tenant: the Splunk-extracted Sysmon EID 10 field names GrantedAccess, SourceUser and SourceProcessGUID (the Sysmon TA does not document them) and the classic aliases Target_Image, Source_Image, Granted_Access and Source_User."
 author: DaC
 status: experimental
 platforms:

@@ -1,6 +1,6 @@
 id: DAC-CS-0202
 title: GPO persistence via SYSVOL ScheduledTasks.xml or GptTmpl.inf write
-description: "Detects *FileWritten family events under SYSVOL Policies paths targeting ScheduledTasks.xml, SecEdit\\GptTmpl.inf, GPT.INI or Registry.pol. Telemetry coverage for xml/inf/pol/ini via typed FileWritten ESNs is unverified on public vendor docs — validate on a lab DC before promote. Prefer pairing with Windows 5145/5136 SYSVOL/GPO controls."
+description: "Detects *FileWritten family events under SYSVOL Policies paths targeting ScheduledTasks.xml, SecEdit\\GptTmpl.inf, GPT.INI or Registry.pol. Prefer pairing with Windows 5145/5136 SYSVOL/GPO controls. Unconfirmed in tenant: whether any #event_simpleName matching /FileWritten$/ is emitted for .xml, .inf, .ini and .pol writes (ScheduledTasks.xml, GptTmpl.inf, GPT.INI, Registry.pol) under SYSVOL."
 author: DaC
 status: experimental
 platforms:
