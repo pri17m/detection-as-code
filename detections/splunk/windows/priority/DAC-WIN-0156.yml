@@ -8,7 +8,7 @@ platforms:
 severity: medium
 mitre:
   tactics:
-  - Discovery
+  - discovery
   techniques:
   - T1087.002
   - T1059.001

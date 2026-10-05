@@ -10,7 +10,7 @@ sourcetypes:
 - XmlWinEventLog:Security
 mitre:
   tactics:
-  - Lateral Movement
+  - lateral-movement
   techniques:
   - T1021.001
   - T1078.002

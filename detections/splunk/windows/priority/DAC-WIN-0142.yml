@@ -8,7 +8,7 @@ platforms:
 severity: high
 mitre:
   tactics:
-  - Defense Evasion
+  - defense-evasion
   techniques:
   - T1562.001
   - T1070.001

@@ -8,7 +8,7 @@ platforms:
 severity: high
 mitre:
   tactics:
-  - Persistence
+  - persistence
   techniques:
   - T1484.001
 sourcetypes:

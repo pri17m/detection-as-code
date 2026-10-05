@@ -9,7 +9,7 @@ sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 mitre:
   tactics:
-  - Lateral Movement
+  - lateral-movement
   techniques:
   - T1021.002
 severity: medium

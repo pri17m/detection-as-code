@@ -10,7 +10,7 @@ platforms:
 severity: critical
 mitre:
   tactics:
-  - Credential Access
+  - credential-access
   techniques:
   - T1003.001
 sourcetypes:

@@ -8,7 +8,7 @@ platforms:
 severity: medium
 mitre:
   tactics:
-  - Defense Evasion
+  - defense-evasion
   techniques:
   - T1218.010
 sourcetypes:
