@@ -10,7 +10,7 @@ platforms:
 severity: high
 mitre:
   tactics:
-  - Initial Access
+  - initial-access
   techniques:
   - T1078.002
 sourcetypes:

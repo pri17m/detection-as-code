@@ -8,7 +8,7 @@ platforms:
 severity: high
 mitre:
   tactics:
-  - Lateral Movement
+  - lateral-movement
   techniques:
   - T1550.003
 sourcetypes:

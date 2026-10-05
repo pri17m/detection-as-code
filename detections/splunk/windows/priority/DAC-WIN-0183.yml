@@ -10,7 +10,7 @@ sourcetypes:
 - XmlWinEventLog:Security
 mitre:
   tactics:
-  - Defense Evasion
+  - defense-evasion
   techniques:
   - T1053.005
   - T1070

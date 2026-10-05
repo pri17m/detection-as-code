@@ -8,7 +8,7 @@ platforms:
 severity: critical
 mitre:
   tactics:
-  - Lateral Movement
+  - lateral-movement
   techniques:
   - T1003.001
   - T1550.002
