@@ -1,0 +1,32 @@
+id: DAC-WIN-0336
+title: 'Executable started from C\\PerfLogs'
+description: 'Detects a process whose image path is under C:\\PerfLogs and whose name is not a Windows component. PerfLogs is a staging directory in intrusions that also use it for credential dumping and exfiltration tools. A performance counter file written there is not a process start, and is not in this rule.'
+author: DaC
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - WinEventLog:Security
+mitre:
+  tactics:
+    - execution
+    - credential-access
+  techniques:
+    - T1059
+    - T1003.001
+severity: high
+false_positives:
+  - 'A signed performance or diagnostic tool that an admin deliberately runs from PerfLogs. Rare.'
+references:
+  - 'https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688'
+telemetry_validated: false
+required_fields:
+  - EventCode
+  - NewProcessName
+query:
+  splunk: |
+    sourcetype=WinEventLog:Security EventCode=4688
+    | eval proc=lower(coalesce(NewProcessName, process_path, Image))
+    | where match(proc, "(?i)\\\\perflogs\\\\")
+    | where NOT match(proc, "(?i)\\\\windows\\\\(system32|syswow64)\\\\")
+    | stats count min(_time) as firstTime values(CommandLine) as command values(ParentProcessName) as parent by Computer, SubjectUserName, proc
