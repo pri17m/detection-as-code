@@ -1,30 +1,24 @@
 id: DAC-GH-0006
-title: "GitHub: Actions workflow modified"
-description: "Detects a change to a GitHub Actions workflow file, or a workflow being enabled or disabled. Covers git push of .github/workflows, workflow create/update actions emitted by some audit exports, and workflows.enable_workflow or workflows.disable_workflow. A malicious CI pipeline is a workflow edit, not a malware name."
+title: "GitHub: Actions workflow enabled, disabled, or created"
+description: "Detects a GitHub Actions workflow being enabled, disabled, or a workflow run being created, plus a git push to the repository. GitHub audit events do not include the changed file path, so this rule does not match .github/workflows. Fields are the ones Splunk security_content uses on github audit events: action, actor, actor_id, actor_is_bot, org, repo, user_agent, operation_type."
 author: "DaC"
 status: experimental
 platforms: [splunk]
-sourcetypes: ["github:audit", "github:cloud:audit"]
+sourcetypes: ["github:audit", "github:cloud:audit", "httpevent"]
 mitre:
   tactics: ["execution", "persistence"]
-  techniques: ["T1195.002"]
-severity: high
+  techniques: ["T1195"]
+severity: medium
 false_positives:
-  - "Normal workflow edits by a known CI maintainer on a non-production repository."
-  - "Dependabot or a release bot opening a pull request that touches .github/workflows."
+  - "A normal git push. This action does not say the push touched a workflow file."
+  - "A scheduled or trusted workflow run."
 references:
-  - "https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise#workflows"
-  - "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax"
+  - "https://github.com/splunk/security_content/blob/develop/detections/cloud/github_enterprise_register_self_hosted_runner.yml"
+  - "https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise"
 telemetry_validated: false
 required_fields: ["action", "actor", "repo"]
 query:
   splunk: |
-    (sourcetype=github:audit OR sourcetype=github:cloud:audit)
-    | eval workflow_path=coalesce(workflow_path, workflow_file, path, 'data.workflow_path', 'additional_fields.workflow_path')
-    | eval push_paths=mvjoin(mvappend(coalesce(commits{}.modified{}, modified{}, paths{}, path), workflow_path), " ")
-    | where action IN ("workflows.enable_workflow", "workflows.disable_workflow", "workflows.created_workflow_run")
-        OR match(action, "(?i)workflow_(file_)?(modified|created|updated)|actions_workflow")
-        OR (action="git.push" AND match(push_paths, "(?i)\\.github/workflows/.+\\.(yml|yaml)"))
-        OR match(workflow_path, "(?i)\\.github/workflows/.+\\.(yml|yaml)")
-    | stats count values(actor) as actors values(repo) as repos values(workflow_path) as workflow_paths values(action) as actions min(_time) as first_seen max(_time) as last_seen by repo
-    | where count>0
+    (sourcetype=github:audit OR sourcetype=github:cloud:audit OR sourcetype=httpevent) action IN ("workflows.enable_workflow", "workflows.disable_workflow", "workflows.created_workflow_run", "git.push")
+    | fillnull
+    | stats count min(_time) as firstTime max(_time) as lastTime values(action) as actions values(actor) as actors values(actor_is_bot) as actor_is_bot values(user_agent) as user_agent values(operation_type) as operation_type by org, repo
