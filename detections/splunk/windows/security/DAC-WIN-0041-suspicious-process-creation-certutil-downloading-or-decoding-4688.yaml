@@ -1,8 +1,8 @@
 id: DAC-WIN-0041
 title: 'Suspicious process creation: Certutil downloading or decoding (4688)'
-description: 'Detects Security 4688 (classic+XML) where certutil.exe runs with -urlcache,
-  -decode, or -encode. Uses windows_security so XmlWinEventLog:Security lab/TA
-  feeds are covered; requires process path to be certutil.exe (not only cmdline).'
+description: 'Detects Security 4688 where certutil.exe runs with -urlcache, -decode, or
+  -encode. The search is the expanded Security sourcetype clause plus
+  XmlWinEventLog:Security, which is the lab query that returned the event.'
 author: DaC
 status: experimental
 platforms:
@@ -30,7 +30,7 @@ required_fields:
 - ParentProcessName
 - SubjectUserName
 query:
-  splunk: '`windows_security` EventCode=4688
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security OR (sourcetype=WinEventLog source=WinEventLog:Security) OR (sourcetype=XmlWinEventLog source=XmlWinEventLog:Security)) EventCode=4688
 
     | eval proc=lower(coalesce(NewProcessName, process_path, Image))
 
@@ -38,7 +38,7 @@ query:
 
     | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, parent_process_name))
 
-    | search proc="*certutil.exe" (cmd="*-urlcache*" OR cmd="*-decode*" OR cmd="*-encode*")
+    | search proc="*certutil.exe" (cmd="*-urlcache*" OR cmd="*-decode*" OR cmd="*-encode*") sourcetype="XmlWinEventLog:Security"
 
     | stats count values(proc) as processes values(parent) as parents values(cmd)
     as commands by host, SubjectUserName
