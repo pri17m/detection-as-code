@@ -1,38 +1,43 @@
-false_positives:
-- Tune after baselining; experimental sketch may be noisy.
-required_fields:
-- eventName
-- userIdentity.arn
-- sourceIPAddress
-- awsRegion
-telemetry_validated: false
+id: DAC-AWS-0038
+title: 'AWS: CloudFormation stack with IAM capability from a CI or rare role'
+description: 'Detects CloudFormation creating or executing a stack or change set with CAPABILITY_IAM or CAPABILITY_NAMED_IAM. Covers CreateStack, UpdateStack, CreateChangeSet, and ExecuteChangeSet, whether capabilities arrives as a string or an array, and whether the caller is a GitHub Actions role or the CloudFormation service. This is the privilege-escalation hop, not a miner keyword.'
 author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - aws:cloudtrail
 mitre:
   tactics:
-  - persistence
+    - privilege-escalation
+    - persistence
   techniques:
-  - T1578
-id: DAC-AWS-0038
-status: experimental
-title: 'AWS: CloudFormation CreateStack with IAM capabilities from rare actor'
-query:
-  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
-
-    | search eventName IN ("CreateStack","UpdateStack")
-
-    | search requestParameters.capabilities="*CAPABILITY_NAMED_IAM*" OR requestParameters.capabilities="*CAPABILITY_IAM*"
-
-    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
-
-    '
-severity: medium
+    - T1098
+severity: high
+false_positives:
+  - "A known infrastructure pipeline that is allowed to create IAM resources. Allowlist that role ARN."
 references:
-- https://attack.mitre.org/techniques/T1578/
-platforms:
-- splunk
+  - "https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_CreateStack.html"
+  - "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html"
+  - "https://attack.mitre.org/techniques/T1098/"
+telemetry_validated: false
+required_fields:
+  - eventName
+  - userIdentity.arn
 tags:
-- wave-c
-- P1
-description: CreateStack CAPABILITY_NAMED_IAM
-sourcetypes:
-- aws:cloudtrail
+  - wave-c
+  - P1
+query:
+  splunk: |
+    (sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event) eventSource=cloudformation.amazonaws.com eventName IN ("CreateStack", "UpdateStack", "CreateChangeSet", "ExecuteChangeSet")
+    | spath input=_raw path=requestParameters.capabilities{} output=cap_list
+    | spath input=_raw path=requestParameters.capabilities output=cap_raw
+    | spath input=_raw path=requestParameters.stackName output=stackName
+    | spath input=_raw path=requestParameters.changeSetName output=changeSetName
+    | eval caps=mvappend(cap_list, split(cap_raw, ","))
+    | eval cap_text=mvjoin(caps, " ")
+    | where match(cap_text, "CAPABILITY_NAMED_IAM|CAPABILITY_IAM")
+    | eval caller=coalesce('userIdentity.sessionContext.sessionIssuer.userName', 'userIdentity.userName', 'userIdentity.invokedBy', 'userIdentity.arn')
+    | where match(caller, "(?i)Github-Actions|cloudformation|AssumedRole") OR match('userIdentity.arn', "(?i)assumed-role/.+(Github|CloudFormation)")
+    | where isnull(errorCode) OR errorCode=""
+    | table _time, eventName, stackName, changeSetName, caps, caller, userIdentity.arn, sourceIPAddress, awsRegion

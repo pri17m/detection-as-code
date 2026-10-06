@@ -1,41 +1,60 @@
-query:
-  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
-
-    | search action IN ("workflows.completed_workflow_run","oidc.*") OR operation_type="oidc"
-
-    | # Correlate separately to cloud AssumeRoleWithWebIdentity via sub claim
-
-    | table _time, actor, action, org, repo, actor_ip, user_agent
-
-    '
 id: DAC-GH-0046
 title: 'GitHub: OIDC cloud role assumption from Actions for unexpected repo'
-false_positives:
-- Tune after baselining; experimental sketch may be noisy.
-severity: high
-sourcetypes:
-- github:audit
-- github:cloud:audit
-platforms:
-- splunk
-tags:
-- wave-b
-- P0
-- phase2-top5
-telemetry_validated: false
-required_fields:
-- actor
-- action
-- org
-- repo
-- actor_ip
-references:
-- https://attack.mitre.org/techniques/T1550/001/
-mitre:
-  tactics:
-  - lateral-movement
-  techniques:
-  - T1550.001
+description: 'Detects a GitHub Actions OIDC assumption of an AWS role from a repository that is not on the deploy allowlist. Covers AssumeRoleWithWebIdentity where the issuer is token.actions.githubusercontent.com, the sub or userName claim repo:org/repo:ref, and a GitHub audit workflow run that requested an OIDC token. Edit the allowlist before promoting.'
 author: Detection Engineer
 status: experimental
-description: correlate cloud AssumeRoleWithWebIdentity sub claim
+platforms:
+  - splunk
+sourcetypes:
+  - aws:cloudtrail
+  - github:audit
+  - github:cloud:audit
+mitre:
+  tactics:
+    - lateral-movement
+    - privilege-escalation
+  techniques:
+    - T1550.001
+severity: high
+false_positives:
+  - "A new deploy repository that has not been added to the allowlist."
+  - "A pull_request workflow from a fork, if the trust policy allows pull_request subjects."
+references:
+  - "https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services"
+  - "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html"
+  - "https://attack.mitre.org/techniques/T1550/001/"
+telemetry_validated: false
+required_fields:
+  - eventName
+  - userIdentity.arn
+tags:
+  - wave-b
+  - P0
+query:
+  splunk: |
+    (sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event) eventName=AssumeRoleWithWebIdentity
+    | spath input=_raw path=userIdentity.identityProvider output=identityProvider
+    | spath input=_raw path=userIdentity.userName output=webUser
+    | spath input=_raw path=userIdentity.principalId output=principalId
+    | spath input=_raw path=requestParameters.roleArn output=roleArn
+    | spath input=_raw path=requestParameters.roleSessionName output=roleSessionName
+    | spath input=_raw path=responseElements.assumedRoleUser.arn output=assumedArn
+    | spath input=_raw path=userIdentity.sessionContext.webIdFederationData.attributes.sub output=subClaim
+    | eval issuer=coalesce(identityProvider, principalId)
+    | eval subject=coalesce(subClaim, webUser, roleSessionName)
+    | where match(issuer, "(?i)token\\.actions\\.githubusercontent\\.com") OR match(subject, "(?i)^repo:[^/]+/[^:]+")
+    | rex field=subject "repo:(?<gh_repo>[^/]+/[^:]+)"
+    | eval allowed=if(match(gh_repo, "^(YOURORG/deploy-repo|YOURORG/infra-repo)$"), 1, 0)
+    | where allowed=0
+    | eval hop="aws-oidc"
+    | table _time, hop, gh_repo, subject, roleArn, assumedArn, sourceIPAddress, errorCode, userIdentity.arn
+    | append [
+        search (sourcetype=github:audit OR sourcetype=github:cloud:audit) action IN ("workflows.completed_workflow_run", "workflows.created_workflow_run", "workflows.prepared_workflow_job")
+        | eval token_scope=coalesce(token_scope, permissions, 'data.permissions', workflow_path)
+        | where match(token_scope, "(?i)id-token") OR match(action, "(?i)oidc") OR operation_type="oidc"
+        | rex field=repo "^(?<gh_repo>[^/]+/[^/]+)$"
+        | eval allowed=if(match(gh_repo, "^(YOURORG/deploy-repo|YOURORG/infra-repo)$"), 1, 0)
+        | where allowed=0
+        | eval hop="github-workflow-oidc"
+        | table _time, hop, gh_repo, actor, action, org, repo, actor_ip
+      ]

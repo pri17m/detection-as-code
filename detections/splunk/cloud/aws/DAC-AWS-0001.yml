@@ -1,39 +1,40 @@
-false_positives:
-- Tune after baselining; experimental sketch may be noisy.
-required_fields:
-- eventName
-- userIdentity.arn
-- sourceIPAddress
-- awsRegion
-telemetry_validated: false
+id: DAC-AWS-0001
+title: 'AWS: IAM AttachUserPolicy or AttachRolePolicy with AdministratorAccess'
+description: 'Detects attachment of the AWS managed AdministratorAccess policy to a user, role, or group in any commercial, GovCloud, or China partition. Covers AttachUserPolicy, AttachRolePolicy, and AttachGroupPolicy. The caller may be a human, a GitHub Actions role, or cloudformation.amazonaws.com acting for a stack.'
 author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - aws:cloudtrail
 mitre:
   tactics:
-  - persistence
+    - privilege-escalation
+    - persistence
   techniques:
-  - T1098.003
-id: DAC-AWS-0001
-status: experimental
-title: 'AWS: IAM AttachUserPolicy or AttachRolePolicy with AdministratorAccess'
-query:
-  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
-
-    | search eventName IN ("AttachUserPolicy","AttachRolePolicy","AttachGroupPolicy")
-
-    | search requestParameters.policyArn="*AdministratorAccess*" OR requestParameters.policyArn="*Admin*"
-
-    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
-
-    '
-severity: high
+    - T1098.003
+severity: critical
+false_positives:
+  - "A break-glass role attach during a controlled incident. Confirm the change ticket before closing."
 references:
-- https://attack.mitre.org/techniques/T1098/003/
-platforms:
-- splunk
+  - "https://docs.aws.amazon.com/IAM/latest/APIReference/API_AttachRolePolicy.html"
+  - "https://attack.mitre.org/techniques/T1098/003/"
+telemetry_validated: false
+required_fields:
+  - eventName
+  - userIdentity.arn
 tags:
-- wave-c
-- P0
-- phase2-top5
-description: eventName Attach*Policy PolicyArn */AdministratorAccess
-sourcetypes:
-- aws:cloudtrail
+  - wave-c
+  - P0
+  - phase2-top5
+query:
+  splunk: |
+    (sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event) eventName IN ("AttachUserPolicy", "AttachRolePolicy", "AttachGroupPolicy")
+    | spath input=_raw path=requestParameters.policyArn output=policyArn
+    | spath input=_raw path=requestParameters.roleName output=roleName
+    | spath input=_raw path=requestParameters.userName output=userName
+    | spath input=_raw path=requestParameters.groupName output=groupName
+    | where match(policyArn, "^arn:aws[a-z-]*:iam::aws:policy/AdministratorAccess$")
+    | eval target=coalesce(roleName, userName, groupName)
+    | eval caller=coalesce('userIdentity.invokedBy', 'userIdentity.sessionContext.sessionIssuer.userName', 'userIdentity.arn')
+    | table _time, eventName, policyArn, target, caller, userIdentity.arn, sourceIPAddress, awsRegion, errorCode
