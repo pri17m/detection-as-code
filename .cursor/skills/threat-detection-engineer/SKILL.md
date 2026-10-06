@@ -43,7 +43,12 @@ One rule per change. Do not rewrite descriptions, tags, or unrelated keys.
 
 ## Order of work
 
-1. Name the technique and the log source. If that log is not collected, say so and stop.
-2. Write or fix the smallest YAML diff.
+Use the other skills in `.cursor/skills/` in this order. Do not skip the reality check.
+
+1. `threat-intel-prioritizer` names the technique and the log. If that log is not collected, stop.
+2. `minimal-detection-change` writes the smallest YAML diff.
 3. Run the harmless fixture, then the rule query.
-4. On a pass, redact the event, set the flag, and open a pull request with the evidence. On a fail, leave the flag false and report the mismatch.
+4. `detection-reality-checker` decides pass or fail. On a fail, leave `telemetry_validated` false.
+5. On a pass, `sample-redaction` cleans the event, then set the flag and `validation`.
+6. `detection-review` checks the diff. `detection-git` commits only when asked.
+
