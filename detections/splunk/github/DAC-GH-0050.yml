@@ -1,0 +1,30 @@
+id: DAC-GH-0050
+title: 'GitHub: Repository ruleset destroyed'
+description: 'Detects repository_ruleset.destroy. GitHub documents this action as a repository ruleset being deleted. A ruleset update is a different action and is not included.'
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - github:audit
+  - github:cloud:audit
+mitre:
+  tactics:
+    - defense-evasion
+  techniques:
+    - T1562.001
+severity: high
+false_positives:
+  - 'An admin deleting a ruleset that has been replaced.'
+references:
+  - 'https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise'
+telemetry_validated: false
+required_fields:
+  - action
+  - actor
+  - repo
+query:
+  splunk: |
+    (sourcetype=github:audit OR sourcetype=github:cloud:audit OR sourcetype=httpevent) action=repository_ruleset.destroy
+    | fillnull
+    | stats count min(_time) as firstTime max(_time) as lastTime values(user_agent) as user_agent by actor, actor_id, org, repo

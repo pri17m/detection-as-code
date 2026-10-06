@@ -1,0 +1,30 @@
+id: DAC-GH-0052
+title: 'GitHub: Organization removed from enterprise'
+description: 'Detects business.remove_organization. GitHub documents this action as an organization removed from an enterprise. This event has no repo field.'
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - github:audit
+  - github:cloud:audit
+mitre:
+  tactics:
+    - impact
+  techniques:
+    - T1531
+severity: critical
+false_positives:
+  - 'A planned enterprise offboarding of an organization.'
+references:
+  - 'https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise'
+telemetry_validated: false
+required_fields:
+  - action
+  - actor
+  - business
+query:
+  splunk: |
+    (sourcetype=github:audit OR sourcetype=github:cloud:audit OR sourcetype=httpevent) action=business.remove_organization
+    | fillnull
+    | stats count min(_time) as firstTime max(_time) as lastTime values(user_agent) as user_agent by actor, actor_id, business, org
