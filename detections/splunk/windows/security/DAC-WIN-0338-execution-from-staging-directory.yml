@@ -1,6 +1,6 @@
 id: DAC-WIN-0338
 title: 'Process started from a directory that should not hold executables'
-description: 'Detects event 4688 where the image path is a known staging directory and the binary is not a Windows component. Covers PerfLogs, Windows Temp, Windows Tasks, tracing, CRMLog, spool driver color, spool PRINTERS, COM dumps, and Users Public. These directories exist by default and hold data, not programs. ProgramData is excluded because legitimate updaters execute from vendor folders there.'
+description: 'Detects event 4688 where the image path is a staging location seen in intrusion reports, and the binary is not a Windows component. Huntress Akira ran svchost, procdump, and a GOST tunnel from C:\PerfLogs. Huntress INC ran win.exe from C:\perflogs, w.exe from the ProgramData root, hwau.exe from Users\Public, and a script from Users\Public\Documents. The DFIR Report recorded procdump64.exe executed from ProgramData. ProgramData is matched only at its root, not in vendor subfolders, because updaters execute from those.'
 author: DaC
 status: experimental
 platforms:
@@ -16,12 +16,13 @@ mitre:
     - T1036.005
 severity: high
 false_positives:
-  - 'An installer that briefly runs a helper from Windows Temp. Tune on parent process and signer, not by deleting the path.'
-  - 'A management agent that an admin copied into Public. Allowlist that full path.'
+  - 'An installer that briefly runs a helper from Windows Temp. Tune on parent process, not by deleting the path.'
+  - 'A management agent copied into Public. Allowlist that full path.'
 references:
+  - 'https://www.huntress.com/blog/mapping-akira-ransomware-attack'
+  - 'https://www.huntress.com/threat-library/ransomware/inc-ransomware'
+  - 'https://thedfirreport.com/2022/08/08/bumblebee-roasts-its-way-to-domain-admin/'
   - 'https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688'
-  - 'https://attack.mitre.org/techniques/T1074/001/'
-  - 'https://research.splunk.com/endpoint/237016fa-d8e6-47b4-80f9-70c4d42c72c0/'
 telemetry_validated: false
 required_fields:
   - EventCode
@@ -30,6 +31,10 @@ query:
   splunk: |
     sourcetype=WinEventLog:Security EventCode=4688
     | eval proc=lower(coalesce(NewProcessName, process_path, Image))
-    | where match(proc, "(?i)(\\\\perflogs\\\\|\\\\windows\\\\temp\\\\|\\\\windows\\\\tasks\\\\|\\\\windows\\\\tracing\\\\|\\\\windows\\\\registration\\\\crmlog\\\\|\\\\windows\\\\system32\\\\spool\\\\drivers\\\\color\\\\|\\\\windows\\\\system32\\\\spool\\\\printers\\\\|\\\\windows\\\\system32\\\\com\\\\dmp\\\\|\\\\users\\\\public\\\\)")
+    | where match(proc, "(?i)(\\\\perflogs\\\\|\\\\windows\\\\temp\\\\|\\\\temp\\\\|\\\\windows\\\\tasks\\\\|\\\\windows\\\\tracing\\\\|\\\\windows\\\\registration\\\\crmlog\\\\|\\\\windows\\\\system32\\\\spool\\\\drivers\\\\color\\\\|\\\\windows\\\\system32\\\\spool\\\\printers\\\\|\\\\windows\\\\system32\\\\com\\\\dmp\\\\|\\\\users\\\\public\\\\)")
+        OR match(proc, "(?i)^[a-z]:\\\\programdata\\\\[^\\\\]+\\.(exe|dll|ps1)$")
+        OR match(proc, "(?i)^[a-z]:\\\\users\\\\[^\\\\]+\\\\[^\\\\]+\\.(exe|dll)$")
+        OR match(proc, "(?i)^[a-z]:\\\\windows\\\\[^\\\\]+\\.(exe|dll)$")
     | where NOT match(proc, "(?i)\\\\windows\\\\(system32|syswow64)\\\\")
+    | where NOT match(proc, "(?i)\\\\users\\\\[^\\\\]+\\\\(appdata|desktop|documents|downloads|ntuser)\\\\")
     | stats count min(_time) as firstTime values(CommandLine) as command values(ParentProcessName) as parent by Computer, SubjectUserName, proc
