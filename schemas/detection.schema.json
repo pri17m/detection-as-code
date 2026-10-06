@@ -77,6 +77,17 @@
       "items": { "type": "string", "minLength": 8 }
     },
     "telemetry_validated": { "type": "boolean" },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sample_event"],
+      "properties": {
+        "sample_event": { "type": "string", "minLength": 20 },
+        "validated_at": { "type": "string", "minLength": 10 },
+        "sourcetype": { "type": "string", "minLength": 3 },
+        "note": { "type": "string", "minLength": 3 }
+      }
+    },
     "required_fields": {
       "type": "array",
       "minItems": 0,
@@ -113,6 +124,15 @@
         { "required": ["query"] },
         { "required": ["sigma"] }
       ]
+    },
+    {
+      "if": {
+        "properties": { "telemetry_validated": { "const": true } },
+        "required": ["telemetry_validated"]
+      },
+      "then": {
+        "required": ["validation"]
+      }
     }
   ]
 }
