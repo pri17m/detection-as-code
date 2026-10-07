@@ -27,7 +27,10 @@ required_fields:
 - host
 query:
   splunk: '(sourcetype=XmlWinEventLog OR sourcetype=WinEventLog) source="*Microsoft-Windows-Windows Defender/Operational"
-    (EventCode=5001 OR EventCode=5007 OR EventCode=5010 OR EventCode=5012)
+    ((EventCode=5001 OR EventID=5001) OR (EventCode=5007 OR EventID=5007) OR (EventCode=5010 OR EventID=5010)
+    OR (EventCode=5012 OR EventID=5012))
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval msg=lower(coalesce(Message))
 

@@ -49,7 +49,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=11
+    | search (EventCode=11 OR EventID=11)
 
     | eval TargetFilename=coalesce(TargetFilename, Image)
 

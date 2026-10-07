@@ -43,7 +43,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=7
+    | search (EventCode=7 OR EventID=7)
 
     | eval ImageLoaded=coalesce(ImageLoaded, Image)
 

@@ -49,7 +49,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=5140 ShareName IN ("*ADMIN$*","*C$*","*IPC$*")
+    | search (EventCode=5140 OR EventID=5140) ShareName IN ("*ADMIN$*","*C$*","*IPC$*")
 
     | stats dc(ShareName) AS shares dc(Ip) AS srcs by host Account
 

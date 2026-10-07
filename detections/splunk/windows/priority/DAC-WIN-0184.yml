@@ -41,7 +41,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode IN (4729,4733,4757)
+    | search (EventCode IN (4729,4733,4757) OR EventID IN (4729,4733,4757))
 
     | eval Group=coalesce(TargetUserName, Group_Name)
 

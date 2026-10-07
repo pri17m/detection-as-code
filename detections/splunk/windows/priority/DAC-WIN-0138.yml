@@ -51,7 +51,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode IN (5136,5137)
+    | search (EventCode IN (5136,5137) OR EventID IN (5136,5137))
 
     | search ObjectClass="groupPolicyContainer" OR ObjectDN="*CN=Policies,CN=System*"
 

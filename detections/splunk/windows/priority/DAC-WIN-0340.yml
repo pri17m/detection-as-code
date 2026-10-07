@@ -44,7 +44,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=1 Image IN ("*\\regsvcs.exe","*\\regasm.exe")
+    | search (EventCode=1 OR EventID=1) Image IN ("*\\regsvcs.exe","*\\regasm.exe")
 
     | where match(CommandLine, "(?i)http|\\\\|\\users\\|\\temp\\") OR len(CommandLine)<40
 

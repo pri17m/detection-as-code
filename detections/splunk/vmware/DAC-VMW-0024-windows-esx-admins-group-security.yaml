@@ -1,6 +1,7 @@
 id: DAC-VMW-0024
 title: Windows ESX Admins group created, changed, or deleted
-description: Detects Active Directory security events 4727, 4730, and 4737 for a group named ESX Admins. Creating that group is the CVE-2024-37085 path that makes any member a full ESXi admin.
+description: Detects Active Directory security events 4727, 4730, and 4737 for a group named ESX Admins.
+  Creating that group is the CVE-2024-37085 path that makes any member a full ESXi admin.
 author: DaC
 status: experimental
 platforms:
@@ -16,7 +17,8 @@ mitre:
   - T1136.002
 severity: high
 false_positives:
-- A VMware administrator creating the ESX Admins group on purpose. CVE-2024-37085 is abused by recreating that exact group, so confirm the actor and the domain controller.
+- A VMware administrator creating the ESX Admins group on purpose. CVE-2024-37085 is abused by recreating
+  that exact group, so confirm the actor and the domain controller.
 references:
 - https://github.com/splunk/security_content/blob/develop/detections/endpoint/windows_esx_admins_group_creation_security_event.yml
 - https://www.microsoft.com/en-us/security/blog/2024/07/29/ransomware-operators-exploit-esxi-hypervisor-vulnerability-for-mass-encryption/
@@ -31,14 +33,19 @@ tags:
 - cve-2024-37085
 - escu
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode IN (4727, 4730, 4737)
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) (EventCode IN (4727,
+    4730, 4737) OR EventID IN (4727, 4730, 4737))
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval group_name=coalesce(TargetUserName, Target_Account_Name)
 
     | where match(group_name, "(?i)^ESX Admins$") OR match(group_name, "(?i)ESX Admins")
 
-    | eval action=case(EventCode=4727, "created", EventCode=4730, "deleted", EventCode=4737, "modified")
+    | eval action=case((EventCode=4727 OR EventID=4727), "created", (EventCode=4730 OR EventID=4730),
+    "deleted", (EventCode=4737 OR EventID=4737), "modified")
 
-    | stats count min(_time) as firstTime max(_time) as lastTime values(action) as action by host, group_name, SubjectUserName, SubjectDomainName
+    | stats count min(_time) as firstTime max(_time) as lastTime values(action) as action by host, group_name,
+    SubjectUserName, SubjectDomainName
 
     '

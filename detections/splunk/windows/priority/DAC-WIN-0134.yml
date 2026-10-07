@@ -54,7 +54,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=20 OR (EventCode=1 Image="*\\wmic.exe" CommandLine="*eventconsumer*")
+    | search (EventCode=20 OR EventID=20) OR ((EventCode=1 OR EventID=1) Image="*\\wmic.exe" CommandLine="*eventconsumer*")
 
     | table _time host User Image CommandLine EventType
 

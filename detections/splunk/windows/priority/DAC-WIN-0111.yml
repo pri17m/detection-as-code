@@ -1,8 +1,8 @@
 id: DAC-WIN-0111
 title: Registry Run key persistence (user-writable path)
-description: 'Sysmon 13 Run/RunOnce; Details Temp/Users | checklist: macros only;
-  no index=; EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary
-  required before telemetry_validated=true; FP baseline pending org allowlists'
+description: 'Sysmon 13 Run/RunOnce; Details Temp/Users | checklist: macros only; no index=; EventCode
+  on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true;
+  FP baseline pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -39,7 +39,9 @@ tags:
 - windows
 query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
-    OR sourcetype=sysmon) `windows_sysmon` EventCode=13
+    OR sourcetype=sysmon) `windows_sysmon` (EventCode=13 OR EventID=13)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval Image=coalesce(Image, process)
 
@@ -49,11 +51,11 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search TargetObject="*\\CurrentVersion\\Run*" OR TargetObject="*\\CurrentVersion\\RunOnce*"
-    OR TargetObject="*\\Winlogon\\Shell*" OR TargetObject="*\\Winlogon\\Userinit*"
+    | search TargetObject="*\\CurrentVersion\\Run*" OR TargetObject="*\\CurrentVersion\\RunOnce*" OR TargetObject="*\\Winlogon\\Shell*"
+    OR TargetObject="*\\Winlogon\\Userinit*"
 
-    | search Details="*\\Temp\\*" OR Details="*\\Users\\*" OR Details="*\\AppData\\*"
-    OR Details="*\\Downloads\\*" OR Details="*\\Public\\*"
+    | search Details="*\\Temp\\*" OR Details="*\\Users\\*" OR Details="*\\AppData\\*" OR Details="*\\Downloads\\*"
+    OR Details="*\\Public\\*"
 
     | table _time host Image TargetObject Details User
 

@@ -26,7 +26,9 @@ required_fields:
 - Image
 - host
 query:
-  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=13
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" (EventCode=13 OR EventID=13)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval obj=lower(coalesce(TargetObject))
 

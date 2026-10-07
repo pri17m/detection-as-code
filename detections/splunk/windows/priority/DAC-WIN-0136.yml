@@ -47,7 +47,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4771
+    | search (EventCode=4771 OR EventID=4771)
 
     | stats count values(Account) AS accounts by Ip host
 

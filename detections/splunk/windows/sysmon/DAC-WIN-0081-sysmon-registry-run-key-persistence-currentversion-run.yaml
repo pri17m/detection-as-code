@@ -25,7 +25,9 @@ required_fields:
 - Image
 - host
 query:
-  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=13
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" (EventCode=13 OR EventID=13)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval obj=lower(coalesce(TargetObject))
 
@@ -33,7 +35,7 @@ query:
 
     | where match(obj,"\\\\software\\\\microsoft\\\\windows\\\\currentversion\\\\run(once)?\\\\")
 
-    | stats count values(obj) as registry_paths values(Details) as details values(img)
-    as images by host, User
+    | stats count values(obj) as registry_paths values(Details) as details values(img) as images by host,
+    User
 
     '

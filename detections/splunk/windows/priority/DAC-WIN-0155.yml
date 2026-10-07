@@ -46,7 +46,7 @@ query:
 
     | eval Script=coalesce(ScriptBlockText, Message)
 
-    | search EventCode=4104 Script IN ("*DownloadString*","*Invoke-Expression*","*IEX*","*FromBase64String*")
+    | search (EventCode=4104 OR EventID=4104) Script IN ("*DownloadString*","*Invoke-Expression*","*IEX*","*FromBase64String*")
 
     | table _time host User Script
 

@@ -1,8 +1,8 @@
 id: DAC-WIN-0112
 title: Tier-0 account first-seen host / odd LogonType
-description: '4624 Tier-0 first-seen host or odd LogonType | checklist: macros only;
-  no index=; EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary
-  required before telemetry_validated=true; FP baseline pending org allowlists'
+description: '4624 Tier-0 first-seen host or odd LogonType | checklist: macros only; no index=; EventCode
+  on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true;
+  FP baseline pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -40,8 +40,10 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security` EventCode=4624
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
+    (EventCode=4624 OR EventID=4624)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval TargetUserName=coalesce(TargetUserName, Account_Name, user)
 
@@ -51,7 +53,6 @@ query:
 
     | table _time host TargetUserName LogonType IpAddress WorkstationName
 
-    | `comment("PRODUCTION: join Tier-0 identity allowlist / first-seen host baseline
-    KV before enabling")`
+    | `comment("PRODUCTION: join Tier-0 identity allowlist / first-seen host baseline KV before enabling")`
 
     '

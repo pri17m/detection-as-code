@@ -1,8 +1,8 @@
 id: DAC-WIN-0103
 title: AS-REP roasting (PreAuthType 0)
-description: 'Security 4768 PreAuthType=0 | checklist: macros only; no index=; EventCode
-  on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before
-  telemetry_validated=true; FP baseline pending org allowlists'
+description: 'Security 4768 PreAuthType=0 | checklist: macros only; no index=; EventCode on allowlisted
+  channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true; FP baseline
+  pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -38,8 +38,10 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security` EventCode=4768
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
+    (EventCode=4768 OR EventID=4768)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval TargetUserName=coalesce(TargetUserName, Account_Name, user)
 

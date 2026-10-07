@@ -56,7 +56,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4624 LogonType=3
+    | search (EventCode=4624 OR EventID=4624) LogonType=3
 
     | eval Auth=coalesce(AuthenticationPackageName, Authentication_Package)
 

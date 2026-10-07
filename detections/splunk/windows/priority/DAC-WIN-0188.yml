@@ -41,7 +41,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=17 OR EventCode=18
+    | search (EventCode=17 OR EventID=17) OR (EventCode=18 OR EventID=18)
 
     | eval Pipe=coalesce(PipeName, Image)
 

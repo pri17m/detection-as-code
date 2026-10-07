@@ -1,32 +1,42 @@
 id: DAC-WIN-0335
-title: 'Shadow copies removed through WMI, not vssadmin'
-description: 'Detects a process command line that both references Win32_ShadowCopy and removes the object. Covers Get-WmiObject or Get-CimInstance with Remove-WmiObject or Remove-CimInstance. The existing vssadmin delete shadows rule does not see this path.'
+title: Shadow copies removed through WMI, not vssadmin
+description: Detects a process command line that both references Win32_ShadowCopy and removes the object.
+  Covers Get-WmiObject or Get-CimInstance with Remove-WmiObject or Remove-CimInstance. The existing vssadmin
+  delete shadows rule does not see this path.
 author: DaC
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - WinEventLog:Security
-  - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+- WinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
 mitre:
   tactics:
-    - impact
-    - defense-evasion
+  - impact
+  - defense-evasion
   techniques:
-    - T1490
+  - T1490
 severity: high
 false_positives:
-  - 'A backup product that enumerates shadow copies without removing them. Removal is required for this rule.'
+- A backup product that enumerates shadow copies without removing them. Removal is required for this rule.
 references:
-  - 'https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688'
-  - 'https://learn.microsoft.com/powershell/module/microsoft.powershell.management/remove-wmiobject'
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+- https://learn.microsoft.com/powershell/module/microsoft.powershell.management/remove-wmiobject
 telemetry_validated: false
 required_fields:
-  - EventCode
-  - CommandLine
+- EventCode
+- CommandLine
 query:
-  splunk: |
-    (sourcetype=WinEventLog:Security EventCode=4688) OR (sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational EventCode=4104)
+  splunk: '(sourcetype=WinEventLog:Security (EventCode=4688 OR EventID=4688)) OR (sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+    (EventCode=4104 OR EventID=4104))
+
+    | eval EventCode=coalesce(EventCode, EventID)
+
     | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, ScriptBlockText))
+
     | where match(cmd, "win32_shadowcopy") AND match(cmd, "remove-wmiobject|remove-ciminstance|\\.delete\\(")
-    | stats count min(_time) as firstTime values(ParentProcessName) as parent values(cmd) as command by Computer, SubjectUserName, NewProcessName
+
+    | stats count min(_time) as firstTime values(ParentProcessName) as parent values(cmd) as command by
+    Computer, SubjectUserName, NewProcessName
+
+    '

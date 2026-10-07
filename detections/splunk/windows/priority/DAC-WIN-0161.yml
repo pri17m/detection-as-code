@@ -51,10 +51,10 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode IN (4625,4624)
+    | search (EventCode IN (4625,4624) OR EventID IN (4625,4624))
 
-    | stats count(eval(EventCode=4625)) AS fails count(eval(EventCode=4624)) AS ok values(Ip) AS src by
-    host Account
+    | stats count(eval((EventCode=4625 OR EventID=4625))) AS fails count(eval((EventCode=4624 OR EventID=4624)))
+    AS ok values(Ip) AS src by host Account
 
     | where fails>=5 AND ok>=1
 

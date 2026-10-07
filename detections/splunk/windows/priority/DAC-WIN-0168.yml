@@ -48,7 +48,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4738
+    | search (EventCode=4738 OR EventID=4738)
 
     | search UserAccountControl="*DONT_REQUIRE_PREAUTH*" OR OldUacValue!=""
 

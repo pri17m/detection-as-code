@@ -54,7 +54,8 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=1 (Image="*\\nltest.exe" OR CommandLine="*nltest*") CommandLine IN ("*/domain_trusts*","*/dclist*","*/dsgetdc*")
+    | search (EventCode=1 OR EventID=1) (Image="*\\nltest.exe" OR CommandLine="*nltest*") CommandLine
+    IN ("*/domain_trusts*","*/dclist*","*/dsgetdc*")
 
     | table _time host User Image ParentImage CommandLine
 

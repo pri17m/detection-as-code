@@ -49,7 +49,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4672
+    | search (EventCode=4672 OR EventID=4672)
 
     | search Account IN ("*admin*","*domain admin*","krbtgt") OR PrivilegeList="*SeDebugPrivilege*"
 

@@ -1,8 +1,8 @@
 id: DAC-WIN-0100
 title: LSASS process access by non-EDR
-description: 'Sysmon EID 10 TargetImage=lsass.exe; filter EDR/AV SourceImage | checklist:
-  macros only; no index=; EventCode on allowlisted channel; coalesce classic/XML aliases;
-  fieldsummary required before telemetry_validated=true; FP baseline pending org allowlists'
+description: 'Sysmon EID 10 TargetImage=lsass.exe; filter EDR/AV SourceImage | checklist: macros only;
+  no index=; EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before
+  telemetry_validated=true; FP baseline pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -40,7 +40,9 @@ tags:
 - windows
 query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
-    OR sourcetype=sysmon) `windows_sysmon` EventCode=10
+    OR sourcetype=sysmon) `windows_sysmon` (EventCode=10 OR EventID=10)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval TargetImage=coalesce(TargetImage, TargetFilename)
 

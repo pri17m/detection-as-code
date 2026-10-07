@@ -28,7 +28,7 @@ query:
 
     | eval EventCode=coalesce(EventCode, EventID)
 
-    | search EventCode=400
+    | search (EventCode=400 OR EventID=400)
 
     | table _time host User Message
 

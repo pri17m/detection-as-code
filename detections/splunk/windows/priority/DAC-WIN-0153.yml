@@ -54,7 +54,8 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=1 Image IN ("*\\sc.exe","*\\net.exe","*\\powershell.exe") CommandLine IN ("*WinDefend*","*Sense*","*Set-MpPreference*","*DisableRealtimeMonitoring*")
+    | search (EventCode=1 OR EventID=1) Image IN ("*\\sc.exe","*\\net.exe","*\\powershell.exe") CommandLine
+    IN ("*WinDefend*","*Sense*","*Set-MpPreference*","*DisableRealtimeMonitoring*")
 
     | table _time host User Image ParentImage CommandLine
 

@@ -54,7 +54,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=3 Image IN ("*\\certutil.exe","*\\mshta.exe")
+    | search (EventCode=3 OR EventID=3) Image IN ("*\\certutil.exe","*\\mshta.exe")
 
     | table _time host User Image DestinationIp DestinationPort
 

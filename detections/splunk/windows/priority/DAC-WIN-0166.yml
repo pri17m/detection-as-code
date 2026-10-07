@@ -40,7 +40,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode IN (4723,4724)
+    | search (EventCode IN (4723,4724) OR EventID IN (4723,4724))
 
     | table _time host Account SubjectUserName TargetUserName
 

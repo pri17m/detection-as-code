@@ -50,7 +50,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4719
+    | search (EventCode=4719 OR EventID=4719)
 
     | table _time host Account Category Subcategory AuditPolicyChanges
 

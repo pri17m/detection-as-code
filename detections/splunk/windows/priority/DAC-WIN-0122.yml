@@ -52,7 +52,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=1 ParentImage IN ("*\\winword.exe","*\\excel.exe","*\\powerpnt.exe","*\\outlook.exe")
+    | search (EventCode=1 OR EventID=1) ParentImage IN ("*\\winword.exe","*\\excel.exe","*\\powerpnt.exe","*\\outlook.exe")
     Image IN ("*\\powershell.exe","*\\cmd.exe","*\\mshta.exe","*\\wscript.exe","*\\cscript.exe")
 
     | table _time host User ParentImage Image CommandLine

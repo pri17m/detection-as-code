@@ -1,6 +1,7 @@
 id: DAC-WIN-0137
 title: NTLM credential validation failures spray (4776)
-description: 4776 Status failures burst
+description: 'Behavior: NTLM credential validation failures spray (4776). Anchor after classic/XML coalesce.
+  Not telemetry_validated.'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -20,7 +21,8 @@ required_fields:
 - Status
 telemetry_validated: false
 false_positives:
-- Legacy NTLM apps
+- Admin tooling and change windows
+- Security agents loading signed drivers or modules
 references:
 - https://attack.mitre.org/techniques/T1110/003/
 tags:
@@ -32,9 +34,20 @@ tags:
 - tier:P1
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security`
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search (EventCode=4776 OR EventID=4776)
+
+    | eval Status=coalesce(Status, Error_Code)
+
+    | stats count dc(Account) AS users by Ip host Status
+
+    | where count>=8
 
     '

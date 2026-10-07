@@ -51,7 +51,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4625 LogonType=10
+    | search (EventCode=4625 OR EventID=4625) LogonType=10
 
     | stats count values(Account) AS accounts by src host
 

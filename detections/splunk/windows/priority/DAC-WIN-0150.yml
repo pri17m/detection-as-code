@@ -54,7 +54,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=1 Image="*\\bitsadmin.exe" CommandLine IN ("*/transfer*","*/addfile*","*/download*")
+    | search (EventCode=1 OR EventID=1) Image="*\\bitsadmin.exe" CommandLine IN ("*/transfer*","*/addfile*","*/download*")
 
     | table _time host User Image ParentImage CommandLine
 

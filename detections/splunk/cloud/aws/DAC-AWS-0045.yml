@@ -22,8 +22,8 @@ mitre:
   - T1556.006
 severity: high
 false_positives:
-- "Federated/SSO sessions often log mfaAuthenticated=false even when the IdP enforced MFA \u2014 confirm\
-  \ IdP MFA before paging."
+- Federated/SSO sessions often log mfaAuthenticated=false even when the IdP enforced MFA — confirm IdP
+  MFA before paging.
 - sessionCredentialFromConsole is omitted unless true; absence is not proof of non-console.
 references:
 - https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
@@ -31,6 +31,7 @@ references:
 - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
 telemetry_validated: false
 required_fields:
+- eventSource
 - eventName
 - sessionCredentialFromConsole
 - userIdentity.sessionContext.attributes.mfaAuthenticated
@@ -47,8 +48,9 @@ tags:
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName IN ("CreateStack", "UpdateStack", "RunInstances", "CreateAccessKey", "CreateUser",
-    "CreateLoginProfile", "AttachUserPolicy", "AttachRolePolicy", "PutUserPolicy", "PutRolePolicy")
+    | search eventSource IN ("cloudformation.amazonaws.com", "iam.amazonaws.com") eventName IN ("CreateStack",
+    "UpdateStack", "RunInstances", "CreateAccessKey", "CreateUser", "CreateLoginProfile", "AttachUserPolicy",
+    "AttachRolePolicy", "PutUserPolicy", "PutRolePolicy")
 
     | eval from_console=if(sessionCredentialFromConsole=true OR sessionCredentialFromConsole="true", "true",
     "false")

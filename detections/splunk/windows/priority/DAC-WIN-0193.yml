@@ -41,7 +41,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4688
+    | search (EventCode=4688 OR EventID=4688)
 
     | where match(Cmd, "(?i)encodedcommand|downloadstring|invoke-expression|frombase64") OR match(Process,
     "(?i)\\(certutil|mshta|regsvr32|rundll32)\\")

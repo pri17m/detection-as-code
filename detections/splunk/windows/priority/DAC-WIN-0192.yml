@@ -1,12 +1,14 @@
 id: DAC-WIN-0192
 title: PowerShell module logging suspicious cmdlets (4103)
-description: 4103 Module logging suspicious
+description: 'Behavior: PowerShell module logging suspicious cmdlets (4103). Anchor after classic/XML
+  coalesce. Not telemetry_validated.'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+- WinEventLog:Microsoft-Windows-PowerShell/Operational
 mitre:
   tactics:
   - execution
@@ -14,16 +16,26 @@ mitre:
   - T1059.001
 severity: medium
 false_positives:
-- Admin modules
+- Admin tooling and change windows
+- Security agents loading signed drivers or modules
 references:
 - https://attack.mitre.org/techniques/T1059/001/
 telemetry_validated: false
 required_fields:
 - EventCode
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational")
+  splunk: '(sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational)
+    `windows_powershell_operational`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Script=coalesce(ScriptBlockText, Payload, Message)
+
+    | search (EventCode=4103 OR EventID=4103) Script IN ("*Invoke-Mimikatz*","*sekurlsa*","*Add-MpPreference*","*Set-MpPreference*","*DownloadString*")
+
+    | table _time host User Script
+
+    '
 tags:
 - phase1
 - windows

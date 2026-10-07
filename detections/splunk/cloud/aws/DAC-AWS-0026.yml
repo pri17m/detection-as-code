@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,7 @@ title: 'AWS: KMS ScheduleKeyDeletion or DisableKey'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName IN ("ScheduleKeyDeletion","DisableKey","PutKeyPolicy")
+    | search eventSource="kms.amazonaws.com" eventName IN ("ScheduleKeyDeletion","DisableKey","PutKeyPolicy")
 
     | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
 

@@ -43,8 +43,8 @@ query:
   splunk: "(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational\
     \ OR sourcetype=sysmon) `windows_sysmon`\n| eval EventCode=coalesce(EventCode, EventID)\n| eval Image=coalesce(Image,\
     \ NewProcessName)\n| eval CommandLine=coalesce(CommandLine, Process_Command_Line)\n| eval ParentImage=coalesce(ParentImage,\
-    \ ParentProcessName)\n| eval User=coalesce(User, UserName, SubjectUserName)\n| search EventCode=1\
-    \ Image=\"*\\\\wevtutil.exe\" CommandLine IN (\"*cl *\",\"*clear-log*\",\"*sl *\")\n| append [ search\
-    \ (sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`\n   \
-    \ | eval EventCode=coalesce(EventCode, EventID) | search EventCode=1102 ]\n| table _time host User\
-    \ Image CommandLine EventCode\n"
+    \ ParentProcessName)\n| eval User=coalesce(User, UserName, SubjectUserName)\n| search (EventCode=1\
+    \ OR EventID=1) Image=\"*\\\\wevtutil.exe\" CommandLine IN (\"*cl *\",\"*clear-log*\",\"*sl *\")\n\
+    | append [ search (sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`\n\
+    \    | eval EventCode=coalesce(EventCode, EventID) | search (EventCode=1102 OR EventID=1102) ]\n|\
+    \ table _time host User Image CommandLine EventCode\n"

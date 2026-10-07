@@ -1,6 +1,7 @@
 id: DAC-WIN-0162
 title: LogonType 3 from new workstation for privileged user
-description: 4624 Type3 privileged first-seen WorkstationName
+description: 'Behavior: LogonType 3 from new workstation for privileged user. Anchor after classic/XML
+  coalesce. Not telemetry_validated.'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -22,7 +23,8 @@ required_fields:
 - WorkstationName
 telemetry_validated: false
 false_positives:
-- New VDI pools
+- Admin tooling and change windows
+- Security agents loading signed drivers or modules
 references:
 - https://attack.mitre.org/techniques/T1078/002/
 - https://attack.mitre.org/techniques/T1021/002/
@@ -35,9 +37,22 @@ tags:
 - tier:P1
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security`
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search (EventCode=4624 OR EventID=4624) LogonType=3
+
+    | eval Workstation=coalesce(WorkstationName, Workstation_Name)
+
+    | where match(Account, "(?i)admin")
+
+    | stats dc(Workstation) AS hosts values(Workstation) AS srcs by Account
+
+    | where hosts>=3
 
     '

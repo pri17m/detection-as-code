@@ -47,7 +47,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4624 LogonType=10
+    | search (EventCode=4624 OR EventID=4624) LogonType=10
 
     | stats dc(host) AS hosts values(host) AS dests by Account
 

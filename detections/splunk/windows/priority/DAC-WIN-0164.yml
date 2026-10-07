@@ -37,7 +37,7 @@ query:
 
     | eval Service=coalesce(ServiceName, param1)
 
-    | search EventCode=7045
+    | search (EventCode=7045 OR EventID=7045)
 
     | eval ImagePath=coalesce(ImagePath, ServiceFileName)
 

@@ -52,7 +52,8 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=1 ParentImage IN ("*\\wsmprovhost.exe","*\\winrshost.exe") Image IN ("*\\cmd.exe","*\\powershell.exe","*\\whoami.exe")
+    | search (EventCode=1 OR EventID=1) ParentImage IN ("*\\wsmprovhost.exe","*\\winrshost.exe") Image
+    IN ("*\\cmd.exe","*\\powershell.exe","*\\whoami.exe")
 
     | table _time host User ParentImage Image CommandLine
 

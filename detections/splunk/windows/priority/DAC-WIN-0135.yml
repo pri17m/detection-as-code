@@ -49,7 +49,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4625
+    | search (EventCode=4625 OR EventID=4625)
 
     | stats dc(Account) AS users count by Ip host
 

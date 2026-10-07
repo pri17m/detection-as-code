@@ -1,7 +1,7 @@
 id: DAC-WIN-0078
 title: 'Sysmon: CreateRemoteThread (possible injection)'
-description: Detects Sysmon CreateRemoteThread events which are commonly associated
-  with code injection techniques.
+description: Detects Sysmon CreateRemoteThread events which are commonly associated with code injection
+  techniques.
 author: DaC
 status: experimental
 platforms:
@@ -25,7 +25,9 @@ required_fields:
 - TargetImage
 - host
 query:
-  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=8
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" (EventCode=8 OR EventID=8)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval src=lower(coalesce(SourceImage))
 

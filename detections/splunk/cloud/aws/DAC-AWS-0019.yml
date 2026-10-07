@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,7 @@ title: 'AWS: Secrets Manager GetSecretValue high volume by one principal'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName IN ("GetSecretValue","BatchGetSecretValue","ListSecrets")
+    | search eventSource="secretsmanager.amazonaws.com" eventName IN ("GetSecretValue","BatchGetSecretValue","ListSecrets")
 
     | stats count by userIdentity.arn
 

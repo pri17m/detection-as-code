@@ -2,6 +2,8 @@ severity: critical
 query:
   splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-PowerShell/Operational")
 
+    | eval EventCode=coalesce(EventCode, EventID)
+
     | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
 
     | eval process=coalesce(Image, NewProcessName, process)

@@ -37,7 +37,7 @@ query:
 
     | eval Service=coalesce(ServiceName, param1)
 
-    | search EventCode=7045 Service IN ("*PSEXESVC*","*PaExec*")
+    | search (EventCode=7045 OR EventID=7045) Service IN ("*PSEXESVC*","*PaExec*")
 
     | table _time host Service ImagePath AccountName
 

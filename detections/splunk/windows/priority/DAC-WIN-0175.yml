@@ -42,7 +42,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=25
+    | search (EventCode=25 OR EventID=25)
 
     | table _time host User Image ProcessTamperingType
 

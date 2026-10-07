@@ -3,9 +3,11 @@ platforms:
 - splunk
 query:
   splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
-    OR sourcetype=sysmon) EventCode=13
+    OR sourcetype=sysmon) (EventCode=13 OR EventID=13)
 
     | search Details="DWORD (0x00000001)"
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
 

@@ -1,8 +1,8 @@
 id: DAC-WIN-0108
 title: AD CS suspicious cert issued / PKINIT
-description: '4886/4887 + 4768 PreAuthType=16 | checklist: macros only; no index=;
-  EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary required
-  before telemetry_validated=true; FP baseline pending org allowlists'
+description: '4886/4887 + 4768 PreAuthType=16 | checklist: macros only; no index=; EventCode on allowlisted
+  channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true; FP baseline
+  pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -41,8 +41,10 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security` (EventCode=4768 OR EventCode IN (4886,4887,4888))
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
+    ((EventCode=4768 OR EventID=4768) OR (EventCode IN (4886,4887,4888) OR EventID IN (4886,4887,4888)))
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval TargetUserName=coalesce(TargetUserName, Account_Name, user)
 
@@ -54,10 +56,9 @@ query:
 
     | eval Requester=coalesce(Requester, SubjectUserName, RequesterName)
 
-    | search (EventCode=4768 (PreAuthType=16 OR PreAuthType="16")) OR EventCode IN
-    (4886,4887,4888)
+    | search ((EventCode=4768 OR EventID=4768) (PreAuthType=16 OR PreAuthType="16")) OR (EventCode IN
+    (4886,4887,4888) OR EventID IN (4886,4887,4888))
 
-    | table _time host EventCode TargetUserName IpAddress PreAuthType RequestId Requester
-    Attributes Status
+    | table _time host EventCode TargetUserName IpAddress PreAuthType RequestId Requester Attributes Status
 
     '

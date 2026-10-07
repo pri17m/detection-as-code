@@ -1,0 +1,43 @@
+id: DAC-WIN-0342
+title: Security service stopped or start type changed
+description: 'Behavior: WinDefend, Sense, Sysmon, or EventLog service stopped or disabled (T1489). Anchor
+  is System EventCode 7036/7040 plus service name. Not telemetry_validated.'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1489
+sourcetypes:
+- WinEventLog:System
+- XmlWinEventLog:System
+required_fields:
+- EventCode
+- ServiceName
+- Message
+telemetry_validated: false
+false_positives:
+- Planned sensor upgrade or maintenance window
+references:
+- https://attack.mitre.org/techniques/T1489/
+tags:
+- windows
+- gap-fill
+query:
+  splunk: '(sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System) `windows_system`
+
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Service=coalesce(ServiceName, param1)
+
+    | search (EventCode=7036 OR EventID=7036 OR EventCode=7040 OR EventID=7040)
+
+    | search Service IN ("*WinDefend*","*Sense*","*Sysmon*","*EventLog*")
+
+    | table _time host EventCode Service Message
+
+    '

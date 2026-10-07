@@ -43,7 +43,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4769
+    | search (EventCode=4769 OR EventID=4769)
 
     | eval Enc=coalesce(TicketEncryptionType, Ticket_Encryption_Type)
 

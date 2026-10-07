@@ -43,7 +43,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=1 Image="*\\mmc.exe" CommandLine="*.msc"
+    | search (EventCode=1 OR EventID=1) Image="*\\mmc.exe" CommandLine="*.msc"
 
     | where match(CommandLine, "(?i)\\users\\|\\temp\\|\\appdata\\|\\programdata\\")
 

@@ -42,7 +42,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4699
+    | search (EventCode=4699 OR EventID=4699)
 
     | table _time host Account TaskName SubjectUserName
 

@@ -1,7 +1,7 @@
 id: DAC-WIN-0077
 title: 'Sysmon: LOLBins initiating outbound network connections'
-description: Detects Sysmon network connections initiated by common LOLBins often
-  used for tool transfer or staging.
+description: Detects Sysmon network connections initiated by common LOLBins often used for tool transfer
+  or staging.
 author: DaC
 status: experimental
 platforms:
@@ -26,14 +26,15 @@ required_fields:
 - DestinationPort
 - host
 query:
-  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=3
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" (EventCode=3 OR EventID=3)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval img=lower(coalesce(Image))
 
     | where match(img,"(powershell|pwsh|mshta|rundll32|regsvr32|bitsadmin|certutil)\\.exe")
 
-    | stats count dc(DestinationIp) as dest_ips values(DestinationPort) as ports by
-    host, User, img
+    | stats count dc(DestinationIp) as dest_ips values(DestinationPort) as ports by host, User, img
 
     | where count >= 10 AND dest_ips >= 5
 

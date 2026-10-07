@@ -172,3 +172,5 @@ Frontmatter fields used above: `title`, `phase`, `last_updated`, `status`, plus 
 - Filled logic-less Splunk stubs with EventCode/Image anchors and classic/XML coalesce. telemetry_validated remains false.
 - Paired unambiguous CloudTrail eventName filters with eventSource.
 - Added DAC-WIN-0339/0340/0341 and DAC-AWS-0061.
+
+- 2026-10-07 follow-up: remaining 11 Windows stubs anchored; EventCode OR EventID on XML-capable SPL; CloudTrail eventSource on the leftover single-service APIs; DAC-WIN-0342 service stop.

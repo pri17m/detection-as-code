@@ -41,7 +41,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=13
+    | search (EventCode=13 OR EventID=13)
 
     | eval TargetObject=coalesce(TargetObject, Image)
 

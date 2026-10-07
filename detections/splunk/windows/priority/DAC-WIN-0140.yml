@@ -47,7 +47,7 @@ query:
 
     | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
 
-    | search EventCode=4624 LogonType=9
+    | search (EventCode=4624 OR EventID=4624) LogonType=9
 
     | table _time host Account Ip Process WorkstationName
 

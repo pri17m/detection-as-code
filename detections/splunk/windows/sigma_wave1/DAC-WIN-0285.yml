@@ -1,6 +1,8 @@
 severity: high
 query:
-  splunk: '(sourcetype=XmlWinEventLog:System OR sourcetype=WinEventLog:System) EventCode=7045
+  splunk: '(sourcetype=XmlWinEventLog:System OR sourcetype=WinEventLog:System) (EventCode=7045 OR EventID=7045)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
 

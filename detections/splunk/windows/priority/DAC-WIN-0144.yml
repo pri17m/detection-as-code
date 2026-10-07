@@ -46,7 +46,7 @@ query:
 
     | eval Service=coalesce(ServiceName, param1)
 
-    | search EventCode IN (7036,7040,7045) Service IN ("*sysmon*","*Sysmon*")
+    | search (EventCode IN (7036,7040,7045) OR EventID IN (7036,7040,7045)) Service IN ("*sysmon*","*Sysmon*")
 
     | table _time host EventCode Service Message
 

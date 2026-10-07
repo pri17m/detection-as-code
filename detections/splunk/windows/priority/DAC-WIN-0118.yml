@@ -1,6 +1,7 @@
 id: DAC-WIN-0118
 title: Explicit credentials (4648) to remote host
-description: Security 4648 remote TargetServerName
+description: 'Behavior: Explicit credentials (4648) to remote host. Anchor after classic/XML coalesce.
+  Not telemetry_validated.'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -24,7 +25,8 @@ required_fields:
 - ProcessName
 telemetry_validated: false
 false_positives:
-- Scheduled tasks/runas
+- Admin tooling and change windows
+- Security agents loading signed drivers or modules
 references:
 - https://attack.mitre.org/techniques/T1021/002/
 - https://attack.mitre.org/techniques/T1550/002/
@@ -37,9 +39,18 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security`
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search (EventCode=4648 OR EventID=4648)
+
+    | eval Target=coalesce(TargetServerName, Target_Server_Name)
+
+    | table _time host Account Target Ip Process
 
     '

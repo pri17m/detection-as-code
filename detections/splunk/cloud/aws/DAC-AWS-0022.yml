@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,8 @@ title: 'AWS: EC2 Instance Connect or serial console session'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName IN ("SendSSHPublicKey","SendSerialConsoleSSHPublicKey") OR eventName="*Serial*"
+    | search eventSource="ec2-instance-connect.amazonaws.com" eventName IN ("SendSSHPublicKey","SendSerialConsoleSSHPublicKey")
+    OR eventName="*Serial*"
 
     | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
 

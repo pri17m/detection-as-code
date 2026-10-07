@@ -54,8 +54,11 @@ tags:
 - attack-v19-remap
 query:
   splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security OR sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
-    OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational) (`windows_security` EventCode IN (1102,4719))
-    OR (`windows_sysmon` EventCode IN (4,16,255)) OR (`windows_system` EventCode IN (7036,7040))
+    OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational) (`windows_security` (EventCode IN
+    (1102,4719) OR EventID IN (1102,4719))) OR (`windows_sysmon` (EventCode IN (4,16,255) OR EventID IN
+    (4,16,255))) OR (`windows_system` (EventCode IN (7036,7040) OR EventID IN (7036,7040)))
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval SubjectUserName=coalesce(SubjectUserName, Account_Name, user)
 

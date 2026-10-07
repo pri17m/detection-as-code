@@ -52,7 +52,7 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=1 Image IN ("*\\net.exe","*\\net1.exe") CommandLine IN ("*group*","*/domain*","*user
+    | search (EventCode=1 OR EventID=1) Image IN ("*\\net.exe","*\\net1.exe") CommandLine IN ("*group*","*/domain*","*user
     /domain*")
 
     | table _time host User Image ParentImage CommandLine

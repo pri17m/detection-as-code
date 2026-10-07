@@ -1,6 +1,8 @@
 severity: low
 query:
-  splunk: '(sourcetype=XmlWinEventLog:System OR sourcetype=WinEventLog:System) EventCode=53
+  splunk: '(sourcetype=XmlWinEventLog:System OR sourcetype=WinEventLog:System) (EventCode=53 OR EventID=53)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
 
