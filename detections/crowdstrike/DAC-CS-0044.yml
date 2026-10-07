@@ -1,6 +1,7 @@
 author: Detection Engineer
 references:
 - https://attack.mitre.org/techniques/T1562/002/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 title: 'Falcon: auditpol disable process/logon auditing'
 description: auditpol /set disable
 severity: high
@@ -18,6 +19,7 @@ status: experimental
 tags:
 - wave-a
 - P0
+- attack-v19-remap
 query:
   crowdstrike: 'ImageFileName="auditpol.exe" AND CommandLine CONTAINS "/set" AND CommandLine CONTAINS
     "disable"
@@ -27,6 +29,6 @@ sourcetypes:
 - falcon:process
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.002
+  - T1685.001

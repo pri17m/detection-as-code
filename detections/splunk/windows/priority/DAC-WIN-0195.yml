@@ -1,6 +1,7 @@
 id: DAC-WIN-0195
 title: NTLM LogonType 3 KeyLength 0 privileged user
-description: 4624 Type3 NTLM KeyLength 0
+description: 'Behavior: NTLM LogonType 3 KeyLength 0 privileged user. Anchor is process+flag or event
+  id+field after classic/XML coalesce. Not telemetry_validated. 4624 Type3 NTLM KeyLength 0'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -15,7 +16,8 @@ mitre:
   - T1550.002
 severity: high
 false_positives:
-- Legacy apps
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1550/002/
 telemetry_validated: false
@@ -26,9 +28,29 @@ required_fields:
 - IpAddress
 - WorkstationName
 query:
-  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=4624 LogonType=3
+
+    | eval KeyLength=coalesce(KeyLength, Key_Length)
+
+    | eval Auth=coalesce(AuthenticationPackageName, Authentication_Package)
+
+    | search Auth="NTLM" KeyLength=0
+
+    | table _time host Account Ip Auth KeyLength WorkstationName
+
+    '
 tags:
 - phase1
 - windows

@@ -1,40 +1,41 @@
 id: DAC-WIN-0334
-title: 'RDP logon followed by a security service stop'
-description: 'Detects a successful RemoteInteractive logon (4624 LogonType 10) on a host, followed within 30 minutes by Service Control Manager event 7036 reporting a security product service stopped. This is the access-then-disable sequence, not a single RDP spike and not a named antivirus product.'
+title: RDP logon followed by a security service stop
+description: Detects a successful RemoteInteractive logon (4624 LogonType 10) on a host, followed within
+  30 minutes by Service Control Manager event 7036 reporting a security product service stopped. This
+  is the access-then-disable sequence, not a single RDP spike and not a named antivirus product.
 author: DaC
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - WinEventLog:Security
-  - WinEventLog:System
+- WinEventLog:Security
+- WinEventLog:System
 mitre:
   tactics:
-    - lateral-movement
-    - defense-evasion
+  - lateral-movement
+  - defense-impairment
   techniques:
-    - T1021.001
-    - T1562.001
+  - T1021.001
+  - T1685
 severity: high
 false_positives:
-  - 'An admin RDP session during a planned antivirus maintenance window.'
+- An admin RDP session during a planned antivirus maintenance window.
 references:
-  - 'https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624'
-  - 'https://learn.microsoft.com/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-7036'
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624
+- https://learn.microsoft.com/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-7036
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 telemetry_validated: false
 required_fields:
-  - EventCode
-  - Computer
+- EventCode
+- Computer
 query:
-  splunk: |
-    sourcetype=WinEventLog:Security EventCode=4624 LogonType=10
-    | rename Computer as host, TargetUserName as user, IpAddress as src_ip, WorkstationName as src_host
-    | stats count as rdp_logons earliest(_time) as rdp_time values(src_ip) as src_ip values(src_host) as src_host by host, user
-    | join host [
-        search sourcetype=WinEventLog:System EventCode=7036
-        | where match(Message, "(?i)stopped") AND match(Message, "(?i)defender|bitdefender|falcon|crowdstrike|sentinel|sysmon|sense|windefend")
-        | rename Computer as host
-        | stats count as stops latest(_time) as stop_time values(Message) as service_messages by host
-      ]
-    | where stop_time>rdp_time AND (stop_time-rdp_time)<1800
-    | table rdp_time, stop_time, host, user, src_ip, src_host, service_messages
+  splunk: "sourcetype=WinEventLog:Security EventCode=4624 LogonType=10\n| rename Computer as host, TargetUserName\
+    \ as user, IpAddress as src_ip, WorkstationName as src_host\n| stats count as rdp_logons earliest(_time)\
+    \ as rdp_time values(src_ip) as src_ip values(src_host) as src_host by host, user\n| join host [\n\
+    \    search sourcetype=WinEventLog:System EventCode=7036\n    | where match(Message, \"(?i)stopped\"\
+    ) AND match(Message, \"(?i)defender|bitdefender|falcon|crowdstrike|sentinel|sysmon|sense|windefend\"\
+    )\n    | rename Computer as host\n    | stats count as stops latest(_time) as stop_time values(Message)\
+    \ as service_messages by host\n  ]\n| where stop_time>rdp_time AND (stop_time-rdp_time)<1800\n| table\
+    \ rdp_time, stop_time, host, user, src_ip, src_host, service_messages\n"
+tags:
+- attack-v19-remap

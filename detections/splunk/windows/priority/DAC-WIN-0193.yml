@@ -1,6 +1,7 @@
 id: DAC-WIN-0193
 title: Security 4688 suspicious parent if cmdline audited
-description: 4688 prefer Sysmon 1 if no cmdline
+description: 'Behavior: Security 4688 suspicious parent if cmdline audited. Anchor is process+flag or
+  event id+field after classic/XML coalesce. Not telemetry_validated. 4688 prefer Sysmon 1 if no cmdline'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -15,7 +16,8 @@ mitre:
   - T1059
 severity: low
 false_positives:
-- Noise without filters
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1059/
 telemetry_validated: false
@@ -27,9 +29,26 @@ required_fields:
 - SubjectUserName
 - CommandLine
 query:
-  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=4688
+
+    | where match(Cmd, "(?i)encodedcommand|downloadstring|invoke-expression|frombase64") OR match(Process,
+    "(?i)\\(certutil|mshta|regsvr32|rundll32)\\")
+
+    | table _time host Account Process Cmd ParentProcessName
+
+    '
 tags:
 - phase1
 - windows

@@ -1,6 +1,7 @@
 id: DAC-WIN-0177
 title: PowerShell classic engine suspicious start
-description: Classic PS start with -enc
+description: 'Behavior: PowerShell classic engine suspicious start. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Classic PS start with -enc'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -14,16 +15,24 @@ mitre:
   - T1059.001
 severity: low
 false_positives:
-- Interactive admin
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1059/001/
 telemetry_validated: false
 required_fields:
 - EventCode
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational")
+  splunk: '(sourcetype="WinEventLog:Windows PowerShell" OR sourcetype="XmlWinEventLog:Windows PowerShell")
+    `windows_powershell_classic`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | search EventCode=400
+
+    | table _time host User Message
+
+    '
 tags:
 - phase1
 - windows

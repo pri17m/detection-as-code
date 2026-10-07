@@ -1,12 +1,15 @@
 id: DAC-WIN-0173
 title: CreateRemoteThread into LSASS
-description: Sysmon 8 TargetImage lsass
+description: 'Behavior: CreateRemoteThread into LSASS. Anchor is process+flag or event id+field after
+  classic/XML coalesce. Not telemetry_validated. Sysmon 8 TargetImage lsass'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - credential-access
@@ -15,7 +18,8 @@ mitre:
   - T1055
 severity: critical
 false_positives:
-- EDR injectors
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1003/001/
 - https://attack.mitre.org/techniques/T1055/
@@ -28,9 +32,28 @@ required_fields:
 - StartFunction
 - StartAddress
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=8
+
+    | eval TargetImage=coalesce(TargetImage, TargetFilename)
+
+    | search TargetImage="*\\lsass.exe"
+
+    | table _time host User Image TargetImage StartAddress
+
+    '
 tags:
 - phase1
 - windows

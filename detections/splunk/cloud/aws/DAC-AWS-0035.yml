@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,7 @@ title: 'AWS: S3 GetObject high volume from unusual principal'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName="GetObject"
+    | search eventSource="s3.amazonaws.com" eventName="GetObject"
 
     | stats count by userIdentity.arn, requestParameters.bucketName
 
@@ -36,6 +37,6 @@ tags:
 - wave-c
 - P2
 - phase2-related
-description: "GetObject burst \u2014 needs data events"
+description: GetObject burst — needs data events
 sourcetypes:
 - aws:cloudtrail

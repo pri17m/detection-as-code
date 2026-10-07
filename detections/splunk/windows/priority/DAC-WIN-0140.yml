@@ -1,6 +1,7 @@
 id: DAC-WIN-0140
 title: Token impersonation / NewCredentials LogonType 9
-description: 4624 LogonType=9
+description: 'Behavior: Token impersonation / NewCredentials LogonType 9. Anchor is process+flag or event
+  id+field after classic/XML coalesce. Not telemetry_validated. 4624 LogonType=9'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -21,7 +22,8 @@ required_fields:
 - WorkstationName
 telemetry_validated: false
 false_positives:
-- runas /netonly
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1134/001/
 tags:
@@ -33,9 +35,20 @@ tags:
 - tier:P1
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security`
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=4624 LogonType=9
+
+    | table _time host Account Ip Process WorkstationName
 
     '

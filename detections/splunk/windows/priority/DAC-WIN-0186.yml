@@ -1,12 +1,15 @@
 id: DAC-WIN-0186
 title: Registry ASEP AppInit_DLLs / IFEO debugger
-description: Sysmon 13 AppInit_DLLs or IFEO
+description: 'Behavior: Registry ASEP AppInit_DLLs / IFEO debugger. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Sysmon 13 AppInit_DLLs or IFEO'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - persistence
@@ -15,7 +18,8 @@ mitre:
   - T1546.012
 severity: high
 false_positives:
-- Dev tooling
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1546/010/
 - https://attack.mitre.org/techniques/T1546/012/
@@ -26,9 +30,29 @@ required_fields:
 - TargetObject
 - Details
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=13
+
+    | eval TargetObject=coalesce(TargetObject, Image)
+
+    | search TargetObject IN ("*\\Windows NT\\CurrentVersion\\Windows\\AppInit_DLLs","*\\Image File Execution
+    Options\\*")
+
+    | table _time host User Image TargetObject Details
+
+    '
 tags:
 - phase1
 - windows

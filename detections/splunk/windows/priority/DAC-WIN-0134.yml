@@ -1,6 +1,7 @@
 id: DAC-WIN-0134
 title: WMI permanent event consumer creation attempt
-description: Sysmon 1/19/20/21 WMI if enabled
+description: 'Behavior: WMI permanent event consumer creation attempt. Anchor is process+flag or event
+  id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1/19/20/21 WMI if enabled'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -26,7 +27,8 @@ required_fields:
 - Hashes
 telemetry_validated: false
 false_positives:
-- Enterprise mgmt
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1047/
 - https://attack.mitre.org/techniques/T1546/003/
@@ -42,6 +44,18 @@ query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=20 OR (EventCode=1 Image="*\\wmic.exe" CommandLine="*eventconsumer*")
+
+    | table _time host User Image CommandLine EventType
 
     '

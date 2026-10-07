@@ -1,6 +1,7 @@
 id: DAC-WIN-0141
 title: Suspicious process access for token theft
-description: Sysmon 10 unusual Source to high-priv Target
+description: 'Behavior: Suspicious process access for token theft. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Sysmon 10 unusual Source to high-priv Target'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -22,7 +23,8 @@ required_fields:
 - GrantedAccess
 telemetry_validated: false
 false_positives:
-- Debuggers/EDR
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1134/001/
 tags:
@@ -37,6 +39,24 @@ query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=10
+
+    | eval TargetImage=coalesce(TargetImage, TargetFilename)
+
+    | eval GrantedAccess=coalesce(GrantedAccess, AccessMask)
+
+    | search GrantedAccess IN ("0x1010","0x1410","0x143a","0x1fffff")
+
+    | table _time host User Image TargetImage GrantedAccess
 
     '

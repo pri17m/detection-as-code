@@ -19,6 +19,7 @@ references:
 - https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/system/microsoft_windows_eventlog/win_system_susp_eventlog_cleared.yml
 - https://attack.mitre.org/techniques/T1070/001/
 - https://attack.mitre.org/techniques/T1685/005/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 platforms:
 - splunk
 tags:
@@ -26,6 +27,7 @@ tags:
 - P1
 - windows_system
 - sigma:rules/windows/builtin/system/microsoft_windows_eventlog/win_system_susp_eventlog_cleared.yml
+- attack-v19-remap
 title: Important Windows Eventlog Cleared
 author: Detection Engineer
 sourcetypes:
@@ -36,9 +38,8 @@ description: Detects the clearing of one of the Windows Core Eventlogs. e.g. cau
   execution
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1070.001
   - T1685.005
 required_fields:
 - EventCode

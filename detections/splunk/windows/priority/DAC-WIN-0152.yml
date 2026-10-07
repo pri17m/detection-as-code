@@ -1,6 +1,7 @@
 id: DAC-WIN-0152
 title: AMSI related registry tampering
-description: Sysmon 13 AMSI keys OR Sysmon 1
+description: 'Behavior: AMSI related registry tampering. Anchor is process+flag or event id+field after
+  classic/XML coalesce. Not telemetry_validated. Sysmon 13 AMSI keys OR Sysmon 1'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -8,9 +9,9 @@ platforms:
 severity: high
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.001
+  - T1685
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 - WinEventLog:Microsoft-Windows-Sysmon/Operational
@@ -27,9 +28,11 @@ required_fields:
 - Hashes
 telemetry_validated: false
 false_positives:
-- Security product installs
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 tags:
 - P1
 - category:defense-evasion
@@ -38,10 +41,27 @@ tags:
 - remapped_from:DAC-WIN-0053
 - tier:P1
 - windows
+- attack-v19-remap
 query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=13
+
+    | eval TargetObject=coalesce(TargetObject, Image)
+
+    | search TargetObject="*Amsi*"
+
+    | table _time host User Image TargetObject Details
 
     '

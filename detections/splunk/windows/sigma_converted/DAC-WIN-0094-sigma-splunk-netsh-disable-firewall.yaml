@@ -10,13 +10,15 @@ sourcetypes:
 mitre:
   tactics:
   - execution
+  - defense-impairment
   techniques:
-  - T1562.004
+  - T1686
 severity: medium
 false_positives:
 - Tune by allowlisting known admin tooling or software installers.
 references:
 - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 telemetry_validated: false
 required_fields:
 - EventCode
@@ -34,3 +36,5 @@ query:
     '
 sigma:
   path: SigmaHQ:windows/process_creation/netsh_firewall_off.yml
+tags:
+- attack-v19-remap

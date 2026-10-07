@@ -1,6 +1,7 @@
 id: DAC-WIN-0142
 title: Event log cleared (1102)
-description: Security 1102
+description: 'Behavior: Event log cleared (1102). Anchor is process+flag or event id+field after classic/XML
+  coalesce. Not telemetry_validated. Security 1102'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -8,22 +9,27 @@ platforms:
 severity: high
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.001
-  - T1070.001
+  - T1685
+  - T1685.005
 sourcetypes:
 - WinEventLog:Security
 - XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 required_fields:
 - SubjectUserName
 - SubjectDomainName
 telemetry_validated: false
 false_positives:
-- Rare log rotation
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1562/001/
 - https://attack.mitre.org/techniques/T1070/001/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 tags:
 - P1
 - category:defense-evasion
@@ -32,10 +38,13 @@ tags:
 - remapped_from:DAC-WIN-0043
 - tier:P1
 - windows
+- attack-v19-remap
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security`
-
-    | table _time host
-
-    '
+  splunk: "(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational\
+    \ OR sourcetype=sysmon) `windows_sysmon`\n| eval EventCode=coalesce(EventCode, EventID)\n| eval Image=coalesce(Image,\
+    \ NewProcessName)\n| eval CommandLine=coalesce(CommandLine, Process_Command_Line)\n| eval ParentImage=coalesce(ParentImage,\
+    \ ParentProcessName)\n| eval User=coalesce(User, UserName, SubjectUserName)\n| search EventCode=1\
+    \ Image=\"*\\\\wevtutil.exe\" CommandLine IN (\"*cl *\",\"*clear-log*\",\"*sl *\")\n| append [ search\
+    \ (sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`\n   \
+    \ | eval EventCode=coalesce(EventCode, EventID) | search EventCode=1102 ]\n| table _time host User\
+    \ Image CommandLine EventCode\n"

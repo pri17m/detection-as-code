@@ -1,6 +1,7 @@
 id: DAC-WIN-0179
 title: PsExec-like named service PSEXESVC
-description: 7045 ServiceName PSEXESVC
+description: 'Behavior: PsExec-like named service PSEXESVC. Anchor is process+flag or event id+field after
+  classic/XML coalesce. Not telemetry_validated. 7045 ServiceName PSEXESVC'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -16,7 +17,8 @@ mitre:
   - T1569.002
 severity: high
 false_positives:
-- Authorized PsExec
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1021/002/
 - https://attack.mitre.org/techniques/T1569/002/
@@ -29,9 +31,17 @@ required_fields:
 - StartType
 - AccountName
 query:
-  splunk: '(sourcetype="WinEventLog:System" OR sourcetype="XmlWinEventLog:System")
+  splunk: '(sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System) `windows_system`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Service=coalesce(ServiceName, param1)
+
+    | search EventCode=7045 Service IN ("*PSEXESVC*","*PaExec*")
+
+    | table _time host Service ImagePath AccountName
+
+    '
 tags:
 - phase1
 - windows

@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,7 @@ title: 'AWS: RDS ModifyDBInstance publicly accessible or snapshot share'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName IN ("ModifyDBInstance","ModifyDBSnapshotAttribute","ModifyDBCluster")
+    | search eventSource="rds.amazonaws.com" eventName IN ("ModifyDBInstance","ModifyDBSnapshotAttribute","ModifyDBCluster")
 
     | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
 

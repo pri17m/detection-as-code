@@ -1,6 +1,7 @@
 id: DAC-WIN-0131
 title: RDP LogonType 10 outside jump-host allowlist
-description: 4624 LogonType=10
+description: 'Behavior: RDP LogonType 10 outside jump-host allowlist. Anchor is process+flag or event
+  id+field after classic/XML coalesce. Not telemetry_validated. 4624 LogonType=10'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -34,9 +35,22 @@ tags:
 - tier:P1
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security`
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=4624 LogonType=10
+
+    | stats dc(host) AS hosts values(host) AS dests by Account
+
+    | where hosts>=3
 
     '

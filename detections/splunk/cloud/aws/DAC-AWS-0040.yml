@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,7 @@ title: 'AWS: S3 DeleteBucket or mass DeleteObject after privilege grant'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName IN ("DeleteBucket","DeleteObjects","DeleteObject")
+    | search eventSource="s3.amazonaws.com" eventName IN ("DeleteBucket","DeleteObjects","DeleteObject")
 
     | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
 

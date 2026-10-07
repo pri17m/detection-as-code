@@ -1,12 +1,15 @@
 id: DAC-WIN-0182
 title: Suspicious ImageLoad of dbghelp/dbgcore
-description: Sysmon 7 dbghelp/dbgcore load
+description: 'Behavior: Suspicious ImageLoad of dbghelp/dbgcore. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Sysmon 7 dbghelp/dbgcore load'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - credential-access
@@ -14,7 +17,8 @@ mitre:
   - T1003.001
 severity: medium
 false_positives:
-- Debuggers/WER
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1003/001/
 telemetry_validated: false
@@ -25,9 +29,28 @@ required_fields:
 - Signed
 - SignatureStatus
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=7
+
+    | eval ImageLoaded=coalesce(ImageLoaded, Image)
+
+    | search ImageLoaded IN ("*\\dbghelp.dll","*\\dbgcore.dll")
+
+    | table _time host Image ImageLoaded
+
+    '
 tags:
 - phase1
 - windows

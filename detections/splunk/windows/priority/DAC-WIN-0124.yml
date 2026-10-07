@@ -1,6 +1,7 @@
 id: DAC-WIN-0124
 title: Account added to Domain Admins / Tier-0 group
-description: 4728/4732/4756 Domain/Enterprise Admins
+description: 'Behavior: Account added to Domain Admins / Tier-0 group. Anchor is process+flag or event
+  id+field after classic/XML coalesce. Not telemetry_validated. 4728/4732/4756 Domain/Enterprise Admins'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -23,7 +24,8 @@ required_fields:
 - SubjectDomainName
 telemetry_validated: false
 false_positives:
-- Change-control
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1098/
 - https://attack.mitre.org/techniques/T1078/002/
@@ -36,9 +38,24 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security`
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode IN (4728,4732,4756)
+
+    | eval Group=coalesce(TargetUserName, Group_Name)
+
+    | search Group IN ("Domain Admins","Enterprise Admins","Schema Admins","Administrators")
+
+    | table _time host Account SubjectUserName Group MemberName
 
     '

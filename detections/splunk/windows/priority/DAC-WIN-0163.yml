@@ -1,12 +1,15 @@
 id: DAC-WIN-0163
 title: Windows service ImagePath modified to user-writable
-description: Sysmon 13 Services ImagePath Temp/Users
+description: 'Behavior: Windows service ImagePath modified to user-writable. Anchor is process+flag or
+  event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 13 Services ImagePath Temp/Users'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - persistence
@@ -14,7 +17,8 @@ mitre:
   - T1543.003
 severity: high
 false_positives:
-- Installer registration
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1543/003/
 telemetry_validated: false
@@ -24,9 +28,30 @@ required_fields:
 - TargetObject
 - Details
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=13
+
+    | eval TargetObject=coalesce(TargetObject, Image)
+
+    | search TargetObject="*\\Services\\*" TargetObject="*ImagePath*"
+
+    | where match(Details, "(?i)\\users\\|\\temp\\|\\appdata\\|powershell")
+
+    | table _time host User Image TargetObject Details
+
+    '
 tags:
 - phase1
 - windows

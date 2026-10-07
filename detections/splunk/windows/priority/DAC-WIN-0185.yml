@@ -1,12 +1,15 @@
 id: DAC-WIN-0185
 title: Sysmon network from LOLBin (certutil/mshta)
-description: Sysmon 3 Image certutil/mshta/bitsadmin
+description: 'Behavior: Sysmon network from LOLBin (certutil/mshta). Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Sysmon 3 Image certutil/mshta/bitsadmin'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - command-and-control
@@ -15,7 +18,8 @@ mitre:
   - T1218
 severity: medium
 false_positives:
-- Rare legit
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1105/
 - https://attack.mitre.org/techniques/T1218/
@@ -31,9 +35,24 @@ required_fields:
 - DestinationIp
 - DestinationPort
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=3 Image IN ("*\\certutil.exe","*\\mshta.exe")
+
+    | table _time host User Image DestinationIp DestinationPort
+
+    '
 tags:
 - phase1
 - windows

@@ -1,6 +1,7 @@
 id: DAC-WIN-0139
 title: SYSVOL script/file create on DC
-description: Sysmon 11 SYSVOL Policies path
+description: 'Behavior: SYSVOL script/file create on DC. Anchor is process+flag or event id+field after
+  classic/XML coalesce. Not telemetry_validated. Sysmon 11 SYSVOL Policies path'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -22,7 +23,8 @@ required_fields:
 - User
 telemetry_validated: false
 false_positives:
-- Legit GPO updates
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1484/001/
 tags:
@@ -37,6 +39,22 @@ query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=11
+
+    | eval TargetFilename=coalesce(TargetFilename, Image)
+
+    | search TargetFilename="*\\SYSVOL\\*" TargetFilename IN ("*.ps1","*.vbs","*.js","*.bat","*.cmd","*.dll")
+
+    | table _time host User Image TargetFilename
 
     '

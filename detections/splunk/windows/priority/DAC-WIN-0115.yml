@@ -1,6 +1,7 @@
 id: DAC-WIN-0115
 title: LSASS access via comsvcs MiniDump pattern
-description: Sysmon 1 rundll32/comsvcs MiniDump OR Sysmon 10
+description: 'Behavior: LSASS access via comsvcs MiniDump pattern. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Sysmon 1 rundll32/comsvcs MiniDump OR Sysmon 10'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -28,7 +29,8 @@ required_fields:
 - GrantedAccess
 telemetry_validated: false
 false_positives:
-- Rare diagnostics
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1003/001/
 tags:
@@ -43,6 +45,18 @@ query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=1 (Image="*\\rundll32.exe" OR CommandLine="*comsvcs*") CommandLine="*MiniDump*"
+
+    | table _time host User Image ParentImage CommandLine
 
     '

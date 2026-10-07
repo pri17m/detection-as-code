@@ -1,6 +1,7 @@
 id: DAC-WIN-0155
 title: PowerShell DownloadString / IEX cradle (4104)
-description: 4104 DownloadString/IEX/WebClient
+description: 'Behavior: PowerShell DownloadString / IEX cradle (4104). Anchor is process+flag or event
+  id+field after classic/XML coalesce. Not telemetry_validated. 4104 DownloadString/IEX/WebClient'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -24,7 +25,8 @@ required_fields:
 - SubjectUserName
 telemetry_validated: false
 false_positives:
-- Admin bootstrap
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1059/001/
 - https://attack.mitre.org/techniques/T1105/
@@ -40,6 +42,12 @@ query:
   splunk: '(sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational)
     `windows_powershell_operational`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Script=coalesce(ScriptBlockText, Message)
+
+    | search EventCode=4104 Script IN ("*DownloadString*","*Invoke-Expression*","*IEX*","*FromBase64String*")
+
+    | table _time host User Script
 
     '

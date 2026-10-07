@@ -1,6 +1,7 @@
 id: DAC-WIN-0143
 title: Audit policy changed (4719)
-description: Security 4719
+description: 'Behavior: Audit policy changed (4719). Anchor is process+flag or event id+field after classic/XML
+  coalesce. Not telemetry_validated. Security 4719'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -8,9 +9,9 @@ platforms:
 severity: high
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.001
+  - T1685
 sourcetypes:
 - WinEventLog:Security
 - XmlWinEventLog:Security
@@ -22,9 +23,11 @@ required_fields:
 - AuditPolicyChanges
 telemetry_validated: false
 false_positives:
-- GPO audit refresh
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 tags:
 - P1
 - category:defense-evasion
@@ -33,10 +36,22 @@ tags:
 - remapped_from:DAC-WIN-0044
 - tier:P1
 - windows
+- attack-v19-remap
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security`
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=4719
+
+    | table _time host Account Category Subcategory AuditPolicyChanges
 
     '

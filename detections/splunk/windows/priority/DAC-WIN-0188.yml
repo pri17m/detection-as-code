@@ -1,12 +1,15 @@
 id: DAC-WIN-0188
 title: Suspicious named pipe related to remoting
-description: Sysmon 17/18 pipe create/connect if enabled
+description: 'Behavior: Suspicious named pipe related to remoting. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Sysmon 17/18 pipe create/connect if enabled'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - lateral-movement
@@ -14,7 +17,8 @@ mitre:
   - T1021.002
 severity: medium
 false_positives:
-- Admin tools
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1021/002/
 telemetry_validated: false
@@ -24,9 +28,28 @@ required_fields:
 - Image
 - User
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=17 OR EventCode=18
+
+    | eval Pipe=coalesce(PipeName, Image)
+
+    | search Pipe IN ("*\\psexec*","*\\remcom*","*\\paexec*","*\\winrm*")
+
+    | table _time host User Image Pipe
+
+    '
 tags:
 - phase1
 - windows

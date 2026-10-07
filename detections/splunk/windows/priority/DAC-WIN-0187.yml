@@ -1,12 +1,15 @@
 id: DAC-WIN-0187
 title: Clear PowerShell history via process
-description: Sysmon 1 Remove-Item PSReadLine history
+description: 'Behavior: Clear PowerShell history via process. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Sysmon 1 Remove-Item PSReadLine history'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - defense-evasion
@@ -14,7 +17,8 @@ mitre:
   - T1070.003
 severity: medium
 false_positives:
-- Admin cleanup
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1070/003/
 telemetry_validated: false
@@ -27,9 +31,24 @@ required_fields:
 - ProcessGuid
 - Hashes
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=1 CommandLine IN ("*ConsoleHost_history*","*Clear-History*","*Remove-Item*history*")
+
+    | table _time host User Image ParentImage CommandLine
+
+    '
 tags:
 - phase1
 - windows

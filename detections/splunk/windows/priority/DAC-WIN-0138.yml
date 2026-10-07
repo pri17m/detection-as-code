@@ -1,6 +1,7 @@
 id: DAC-WIN-0138
 title: GPO modification by non-change-control account
-description: 5136/5137 GPO Directory Service Changes
+description: 'Behavior: GPO modification by non-change-control account. Anchor is process+flag or event
+  id+field after classic/XML coalesce. Not telemetry_validated. 5136/5137 GPO Directory Service Changes'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -25,7 +26,8 @@ required_fields:
 - OperationType
 telemetry_validated: false
 false_positives:
-- Tier-0 GPO admins
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1484/001/
 tags:
@@ -37,9 +39,22 @@ tags:
 - tier:P1
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security`
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode IN (5136,5137)
+
+    | search ObjectClass="groupPolicyContainer" OR ObjectDN="*CN=Policies,CN=System*"
+
+    | table _time host Account ObjectDN AttributeLDAPDisplayName
 
     '

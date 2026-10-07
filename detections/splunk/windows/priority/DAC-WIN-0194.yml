@@ -1,6 +1,7 @@
 id: DAC-WIN-0194
 title: Kerberos service ticket from unusual client
-description: 4769 rare Client Address for SPN
+description: 'Behavior: Kerberos service ticket from unusual client. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. 4769 rare Client Address for SPN'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -16,7 +17,8 @@ mitre:
   - T1078.002
 severity: medium
 false_positives:
-- Mobile admins
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1558/003/
 - https://attack.mitre.org/techniques/T1078/002/
@@ -29,9 +31,29 @@ required_fields:
 - TicketEncryptionType
 - Status
 query:
-  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=4769
+
+    | eval Enc=coalesce(TicketEncryptionType, Ticket_Encryption_Type)
+
+    | eval Service=coalesce(ServiceName, Service_Name)
+
+    | search Enc="0x17"
+
+    | table _time host Account Service Enc Ip
+
+    '
 tags:
 - phase1
 - windows

@@ -1,6 +1,7 @@
 id: DAC-WIN-0157
 title: Net.exe domain group enumeration
-description: Sysmon 1 net group/user /domain
+description: 'Behavior: Net.exe domain group enumeration. Anchor is process+flag or event id+field after
+  classic/XML coalesce. Not telemetry_validated. Sysmon 1 net group/user /domain'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -25,7 +26,8 @@ required_fields:
 - Hashes
 telemetry_validated: false
 false_positives:
-- Helpdesk scripts
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1087/002/
 tags:
@@ -40,6 +42,19 @@ query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=1 Image IN ("*\\net.exe","*\\net1.exe") CommandLine IN ("*group*","*/domain*","*user
+    /domain*")
+
+    | table _time host User Image ParentImage CommandLine
 
     '

@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,7 @@ title: 'AWS: IAM CreateAccessKey for privileged or unused IAM user'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName="CreateAccessKey"
+    | search eventSource="iam.amazonaws.com" eventName="CreateAccessKey"
 
     | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
 

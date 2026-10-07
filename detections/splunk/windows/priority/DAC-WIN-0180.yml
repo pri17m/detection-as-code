@@ -1,6 +1,7 @@
 id: DAC-WIN-0180
 title: Account locked out burst (4740)
-description: 4740 many users one caller
+description: 'Behavior: Account locked out burst (4740). Anchor is process+flag or event id+field after
+  classic/XML coalesce. Not telemetry_validated. 4740 many users one caller'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -15,7 +16,8 @@ mitre:
   - T1110
 severity: medium
 false_positives:
-- Password policy
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1110/
 telemetry_validated: false
@@ -24,9 +26,25 @@ required_fields:
 - TargetUserName
 - CallerComputerName
 query:
-  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=4740
+
+    | stats count values(Account) AS accounts by Ip host
+
+    | where count>=5
+
+    '
 tags:
 - phase1
 - windows

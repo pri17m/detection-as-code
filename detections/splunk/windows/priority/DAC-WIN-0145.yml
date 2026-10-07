@@ -1,6 +1,7 @@
 id: DAC-WIN-0145
 title: Rundll32 with unusual DLL path
-description: Sysmon 1 rundll32 Temp/Users/javascript
+description: 'Behavior: Rundll32 with unusual DLL path. Anchor is process+flag or event id+field after
+  classic/XML coalesce. Not telemetry_validated. Sysmon 1 rundll32 Temp/Users/javascript'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -25,7 +26,8 @@ required_fields:
 - Hashes
 telemetry_validated: false
 false_positives:
-- OEM utilities
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1218/011/
 tags:
@@ -40,6 +42,20 @@ query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=1 Image="*\\rundll32.exe"
+
+    | where match(CommandLine, "(?i)\\users\\|\\temp\\|\\appdata\\|http")
+
+    | table _time host User Image ParentImage CommandLine
 
     '

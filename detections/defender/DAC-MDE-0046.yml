@@ -1,6 +1,7 @@
 author: Detection Engineer
 references:
 - https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 title: 'MDE: Set-MpPreference disable realtime'
 description: PowerShell Defender disable
 severity: high
@@ -19,6 +20,7 @@ status: experimental
 tags:
 - wave-a
 - P0
+- attack-v19-remap
 query:
   defender: 'DeviceProcessEvents
 
@@ -33,6 +35,6 @@ sourcetypes:
 - mde:advanced_hunting
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.001
+  - T1685

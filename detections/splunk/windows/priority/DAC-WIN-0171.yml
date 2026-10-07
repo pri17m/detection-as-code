@@ -1,12 +1,16 @@
 id: DAC-WIN-0171
 title: Unsigned DLL loaded by signed Microsoft process (user path)
-description: Sysmon 7 unsigned ImageLoaded under Users/Temp
+description: 'Behavior: Unsigned DLL loaded by signed Microsoft process (user path). Anchor is process+flag
+  or event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 7 unsigned ImageLoaded
+  under Users/Temp'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - defense-evasion
@@ -14,7 +18,8 @@ mitre:
   - T1574.001
 severity: medium
 false_positives:
-- Plugins/dev tools
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1574/001/
 telemetry_validated: false
@@ -25,9 +30,30 @@ required_fields:
 - Signed
 - SignatureStatus
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=7
+
+    | eval ImageLoaded=coalesce(ImageLoaded, Image)
+
+    | eval Signed=coalesce(Signed, SignatureStatus)
+
+    | search Signed="false" ImageLoaded IN ("*\\users\\*","*\\temp\\*","*\\appdata\\*")
+
+    | table _time host Image ImageLoaded Signed Signature
+
+    '
 tags:
 - phase1
 - windows

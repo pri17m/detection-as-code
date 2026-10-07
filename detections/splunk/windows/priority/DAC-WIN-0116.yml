@@ -1,6 +1,7 @@
 id: DAC-WIN-0116
 title: Suspicious process creating LSASS dump file
-description: Sysmon 11 TargetFilename *.dmp
+description: 'Behavior: Suspicious process creating LSASS dump file. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Sysmon 11 TargetFilename *.dmp'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -22,7 +23,8 @@ required_fields:
 - User
 telemetry_validated: false
 false_positives:
-- WER dumps
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1003/001/
 tags:
@@ -37,6 +39,22 @@ query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=11
+
+    | eval TargetFilename=coalesce(TargetFilename, Image)
+
+    | search TargetFilename IN ("*.dmp","*lsass*")
+
+    | table _time host User Image TargetFilename
 
     '

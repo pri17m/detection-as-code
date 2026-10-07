@@ -1,6 +1,7 @@
 id: DAC-WIN-0183
 title: Scheduled task deleted suspiciously (4699)
-description: Security 4699
+description: 'Behavior: Scheduled task deleted suspiciously (4699). Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Security 4699'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -16,7 +17,8 @@ mitre:
   - T1070
 severity: low
 false_positives:
-- Software cleanup
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1053/005/
 - https://attack.mitre.org/techniques/T1070/
@@ -28,9 +30,23 @@ required_fields:
 - SubjectDomainName
 - TaskContent
 query:
-  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=4699
+
+    | table _time host Account TaskName SubjectUserName
+
+    '
 tags:
 - phase1
 - windows

@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,7 @@ title: 'AWS: S3 PutBucketPolicy or PutBucketAcl granting external account'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName IN ("PutBucketPolicy","PutBucketAcl","PutBucketPublicAccessBlock")
+    | search eventSource="s3.amazonaws.com" eventName IN ("PutBucketPolicy","PutBucketAcl","PutBucketPublicAccessBlock")
 
     | search requestParameters="*Principal*" OR requestParameters="*AllUsers*" OR requestParameters="*AuthenticatedUsers*"
 

@@ -19,6 +19,7 @@ references:
 - https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_disable_event_auditing.yml
 - https://attack.mitre.org/techniques/T1562/001/
 - https://attack.mitre.org/techniques/T1685/001/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 platforms:
 - splunk
 tags:
@@ -26,6 +27,7 @@ tags:
 - P1
 - windows_security
 - sigma:rules/windows/builtin/security/win_security_disable_event_auditing.yml
+- attack-v19-remap
 title: Windows Event Auditing Disabled
 author: Detection Engineer
 sourcetypes:
@@ -46,9 +48,9 @@ description: 'Detects scenarios where system auditing (i.e.: Windows event log a
   Directory anyways.'
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.001
+  - T1685
   - T1685.001
 required_fields:
 - EventCode

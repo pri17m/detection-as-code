@@ -1,6 +1,7 @@
 id: DAC-WIN-0159
 title: SMB sweep many destinations from one host
-description: Sysmon 3 many DestinationIp:445
+description: 'Behavior: SMB sweep many destinations from one host. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Sysmon 3 many DestinationIp:445'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -17,6 +18,8 @@ sourcetypes:
 - WinEventLog:Microsoft-Windows-Sysmon/Operational
 - sysmon
 - sysmon:*
+- WinEventLog:Security
+- XmlWinEventLog:Security
 required_fields:
 - Image
 - User
@@ -28,7 +31,8 @@ required_fields:
 - DestinationPort
 telemetry_validated: false
 false_positives:
-- Vuln scanners allowlist
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1018/
 - https://attack.mitre.org/techniques/T1021/002/
@@ -41,9 +45,22 @@ tags:
 - tier:P1
 - windows
 query:
-  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
-    OR sourcetype=sysmon) `windows_sysmon`
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=5140 ShareName IN ("*ADMIN$*","*C$*","*IPC$*")
+
+    | stats dc(ShareName) AS shares dc(Ip) AS srcs by host Account
+
+    | where shares>=3 OR srcs>=5
 
     '

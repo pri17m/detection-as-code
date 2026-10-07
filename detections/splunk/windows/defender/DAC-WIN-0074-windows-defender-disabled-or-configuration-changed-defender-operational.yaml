@@ -1,7 +1,7 @@
 id: DAC-WIN-0074
 title: Windows Defender disabled or configuration changed (Defender Operational)
-description: Detects Defender operational events associated with disabling or configuration
-  changes that may indicate defense evasion.
+description: Detects Defender operational events associated with disabling or configuration changes that
+  may indicate defense evasion.
 author: DaC
 status: experimental
 platforms:
@@ -11,14 +11,15 @@ sourcetypes:
 - WinEventLog
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.001
+  - T1685
 severity: high
 false_positives:
 - IT-driven Defender policy changes.
 references:
 - https://learn.microsoft.com/microsoft-365/security/defender-endpoint/troubleshoot-microsoft-defender-antivirus
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 telemetry_validated: false
 required_fields:
 - EventCode
@@ -33,3 +34,5 @@ query:
     | stats count values(msg) as messages by host
 
     '
+tags:
+- attack-v19-remap

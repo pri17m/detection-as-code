@@ -1,12 +1,14 @@
 id: DAC-WIN-0026
 title: User added to security group (EventCode 4732)
-description: Detects group membership additions (EventCode 4732). On this event TargetUserName is the GROUP and MemberName/MemberSid identify the member added; SubjectUserName is the actor.
+description: Detects group membership additions (EventCode 4732). On this event TargetUserName is the
+  GROUP and MemberName/MemberSid identify the member added; SubjectUserName is the actor.
 author: DaC
 status: experimental
 platforms:
 - splunk
 sourcetypes:
-- "WinEventLog:Security"
+- WinEventLog:Security
+- XmlWinEventLog:Security
 mitre:
   tactics:
   - privilege-escalation
@@ -17,8 +19,8 @@ severity: high
 false_positives:
 - Legitimate group administration.
 references:
-- "https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4732"
-- "https://attack.mitre.org/techniques/T1098/"
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4732
+- https://attack.mitre.org/techniques/T1098/
 telemetry_validated: false
 required_fields:
 - EventCode
@@ -27,11 +29,19 @@ required_fields:
 - MemberSid
 - SubjectUserName
 query:
-  splunk: |
-    `windows_security` EventCode=4732
+  splunk: '`windows_security` EventCode=4732
+
     | eval actor=coalesce(SubjectUserName, Subject_User_Name, src_user)
+
     | eval group=coalesce(TargetUserName, Target_User_Name, GroupName)
+
     | eval member=coalesce(MemberName, Member_Name)
+
     | eval member_sid=coalesce(MemberSid, Member_Sid)
+
     | where isnotnull(member) OR isnotnull(member_sid)
-    | stats count values(member) as members values(member_sid) as member_sids values(group) as groups by actor, host
+
+    | stats count values(member) as members values(member_sid) as member_sids values(group) as groups
+    by actor, host
+
+    '

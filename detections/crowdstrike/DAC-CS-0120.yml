@@ -10,8 +10,7 @@ description: 'ScriptControlScanV2 ScriptContent matching common AMSI bypass toke
 
   '
 false_positives:
-- "Legitimate admin, software deployment, or IT tooling matching these patterns \u2014 baseline before\
-  \ promote."
+- Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
 - Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
 id: DAC-CS-0120
 query:
@@ -24,9 +23,9 @@ query:
     '
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.001
+  - T1685
   - T1059.001
 title: 'Falcon: ScriptControlScanV2 AMSI Bypass Patterns'
 status: experimental
@@ -34,12 +33,14 @@ references:
 - https://attack.mitre.org/techniques/T1562/001/
 - https://attack.mitre.org/techniques/T1059/001/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Suspicious_PowerShell_Execution.yml
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 tags:
 - cs-query-hub
 - safe-esn-wave
 - tp-quality-v2
 - src:Suspicious_PowerShell_Execution.yml
 - esn:ScriptControlScanV2
+- attack-v19-remap
 severity: high
 required_fields:
 - '#event_simpleName'

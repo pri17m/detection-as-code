@@ -8,9 +8,9 @@ telemetry_validated: false
 author: Detection Engineer
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562
+  - T1685
 id: DAC-GCP-0037
 status: experimental
 title: 'GCP: VPC Service Controls perimeter soften or dry-run only'
@@ -26,11 +26,13 @@ query:
 severity: medium
 references:
 - https://attack.mitre.org/techniques/T1562/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 platforms:
 - splunk
 tags:
 - wave-c
 - P1
+- attack-v19-remap
 description: UpdateServicePerimeter
 sourcetypes:
 - gcp:audit

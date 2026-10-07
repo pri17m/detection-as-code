@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,7 @@ title: 'AWS: IAM CreateAccessKey then use from new source IP'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName="CreateAccessKey"
+    | search eventSource="iam.amazonaws.com" eventName="CreateAccessKey"
 
     | # Join subsequent API calls by accessKeyId with novel sourceIPAddress (tenant-tune)
 
@@ -34,6 +35,6 @@ tags:
 - wave-c
 - P0
 - phase2-top5
-description: "CreateAccessKey \u2192 API from novel sourceIPAddress"
+description: CreateAccessKey → API from novel sourceIPAddress
 sourcetypes:
 - aws:cloudtrail

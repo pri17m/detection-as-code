@@ -1,12 +1,15 @@
 id: DAC-WIN-0164
 title: Service installed via sc.exe create
-description: Sysmon 1 sc.exe create
+description: 'Behavior: Service installed via sc.exe create. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. Sysmon 1 sc.exe create'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:System
+- XmlWinEventLog:System
 mitre:
   tactics:
   - persistence
@@ -14,7 +17,8 @@ mitre:
   - T1543.003
 severity: medium
 false_positives:
-- Admin service mgmt
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1543/003/
 telemetry_validated: false
@@ -27,9 +31,21 @@ required_fields:
 - ProcessGuid
 - Hashes
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System) `windows_system`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Service=coalesce(ServiceName, param1)
+
+    | search EventCode=7045
+
+    | eval ImagePath=coalesce(ImagePath, ServiceFileName)
+
+    | where match(ImagePath, "(?i)\\users\\|\\temp\\|\\appdata\\|powershell|cmd.exe")
+
+    | table _time host Service ImagePath AccountName
+
+    '
 tags:
 - phase1
 - windows

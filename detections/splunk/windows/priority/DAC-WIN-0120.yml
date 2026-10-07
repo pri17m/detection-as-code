@@ -1,6 +1,7 @@
 id: DAC-WIN-0120
 title: New service installed with suspicious ImagePath
-description: System 7045 ImagePath Temp/Users/UNC
+description: 'Behavior: New service installed with suspicious ImagePath. Anchor is process+flag or event
+  id+field after classic/XML coalesce. Not telemetry_validated. System 7045 ImagePath Temp/Users/UNC'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -23,7 +24,8 @@ required_fields:
 - AccountName
 telemetry_validated: false
 false_positives:
-- Software deployment
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1543/003/
 - https://attack.mitre.org/techniques/T1021/002/
@@ -38,6 +40,16 @@ tags:
 query:
   splunk: '(sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System) `windows_system`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Service=coalesce(ServiceName, param1)
+
+    | search EventCode=7045
+
+    | eval ImagePath=coalesce(ImagePath, ServiceFileName)
+
+    | where match(ImagePath, "(?i)\\users\\|\\temp\\|\\appdata\\|powershell|cmd.exe")
+
+    | table _time host Service ImagePath AccountName
 
     '

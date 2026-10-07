@@ -1,6 +1,7 @@
 id: DAC-WIN-0167
 title: Computer account created unexpectedly
-description: 4741 (Phase-1 experimental Splunk detection).
+description: 'Behavior: Computer account created unexpectedly. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. 4741 (Phase-1 experimental Splunk detection).'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -15,7 +16,8 @@ mitre:
   - T1098
 severity: low
 false_positives:
-- Domain join
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1098/
 telemetry_validated: false
@@ -25,9 +27,23 @@ required_fields:
 - SubjectUserName
 - SubjectDomainName
 query:
-  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=4741
+
+    | table _time host Account SubjectUserName TargetUserName
+
+    '
 tags:
 - phase1
 - windows

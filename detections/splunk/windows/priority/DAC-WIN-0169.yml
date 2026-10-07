@@ -1,12 +1,15 @@
 id: DAC-WIN-0169
 title: Critical binary masquerading outside System32
-description: Sysmon 1 svchost.exe NOT System32
+description: 'Behavior: Critical binary masquerading outside System32. Anchor is process+flag or event
+  id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1 svchost.exe NOT System32'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - defense-evasion
@@ -14,7 +17,8 @@ mitre:
   - T1036.005
 severity: high
 false_positives:
-- WinSxS edge cases
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1036/005/
 telemetry_validated: false
@@ -27,9 +31,26 @@ required_fields:
 - ProcessGuid
 - Hashes
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=1 Image IN ("*\\svchost.exe","*\\lsass.exe","*\\csrss.exe","*\\services.exe","*\\wininit.exe")
+
+    | where NOT match(Image, "(?i)\\Windows\\System32\\") AND NOT match(Image, "(?i)\\Windows\\SysWOW64\\")
+
+    | table _time host User Image ParentImage CommandLine
+
+    '
 tags:
 - phase1
 - windows

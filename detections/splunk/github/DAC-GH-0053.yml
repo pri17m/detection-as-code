@@ -1,29 +1,37 @@
 id: DAC-GH-0053
 title: 'GitHub: Audit log streaming endpoint deleted'
-description: 'Detects audit_log_streaming.destroy. GitHub documents this action as an audit log streaming endpoint being deleted. An update is audit_log_streaming.update and is not included.'
+description: Detects audit_log_streaming.destroy. GitHub documents this action as an audit log streaming
+  endpoint being deleted. An update is audit_log_streaming.update and is not included.
 author: Detection Engineer
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - github:audit
-  - github:cloud:audit
+- github:audit
+- github:cloud:audit
 mitre:
   tactics:
-    - defense-evasion
+  - defense-impairment
   techniques:
-    - T1562.001
+  - T1685
 severity: critical
 false_positives:
-  - 'A platform admin replacing a streaming endpoint. Confirm the new endpoint exists.'
+- A platform admin replacing a streaming endpoint. Confirm the new endpoint exists.
 references:
-  - 'https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise'
+- https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 telemetry_validated: false
 required_fields:
-  - action
-  - actor
+- action
+- actor
 query:
-  splunk: |
-    (sourcetype=github:audit OR sourcetype=github:cloud:audit OR sourcetype=httpevent) action=audit_log_streaming.destroy
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit OR sourcetype=httpevent) action=audit_log_streaming.destroy
+
     | fillnull
-    | stats count min(_time) as firstTime max(_time) as lastTime values(user_agent) as user_agent by actor, actor_id, org, business
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(user_agent) as user_agent by actor,
+    actor_id, org, business
+
+    '
+tags:
+- attack-v19-remap

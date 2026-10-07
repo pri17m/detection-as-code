@@ -9,14 +9,15 @@ sourcetypes:
 - mde:advanced_hunting
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.004
+  - T1686
 severity: high
 false_positives:
 - Legitimate troubleshooting by admins; tune by accounts/devices.
 references:
 - https://learn.microsoft.com/microsoft-365/security/defender/advanced-hunting-deviceprocessevents-table
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 telemetry_validated: false
 required_fields:
 - DeviceName
@@ -32,3 +33,5 @@ query:
     | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
 
     '
+tags:
+- attack-v19-remap

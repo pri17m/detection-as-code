@@ -1,7 +1,7 @@
-id: DAC-WIN-0158
-title: Nltest / domain trust discovery
-description: 'Behavior: Nltest / domain trust discovery. Anchor is process+flag or event id+field after
-  classic/XML coalesce. Not telemetry_validated. Sysmon 1 nltest /dclist /domain_trusts'
+id: DAC-WIN-0341
+title: MMC launched against MSC file in a user-writable path
+description: 'Behavior: mmc.exe opening an MSC from a user-writable path (T1218.014). Anchor is Image+CommandLine
+  path. Not telemetry_validated.'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -9,37 +9,26 @@ platforms:
 severity: medium
 mitre:
   tactics:
-  - discovery
+  - defense-evasion
   techniques:
-  - T1018
-  - T1482
+  - T1218.014
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 - WinEventLog:Microsoft-Windows-Sysmon/Operational
 - sysmon
-- sysmon:*
 required_fields:
+- EventCode
 - Image
 - CommandLine
-- ParentImage
-- User
-- ProcessGuid
-- Hashes
 telemetry_validated: false
 false_positives:
-- Admin tooling and change windows
-- EDR or backup agents on the same host
+- Administrators opening MSC consoles from a profile
 references:
-- https://attack.mitre.org/techniques/T1018/
-- https://attack.mitre.org/techniques/T1482/
+- https://attack.mitre.org/techniques/T1218/014/
 tags:
-- P1
-- ad-auth
-- category:ad-auth
-- phase1
-- remapped_from:DAC-WIN-0059
-- tier:P1
 - windows
+- gap-fill
+- lolbin
 query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
@@ -54,7 +43,9 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search EventCode=1 (Image="*\\nltest.exe" OR CommandLine="*nltest*") CommandLine IN ("*/domain_trusts*","*/dclist*","*/dsgetdc*")
+    | search EventCode=1 Image="*\\mmc.exe" CommandLine="*.msc"
+
+    | where match(CommandLine, "(?i)\\users\\|\\temp\\|\\appdata\\|\\programdata\\")
 
     | table _time host User Image ParentImage CommandLine
 

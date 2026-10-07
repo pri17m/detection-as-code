@@ -1,7 +1,7 @@
 id: DAC-WIN-0053
 title: 'Suspicious process creation: Wevtutil clear logs (4688)'
-description: 'Detects 4688 process creation events matching a known suspicious pattern:
-  Wevtutil clear logs.'
+description: 'Detects 4688 process creation events matching a known suspicious pattern: Wevtutil clear
+  logs.'
 author: DaC
 status: experimental
 platforms:
@@ -11,15 +11,15 @@ sourcetypes:
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1070.001
+  - T1685.005
 severity: high
 false_positives:
-- Administrative scripts or software installers may match; tune by allowlisting known
-  management hosts/accounts.
+- Administrative scripts or software installers may match; tune by allowlisting known management hosts/accounts.
 references:
 - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 telemetry_validated: false
 required_fields:
 - EventCode
@@ -38,7 +38,9 @@ query:
 
     | where match(cmd, "wevtutil\.exe\s+cl\s+")
 
-    | stats count values(proc) as processes values(parent) as parents values(cmd)
-    as commands by host, SubjectUserName
+    | stats count values(proc) as processes values(parent) as parents values(cmd) as commands by host,
+    SubjectUserName
 
     '
+tags:
+- attack-v19-remap

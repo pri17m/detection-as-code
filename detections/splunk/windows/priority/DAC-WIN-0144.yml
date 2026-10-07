@@ -1,6 +1,7 @@
 id: DAC-WIN-0144
 title: Sysmon service state change / stop
-description: Sysmon 4 or System 7036/7040
+description: 'Behavior: Sysmon service state change / stop. Anchor is process+flag or event id+field after
+  classic/XML coalesce. Not telemetry_validated. Sysmon 4 or System 7036/7040'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -8,9 +9,9 @@ platforms:
 severity: critical
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.001
+  - T1685
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 - WinEventLog:Microsoft-Windows-Sysmon/Operational
@@ -24,9 +25,11 @@ required_fields:
 - SchemaVersion
 telemetry_validated: false
 false_positives:
-- Sysmon upgrades
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 tags:
 - P1
 - category:defense-evasion
@@ -35,10 +38,16 @@ tags:
 - remapped_from:DAC-WIN-0045
 - tier:P1
 - windows
+- attack-v19-remap
 query:
-  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
-    OR sourcetype=sysmon OR sourcetype=WinEventLog:System) `windows_sysmon`
+  splunk: '(sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System) `windows_system`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Service=coalesce(ServiceName, param1)
+
+    | search EventCode IN (7036,7040,7045) Service IN ("*sysmon*","*Sysmon*")
+
+    | table _time host EventCode Service Message
 
     '

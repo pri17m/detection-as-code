@@ -1,6 +1,7 @@
 id: DAC-WIN-0156
 title: PowerShell AD enumeration burst
-description: 4104 Get-ADUser/DirectorySearcher
+description: 'Behavior: PowerShell AD enumeration burst. Anchor is process+flag or event id+field after
+  classic/XML coalesce. Not telemetry_validated. 4104 Get-ADUser/DirectorySearcher'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -15,6 +16,9 @@ mitre:
 sourcetypes:
 - WinEventLog:Microsoft-Windows-PowerShell/Operational
 - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 required_fields:
 - ScriptBlockText
 - ScriptBlockId
@@ -24,7 +28,8 @@ required_fields:
 - SubjectUserName
 telemetry_validated: false
 false_positives:
-- IT identity tooling
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1087/002/
 - https://attack.mitre.org/techniques/T1059/001/
@@ -37,9 +42,22 @@ tags:
 - tier:P1
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational)
-    `windows_powershell_operational`
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=1 Image IN ("*\\net.exe","*\\net1.exe") CommandLine IN ("*group*","*/domain*","*user
+    /domain*")
+
+    | table _time host User Image ParentImage CommandLine
 
     '

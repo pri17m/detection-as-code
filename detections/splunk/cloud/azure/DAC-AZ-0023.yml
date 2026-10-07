@@ -9,9 +9,9 @@ telemetry_validated: false
 author: Detection Engineer
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562
+  - T1685
 id: DAC-AZ-0023
 status: experimental
 title: 'Azure: SQL server firewall allow Azure services or 0.0.0.0-255'
@@ -28,11 +28,13 @@ query:
 severity: medium
 references:
 - https://attack.mitre.org/techniques/T1562/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 platforms:
 - splunk
 tags:
 - wave-c
 - P1
+- attack-v19-remap
 description: firewallRules 0.0.0.0
 sourcetypes:
 - azure:monitor:activity

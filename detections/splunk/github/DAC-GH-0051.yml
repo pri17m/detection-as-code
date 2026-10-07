@@ -1,30 +1,38 @@
 id: DAC-GH-0051
 title: 'GitHub: Dependabot alerts disabled'
-description: 'Detects repository_vulnerability_alerts.disable. GitHub documents this action as Dependabot alerts being disabled.'
+description: Detects repository_vulnerability_alerts.disable. GitHub documents this action as Dependabot
+  alerts being disabled.
 author: Detection Engineer
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - github:audit
-  - github:cloud:audit
+- github:audit
+- github:cloud:audit
 mitre:
   tactics:
-    - defense-evasion
+  - defense-impairment
   techniques:
-    - T1562.001
+  - T1685
 severity: high
 false_positives:
-  - 'An admin disabling alerts on a repository that is being archived.'
+- An admin disabling alerts on a repository that is being archived.
 references:
-  - 'https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise'
+- https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 telemetry_validated: false
 required_fields:
-  - action
-  - actor
-  - repo
+- action
+- actor
+- repo
 query:
-  splunk: |
-    (sourcetype=github:audit OR sourcetype=github:cloud:audit OR sourcetype=httpevent) action=repository_vulnerability_alerts.disable
+  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit OR sourcetype=httpevent) action=repository_vulnerability_alerts.disable
+
     | fillnull
-    | stats count min(_time) as firstTime max(_time) as lastTime values(user_agent) as user_agent by actor, actor_id, org, repo
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(user_agent) as user_agent by actor,
+    actor_id, org, repo
+
+    '
+tags:
+- attack-v19-remap

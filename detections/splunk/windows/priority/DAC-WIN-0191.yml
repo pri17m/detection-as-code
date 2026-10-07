@@ -1,6 +1,7 @@
 id: DAC-WIN-0191
 title: LogonType 10 concurrent many hosts for one user
-description: 4624 Type10 many hosts one Tier-0 user
+description: 'Behavior: LogonType 10 concurrent many hosts for one user. Anchor is process+flag or event
+  id+field after classic/XML coalesce. Not telemetry_validated. 4624 Type10 many hosts one Tier-0 user'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -16,7 +17,8 @@ mitre:
   - T1078.002
 severity: medium
 false_positives:
-- Jump box admin
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1021/001/
 - https://attack.mitre.org/techniques/T1078/002/
@@ -28,9 +30,25 @@ required_fields:
 - IpAddress
 - WorkstationName
 query:
-  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=4624 LogonType=10
+
+    | stats dc(host) AS hosts values(host) AS dests by Account
+
+    | where hosts>=3
+
+    '
 tags:
 - phase1
 - windows

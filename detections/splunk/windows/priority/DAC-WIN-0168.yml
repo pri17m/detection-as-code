@@ -1,6 +1,7 @@
 id: DAC-WIN-0168
 title: UAC flag change disabling Kerberos preauth
-description: 4738/5136 userAccountControl preauth bit
+description: 'Behavior: UAC flag change disabling Kerberos preauth. Anchor is process+flag or event id+field
+  after classic/XML coalesce. Not telemetry_validated. 4738/5136 userAccountControl preauth bit'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -16,7 +17,8 @@ mitre:
   - T1098
 severity: high
 false_positives:
-- Legacy remediation
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1558/004/
 - https://attack.mitre.org/techniques/T1098/
@@ -34,9 +36,25 @@ required_fields:
 - AttributeValue
 - OperationType
 query:
-  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Process=coalesce(NewProcessName, Process_Name)
+
+    | eval Cmd=coalesce(CommandLine, Process_Command_Line)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search EventCode=4738
+
+    | search UserAccountControl="*DONT_REQUIRE_PREAUTH*" OR OldUacValue!=""
+
+    | table _time host Account SubjectUserName UserAccountControl
+
+    '
 tags:
 - phase1
 - windows

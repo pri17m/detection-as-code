@@ -1,12 +1,15 @@
 id: DAC-WIN-0175
 title: Process tampering indicators (Sysmon 25 if present)
-description: Sysmon 25 ProcessTampering
+description: 'Behavior: Process tampering indicators (Sysmon 25 if present). Anchor is process+flag or
+  event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 25 ProcessTampering'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - defense-evasion
@@ -14,7 +17,8 @@ mitre:
   - T1055.012
 severity: high
 false_positives:
-- Some .NET runtime
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1055/012/
 telemetry_validated: false
@@ -25,9 +29,24 @@ required_fields:
 - User
 - ProcessGuid
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=25
+
+    | table _time host User Image ProcessTamperingType
+
+    '
 tags:
 - phase1
 - windows

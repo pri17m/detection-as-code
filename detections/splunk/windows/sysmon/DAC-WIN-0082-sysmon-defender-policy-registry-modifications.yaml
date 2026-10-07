@@ -1,7 +1,7 @@
 id: DAC-WIN-0082
 title: 'Sysmon: Defender policy registry modifications'
-description: Detects registry modifications under Windows Defender policy keys that
-  can indicate attempts to impair defenses.
+description: Detects registry modifications under Windows Defender policy keys that can indicate attempts
+  to impair defenses.
 author: DaC
 status: experimental
 platforms:
@@ -10,14 +10,15 @@ sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.001
+  - T1685
 severity: high
 false_positives:
 - Legitimate policy enforcement (GPO/Intune); tune by management hosts.
 references:
 - https://learn.microsoft.com/sysinternals/downloads/sysmon
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 telemetry_validated: false
 required_fields:
 - EventCode
@@ -31,9 +32,11 @@ query:
 
     | eval img=lower(coalesce(Image))
 
-    | where match(obj,"\\\\software\\\\policies\\\\microsoft\\\\windows defender\\\\")
-    OR match(obj,"\\\\software\\\\microsoft\\\\windows defender\\\\")
+    | where match(obj,"\\\\software\\\\policies\\\\microsoft\\\\windows defender\\\\") OR match(obj,"\\\\software\\\\microsoft\\\\windows
+    defender\\\\")
 
     | stats count values(obj) as registry_paths values(img) as images by host, User
 
     '
+tags:
+- attack-v19-remap

@@ -1,33 +1,42 @@
 id: DAC-WIN-0011
 title: Scheduled task created with LOLBin/SYSTEM (4698 + task content)
-description: Detects scheduled task creation where the task content references common LOLBins or suspicious interpreters. Requires Security auditing for task creation events and TaskContent extraction.
+description: Detects scheduled task creation where the task content references common LOLBins or suspicious
+  interpreters. Requires Security auditing for task creation events and TaskContent extraction.
 author: Threat Detection Engineering
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_security
+- windows_security
+- WinEventLog:Security
+- XmlWinEventLog:Security
 mitre:
   tactics:
-    - persistence
-    - execution
+  - persistence
+  - execution
   techniques:
-    - T1053.005
+  - T1053.005
 severity: high
 false_positives:
-  - Legitimate admin automation and enterprise scheduled tasks (allowlist by TaskName/publisher).
+- Legitimate admin automation and enterprise scheduled tasks (allowlist by TaskName/publisher).
 references:
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4698
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4698
 telemetry_validated: false
 required_fields:
-  - TaskName
-  - SubjectUserName
-  - TaskContent
+- TaskName
+- SubjectUserName
+- TaskContent
 query:
-  splunk: |
-    `windows_security` EventCode=4698
+  splunk: '`windows_security` EventCode=4698
+
     | eval user=coalesce(SubjectUserName, Account_Name, user)
+
     | eval task=coalesce(TaskName, Task_Name, ObjectName)
+
     | eval content=lower(coalesce(TaskContent, Message))
+
     | where match(content,"powershell(\\.exe)?|cmd(\\.exe)?|rundll32(\\.exe)?|mshta(\\.exe)?|wscript(\\.exe)?|cscript(\\.exe)?|regsvr32(\\.exe)?|bitsadmin(\\.exe)?")
+
     | stats count values(task) as task_names values(content) as task_content_samples by host, user
+
+    '

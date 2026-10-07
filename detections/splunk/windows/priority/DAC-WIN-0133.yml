@@ -1,6 +1,7 @@
 id: DAC-WIN-0133
 title: WinRM host process spawning script interpreter
-description: Sysmon 1 Parent wsmprovhost to powershell/cmd
+description: 'Behavior: WinRM host process spawning script interpreter. Anchor is process+flag or event
+  id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1 Parent wsmprovhost to powershell/cmd'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -25,7 +26,8 @@ required_fields:
 - Hashes
 telemetry_validated: false
 false_positives:
-- Admin remoting
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1021/006/
 tags:
@@ -40,6 +42,18 @@ query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search EventCode=1 ParentImage IN ("*\\wsmprovhost.exe","*\\winrshost.exe") Image IN ("*\\cmd.exe","*\\powershell.exe","*\\whoami.exe")
+
+    | table _time host User ParentImage Image CommandLine
 
     '

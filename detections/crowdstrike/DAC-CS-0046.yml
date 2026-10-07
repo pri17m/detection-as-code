@@ -1,6 +1,7 @@
 author: Detection Engineer
 references:
 - https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 title: 'Falcon: AMSI or ETW bypass script patterns'
 description: amsiUtils/etw reflection tokens in PS
 severity: high
@@ -18,6 +19,7 @@ status: experimental
 tags:
 - wave-a
 - P0
+- attack-v19-remap
 query:
   crowdstrike: 'ImageFileName IN ["powershell.exe","pwsh.exe"] AND CommandLine CONTAINS_ANY ["amsiUtils","AmsiScanBuffer","etw","System.Management.Automation.Tracing"]
 
@@ -26,6 +28,6 @@ sourcetypes:
 - falcon:process
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.001
+  - T1685
