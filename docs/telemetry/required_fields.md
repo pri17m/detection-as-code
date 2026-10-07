@@ -45,6 +45,6 @@ Variants: classic Account_Name vs XML TargetUserName/SubjectUserName; CIM user/p
 8. Sysmon version/renderXml
 9. FP baseline
 10. data-gap if blind
-11. sample event
+11. sample event (`validation.sample_event` required if `telemetry_validated: true`)
 12. CI clean
 

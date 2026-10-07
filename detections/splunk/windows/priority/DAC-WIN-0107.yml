@@ -1,8 +1,8 @@
 id: DAC-WIN-0107
 title: Suspicious PowerShell (enc/IEX/remote)
-description: '4104 ScriptBlock + Sysmon 1 -enc/IEX | checklist: macros only; no index=;
-  EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary required
-  before telemetry_validated=true; FP baseline pending org allowlists'
+description: 'Detects suspicious PowerShell via 4104 ScriptBlock, Sysmon 1, or Security
+  4688 (classic+XML) with -enc/-EncodedCommand, IEX, download, or hidden-window patterns.
+  Image/NewProcessName are coalesced after the base search so XML 4688 is not dropped.'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -18,22 +18,20 @@ sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 - WinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Security
+- XmlWinEventLog:Security
 - sysmon
 - sysmon:*
 required_fields:
 - EventCode
 - ScriptBlockText
-- ScriptBlockId
-- Path
-- MessageNumber
-- MessageTotal
 - SubjectUserName
 - Image
+- NewProcessName
 - CommandLine
 - ParentImage
+- ParentProcessName
 - User
-- ProcessGuid
-- Hashes
 telemetry_validated: false
 false_positives:
 - Admin encoded automation
@@ -49,10 +47,8 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
-    OR sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational)
-    (`windows_powershell_operational` EventCode=4104) OR (`windows_sysmon` EventCode=1
-    (Image="*\\powershell.exe" OR Image="*\\pwsh.exe"))
+  splunk: '((`windows_powershell_operational` EventCode=4104) OR (`windows_sysmon` EventCode=1)
+    OR (`windows_security` EventCode=4688))
 
     | eval ScriptBlockText=coalesce(ScriptBlockText, Message)
 
@@ -60,14 +56,17 @@ query:
 
     | eval Image=coalesce(Image, NewProcessName, process)
 
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName, Creator_Process_Name)
+
     | eval User=coalesce(User, UserName, SubjectUserName, user)
 
-    | search EventCode=4104 (ScriptBlockText="*IEX*" OR ScriptBlockText="*Invoke-Expression*"
+    | search (EventCode=4104 AND (ScriptBlockText="*IEX*" OR ScriptBlockText="*Invoke-Expression*"
     OR ScriptBlockText="*DownloadString*" OR ScriptBlockText="*FromBase64String*"
-    OR ScriptBlockText="*Net.WebClient*") OR (EventCode=1 (CommandLine="*-enc*" OR
+    OR ScriptBlockText="*Net.WebClient*")) OR ((EventCode=1 OR EventCode=4688)
+    AND (Image="*powershell.exe" OR Image="*pwsh.exe") AND (CommandLine="*-enc*" OR
     CommandLine="*-EncodedCommand*" OR CommandLine="*IEX*" OR CommandLine="*DownloadString*"
     OR CommandLine="*-w hidden*" OR CommandLine="*-WindowStyle Hidden*"))
 
-    | table _time host EventCode Image CommandLine User ScriptBlockText Path
+    | table _time host EventCode Image ParentImage CommandLine User ScriptBlockText Path
 
     '

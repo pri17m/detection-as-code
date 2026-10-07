@@ -128,7 +128,7 @@ Before merging a Windows Splunk detection:
 8. **Sysmon version:** Fields like `OriginalFileName`, `ParentCommandLine` need sufficiently new Sysmon + XML render (`renderXml=true`).  
 9. **Baseline false positives:** Spot-check `| stats count by <key fields>` for noisy defaults (e.g. 4624 LogonType 3).  
 10. **MITRE + data gap:** If required field missing in telemetry, file a **data gap** (don’t ship a blind rule).  
-11. **Unit sample:** Attach or cite at least one anonymized raw event (or bot SV fixture) proving field names.  
+11. **Unit sample:** When `telemetry_validated` is `true`, embed one anonymized Splunk `_raw` event in `validation.sample_event` (schema requires this). Redact hostname, usernames, SIDs, GUIDs, and user-profile paths. Keep technique tokens (for example `-EncodedCommand`, `certutil -encode`).  
 12. **CI dry-run:** Local/CI sourcetype linter clean; macro names resolve.
 
 ---
