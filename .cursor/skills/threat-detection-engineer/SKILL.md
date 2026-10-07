@@ -52,3 +52,6 @@ Use the other skills in `.cursor/skills/` in this order. Do not skip the reality
 5. On a pass, `sample-redaction` cleans the event, then set the flag and `validation`.
 6. `detection-review` checks the diff. `detection-git` commits only when asked.
 
+After a rule is loaded in Splunk, live hits are not validated by this skill. `soc-l1-triage` closes lab fixtures and stubs. Only `escalate` goes to `soc-l2-investigate`. L2 never contains the host and never flips `telemetry_validated`.
+
+
