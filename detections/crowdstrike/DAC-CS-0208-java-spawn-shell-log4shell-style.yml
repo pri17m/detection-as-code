@@ -37,6 +37,7 @@ required_fields:
 - RemoteAddressIP4
 - RemotePort
 tags:
+- reviewed-batch1
 - wave1
 - log4shell
 - tp-quality
@@ -46,7 +47,7 @@ query:
     | case {
         in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
           | ParentBaseFileName=/^(java|javaw|java\.exe|javaw\.exe)$/i
-          | ImageFileName=/\\(cmd|powershell|pwsh|bash|sh|curl|wget|certutil|mshta)\.exe$/i OR ImageFileName=/\/(bash|sh|curl|wget)$/i
+          | ImageFileName=/\\(cmd|powershell|pwsh|bash|sh|curl|wget|certutil|mshta|wscript|cscript|regsvr32|bitsadmin)\.exe$/i OR ImageFileName=/\/(bash|sh|curl|wget)$/i
           | falconPID := TargetProcessId
           | Stage := "shell" ;
         #event_simpleName=NetworkConnectIP4

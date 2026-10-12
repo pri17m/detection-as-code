@@ -1,0 +1,7 @@
+{
+  "label": "near-miss",
+  "ParentBaseFileName": "java.exe",
+  "ImageFileName": "/usr/bin/python3",
+  "RemotePort": 1389,
+  "expect_alert": false
+}
