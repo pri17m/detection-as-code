@@ -58,3 +58,4 @@ references:
 - https://attack.mitre.org/techniques/T1490/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/ransomware_precursors.yml
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/shadow_mcp_server_activity_via_common_runtime_interpreters.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"

@@ -34,6 +34,7 @@ references:
 - https://attack.mitre.org/techniques/T1036/
 - https://attack.mitre.org/techniques/T1574/002/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Dll-Side_Loading_Detection_Query.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

@@ -46,6 +46,7 @@ references:
 - https://attack.mitre.org/techniques/T1571/
 - https://attack.mitre.org/techniques/T1046/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Bottom_10_Percent_of_NetworkConnct_Port_Values.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

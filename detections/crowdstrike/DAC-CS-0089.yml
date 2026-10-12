@@ -29,6 +29,7 @@ references:
 - https://attack.mitre.org/techniques/T1490/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/the_gentlemen_raas_custom_backdoors_and_evolving_tactics.yml
 - https://attack.mitre.org/resources/updates/updates-april-2026/
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "#event_simpleName=ProcessRollup2\n| case {\n    ImageFileName=/\\\\netsh\\.exe$/i AND\
     \ CommandLine=/trace start capture=yes/i | HuntLogic:=\"Netsh_Trace_Packet_Capture\";\n    CommandLine=/SharpADWS/i\

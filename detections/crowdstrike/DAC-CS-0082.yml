@@ -28,6 +28,7 @@ references:
 - https://attack.mitre.org/techniques/T1033/
 - https://attack.mitre.org/techniques/T1087/001/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/overnight-post-rdp-activity.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| ImageFileName=/\\\\(cmd|powershell|pwsh|wscript|cscript|mshta|rundll32|regsvr32|wmic|certutil|bitsadmin|schtasks|sc|net|net1|nltest|whoami|quser|systeminfo|hostname|tasklist|netstat|ipconfig|curl|wget|rclone|psexec|paexec|winrs)\\\
     .exe$/i\n| case {\n    CommandLine=/\\b(whoami|quser|query\\s+user|net1?(\\.exe)?\"?\\s+(users?|group|localgroup|session)|nltest|ipconfig\\\

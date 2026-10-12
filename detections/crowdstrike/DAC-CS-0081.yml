@@ -21,6 +21,7 @@ mitre:
 references:
 - https://attack.mitre.org/techniques/T1059/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/mongodb_processes_on_windows___linux_hosts__cve_2025_14847_.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "#event_simpleName=ProcessRollup2\n| (\n    (event_platform=Win AND ImageFileName=/mongod\\\
     .exe|mongos\\.exe/i)\n    OR (event_platform=Lin AND ImageFileName=/(\\/|^)(mongod|mongos)(\\s|$)/i)\n\

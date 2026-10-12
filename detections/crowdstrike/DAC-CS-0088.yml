@@ -24,6 +24,7 @@ references:
 - https://attack.mitre.org/techniques/T1595/
 - https://attack.mitre.org/techniques/T1046/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/systems_initiating_connections_to_a_high_number_of_ports.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "(#event_simpleName=NetworkConnectIP4 OR #event_simpleName=ProcessRollup2)\n| falconPID:=TargetProcessId\
     \ | falconPID:=ContextProcessId\n| selfJoinFilter(field=[aid, falconPID], where=[{#event_simpleName=NetworkConnectIP4\

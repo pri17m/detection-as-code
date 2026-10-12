@@ -42,6 +42,7 @@ references:
 - https://attack.mitre.org/techniques/T1003/001/
 - https://attack.mitre.org/techniques/T1003/002/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Credential_Dumping_Detection.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

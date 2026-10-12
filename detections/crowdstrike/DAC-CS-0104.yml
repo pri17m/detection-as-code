@@ -36,6 +36,7 @@ references:
 - https://attack.mitre.org/techniques/T1071/004/
 - https://attack.mitre.org/techniques/T1568/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/DoH_traffic.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

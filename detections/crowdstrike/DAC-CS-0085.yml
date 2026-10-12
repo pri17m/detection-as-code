@@ -25,6 +25,7 @@ references:
 - https://attack.mitre.org/techniques/T1572/
 - https://attack.mitre.org/techniques/T1021/004/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/remote_port_forwarding_via_plink_unauthorized_rdp_tunneling_detection.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: '#event_simpleName=ProcessRollup2
 
