@@ -1,6 +1,6 @@
 id: DAC-CS-0234
 title: Large volume of files written to USB removable media from one host
-description: Sums Size and counts files from *FileWritten events on USB media (Windows DiskParentDeviceInstanceId=USB*, macOS IsOnRemovableDisk=1) per host over a 1-hour window and alerts above 500 MB or 200 files. Only typed *FileWritten events carry these fields, so totals are a lower bound (untyped files such as .txt/.csv may be missed). Thresholds are tuning knobs; the vendor example uses 5 MB / 10 files. Spotlight index files are excluded.
+description: Counts distinct TargetFileName values and sums Size once per distinct file (largest Size seen for that file) from *FileWritten events on USB media (Windows DiskParentDeviceInstanceId=USB*, macOS IsOnRemovableDisk=1) per host over a 1-hour window and alerts above 500 MB or 200 files. Only typed *FileWritten events carry these fields, so totals are a lower bound (untyped files such as .txt/.csv may be missed). Thresholds are tuning knobs; the vendor example uses 5 MB / 10 files. Spotlight index files are excluded.
 author: DaC
 status: experimental
 platforms:
@@ -38,5 +38,6 @@ query:
     #event_simpleName=/FileWritten$/
     | (event_platform=Win DiskParentDeviceInstanceId="USB*") OR (event_platform=Mac IsOnRemovableDisk=1)
     | TargetFileName!="*.Spotlight-V100*"
-    | groupBy([aid, ComputerName], function=[sum(Size, as=TotalBytes), count(TargetFileName, as=TotalFiles), collect([TargetFileName], limit=50)])
+    | groupBy([aid, ComputerName, TargetFileName], function=[max(Size, as=FileBytes)])
+    | groupBy([aid, ComputerName], function=[sum(FileBytes, as=TotalBytes), count(TargetFileName, distinct=true, as=TotalFiles), collect([TargetFileName], limit=50)])
     | TotalBytes > 524288000 OR TotalFiles > 200

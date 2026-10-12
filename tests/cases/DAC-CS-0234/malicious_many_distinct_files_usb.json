@@ -1,0 +1,36 @@
+{
+  "label": "malicious",
+  "source": "Rule thresholds (>200 distinct files)",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "PdfFileWritten",
+      "event_platform": "Win",
+      "aid": "h1",
+      "DiskParentDeviceInstanceId": "USBSTOR\\DISK",
+      "TargetFileName": "E:\\docs\\f0.pdf",
+      "Size": 1000
+    },
+    {
+      "event_simpleName": "PdfFileWritten",
+      "event_platform": "Win",
+      "aid": "h1",
+      "DiskParentDeviceInstanceId": "USBSTOR\\DISK",
+      "TargetFileName": "E:\\docs\\f1.pdf",
+      "Size": 1000
+    },
+    {
+      "event_simpleName": "PdfFileWritten",
+      "event_platform": "Win",
+      "aid": "h1",
+      "DiskParentDeviceInstanceId": "USBSTOR\\DISK",
+      "TargetFileName": "E:\\docs\\f2.pdf",
+      "Size": 1000
+    },
+    {
+      "note": "repeat pattern for 201 distinct TargetFileName values"
+    }
+  ],
+  "expect_alert": true,
+  "result": "not run"
+}

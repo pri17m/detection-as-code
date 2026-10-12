@@ -1,0 +1,18 @@
+{
+  "label": "near_miss",
+  "source": "One file rewritten 300 times: 1 distinct file, size counted once (ponytail finding 7)",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "PdfFileWritten",
+      "event_platform": "Win",
+      "aid": "h1",
+      "DiskParentDeviceInstanceId": "USBSTOR\\DISK",
+      "TargetFileName": "E:\\docs\\a.pdf",
+      "Size": 2000000,
+      "repeat": 300
+    }
+  ],
+  "expect_alert": false,
+  "result": "not run"
+}
