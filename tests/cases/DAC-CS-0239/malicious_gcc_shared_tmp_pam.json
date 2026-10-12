@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "source": "Atomic Red Team T1556.003 Malicious PAM module (gcc -shared -fPIC -o /tmp/pam_evil.so)",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Lin",
+  "ImageFileName": "/usr/bin/gcc",
+  "ParentBaseFileName": "bash",
+  "CommandLine": "gcc -shared -fPIC -o /tmp/pam_evil.so /tmp/pam_evil.c",
+  "expect_alert": true,
+  "result": "not run"
+}

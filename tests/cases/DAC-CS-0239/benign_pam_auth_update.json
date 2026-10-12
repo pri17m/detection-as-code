@@ -1,0 +1,11 @@
+{
+  "label": "benign",
+  "source": "Elastic FP list — pam-auth-update",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Lin",
+  "ImageFileName": "/usr/sbin/pam-auth-update",
+  "ParentBaseFileName": "pam-auth-update",
+  "CommandLine": "pam-auth-update --package",
+  "expect_alert": false,
+  "result": "not run"
+}
