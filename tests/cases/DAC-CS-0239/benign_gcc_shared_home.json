@@ -1,0 +1,11 @@
+{
+  "label": "benign",
+  "source": "Developer shared-object build outside PAM paths",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Lin",
+  "ImageFileName": "/usr/bin/gcc",
+  "ParentBaseFileName": "bash",
+  "CommandLine": "gcc -shared -fPIC -o /home/user/mylib.so /home/user/mylib.c",
+  "expect_alert": false,
+  "result": "not run"
+}

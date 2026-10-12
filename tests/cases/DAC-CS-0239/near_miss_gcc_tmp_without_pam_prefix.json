@@ -1,0 +1,11 @@
+{
+  "label": "near-miss",
+  "source": "gcc -shared to /tmp without pam_ prefix and without PAM path — should not match Branch B",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Lin",
+  "ImageFileName": "/usr/bin/gcc",
+  "ParentBaseFileName": "bash",
+  "CommandLine": "gcc -shared -fPIC -o /tmp/foo.so /tmp/foo.c",
+  "expect_alert": false,
+  "result": "not run"
+}

@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "source": "ATT&CK T1556.003 / Skidmap procedure — .so under PAM module directory",
+  "event_simpleName": "ELFFileWritten",
+  "event_platform": "Lin",
+  "TargetFileName": "/lib64/security/pam_unix.so",
+  "FileName": "pam_unix.so",
+  "ParentBaseFileName": "bash",
+  "expect_alert": true,
+  "result": "not run"
+}

@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "source": "zephrax/linux-pam-backdoor README (cp pam_unix.so /usr/lib/security/)",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Lin",
+  "ImageFileName": "/usr/bin/cp",
+  "ParentBaseFileName": "bash",
+  "CommandLine": "cp pam_unix.so /usr/lib/security/",
+  "expect_alert": true,
+  "result": "not run"
+}

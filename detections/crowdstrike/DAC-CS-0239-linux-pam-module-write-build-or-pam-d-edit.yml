@@ -1,0 +1,78 @@
+id: DAC-CS-0239
+title: "Falcon Linux: PAM module written, built, or pam.d config edited"
+description: >-
+  Detects (A) ELF .so writes under documented PAM module directories,
+  (B) gcc/cc/clang/ld -shared builds targeting those directories or Atomic-style
+  /tmp/pam_*.so|/dev/shm/*.so, (C) GTFOBins transfer/write binaries (excluding
+  wget/curl) whose CommandLine references a PAM path or /etc/pam.d/, and
+  (D) sed/tee/awk edits under /etc/pam.d/. Clean-room draft for T1556.003.
+  Package-manager and PAM-config-tool parents are allowlisted from Elastic's
+  published false-positive list. telemetry_validated false; not run in tenant.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-impairment
+  - persistence
+  - credential-access
+  techniques:
+  - T1556.003
+severity: high
+false_positives:
+- Package managers and config management (dpkg/rpm/yum/dnf/apt/pacman/apk/snapd/puppet/chef) refreshing PAM — allowlisted by ParentBaseFileName.
+- pam-auth-update, pam-config, authconfig during legitimate auth stack changes — allowlisted.
+- Build hosts compiling shared objects named /tmp/pam_*.so — tighten Branch B or allowlist by aid.
+- Admin automation using python/perl/scp with PAM paths in args — tune by aid after measuring noise (not measured).
+references:
+- https://attack.mitre.org/techniques/T1556/003/
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1556.003/T1556.003.yaml
+- https://github.com/elastic/detection-rules/blob/main/rules/linux/persistence_pluggable_authentication_module_creation.toml
+- https://github.com/zephrax/linux-pam-backdoor
+- https://www.trendmicro.com/en_us/research/19/i/skidmap-linux-malware-uses-rootkit-capabilities-to-hide-cryptocurrency-mining-payload.html
+- https://manpages.debian.org/bookworm/libpam-runtime/pam.conf.5.en.html
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Misc/crwd_live_rmm/RMMHunting.yaml
+- https://gtfobins.github.io/
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- ParentBaseFileName
+- CommandLine
+- TargetFileName
+- FileName
+tags:
+- linux
+- pam
+- t1556.003
+- needs-review
+- clean-room
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ELFFileWritten"])
+    | event_platform=Lin
+    | ParentBaseFileName!=/^(dpkg|dpkg-divert|rpm|yum|yum-cron|dnf|dnf5|dnf-automatic|microdnf|apt|apt-get|aptitude|pacman|apk|snapd|packagekitd|pam-auth-update|pam-config|authconfig|puppet|chef-client|podman|buildah|dockerd|crio|systemd)$/i
+    | case {
+        #event_simpleName=ELFFileWritten
+          TargetFileName=/^\/(lib|lib64|usr\/lib|usr\/lib64|lib\/x86_64-linux-gnu|usr\/lib\/x86_64-linux-gnu)\/security\/[^\/]+\.so$/i;
+        #event_simpleName=ProcessRollup2
+          ImageFileName=/\/(gcc|cc|clang|clang\+\+|g\+\+|ld|ld\.bfd|ld\.gold)$/i
+          CommandLine=/\s-shared\b/i
+          CommandLine=/(\/(lib|lib64|usr\/lib|usr\/lib64|lib\/x86_64-linux-gnu|usr\/lib\/x86_64-linux-gnu)\/security\/|\/tmp\/pam_[^ ]*\.so|\/dev\/shm\/[^ ]*\.so)/i;
+        #event_simpleName=ProcessRollup2
+          ImageFileName=/\/(scp|sftp|openssl|socat|nc|ncat|tftp|ftp|python3?|perl|ruby|php|dd|cp|tee|xxd|busybox)$/i
+          CommandLine=/(\/(lib|lib64|usr\/lib|usr\/lib64|lib\/x86_64-linux-gnu|usr\/lib\/x86_64-linux-gnu)\/security\/|\/etc\/pam\.d\/)/i;
+        #event_simpleName=ProcessRollup2
+          ImageFileName=/\/(sed|tee|awk)$/i
+          CommandLine=/\/etc\/pam\.d\//i;
+      }
+    | groupBy(
+        [aid, ComputerName, #event_simpleName, ImageFileName, ParentBaseFileName, CommandLine, TargetFileName, FileName],
+        function=count()
+      )

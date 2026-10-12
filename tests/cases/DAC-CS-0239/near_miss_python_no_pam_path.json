@@ -1,0 +1,11 @@
+{
+  "label": "near-miss",
+  "source": "python3 without PAM path in CommandLine — Branch C must not fire",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Lin",
+  "ImageFileName": "/usr/bin/python3",
+  "ParentBaseFileName": "bash",
+  "CommandLine": "python3 /opt/tools/helper.py",
+  "expect_alert": false,
+  "result": "not run"
+}
