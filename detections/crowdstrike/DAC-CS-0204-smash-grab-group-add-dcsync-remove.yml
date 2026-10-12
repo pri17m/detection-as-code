@@ -14,6 +14,7 @@ mitre:
   - privilege-escalation
   techniques:
   - T1098
+  - T1098.007
   - T1003.006
 severity: critical
 false_positives:
@@ -38,6 +39,7 @@ required_fields:
 - CommandLine
 - TargetProcessId
 tags:
+- reviewed-batch1
 - wave1
 - ad
 - dcsync
@@ -54,7 +56,7 @@ query:
           | Stage := "group-add"
           | StageTime := @timestamp ;
         #event_simpleName=ProcessRollup2
-          | (CommandLine=/(secretsdump|lsadump::dcsync|ntdsutil.*ifm|--just-dc)/i OR ImageFileName=/\\(secretsdump|mimikatz|ntdsutil)\.exe$/i)
+          | (CommandLine=/(secretsdump|lsadump::dcsync|ntdsutil.*ifm|--just-dc|Get-ADReplAccount)/i OR ImageFileName=/\\(secretsdump|mimikatz|ntdsutil)\.exe$/i)
           | Stage := "dcsync-tool"
           | StageTime := @timestamp ;
       }

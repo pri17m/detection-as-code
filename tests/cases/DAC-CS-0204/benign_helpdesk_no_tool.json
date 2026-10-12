@@ -1,0 +1,6 @@
+{
+  "label": "benign",
+  "source": "JIT admin add without DCSync tooling",
+  "GroupRidDec": 544,
+  "expect_alert": false
+}
