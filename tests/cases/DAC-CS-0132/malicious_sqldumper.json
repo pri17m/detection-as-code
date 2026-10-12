@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "source": "https://lolbas-project.github.io/lolbas/OtherMSBinaries/Sqldumper/",
+  "CommandLine": "sqldumper.exe 540 0 0x01100:40",
+  "ImageFileName": "C:\\Program Files\\Microsoft SQL Server\\150\\Shared\\sqldumper.exe",
+  "expect_alert": true
+}

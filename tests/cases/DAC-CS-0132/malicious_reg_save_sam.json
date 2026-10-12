@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "source": "Atomic T1003.002 test 5c2571d0",
+  "CommandLine": "reg.exe save HKLM\\sam C:\\Temp\\sam",
+  "ImageFileName": "C:\\Windows\\System32\\reg.exe",
+  "expect_alert": true
+}

@@ -17,7 +17,7 @@ id: DAC-CS-0132
 query:
   crowdstrike: '#event_simpleName=ProcessRollup2
 
-    | (CommandLine=/(mimikatz|sekurlsa|procdump.*lsass|lsass\.dmp|comsvcs\.dll.*MiniDump)/i OR ImageFileName=/\\(mimikatz|procdump|pwdump|nanodump)\.exe$/i)
+    | (CommandLine=/(mimikatz|sekurlsa|procdump.*lsass|lsass\.dmp|comsvcs\.dll.*MiniDump|rdrleakdiag.*(fullmemdmp|\/memdmp)|createdump.*lsass|sqldumper.*\s0x01100:40|\s-m[amp]\s+lsass|outflank-dumpert|reg(\.exe)?\s+(save|export)\s+(hklm|hkey_local_machine)\\(sam|security)\b)/i OR ImageFileName=/\\(mimikatz|procdump|pwdump|nanodump(\.x64)?)\.exe$/i)
 
     | ParentBaseFileName!=/^(MsMpEng|CSFalconService)$/i
 
@@ -44,6 +44,7 @@ references:
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Credential_Dumping_Detection.yml
 - "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
+- reviewed-batch1
 - cs-query-hub
 - safe-esn-wave
 - tp-quality-v2
