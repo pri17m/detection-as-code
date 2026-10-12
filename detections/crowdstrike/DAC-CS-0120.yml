@@ -4,34 +4,39 @@ author: DaC
 sourcetypes:
 - falcon:process
 telemetry_validated: false
-description: 'ScriptControlScanV2 ScriptContent matching common AMSI bypass tokens (amsiInitFailed, amsiContext,
-
-  AmsiUtils reflection).
-
-  '
+description: 'Detects AMSI bypass techniques in Falcon ScriptControl script content (#event_simpleName=/^ScriptControl/) and ProcessRollup2 command lines: (1) AmsiUtils/amsiInitFailed reflection (Atomic Red Team T1685 test 16); (2) AmsiScanBuffer in-memory patching via GetProcAddress/VirtualProtect against amsi.dll (ART T1685 test 78; AmsiScanBuffer API per Microsoft Learn); (3) removal of the AMSI provider registry key HKLM\SOFTWARE\Microsoft\AMSI\Providers (ART T1685 test 17); (4) AMSI COM server hijack of CLSID {fdb00e52-a214-4aa1-8fba-4357bb0072ec} under HKCU\Software\Classes (ART T1685 test 48); (5) setting AmsiEnable=0 under HKCU\Software\Microsoft\Windows Script\Settings (ART T1685 test 56). Defender exclusions (Add-MpPreference) are out of scope; see DAC-CS-0224. Unconfirmed: whether every /^ScriptControl/ subtype (ScanInfo, DetectInfo, Blocked) carries ScriptContent; public vendor content shows it on ScriptControlScanInfo.'
 false_positives:
 - Legitimate admin, software deployment, or IT tooling matching these patterns — baseline before promote.
 - Tune allowlists for known management / RMM / build accounts and approved paths after tenant baselining.
 id: DAC-CS-0120
 query:
-  crowdstrike: '#event_simpleName=ScriptControlScanV2
-
-    | ScriptContent=/(amsiInitFailed|AmsiUtils|amsiContext|System\.Management\.Automation\.AmsiUtils|amsiSession)/i
-
-    | groupBy([aid, ComputerName], function=[count(), collect([ScriptContent], limit=3)])
-
-    '
+  crowdstrike: |
+    (#event_simpleName=/^ScriptControl/ event_platform=Win) OR (#event_simpleName=ProcessRollup2 event_platform=Win)
+    | concat([ScriptContent, CommandLine], as=Evidence)
+    | case {
+        Evidence=/AmsiUtils/i Evidence=/amsiInitFailed/i | Pattern:="amsiInitFailed reflection";
+        Evidence=/AmsiScanBuffer/i Evidence=/(GetProcAddress|VirtualProtect)/i | Pattern:="AmsiScanBuffer patch";
+        Evidence=/\\Microsoft\\AMSI\\Providers/i Evidence=/(Remove-Item|reg(\.exe)?["']?\s+delete)/i | Pattern:="AMSI provider key removal";
+        Evidence=/\{?fdb00e52-a214-4aa1-8fba-4357bb0072ec\}?/i Evidence=/InProcServer32/i | Pattern:="AMSI COM server hijack";
+        Evidence=/Windows Script\\Settings/i Evidence=/AmsiEnable/i | Pattern:="AmsiEnable disabled";
+      }
+    | groupBy([aid, ComputerName, Pattern], function=[count(), collect([#event_simpleName, Evidence], limit=5)])
 mitre:
   tactics:
   - defense-impairment
   techniques:
   - T1685
   - T1059.001
-title: 'Falcon: ScriptControlScanV2 AMSI Bypass Patterns'
+title: 'Falcon: AMSI bypass patterns in ScriptControl content or command lines'
 status: experimental
 references:
-- https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/techniques/T1685/
 - https://attack.mitre.org/techniques/T1059/001/
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1685/T1685.yaml
+- https://learn.microsoft.com/en-us/windows/win32/api/amsi/nf-amsi-amsiscanbuffer
+- https://learn.microsoft.com/en-us/windows/win32/amsi/antimalware-scan-interface-portal
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Script%20Content%20Entropy.md
+- https://library.humio.com/data-analysis/functions-concat.html
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Suspicious_PowerShell_Execution.yml
 - https://attack.mitre.org/resources/updates/updates-april-2026/
 - "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
@@ -40,11 +45,14 @@ tags:
 - safe-esn-wave
 - tp-quality-v2
 - src:Suspicious_PowerShell_Execution.yml
-- esn:ScriptControlScanV2
 - attack-v19-remap
+- esn:ScriptControl
+- needs-review
 severity: high
 required_fields:
 - '#event_simpleName'
+- event_platform
+- aid
 - ComputerName
 - ScriptContent
-- aid
+- CommandLine
