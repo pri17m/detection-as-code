@@ -1,0 +1,8 @@
+{
+  "label": "benign",
+  "source": "installer shell-out without LDAP/RMI ports",
+  "ParentBaseFileName": "java.exe",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\cmd.exe",
+  "expect_alert": false,
+  "note": "selfJoinFilter requires net stage"
+}

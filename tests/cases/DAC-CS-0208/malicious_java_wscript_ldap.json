@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "ParentBaseFileName": "java.exe",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\wscript.exe",
+  "RemotePort": 1389,
+  "expect_alert": true
+}

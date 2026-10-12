@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "ParentBaseFileName": "javaw.exe",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\bitsadmin.exe",
+  "RemotePort": 1099,
+  "expect_alert": true
+}
