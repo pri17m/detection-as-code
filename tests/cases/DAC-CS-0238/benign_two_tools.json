@@ -1,0 +1,25 @@
+{
+  "label": "benign",
+  "source": "Two discovery tools, below threshold",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ParentProcessId": "10",
+      "FileName": "whoami.exe"
+    },
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ParentProcessId": "10",
+      "FileName": "systeminfo.exe"
+    }
+  ],
+  "expect_alert": false,
+  "result": "not run"
+}
