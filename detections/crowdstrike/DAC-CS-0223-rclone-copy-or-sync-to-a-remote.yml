@@ -1,0 +1,44 @@
+id: DAC-CS-0223
+title: rclone copy or sync to a remote
+description: >-
+  Alerts when rclone.exe copies, syncs, cats, or moves data to a remote. Attackers use it to
+  exfiltrate files to cloud storage after they have collected them.
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: high
+mitre:
+  tactics:
+  - exfiltration
+  techniques:
+  - T1567.002
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "Approved rclone backup jobs."
+references:
+- https://rclone.org/commands/rclone_copy/
+- https://attack.mitre.org/techniques/T1567/002/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- parity:DAC-WIN-0345
+- parity:DAC-MDE-0078
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ImageFileName=/\\rclone\.exe$/i
+    | CommandLine=/(^|\s)(copy|sync|rcat|move)(\s|$)/i
+    | CommandLine=/(:|--config\b|mega|webdav)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

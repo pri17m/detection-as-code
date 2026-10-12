@@ -6,17 +6,17 @@ Debarshi Ghosh’s public detection-engineering portfolio: a multi-platform **De
 
 All counts below are computed from `detections/**` plus `content/mitre/coverage.json` on the current `main` tip.
 
-- **Total detections**: 806
-- **Rules per platform**: Splunk 602 • CrowdStrike 148 • Defender 56
-- **Splunk pack breakdown**: Windows 330 • Cloud 181 • GitHub 54 • VMware ESXi 37
-- **ATT&CK coverage**: 202 unique techniques • tactics normalized from `mitre.tactics` (ATT&CK v19 remap: revoked T1562/T1070.001 folded into T1685/T1686)
-- **ATT&CK mapping completeness**: 806/806 detections include `mitre.techniques` (100%)
+- **Total detections**: 862
+- **Rules per platform**: Splunk 631 • CrowdStrike 160 • Defender 71
+- **Splunk pack breakdown**: Windows 344 • Cloud 181 • GitHub 54 • VMware ESXi 37 • Claude compliance 15
+- **ATT&CK coverage**: 208 unique techniques • tactics normalized from `mitre.tactics` (ATT&CK v19 remap: revoked T1562/T1070.001 folded into T1685/T1686)
+- **ATT&CK mapping completeness**: 862/862 detections include `mitre.techniques` (100%)
 
 | Platform | Rules | Query format |
 | --- | ---: | --- |
-| Splunk | 602 | SPL (`query.splunk`) |
-| CrowdStrike Falcon | 148 | CQL / Falcon IOA-style patterns (`query.crowdstrike`) |
-| Microsoft Defender for Endpoint | 56 | KQL Advanced Hunting (`query.defender`) |
+| Splunk | 631 | SPL (`query.splunk`) |
+| CrowdStrike Falcon | 160 | CQL / Falcon IOA-style patterns (`query.crowdstrike`) |
+| Microsoft Defender for Endpoint | 71 | KQL Advanced Hunting (`query.defender`) |
 | Sigma sources | 0 Sigma YAMLs under `detections/` | 10 detections carry `sigma.path` metadata (Sigma→Splunk conversions) |
 
 **Tactics covered (normalized)**: `collection`, `command-and-control`, `credential-access`, `defense-evasion`, `defense-impairment`, `discovery`, `execution`, `exfiltration`, `impact`, `initial-access`, `lateral-movement`, `persistence`, `privilege-escalation`, `resource-development`, `stealth`.
@@ -27,12 +27,12 @@ The `sourcetypes` field is a portability contract. For Splunk Windows/ESXi sourc
 
 Top telemetry families referenced across the corpus:
 
-- **Windows Sysmon**: `XmlWinEventLog:Microsoft-Windows-Sysmon/Operational` (141), `WinEventLog:Microsoft-Windows-Sysmon/Operational` (111), plus `sysmon` / `sysmon:*` (64 combined)
-- **Windows Security**: `WinEventLog:Security` (141), `XmlWinEventLog:Security` (76)
+- **Windows Sysmon**: `XmlWinEventLog:Microsoft-Windows-Sysmon/Operational` (155), `WinEventLog:Microsoft-Windows-Sysmon/Operational` (111), plus `sysmon` / `sysmon:*` (64 combined)
+- **Windows Security**: `WinEventLog:Security` (153), `XmlWinEventLog:Security` (88)
 - **Cloud audit logs**: `aws:cloudtrail` (60) + AWS CloudTrail variants, `azure:monitor:activity` (40), `azure:monitor:aad` (40), `gcp:audit` (40)
 - **GitHub audit**: `github:audit` (46), `github:cloud:audit` (40)
 - **VMware ESXi**: `vmw-syslog` (23), `vmware:esxlog*` (23)
-- **Platform-native sources**: `falcon:process` (134), `mde:advanced_hunting` (49)
+- **Platform-native sources**: `falcon:process` (146), `mde:advanced_hunting` (64)
 
 ## Pipeline (Detection-as-Code)
 

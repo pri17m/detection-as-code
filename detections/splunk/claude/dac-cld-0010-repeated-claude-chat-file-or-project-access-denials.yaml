@@ -1,0 +1,38 @@
+id: DAC-CLD-0010
+title: Repeated Claude chat, file, or project access denials
+description: >-
+  Alerts when one account is denied access to Claude chats, files, artifacts, or project documents
+  eight or more times. Attackers try identifiers they do not own to find a conversation or file
+  they can open.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: medium
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1087
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "A user clicking shared links they no longer have access to. Raise the threshold if a permission change produces a burst of denials."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1087/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("claude_chat_access_failed", "claude_file_access_failed", "claude_artifact_access_failed", "claude_project_document_access_failed", "claude_project_file_access_failed")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id
+    | where count >= 8

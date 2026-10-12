@@ -1,0 +1,44 @@
+id: DAC-CS-0224
+title: Add-MpPreference exclusion
+description: >-
+  Alerts when PowerShell calls Add-MpPreference with an exclusion for a path, process, extension,
+  or IP. Attackers add that exclusion so Defender stops scanning the directory or process they are
+  about to use.
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1562.001
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "Security administrators who add Defender exclusions from PowerShell."
+references:
+- https://learn.microsoft.com/defender-endpoint/configure-process-opened-file-exclusions-microsoft-defender-antivirus
+- https://attack.mitre.org/techniques/T1562/001/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- parity:DAC-MDE-0079
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ImageFileName=/\\(powershell|pwsh)\.exe$/i
+    | CommandLine=/add-mppreference/i
+    | CommandLine=/-(exclusionpath|exclusionprocess|exclusionextension|exclusionipaddress)/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())
