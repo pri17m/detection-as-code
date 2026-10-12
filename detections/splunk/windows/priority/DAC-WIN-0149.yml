@@ -9,7 +9,8 @@ platforms:
 severity: high
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
+  - command-and-control
   techniques:
   - T1140
   - T1105

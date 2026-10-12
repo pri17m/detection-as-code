@@ -26,7 +26,7 @@ query:
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - stealth
   techniques:
   - T1059.001
   - T1027
@@ -36,6 +36,7 @@ references:
 - https://attack.mitre.org/techniques/T1059/001/
 - https://attack.mitre.org/techniques/T1027/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Command_History_with_Process_Tree.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

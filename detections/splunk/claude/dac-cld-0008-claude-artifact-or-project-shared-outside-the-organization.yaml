@@ -1,0 +1,38 @@
+id: DAC-CLD-0008
+title: Claude artifact or project shared outside the organization
+description: >-
+  Alerts when a member invites an outside address to an artifact, allows one artifact to be shared
+  by link while organization-wide sharing is off, or creates a pending share for someone who is
+  not a member. Attackers use that share so an account outside the organization can open the
+  artifact or project.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: high
+mitre:
+  tactics:
+  - exfiltration
+  techniques:
+  - T1567
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "A member intentionally sharing an artifact with a contractor who is not yet in the organization. Confirm the invited address out of band. This sourcetype does not keep that address."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1567/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("claude_artifact_invite_created", "claude_artifact_external_sharing_permission_updated", "pending_share_created")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id

@@ -24,6 +24,7 @@ references:
 - https://attack.mitre.org/techniques/T1204/001/
 - https://attack.mitre.org/techniques/T1059/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/leaknet_campaign_deno_runtime_klist_suspicious_execution_detection.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "#event_simpleName=ProcessRollup2\n| (\n    (ImageFileName=/\\\\deno(\\.exe)?$/i AND ImageFileName=/\\\
     \\(Users\\\\[^\\\\]+\\\\AppData\\\\(Local|Roaming)|Temp|ProgramData)\\\\/i)\n    OR (ImageFileName=/\\\

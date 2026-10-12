@@ -10,7 +10,7 @@ sourcetypes:
 - vmware:esxlog*
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1686
 severity: high

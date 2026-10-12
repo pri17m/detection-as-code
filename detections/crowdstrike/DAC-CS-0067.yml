@@ -16,7 +16,7 @@ title: 'Falcon: CVE-2025-53770 - SharePoint ToolShell'
 mitre:
   tactics:
   - initial-access
-  - defense-evasion
+  - stealth
   techniques:
   - T1190
   - T1620
@@ -24,6 +24,7 @@ references:
 - https://attack.mitre.org/techniques/T1190/
 - https://attack.mitre.org/techniques/T1620/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/cve_2025_53770___sharepoint_toolshell.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| (\n    (ImageFileName=/\\\\cmd\\\
     .exe$/i AND ParentBaseFileName=/^w3wp\\.exe$/i)\n    OR\n    (ImageFileName=/\\\\powershell(\\.exe)?$/i\

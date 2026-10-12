@@ -40,6 +40,7 @@ references:
 - https://attack.mitre.org/techniques/T1078/
 - https://attack.mitre.org/techniques/T1021/001/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/user_logon_details__time__type__location__last_password_change_.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

@@ -29,7 +29,7 @@ query:
     '
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - persistence
   - credential-access
   techniques:
@@ -41,6 +41,7 @@ references:
 - https://attack.mitre.org/techniques/T1078/
 - https://attack.mitre.org/techniques/T1078/001/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Honey_Token_Account_Logon.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

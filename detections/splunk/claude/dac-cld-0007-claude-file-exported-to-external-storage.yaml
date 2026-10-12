@@ -1,0 +1,36 @@
+id: DAC-CLD-0007
+title: Claude file exported to external storage
+description: >-
+  Alerts when a Claude file is exported to an external storage destination. Attackers use that
+  export to move the file out of the organization without a browser download.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: high
+mitre:
+  tactics:
+  - exfiltration
+  techniques:
+  - T1567
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "A user exporting a file to an approved company drive. The destination name is not kept on this sourcetype, so confirm the file_id with the user."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1567/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("claude_file_exported")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id

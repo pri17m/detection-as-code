@@ -10,7 +10,7 @@ sourcetypes:
 mitre:
   tactics:
   - command-and-control
-  - defense-evasion
+  - stealth
   techniques:
   - T1572
   - T1036.003

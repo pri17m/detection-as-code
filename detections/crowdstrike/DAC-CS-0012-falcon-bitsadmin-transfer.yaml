@@ -23,7 +23,7 @@ tags:
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - command-and-control
   techniques:
   - T1105
 id: DAC-CS-0012
@@ -50,3 +50,4 @@ platforms:
 references:
 - https://attack.mitre.org/techniques/T1105/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/hunting_bitsadmin_usage.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"

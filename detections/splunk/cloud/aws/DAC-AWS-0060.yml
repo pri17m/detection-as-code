@@ -13,7 +13,7 @@ sourcetypes:
 - aws:cloudtrail:event
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - lateral-movement
   techniques:
   - T1078.004

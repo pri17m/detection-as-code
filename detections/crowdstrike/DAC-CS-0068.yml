@@ -21,6 +21,7 @@ mitre:
 references:
 - https://attack.mitre.org/techniques/T1059/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/cve_2026_32202_windows_shell.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| (\n    (ImageFileName=/\\\\(cmd|powershell|pwsh|net|net1)\\\
     .exe$/i\n      AND CommandLine=/(net\\s+use|\\\\\\\\[^\\\\\\s]+\\\\(ADMIN\\$|C\\$|IPC\\$)|Copy-Item\\\

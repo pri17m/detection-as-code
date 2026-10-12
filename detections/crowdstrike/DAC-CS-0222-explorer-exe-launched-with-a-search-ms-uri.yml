@@ -1,0 +1,43 @@
+id: DAC-CS-0222
+title: explorer.exe launched with a search-ms URI
+description: >-
+  Alerts when explorer.exe is started with a search-ms: URI. Attackers send that URI so Windows
+  Search opens a remote share that looks like a local folder of documents.
+author: Detection Engineer
+status: experimental
+platforms:
+- crowdstrike
+severity: high
+mitre:
+  tactics:
+  - initial-access
+  techniques:
+  - T1204.001
+sourcetypes:
+- falcon:process
+required_fields:
+- "#event_simpleName"
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+telemetry_validated: false
+false_positives:
+- "An internal app that deep-links Windows Search."
+references:
+- https://learn.microsoft.com/windows/win32/search/-search-3x-wds-extidx-prot-implementing
+- https://attack.mitre.org/techniques/T1204/001/
+- https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
+tags:
+- quality-wave
+- parity:DAC-WIN-0344
+- parity:DAC-MDE-0077
+query:
+  crowdstrike: |
+    in(#event_simpleName, values=["ProcessRollup2", "ProcessBlocked"])
+    | event_platform=Win
+    | ImageFileName=/\\explorer\.exe$/i
+    | CommandLine=/search-ms:/i
+    | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

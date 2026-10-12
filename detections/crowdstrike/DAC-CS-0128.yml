@@ -31,17 +31,18 @@ query:
     '
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
+  - execution
   - persistence
   techniques:
   - T1574.001
-  - T1574.002
 title: 'Falcon: ClassifiedModuleLoad from Temp or AppData'
 status: experimental
 references:
 - https://attack.mitre.org/techniques/T1574/001/
 - https://attack.mitre.org/techniques/T1574/002/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Dll-Side_Loading_Detection_Query.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

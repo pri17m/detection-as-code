@@ -38,7 +38,8 @@ id: DAC-WIN-0298
 description: Detects a network connection initiated by "Regsvr32.exe"
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
+  - execution
   techniques:
   - T1218.010
   - T1559.001

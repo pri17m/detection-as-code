@@ -39,7 +39,7 @@ id: DAC-WIN-0220
 description: Detects rundll32 loading a renamed comsvcs.dll to dump process memory
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - credential-access
   - persistence
   techniques:

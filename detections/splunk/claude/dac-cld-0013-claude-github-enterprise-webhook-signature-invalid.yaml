@@ -1,0 +1,37 @@
+id: DAC-CLD-0013
+title: Claude GitHub Enterprise webhook signature invalid
+description: >-
+  Alerts when a GitHub Enterprise webhook delivery to Claude fails signature validation. Attackers
+  send an unsigned or wrongly signed webhook to try to push a repository event the organization
+  did not originate.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: medium
+mitre:
+  tactics:
+  - initial-access
+  techniques:
+  - T1190
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "A webhook secret rotated on one side and not the other. A burst from the GitHub IP range during a rotation is the usual cause."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1190/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("ghe_webhook_signature_invalid")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id

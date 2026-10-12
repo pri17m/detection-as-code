@@ -40,7 +40,7 @@ description: Detects the creation of a remote thread from a Powershell process i
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - stealth
   techniques:
   - T1059.001
   - T1055

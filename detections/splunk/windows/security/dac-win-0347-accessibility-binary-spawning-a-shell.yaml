@@ -1,0 +1,46 @@
+id: DAC-WIN-0347
+title: accessibility binary spawning a shell
+description: >-
+  Alerts when sethc, utilman, osk, magnify, narrator, displayswitch, or atbroker starts cmd or
+  PowerShell. Attackers point one of those accessibility binaries at a shell so they can reach it
+  from the logon screen.
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1546.008
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- CommandLine
+- NewProcessName
+- Image
+- ParentProcessName
+telemetry_validated: false
+false_positives:
+- "A screen-reader or on-screen-keyboard helper that launches PowerShell by design. Allowlist that signed child."
+references:
+- https://attack.mitre.org/techniques/T1546/008/
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
+- https://learn.microsoft.com/sysinternals/downloads/sysmon
+tags:
+- quality-wave
+- parity:DAC-MDE-0081
+- parity:DAC-CS-0218
+query:
+  splunk: |
+    ((sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode=4688) OR (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
+    | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
+    | eval proc=lower(coalesce(NewProcessName, Image, process_path, process))
+    | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, parent_process_name, ParentImage))
+    | where match(parent, "(^|\\)(sethc|utilman|osk|magnify|narrator)\.exe$") AND match(proc, "(^|\\)(cmd|powershell|pwsh)\.exe$")
+    | stats count values(proc) as processes values(parent) as parents values(cmd) as commands by host

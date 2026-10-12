@@ -8,7 +8,7 @@ telemetry_validated: false
 author: Detection Engineer
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1484
 id: DAC-GCP-0010

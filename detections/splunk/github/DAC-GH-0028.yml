@@ -30,7 +30,7 @@ references:
 - https://attack.mitre.org/techniques/T1552/001/
 mitre:
   tactics:
-  - defense-evasion
+  - credential-access
   techniques:
   - T1552.001
 author: Detection Engineer

@@ -22,6 +22,7 @@ mitre:
 references:
 - https://attack.mitre.org/techniques/T1059/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Detect_Suspicious_Windows_Command-Line_Activity_Using_System_Utilities.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "#event_simpleName=ProcessRollup2 event_platform=Win\n| ImageFileName=/\\\\(?<FileName>(whoami|net1?|systeminfo|ping|nltest|sc|hostname|ipconfig)\\\
     .exe)$/i\n| CommandLine := lower(CommandLine)\n| FileName := lower(FileName)\n| regex(\"(sc|net1?)\\\

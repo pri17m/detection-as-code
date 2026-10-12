@@ -42,7 +42,7 @@ description: 'Detects password dumper activity by monitoring remote thread creat
 mitre:
   tactics:
   - credential-access
-  - defense-evasion
+  - stealth
   techniques:
   - T1003.001
   - T1055

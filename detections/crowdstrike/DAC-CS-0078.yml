@@ -22,6 +22,7 @@ mitre:
 references:
 - https://attack.mitre.org/techniques/T1059/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/find_openclaw_on_endpoints.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "#event_simpleName=ProcessRollup2\n| case {\n    CommandLine=/openclaw\\.ai\\/install\\\
     .(sh|ps1)/i | Action:=\"openclaw installed via curl script\";\n    CommandLine=/(openclaw|clawdbot|moltbot)/i\

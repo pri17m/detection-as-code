@@ -10,7 +10,7 @@ sourcetypes:
 - mde:advanced_hunting
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1218.011
 severity: medium

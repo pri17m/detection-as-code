@@ -24,6 +24,7 @@ references:
 - https://attack.mitre.org/techniques/T1195/002/
 - https://attack.mitre.org/techniques/T1059/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Rust_Build_Toolchain_Spawning_Interpreter_or_Downloader.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","SyntheticProcessRollup2"])
 

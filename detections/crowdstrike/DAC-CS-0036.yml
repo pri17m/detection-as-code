@@ -27,6 +27,6 @@ sourcetypes:
 - falcon:process
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1127.001

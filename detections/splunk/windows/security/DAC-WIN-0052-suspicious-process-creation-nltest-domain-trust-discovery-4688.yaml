@@ -11,7 +11,7 @@ sourcetypes:
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - discovery
   techniques:
   - T1482
 severity: medium

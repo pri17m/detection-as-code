@@ -41,6 +41,7 @@ references:
 - https://attack.mitre.org/techniques/T1090/003/
 - https://attack.mitre.org/techniques/T1571/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/connections_to_tor_exit_nodes.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

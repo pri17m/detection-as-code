@@ -22,6 +22,7 @@ mitre:
 references:
 - https://attack.mitre.org/techniques/T1219/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/unauthorized_rmm_tool_usage.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "in(#event_simpleName, values=[\"ProcessRollup2\",\"SyntheticProcessRollup2\"])\n| ImageFileName=/(\\\
     \\|\\/)(?<FileName>[^\\\\\\/]+)$/\n| case {\n    FileName=/^anydesk(_custom)?(\\.exe)?$/i | RMMTool:=\"\

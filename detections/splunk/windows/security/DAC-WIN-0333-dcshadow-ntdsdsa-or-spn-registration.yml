@@ -10,7 +10,7 @@ sourcetypes:
 - "XmlWinEventLog:Security"
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1207
 severity: critical
