@@ -1,0 +1,5 @@
+{
+  "label": "benign",
+  "TaskName": "\\\\Microsoft\\\\Windows\\\\TaskScheduler\\\\Maintenance",
+  "expect_alert": false
+}

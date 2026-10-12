@@ -1,0 +1,8 @@
+{
+  "label": "malicious",
+  "source": "Atomic T1003.006 a0bced08 + T1053.005",
+  "TaskName": "\\\\Maint\\\\Repl",
+  "CommandLine": "powershell.exe Get-ADReplAccount -All -Server localhost",
+  "ProductType": 2,
+  "expect_alert": true
+}
