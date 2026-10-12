@@ -1,0 +1,16 @@
+{
+  "label": "benign",
+  "source": "Packaged Store path",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "FileName": "wt.exe",
+      "FilePath": "\\Device\\HarddiskVolume3\\Program Files\\WindowsApps\\Microsoft.WindowsTerminal_1.21.0.0_x64__8wekyb3d8bbwe\\"
+    }
+  ],
+  "expect_alert": false,
+  "result": "not run"
+}

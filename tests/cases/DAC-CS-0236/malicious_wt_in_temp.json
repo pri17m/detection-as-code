@@ -1,0 +1,16 @@
+{
+  "label": "malicious",
+  "source": "wt.exe outside documented install paths (Microsoft Windows Terminal install doc)",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "FileName": "wt.exe",
+      "FilePath": "\\Device\\HarddiskVolume3\\Users\\u1\\AppData\\Local\\Temp\\"
+    }
+  ],
+  "expect_alert": true,
+  "result": "not run"
+}
