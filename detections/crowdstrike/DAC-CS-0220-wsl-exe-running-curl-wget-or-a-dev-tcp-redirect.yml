@@ -32,7 +32,7 @@ references:
 - https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
 tags:
 - quality-wave
-- parity:DAC-WIN-0342
+- parity:DAC-WIN-0352
 - parity:DAC-MDE-0075
 query:
   crowdstrike: |

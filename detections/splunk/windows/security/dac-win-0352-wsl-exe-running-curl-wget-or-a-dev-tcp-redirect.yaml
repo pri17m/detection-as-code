@@ -1,4 +1,4 @@
-id: DAC-WIN-0342
+id: DAC-WIN-0352
 title: wsl.exe running curl, wget, or a /dev/tcp redirect
 description: >-
   Alerts when wsl.exe is started with curl or wget against a URL, or with /dev/tcp/. Attackers use
