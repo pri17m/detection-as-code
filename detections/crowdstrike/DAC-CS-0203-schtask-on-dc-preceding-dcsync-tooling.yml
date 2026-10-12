@@ -37,6 +37,7 @@ required_fields:
 - CommandLine
 - ParentBaseFileName
 tags:
+- reviewed-batch1
 - wave1
 - ad
 - dcsync
@@ -54,7 +55,7 @@ query:
           | Stage := "task"
           | StageTime := @timestamp ;
         in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
-          | (CommandLine=/(secretsdump|lsadump::dcsync|ntdsutil.*ifm|ntds\.dit|--just-dc)/i OR ImageFileName=/\\(secretsdump|mimikatz|ntdsutil)\.exe$/i)
+          | (CommandLine=/(secretsdump|lsadump::dcsync|ntdsutil.*ifm|ntds\.dit|--just-dc|Get-ADReplAccount)/i OR ImageFileName=/\\(secretsdump|mimikatz|ntdsutil)\.exe$/i)
           | Stage := "tool"
           | StageTime := @timestamp ;
       }

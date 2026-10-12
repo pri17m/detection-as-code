@@ -1,0 +1,5 @@
+{
+  "label": "near-miss",
+  "note": "t_tool > t_task gate fails if tooling precedes task",
+  "expect_alert": false
+}
