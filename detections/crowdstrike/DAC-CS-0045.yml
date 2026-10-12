@@ -1,8 +1,9 @@
 author: Detection Engineer
 references:
 - https://attack.mitre.org/techniques/T1562/001/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 title: 'Falcon: Stop or delete Falcon-related service attempt'
-description: "sc stop CSFalcon / tamper \u2014 tune carefully"
+description: sc stop CSFalcon / tamper — tune carefully
 severity: high
 telemetry_validated: false
 platforms:
@@ -18,6 +19,7 @@ status: experimental
 tags:
 - wave-a
 - P0
+- attack-v19-remap
 query:
   crowdstrike: 'CommandLine CONTAINS_ANY ["CSFalconService","CSFalconContainer"] AND ImageFileName IN
     ["sc.exe","net.exe","taskkill.exe"]
@@ -27,6 +29,6 @@ sourcetypes:
 - falcon:process
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.001
+  - T1685

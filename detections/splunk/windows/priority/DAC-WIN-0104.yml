@@ -1,8 +1,8 @@
 id: DAC-WIN-0104
 title: NTDS/VSS suspicious access on DCs
-description: 'Sysmon 1 ntdsutil/vssadmin/diskshadow; Sysmon 11 *.dit | checklist:
-  macros only; no index=; EventCode on allowlisted channel; coalesce classic/XML aliases;
-  fieldsummary required before telemetry_validated=true; FP baseline pending org allowlists'
+description: 'Sysmon 1 ntdsutil/vssadmin/diskshadow; Sysmon 11 *.dit | checklist: macros only; no index=;
+  EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true;
+  FP baseline pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -43,9 +43,11 @@ tags:
 - windows
 query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
-    OR sourcetype=sysmon) `windows_sysmon` ((EventCode=1 (Image="*\\ntdsutil.exe"
-    OR Image="*\\vssadmin.exe" OR Image="*\\diskshadow.exe" OR Image="*\\wbadmin.exe"
-    OR CommandLine="*ntds.dit*" OR CommandLine="*IFM*")) OR (EventCode=11 TargetFilename="*.dit"))
+    OR sourcetype=sysmon) `windows_sysmon` (((EventCode=1 OR EventID=1) (Image="*\\ntdsutil.exe" OR Image="*\\vssadmin.exe"
+    OR Image="*\\diskshadow.exe" OR Image="*\\wbadmin.exe" OR CommandLine="*ntds.dit*" OR CommandLine="*IFM*"))
+    OR ((EventCode=11 OR EventID=11) TargetFilename="*.dit"))
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval Image=coalesce(Image, NewProcessName, process)
 

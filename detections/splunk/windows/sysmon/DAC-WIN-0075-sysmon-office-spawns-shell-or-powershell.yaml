@@ -26,7 +26,9 @@ required_fields:
 - CommandLine
 - host
 query:
-  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1
+  splunk: 'sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" (EventCode=1 OR EventID=1)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval img=lower(coalesce(Image))
 

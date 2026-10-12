@@ -1,8 +1,8 @@
 id: DAC-WIN-0107
 title: Suspicious PowerShell (enc/IEX/remote)
-description: '4104 ScriptBlock + Sysmon 1 -enc/IEX | checklist: macros only; no index=;
-  EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary required
-  before telemetry_validated=true; FP baseline pending org allowlists'
+description: '4104 ScriptBlock + Sysmon 1 -enc/IEX | checklist: macros only; no index=; EventCode on allowlisted
+  channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true; FP baseline
+  pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -51,8 +51,10 @@ tags:
 query:
   splunk: '(sourcetype=WinEventLog:Microsoft-Windows-PowerShell/Operational OR sourcetype=XmlWinEventLog:Microsoft-Windows-PowerShell/Operational
     OR sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational)
-    (`windows_powershell_operational` EventCode=4104) OR (`windows_sysmon` EventCode=1
-    (Image="*\\powershell.exe" OR Image="*\\pwsh.exe"))
+    (`windows_powershell_operational` (EventCode=4104 OR EventID=4104)) OR (`windows_sysmon` (EventCode=1
+    OR EventID=1) (Image="*\\powershell.exe" OR Image="*\\pwsh.exe"))
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval ScriptBlockText=coalesce(ScriptBlockText, Message)
 
@@ -62,11 +64,10 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName, user)
 
-    | search EventCode=4104 (ScriptBlockText="*IEX*" OR ScriptBlockText="*Invoke-Expression*"
-    OR ScriptBlockText="*DownloadString*" OR ScriptBlockText="*FromBase64String*"
-    OR ScriptBlockText="*Net.WebClient*") OR (EventCode=1 (CommandLine="*-enc*" OR
-    CommandLine="*-EncodedCommand*" OR CommandLine="*IEX*" OR CommandLine="*DownloadString*"
-    OR CommandLine="*-w hidden*" OR CommandLine="*-WindowStyle Hidden*"))
+    | search (EventCode=4104 OR EventID=4104) (ScriptBlockText="*IEX*" OR ScriptBlockText="*Invoke-Expression*"
+    OR ScriptBlockText="*DownloadString*" OR ScriptBlockText="*FromBase64String*" OR ScriptBlockText="*Net.WebClient*")
+    OR ((EventCode=1 OR EventID=1) (CommandLine="*-enc*" OR CommandLine="*-EncodedCommand*" OR CommandLine="*IEX*"
+    OR CommandLine="*DownloadString*" OR CommandLine="*-w hidden*" OR CommandLine="*-WindowStyle Hidden*"))
 
     | table _time host EventCode Image CommandLine User ScriptBlockText Path
 

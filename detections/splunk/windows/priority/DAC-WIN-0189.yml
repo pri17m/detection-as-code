@@ -1,12 +1,15 @@
 id: DAC-WIN-0189
 title: CMSTP / InstallUtil / Regasm LOLBin execution
-description: Sysmon 1 cmstp/installutil/regasm uncommon
+description: 'Behavior: CMSTP / InstallUtil / Regasm LOLBin execution. Anchor after classic/XML coalesce.
+  Not telemetry_validated.'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - defense-evasion
@@ -15,7 +18,8 @@ mitre:
   - T1218.004
 severity: medium
 false_positives:
-- Software installs
+- Admin tooling and change windows
+- Security agents loading signed drivers or modules
 references:
 - https://attack.mitre.org/techniques/T1218/003/
 - https://attack.mitre.org/techniques/T1218/004/
@@ -29,9 +33,24 @@ required_fields:
 - ProcessGuid
 - Hashes
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search (EventCode=1 OR EventID=1) Image IN ("*\\cmstp.exe","*\\installutil.exe","*\\regasm.exe","*\\regsvcs.exe")
+
+    | table _time host User Image ParentImage CommandLine
+
+    '
 tags:
 - phase1
 - windows

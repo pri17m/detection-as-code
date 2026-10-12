@@ -2,6 +2,8 @@ severity: high
 query:
   splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-PowerShell/Operational")
 
+    | eval EventCode=coalesce(EventCode, EventID)
+
     | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
 
     | eval process=coalesce(Image, NewProcessName, process)
@@ -20,6 +22,7 @@ references:
 - https://attack.mitre.org/techniques/T1059/001/
 - https://attack.mitre.org/techniques/T1562/001/
 - https://attack.mitre.org/techniques/T1218/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 platforms:
 - splunk
 tags:
@@ -27,6 +30,7 @@ tags:
 - P0
 - windows_powershell_operational
 - sigma:rules/windows/powershell/powershell_classic/posh_pc_remotefxvgpudisablement_abuse.yml
+- attack-v19-remap
 title: Potential RemoteFXvGPUDisablement.EXE Abuse
 author: Detection Engineer
 sourcetypes:
@@ -39,10 +43,10 @@ description: Detects PowerShell module creation where the module Contents are se
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1059.001
-  - T1562.001
+  - T1685
   - T1218
 required_fields:
 - EventCode

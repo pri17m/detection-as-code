@@ -19,8 +19,8 @@ mitre:
   - T1078.004
 severity: high
 false_positives:
-- "Legitimate org cross-account break-glass or CI AssumeRole using admin-like session names \u2014 baseline\
-  \ sessionName allowlist."
+- Legitimate org cross-account break-glass or CI AssumeRole using admin-like session names — baseline
+  sessionName allowlist.
 - SSO/IAM Identity Center sessions often use AWSReservedSSO_ prefixes; tune before promote.
 references:
 - https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
@@ -28,6 +28,7 @@ references:
 - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
 telemetry_validated: false
 required_fields:
+- eventSource
 - eventName
 - userIdentity.type
 - userIdentity.arn
@@ -47,7 +48,7 @@ tags:
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName=AssumeRole
+    | search eventSource="sts.amazonaws.com" eventName=AssumeRole
 
     | eval role_arn=coalesce(''requestParameters.roleArn'',"")
 

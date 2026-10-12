@@ -9,9 +9,9 @@ telemetry_validated: false
 author: Detection Engineer
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562
+  - T1685
 id: DAC-AZ-0008
 status: experimental
 title: 'Azure: NSG rule allow 0.0.0.0/0 to management ports'
@@ -28,12 +28,14 @@ query:
 severity: high
 references:
 - https://attack.mitre.org/techniques/T1562/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 platforms:
 - splunk
 tags:
 - wave-c
 - P0
 - phase2-related
+- attack-v19-remap
 description: securityRules * 0.0.0.0/0 22/3389
 sourcetypes:
 - azure:monitor:activity

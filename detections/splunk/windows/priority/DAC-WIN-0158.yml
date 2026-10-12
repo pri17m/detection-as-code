@@ -1,6 +1,7 @@
 id: DAC-WIN-0158
 title: Nltest / domain trust discovery
-description: Sysmon 1 nltest /dclist /domain_trusts
+description: 'Behavior: Nltest / domain trust discovery. Anchor is process+flag or event id+field after
+  classic/XML coalesce. Not telemetry_validated. Sysmon 1 nltest /dclist /domain_trusts'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -26,7 +27,8 @@ required_fields:
 - Hashes
 telemetry_validated: false
 false_positives:
-- Domain admin tooling
+- Admin tooling and change windows
+- EDR or backup agents on the same host
 references:
 - https://attack.mitre.org/techniques/T1018/
 - https://attack.mitre.org/techniques/T1482/
@@ -42,6 +44,19 @@ query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search (EventCode=1 OR EventID=1) (Image="*\\nltest.exe" OR CommandLine="*nltest*") CommandLine
+    IN ("*/domain_trusts*","*/dclist*","*/dsgetdc*")
+
+    | table _time host User Image ParentImage CommandLine
 
     '

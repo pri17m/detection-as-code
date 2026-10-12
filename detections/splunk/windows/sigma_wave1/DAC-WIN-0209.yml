@@ -1,6 +1,9 @@
 severity: medium
 query:
-  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode IN (4656,4663)
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) (EventCode IN (4656,4663)
+    OR EventID IN (4656,4663))
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
 

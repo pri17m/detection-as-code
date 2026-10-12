@@ -1,0 +1,46 @@
+id: DAC-CS-0230
+title: Multiple advanced klist Kerberos subcommands by one user on one host
+description: Counts distinct advanced klist subcommands (tgt, sessions, kcd_cache, get, query_bind, add_bind, purge_bind) per host and user over the search window and alerts at 2 or more distinct subcommands, or 3 or more runs including -li 0x3e7 (SYSTEM logon session). Plain klist, klist tickets and klist purge are excluded. Operators enumerating sessions, then requesting tickets for SPNs, produce this burst; single admin troubleshooting runs do not. Related to DAC-CS-0080 (klist from a shell parent). Schedule hourly over a 1-hour window.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - credential-access
+  - discovery
+  techniques:
+  - T1558
+  - T1087.002
+severity: medium
+false_positives:
+- Kerberos troubleshooting by identity engineers; allowlist their accounts or admin jump hosts.
+references:
+- https://attack.mitre.org/techniques/T1558/
+- https://attack.mitre.org/techniques/T1087/002/
+- https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/klist
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Combine%20ProcessRollup2%20and%20NetworkConnectIP4%20Events.md
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Hunting%20bcdedit.exe%20usage.md
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Win ImageFileName=/\\klist\.exe$/i
+    | CommandLine=/\b(tgt|sessions|kcd_cache|get|query_bind|add_bind|purge_bind)\b|-li\s+0x3e7/i
+    | regex("\b(?<KlistSub>tgt|sessions|kcd_cache|get|query_bind|add_bind|purge_bind)\b", field=CommandLine, flags=i, strict=false)
+    | groupBy([aid, ComputerName, UserName], function=[count(KlistSub, distinct=true, as=distinctSubcommands), count(as=runs), collect([CommandLine, ParentBaseFileName])])
+    | distinctSubcommands >= 2 OR runs >= 3

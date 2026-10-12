@@ -164,3 +164,13 @@ Frontmatter fields used above: `title`, `phase`, `last_updated`, `status`, plus 
 ---
 
 *Draft for Detection-as-Code Phase 1 — intended for `content/mitre/gaps.md`. Last updated 2026-09-10. Status: draft.*
+
+
+## 2026-10-07 enhancement pass
+
+- Remapped revoked ATT&CK v19 IDs (T1562* and T1070.001) onto T1685/T1686/T1688/T1689/T1690.
+- Filled logic-less Splunk stubs with EventCode/Image anchors and classic/XML coalesce. telemetry_validated remains false.
+- Paired unambiguous CloudTrail eventName filters with eventSource.
+- Added DAC-WIN-0339/0340/0341 and DAC-AWS-0061.
+
+- 2026-10-07 follow-up: remaining 11 Windows stubs anchored; EventCode OR EventID on XML-capable SPL; CloudTrail eventSource on the leftover single-service APIs; DAC-WIN-0342 service stop.

@@ -1,0 +1,67 @@
+id: DAC-MDE-0087
+title: Authentication method change followed by a sign-in from a country new for the user
+description: Joins Entra AuditLogs security-info changes (User registered/changed default/deleted security info and the admin variants) to a successful SigninLogs sign-in by the same user within 6 hours from a Location (country code) not seen for that user in the previous 14 days. Swapping a phone or other factor and then signing in from a new country is the account-takeover pattern behind SIM-swap and helpdesk social engineering.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:SigninLogs
+mitre:
+  tactics:
+  - persistence
+  - credential-access
+  - initial-access
+  techniques:
+  - T1556.006
+  - T1078.004
+severity: high
+false_positives:
+- Travelling users who re-register a phone abroad; check the IP's ASN and the user's travel schedule.
+references:
+- https://attack.mitre.org/techniques/T1556/006/
+- https://attack.mitre.org/techniques/T1078/004/
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/auditlogs
+- https://learn.microsoft.com/en-us/entra/identity/monitoring-health/reference-audit-activities
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/signinlogs
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- OperationName
+- Result
+- TargetResources
+- InitiatedBy
+- UserId
+- UserPrincipalName
+- Location
+- IPAddress
+- AutonomousSystemNumber
+- ResultType
+tags:
+- behavioural
+- clean-room
+query:
+  defender: |
+    let Window = 6h;
+    let Baseline = 14d;
+    let MethodChanges = AuditLogs
+    | where TimeGenerated > ago(1d)
+    | where OperationName in ("User registered security info", "User changed default security info", "User deleted security info", "Admin registered security info", "Admin updated security info", "Admin deleted security info")
+    | where Result =~ "success"
+    | extend UserId = tostring(TargetResources[0].id), UPN = tostring(TargetResources[0].userPrincipalName)
+    | where isnotempty(UserId)
+    | project ChangeTime = TimeGenerated, UserId, UPN, ChangeOperation = OperationName, ChangedBy = coalesce(tostring(InitiatedBy.user.userPrincipalName), tostring(InitiatedBy.app.displayName));
+    let KnownCountries = SigninLogs
+    | where TimeGenerated between (ago(Baseline + 1d) .. ago(1d))
+    | where ResultType == "0" and isnotempty(Location)
+    | summarize KnownLocations = make_set(Location, 50) by UserId;
+    let RecentSignIns = SigninLogs
+    | where TimeGenerated > ago(1d)
+    | where ResultType == "0" and isnotempty(Location)
+    | project SignInTime = TimeGenerated, UserId, Location, IPAddress, AutonomousSystemNumber, AppDisplayName;
+    MethodChanges
+    | join kind=inner RecentSignIns on UserId
+    | where SignInTime between (ChangeTime .. ChangeTime + Window)
+    | join kind=leftouter KnownCountries on UserId
+    | where isnull(KnownLocations) or not(set_has_element(KnownLocations, Location))
+    | summarize FirstNewCountrySignIn = min(SignInTime), NewCountries = make_set(Location), IPs = make_set(IPAddress, 10), ASNs = make_set(AutonomousSystemNumber, 10), Apps = make_set(AppDisplayName, 10) by ChangeTime, UPN, UserId, ChangeOperation, ChangedBy

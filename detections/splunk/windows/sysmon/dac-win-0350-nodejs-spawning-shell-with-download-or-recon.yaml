@@ -1,0 +1,43 @@
+id: DAC-WIN-0350
+title: Node.js spawning a shell that downloads, decodes or runs reconnaissance
+description: Sysmon event 1 where ParentImage is node.exe and the child is cmd, PowerShell, pwsh, wscript, cscript, mshta or rundll32, and the child command line downloads, decodes or enumerates (curl, wget, Invoke-WebRequest, certutil -urlcache, bitsadmin, -enc / FromBase64String, whoami, net user/group, nltest). Exploited Node.js servers and malicious npm install scripts produce this lineage; ordinary npm script runs do not carry these intent markers. Grouped per host and parent command line.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - initial-access
+  - execution
+  techniques:
+  - T1190
+  - T1059
+severity: high
+false_positives:
+- Build pipelines whose package scripts download artefacts with curl; allowlist CI hosts or the specific ParentCommandLine.
+references:
+- https://attack.mitre.org/techniques/T1190/
+- https://attack.mitre.org/techniques/T1059/
+- https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon
+- https://github.com/microsoft/SysmonCommon/blob/main/manifest.xml
+telemetry_validated: false
+required_fields:
+- EventCode
+- host
+- Image
+- ParentImage
+- CommandLine
+- ParentCommandLine
+- User
+tags:
+- behavioural
+- clean-room
+query:
+  splunk: |
+    `windows_sysmon` NOT sourcetype="sysmon:linux" EventCode=1
+    | eval parent=lower(ParentImage), img=lower(Image), cmd=lower(CommandLine)
+    | where match(parent, "\\\\node\.exe$") AND match(img, "\\\\(cmd|powershell|pwsh|wscript|cscript|mshta|rundll32)\.exe$")
+    | where match(cmd, "(curl|wget|invoke-webrequest|iwr |downloadstring|downloadfile|certutil.*-urlcache|bitsadmin|-enc |-encodedcommand|frombase64string|whoami|net1? (user|group)|nltest)")
+    | stats count min(_time) as first_seen max(_time) as last_seen values(Image) as child values(CommandLine) as child_cmd by host User ParentCommandLine

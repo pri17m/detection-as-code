@@ -1,34 +1,45 @@
 id: DAC-WIN-0013
 title: Tier-0 account first-seen host / odd LogonType (4624)
-description: Detects the first observed logon of a Tier-0 account from a given workstation/host within the lookback window. Requires a Tier-0 identity baseline (e.g., Splunk lookup) and should be tuned per org.
+description: Detects the first observed logon of a Tier-0 account from a given workstation/host within
+  the lookback window. Requires a Tier-0 identity baseline (e.g., Splunk lookup) and should be tuned per
+  org.
 author: Threat Detection Engineering
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_security
+- windows_security
+- WinEventLog:Security
+- XmlWinEventLog:Security
 mitre:
   tactics:
-    - initial-access
-    - credential-access
+  - initial-access
+  - credential-access
   techniques:
-    - T1078.002
+  - T1078.002
 severity: high
 false_positives:
-  - New admin workstations, rebuilt endpoints, or newly on-boarded privileged users.
+- New admin workstations, rebuilt endpoints, or newly on-boarded privileged users.
 references:
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4624
 telemetry_validated: false
 required_fields:
-  - LogonType
-  - TargetUserName
-  - IpAddress
-  - WorkstationName
+- LogonType
+- TargetUserName
+- IpAddress
+- WorkstationName
 query:
-  splunk: |
-    `windows_security` EventCode=4624
+  splunk: '`windows_security` EventCode=4624
+
     | eval user=coalesce(TargetUserName, Account_Name, user)
+
     | eval workstation=coalesce(WorkstationName, Workstation, src, src_host)
+
     | lookup dac_tier0_accounts user OUTPUT is_tier0
+
     | where is_tier0=1
-    | stats earliest(_time) as first_seen latest(_time) as last_seen values(IpAddress) as src_ips values(LogonType) as logon_types by user, workstation
+
+    | stats earliest(_time) as first_seen latest(_time) as last_seen values(IpAddress) as src_ips values(LogonType)
+    as logon_types by user, workstation
+
+    '

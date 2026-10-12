@@ -1,8 +1,8 @@
 id: DAC-WIN-0106
 title: Admin share write + new service (PsExec-class)
-description: '5145 Admin$/C$ + System 7045 / Security 4697 | checklist: macros only;
-  no index=; EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary
-  required before telemetry_validated=true; FP baseline pending org allowlists'
+description: '5145 Admin$/C$ + System 7045 / Security 4697 | checklist: macros only; no index=; EventCode
+  on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true;
+  FP baseline pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -46,9 +46,11 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security
-    OR sourcetype=WinEventLog:System OR sourcetype=XmlWinEventLog:System) (`windows_security`
-    EventCode=5145) OR (`windows_system` EventCode=7045) OR (`windows_security` EventCode=4697)
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:System
+    OR sourcetype=XmlWinEventLog:System) (`windows_security` (EventCode=5145 OR EventID=5145)) OR (`windows_system`
+    (EventCode=7045 OR EventID=7045)) OR (`windows_security` (EventCode=4697 OR EventID=4697))
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval SubjectUserName=coalesce(SubjectUserName, Account_Name, user)
 
@@ -62,10 +64,9 @@ query:
 
     | eval IpAddress=coalesce(IpAddress, src, src_ip)
 
-    | search (EventCode=5145 ShareName IN ("Admin$","\\\\*\\Admin$","C$","\\\\*\\C$"))
-    OR EventCode IN (7045,4697)
+    | search ((EventCode=5145 OR EventID=5145) ShareName IN ("Admin$","\\\\*\\Admin$","C$","\\\\*\\C$"))
+    OR (EventCode IN (7045,4697) OR EventID IN (7045,4697))
 
-    | table _time host EventCode ShareName RelativeTargetName ServiceName ImagePath
-    SubjectUserName IpAddress
+    | table _time host EventCode ShareName RelativeTargetName ServiceName ImagePath SubjectUserName IpAddress
 
     '

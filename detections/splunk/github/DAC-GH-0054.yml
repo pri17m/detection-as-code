@@ -1,0 +1,31 @@
+id: DAC-GH-0054
+title: 'GitHub: Self-hosted runner registered'
+description: 'Detects a self-hosted runner registration. GitHub documents three actions: enterprise.register_self_hosted_runner, org.register_self_hosted_runner, and repo.register_self_hosted_runner. The Splunk security_content sample payload uses enterprise.register_self_hosted_runner.'
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - github:audit
+  - github:cloud:audit
+mitre:
+  tactics:
+    - persistence
+    - execution
+  techniques:
+    - T1059
+severity: medium
+false_positives:
+  - 'A platform team registering a runner. Uncommon, and legitimate.'
+references:
+  - 'https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/audit-log-events-for-your-enterprise'
+  - 'https://github.com/splunk/security_content/blob/develop/detections/cloud/github_enterprise_register_self_hosted_runner.yml'
+telemetry_validated: false
+required_fields:
+  - action
+  - actor
+query:
+  splunk: |
+    (sourcetype=github:audit OR sourcetype=github:cloud:audit OR sourcetype=httpevent) action IN ("enterprise.register_self_hosted_runner", "org.register_self_hosted_runner", "repo.register_self_hosted_runner")
+    | fillnull
+    | stats count min(_time) as firstTime max(_time) as lastTime values(user_agent) as user_agent by actor, actor_id, org, repo

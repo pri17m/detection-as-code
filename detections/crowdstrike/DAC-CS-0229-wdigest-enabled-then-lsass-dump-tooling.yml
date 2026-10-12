@@ -1,0 +1,55 @@
+id: DAC-CS-0229
+title: WDigest UseLogonCredential enabled followed by LSASS dump tooling on the same host
+description: 'Sequence within 24 hours on one host: a command line sets WDigest UseLogonCredential to 1 (reg add or PowerShell), then LSASS dump tooling runs (ProcDump -ma lsass, comsvcs.dll MiniDump, or mimikatz sekurlsa::). Enabling WDigest makes LSASS cache cleartext passwords at next logon, so the pairing shows deliberate credential harvesting. Falcon has no public LSASS handle-access event, so the dump stage matches tooling command lines (Atomic Red Team T1003.001 tests 1, 2 and 6). Stage 2 alone overlaps DAC-CS-0013/0019; the value is the sequence.'
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-impairment
+  - credential-access
+  techniques:
+  - T1112
+  - T1003.001
+severity: critical
+false_positives:
+- Red-team or purple-team exercises; suppress by test host group.
+references:
+- https://attack.mitre.org/techniques/T1112/
+- https://attack.mitre.org/techniques/T1003/001/
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.001/T1003.001.yaml
+- https://support.microsoft.com/kb/2871997
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Combine%20ProcessRollup2%20and%20NetworkConnectIP4%20Events.md
+- https://library.humio.com/data-analysis/functions-correlate.html
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  crowdstrike: |
+    correlate(
+      wdigest: {
+        #event_simpleName=ProcessRollup2 event_platform=Win
+        | CommandLine=/WDigest/i CommandLine=/UseLogonCredential/i
+        | CommandLine=/(\/d\s+1\b|-Value\s+1\b|\b0x0*1\b)/i
+      } include: [aid, ComputerName, UserName, CommandLine, ParentBaseFileName],
+      dump: {
+        #event_simpleName=ProcessRollup2 event_platform=Win
+        | CommandLine=/procdump(64)?(\.exe)?["']?\s.*-ma\s.*lsass/i OR CommandLine=/comsvcs(\.dll)?["']?\s*,\s*MiniDump/i OR CommandLine=/sekurlsa::/i
+        | aid <=> wdigest.aid
+      } include: [UserName, ImageFileName, CommandLine],
+      sequence=true, within=24h
+    )

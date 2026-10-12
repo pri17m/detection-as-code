@@ -20,8 +20,8 @@ mitre:
   - T1078.004
 severity: high
 false_positives:
-- "Admin troubleshooting from CloudShell is common \u2014 eventNames are already gated to privileged APIs;\
-  \ baseline CloudShell admin ARNs."
+- Admin troubleshooting from CloudShell is common — eventNames are already gated to privileged APIs; baseline
+  CloudShell admin ARNs.
 - Custom UA spoofing can evade; pair with sessionCredentialFromConsole when present.
 references:
 - https://aws.amazon.com/blogs/security/incident-response-guide-for-aws-cloudtrail-investigations-part-1/
@@ -29,6 +29,7 @@ references:
 - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
 telemetry_validated: false
 required_fields:
+- eventSource
 - eventName
 - userAgent
 - sessionCredentialFromConsole
@@ -47,8 +48,8 @@ query:
 
     | search userAgent="*exec-env/CloudShell*"
 
-    | search eventName IN ("CreateStack", "UpdateStack", "RunInstances", "CreateUser", "CreateAccessKey",
-    "CreateLoginProfile")
+    | search eventSource IN ("cloudformation.amazonaws.com", "iam.amazonaws.com") eventName IN ("CreateStack",
+    "UpdateStack", "RunInstances", "CreateUser", "CreateAccessKey", "CreateLoginProfile")
 
     | eval from_console=if(sessionCredentialFromConsole=true OR sessionCredentialFromConsole="true", "true",
     "false")

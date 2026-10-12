@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,7 @@ title: 'AWS: CloudFormation CreateStack with IAM capabilities from rare actor'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName IN ("CreateStack","UpdateStack")
+    | search eventSource="cloudformation.amazonaws.com" eventName IN ("CreateStack","UpdateStack")
 
     | search requestParameters.capabilities="*CAPABILITY_NAMED_IAM*" OR requestParameters.capabilities="*CAPABILITY_IAM*"
 

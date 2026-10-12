@@ -1,8 +1,11 @@
 severity: high
 query:
-  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=4697
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) (EventCode=4697 OR
+    EventID=4697)
 
     | search ServiceName="PSEXESVC"
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
 

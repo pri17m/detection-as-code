@@ -11,9 +11,9 @@ required_fields:
 - event_platform
 status: experimental
 author: DaC
-description: "Detects netsh disabling or weakening the Windows firewall (advfirewall state off / firewall\
-  \ set opmode disable / delete rule). SAFE ProcessRollup2 rewrite \u2014 FirewallSetRule-heavy Query-Hub\
-  \ Firewall_Rule_Additions.yml is THIN; uses ImageFileName+CommandLine predicates instead."
+description: Detects netsh disabling or weakening the Windows firewall (advfirewall state off / firewall
+  set opmode disable / delete rule). SAFE ProcessRollup2 rewrite — FirewallSetRule-heavy Query-Hub Firewall_Rule_Additions.yml
+  is THIN; uses ImageFileName+CommandLine predicates instead.
 tags:
 - enhance-tp
 - tp-quality-v2
@@ -22,12 +22,13 @@ tags:
 - esn:ProcessBlocked
 - qh:Firewall_Rule_Additions.yml
 - rewrite:firewallsetrule-thin-to-pr2-netsh
+- attack-v19-remap
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.004
+  - T1686
 id: DAC-CS-0010
 query:
   crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
@@ -44,11 +45,11 @@ query:
 severity: medium
 title: 'Falcon: netsh firewall off'
 false_positives:
-- "Legitimate GPO/MDM or IT scripts that toggle firewall during provisioning \u2014 allowlist management\
-  \ parents."
+- Legitimate GPO/MDM or IT scripts that toggle firewall during provisioning — allowlist management parents.
 - Softphone/VPN installers briefly adjusting firewall rules; baseline CommandLine before promote.
 platforms:
 - crowdstrike
 references:
 - https://attack.mitre.org/techniques/T1562/004/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Firewall_Rule_Additions.yml
+- https://attack.mitre.org/resources/updates/updates-april-2026/

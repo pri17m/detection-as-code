@@ -1,6 +1,6 @@
 id: DAC-WIN-0165
 title: User account enabled after create
-description: 4720 then 4722
+description: 'Behavior: User account enabled after create. Anchor after classic/XML coalesce. Not telemetry_validated.'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -15,7 +15,8 @@ mitre:
   - T1098
 severity: medium
 false_positives:
-- JML workflows
+- Admin tooling and change windows
+- Security agents loading signed drivers or modules
 references:
 - https://attack.mitre.org/techniques/T1098/
 telemetry_validated: false
@@ -25,9 +26,21 @@ required_fields:
 - SubjectUserName
 - SubjectDomainName
 query:
-  splunk: '(sourcetype="WinEventLog:Security" OR sourcetype="XmlWinEventLog:Security")
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Account=coalesce(TargetUserName, Account_Name, SubjectUserName)
+
+    | eval Ip=coalesce(IpAddress, Source_Network_Address, WorkstationName)
+
+    | search (EventCode IN (4720,4722) OR EventID IN (4720,4722))
+
+    | stats values(EventCode) AS codes by host Account
+
+    | where mvcount(codes)>=2
+
+    '
 tags:
 - phase1
 - windows

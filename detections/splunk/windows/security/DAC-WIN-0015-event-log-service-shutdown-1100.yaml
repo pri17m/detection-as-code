@@ -1,30 +1,42 @@
 id: DAC-WIN-0015
 title: Security tooling / Sysmon / audit tamper (1102/4719 + Sysmon service events)
-description: Detects common audit and telemetry tampering signals including audit log clear (1102) and audit policy change (4719), plus Sysmon service/config events where available. Investigate quickly on Domain Controllers and high-value hosts.
+description: Detects common audit and telemetry tampering signals including audit log clear (1102) and
+  audit policy change (4719), plus Sysmon service/config events where available. Investigate quickly on
+  Domain Controllers and high-value hosts.
 author: Threat Detection Engineering
 status: experimental
 platforms:
-  - splunk
+- splunk
 sourcetypes:
-  - windows_security
-  - windows_sysmon
+- windows_security
+- windows_sysmon
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
-    - defense-evasion
+  - defense-impairment
   techniques:
-    - T1562.001
+  - T1685
 severity: critical
 false_positives:
-  - Planned maintenance, authorized policy changes, EDR updates, or system reboots.
+- Planned maintenance, authorized policy changes, EDR updates, or system reboots.
 references:
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-1102
-  - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4719
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-1102
+- https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4719
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 telemetry_validated: false
 required_fields:
-  - SubjectUserName
+- SubjectUserName
 query:
-  splunk: |
-    (`windows_security` (EventCode=1102 OR EventCode=4719))
+  splunk: '(`windows_security` (EventCode=1102 OR EventCode=4719))
+
     OR (`windows_sysmon` (EventCode=4 OR EventCode=16 OR EventCode=255))
+
     | eval user=coalesce(SubjectUserName, User, Account_Name, user)
+
     | stats count values(Message) as messages by host, user, EventCode
+
+    '
+tags:
+- attack-v19-remap

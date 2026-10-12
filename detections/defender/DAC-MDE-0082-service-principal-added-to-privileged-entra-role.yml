@@ -1,0 +1,50 @@
+id: DAC-MDE-0082
+title: Service principal added to a privileged Entra ID directory role
+description: Detects successful role-assignment operations in Entra AuditLogs (Add member to role, Add eligible member to role, Add scoped member to role, PIM permanent and activation variants) where the target is a ServicePrincipal and the role display name is in the PrivilegedEntraRoles watchlist (populate it from the roles Microsoft labels PRIVILEGED). Workload identities with directory roles act without MFA or user sign-in and are a common persistence path.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:AuditLogs
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1098.003
+severity: high
+false_positives:
+- Approved automation onboarding (for example, provisioning connectors); confirm with the change record.
+references:
+- https://attack.mitre.org/techniques/T1098/003/
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/auditlogs
+- https://learn.microsoft.com/en-us/entra/identity/monitoring-health/reference-audit-activities
+- https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/privileged-roles-permissions
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- OperationName
+- Category
+- Result
+- TargetResources
+- InitiatedBy
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  defender: |
+    let PrivilegedRoles = _GetWatchlist('PrivilegedEntraRoles') | project RoleName = tostring(SearchKey);
+    AuditLogs
+    | where Category =~ "RoleManagement"
+    | where OperationName has_all ("member to role", "Add")
+    | where Result =~ "success"
+    | where tostring(TargetResources[0].type) =~ "ServicePrincipal"
+    | mv-expand Prop = TargetResources[0].modifiedProperties
+    | where tostring(Prop.displayName) == "Role.DisplayName"
+    | extend RoleName = trim(@'"', tostring(Prop.newValue))
+    | where RoleName in (PrivilegedRoles)
+    | extend ServicePrincipal = tostring(TargetResources[0].displayName), ServicePrincipalObjectId = tostring(TargetResources[0].id)
+    | extend Actor = coalesce(tostring(InitiatedBy.user.userPrincipalName), tostring(InitiatedBy.app.displayName))
+    | project TimeGenerated, OperationName, RoleName, ServicePrincipal, ServicePrincipalObjectId, Actor, CorrelationId

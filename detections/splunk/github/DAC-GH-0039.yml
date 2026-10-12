@@ -19,6 +19,7 @@ platforms:
 tags:
 - wave-b
 - P0
+- attack-v19-remap
 telemetry_validated: false
 required_fields:
 - actor
@@ -28,11 +29,12 @@ required_fields:
 - actor_ip
 references:
 - https://attack.mitre.org/techniques/T1562/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562
+  - T1685
 author: Detection Engineer
 status: experimental
 description: org.update_ip_allow_list disable

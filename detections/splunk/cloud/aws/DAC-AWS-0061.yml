@@ -1,0 +1,38 @@
+id: DAC-AWS-0061
+title: AWS CloudTrail logging stopped or trail deleted
+description: 'Behavior: StopLogging, DeleteTrail, or UpdateTrail on cloudtrail.amazonaws.com (T1685.002).
+  Anchor is eventSource+eventName. Not telemetry_validated.'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: critical
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1685.002
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- eventSource
+- eventName
+- userIdentity.arn
+- requestParameters
+telemetry_validated: false
+false_positives:
+- Pipeline teardown of a trail in a sandbox account
+references:
+- https://attack.mitre.org/techniques/T1685/002/
+tags:
+- aws
+- cloudtrail
+- gap-fill
+query:
+  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
+
+    | search eventSource="cloudtrail.amazonaws.com" eventName IN ("StopLogging","DeleteTrail","UpdateTrail")
+
+    | table _time eventName userIdentity.arn sourceIPAddress awsRegion errorCode requestParameters
+
+    '

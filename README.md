@@ -6,20 +6,20 @@ Debarshi Ghosh’s public detection-engineering portfolio: a multi-platform **De
 
 All counts below are computed from `detections/**` plus `content/mitre/coverage.json` on the current `main` tip.
 
-- **Total detections**: 819
-- **Rules per platform**: Splunk 609 • CrowdStrike 146 • Defender 64
-- **Splunk pack breakdown**: Windows 331 • Cloud 180 • GitHub 46 • VMware ESXi 37 • Claude compliance 15
-- **ATT&CK coverage**: 198 unique techniques • 13 unique tactics (normalized from `mitre.tactics` values)
-- **ATT&CK mapping completeness**: 819/819 detections include `mitre.techniques` (100%)
+- **Total detections**: 862
+- **Rules per platform**: Splunk 631 • CrowdStrike 160 • Defender 71
+- **Splunk pack breakdown**: Windows 344 • Cloud 181 • GitHub 54 • VMware ESXi 37 • Claude compliance 15
+- **ATT&CK coverage**: 209 unique techniques • 15 unique tactics (normalized from `mitre.tactics` values)
+- **ATT&CK mapping completeness**: 862/862 detections include `mitre.techniques` (100%)
 
 | Platform | Rules | Query format |
 | --- | ---: | --- |
-| Splunk | 609 | SPL (`query.splunk`) |
-| CrowdStrike Falcon | 146 | CQL / Falcon IOA-style patterns (`query.crowdstrike`) |
-| Microsoft Defender for Endpoint | 64 | KQL Advanced Hunting (`query.defender`) |
+| Splunk | 631 | SPL (`query.splunk`) |
+| CrowdStrike Falcon | 160 | CQL / Falcon IOA-style patterns (`query.crowdstrike`) |
+| Microsoft Defender for Endpoint | 71 | KQL Advanced Hunting (`query.defender`) |
 | Sigma sources | 0 Sigma YAMLs under `detections/` | 10 detections carry `sigma.path` metadata (Sigma→Splunk conversions) |
 
-**Tactics covered (normalized)**: `collection`, `command-and-control`, `credential-access`, `defense-evasion`, `discovery`, `execution`, `exfiltration`, `impact`, `initial-access`, `lateral-movement`, `persistence`, `privilege-escalation`, `resource-development`.
+**Tactics covered (normalized)**: `collection`, `command-and-control`, `credential-access`, `defense-evasion`, `defense-impairment`, `discovery`, `execution`, `exfiltration`, `impact`, `initial-access`, `lateral-movement`, `persistence`, `privilege-escalation`, `resource-development`, `stealth`.
 
 ### Primary telemetry / sourcetypes (by frequency in `sourcetypes`)
 

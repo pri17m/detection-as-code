@@ -1,8 +1,8 @@
 id: DAC-WIN-0105
 title: Pass-the-Hash NTLM Type 3 anomalies
-description: '4624 LogonType=3 AuthenticationPackage=NTLM | checklist: macros only;
-  no index=; EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary
-  required before telemetry_validated=true; FP baseline pending org allowlists'
+description: '4624 LogonType=3 AuthenticationPackage=NTLM | checklist: macros only; no index=; EventCode
+  on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true;
+  FP baseline pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -38,8 +38,10 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security` EventCode=4624 LogonType=3
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
+    (EventCode=4624 OR EventID=4624) LogonType=3
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval TargetUserName=coalesce(TargetUserName, Account_Name, user)
 
@@ -47,8 +49,7 @@ query:
 
     | eval WorkstationName=coalesce(WorkstationName, Workstation_Name, src_nt_host)
 
-    | eval AuthenticationPackageName=coalesce(AuthenticationPackageName, Authentication_Package,
-    AuthenticationPackage)
+    | eval AuthenticationPackageName=coalesce(AuthenticationPackageName, Authentication_Package, AuthenticationPackage)
 
     | eval KeyLength=coalesce(KeyLength, Key_Length)
 
@@ -56,7 +57,6 @@ query:
 
     | search NOT TargetUserName="*$"
 
-    | table _time host TargetUserName IpAddress WorkstationName LogonType AuthenticationPackageName
-    KeyLength
+    | table _time host TargetUserName IpAddress WorkstationName LogonType AuthenticationPackageName KeyLength
 
     '

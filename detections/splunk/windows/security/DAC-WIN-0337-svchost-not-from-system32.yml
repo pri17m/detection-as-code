@@ -1,0 +1,31 @@
+id: DAC-WIN-0337
+title: 'svchost.exe started from outside System32'
+description: 'Detects a process named svchost.exe whose image path is not Windows System32 or SysWOW64. A tunnel or loader copied over the svchost name still has to run from the directory it was dropped in. The service-host binary path is the behavior. The tool name is not.'
+author: DaC
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - WinEventLog:Security
+mitre:
+  tactics:
+    - defense-evasion
+    - persistence
+  techniques:
+    - T1036.005
+severity: high
+false_positives:
+  - 'A 32-bit svchost under SysWOW64 is excluded. An application that ships its own svchost.exe is rare and should be allowlisted by path.'
+references:
+  - 'https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688'
+telemetry_validated: false
+required_fields:
+  - EventCode
+  - NewProcessName
+query:
+  splunk: |
+    sourcetype=WinEventLog:Security EventCode=4688
+    | eval proc=lower(coalesce(NewProcessName, process_path, Image))
+    | where match(proc, "(?i)\\\\svchost\.exe$")
+    | where NOT match(proc, "(?i)\\\\windows\\\\(system32|syswow64)\\\\svchost\.exe$")
+    | stats count min(_time) as firstTime values(CommandLine) as command values(ParentProcessName) as parent by Computer, SubjectUserName, proc

@@ -1,8 +1,8 @@
 id: DAC-WIN-0109
 title: Password spray then success
-description: '4625/4771 many users one src then 4624 | checklist: macros only; no
-  index=; EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary
-  required before telemetry_validated=true; FP baseline pending org allowlists'
+description: '4625/4771 many users one src then 4624 | checklist: macros only; no index=; EventCode on
+  allowlisted channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true;
+  FP baseline pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -43,8 +43,10 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security` EventCode IN (4625,4771,4624)
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
+    (EventCode IN (4625,4771,4624) OR EventID IN (4625,4771,4624))
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval TargetUserName=coalesce(TargetUserName, Account_Name, user)
 
@@ -56,8 +58,9 @@ query:
 
     | bin _time span=15m
 
-    | stats dc(TargetUserName) AS users values(EventCode) AS codes count(eval(EventCode=4625
-    OR EventCode=4771)) AS fails count(eval(EventCode=4624)) AS oks by _time src host
+    | stats dc(TargetUserName) AS users values(EventCode) AS codes count(eval((EventCode=4625 OR EventID=4625)
+    OR (EventCode=4771 OR EventID=4771))) AS fails count(eval((EventCode=4624 OR EventID=4624))) AS oks
+    by _time src host
 
     | where users > 15 AND fails > 20
 

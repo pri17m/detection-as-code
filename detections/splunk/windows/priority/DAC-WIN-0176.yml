@@ -1,12 +1,15 @@
 id: DAC-WIN-0176
 title: DNS query to tunneling / suspicious patterns
-description: Sysmon 22 QueryName suspicious
+description: 'Behavior: DNS query to tunneling / suspicious patterns. Anchor after classic/XML coalesce.
+  Not telemetry_validated.'
 author: Detection Engineer
 status: experimental
 platforms:
 - splunk
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
 mitre:
   tactics:
   - command-and-control
@@ -14,7 +17,8 @@ mitre:
   - T1071.004
 severity: medium
 false_positives:
-- CDN/dev domains
+- Admin tooling and change windows
+- Security agents loading signed drivers or modules
 references:
 - https://attack.mitre.org/techniques/T1071/004/
 telemetry_validated: false
@@ -26,9 +30,28 @@ required_fields:
 - Status
 - User
 query:
-  splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational")
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
 
-    | table _time host'
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search (EventCode=22 OR EventID=22)
+
+    | eval Query=coalesce(QueryName, query)
+
+    | where match(Query, "(?i)^[a-z0-9]{25,}\.|dnscat|\.localtunnel\.|trycloudflare")
+
+    | table _time host Image Query
+
+    '
 tags:
 - phase1
 - windows

@@ -1,6 +1,9 @@
 severity: medium
 query:
-  splunk: '(sourcetype=XmlWinEventLog:System OR sourcetype=WinEventLog:System) EventCode IN (39,41)
+  splunk: '(sourcetype=XmlWinEventLog:System OR sourcetype=WinEventLog:System) (EventCode IN (39,41) OR
+    EventID IN (39,41))
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
 

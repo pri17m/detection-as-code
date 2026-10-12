@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,7 @@ title: 'AWS: Console login success for root or rarely used IAM user'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName="ConsoleLogin"
+    | search eventSource="signin.amazonaws.com" eventName="ConsoleLogin"
 
     | search userIdentity.type="Root" OR additionalEventData.MFAUsed="No" OR errorMessage=""
 

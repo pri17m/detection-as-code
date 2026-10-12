@@ -1,0 +1,53 @@
+id: DAC-WIN-0340
+title: Regsvcs or Regasm execution with network or no args
+description: 'Behavior: regsvcs/regasm used as a proxy execution host (T1218.009). Anchor is Image plus
+  empty args or http/unc in CommandLine. Not telemetry_validated.'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - defense-evasion
+  techniques:
+  - T1218.009
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+- sysmon
+required_fields:
+- EventCode
+- Image
+- CommandLine
+- ParentImage
+telemetry_validated: false
+false_positives:
+- Developers registering assemblies from build paths
+references:
+- https://attack.mitre.org/techniques/T1218/009/
+tags:
+- windows
+- gap-fill
+- lolbin
+query:
+  splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=sysmon) `windows_sysmon`
+
+    | eval EventCode=coalesce(EventCode, EventID)
+
+    | eval Image=coalesce(Image, NewProcessName)
+
+    | eval CommandLine=coalesce(CommandLine, Process_Command_Line)
+
+    | eval ParentImage=coalesce(ParentImage, ParentProcessName)
+
+    | eval User=coalesce(User, UserName, SubjectUserName)
+
+    | search (EventCode=1 OR EventID=1) Image IN ("*\\regsvcs.exe","*\\regasm.exe")
+
+    | where match(CommandLine, "(?i)http|\\\\|\\users\\|\\temp\\") OR len(CommandLine)<40
+
+    | table _time host User Image ParentImage CommandLine
+
+    '

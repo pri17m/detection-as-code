@@ -1,0 +1,43 @@
+id: DAC-WIN-0338
+title: 'Process started from a staging directory seen in intrusion reports'
+description: 'Detects event 4688 when the image path is a directory that Huntress and The DFIR Report repeatedly show used for payload execution. PerfLogs appears in Akira, INC, Settra, Ryuk, and a 2025 multi-gang case. Users\Public, including Music and Documents, appears in INC, PLAY, and the 2025 DFIR Report case. ProgramData is the DFIR Report workhorse for beacons, Mimikatz, ProcDump, and Akira locker.exe, including subfolders such as ProgramData\x86.dll. Vendor updater folders under ProgramData are excluded. Downloads and AppData are excluded because installers and normal software run from there.'
+author: DaC
+status: experimental
+platforms:
+  - splunk
+sourcetypes:
+  - WinEventLog:Security
+mitre:
+  tactics:
+    - execution
+    - defense-evasion
+  techniques:
+    - T1204.002
+    - T1036.005
+severity: high
+false_positives:
+  - 'An installer helper that runs from Windows Temp. Allowlist the parent, not the path.'
+  - 'A management agent an admin copied into Users\Public. Allowlist that full path.'
+references:
+  - 'https://www.huntress.com/blog/mapping-akira-ransomware-attack'
+  - 'https://www.huntress.com/blog/dispelling-ransomware-deployment-myths'
+  - 'https://thedfirreport.com/2020/10/18/ryuk-in-5-hours/'
+  - 'https://thedfirreport.com/2026/06/29/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira-3/'
+  - 'https://thedfirreport.com/2025/09/08/blurring-the-lines-intrusion-shows-connection-with-three-major-ransomware-gangs/'
+  - 'https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688'
+telemetry_validated: false
+required_fields:
+  - EventCode
+  - NewProcessName
+query:
+  splunk: |
+    sourcetype=WinEventLog:Security EventCode=4688
+    | eval proc=lower(coalesce(NewProcessName, process_path, Image))
+    | where match(proc, "(?i)(\\\\perflogs\\\\|\\\\users\\\\public\\\\|\\\\windows\\\\temp\\\\|\\\\temp\\\\|\\\\windows\\\\tasks\\\\|\\\\windows\\\\tracing\\\\|\\\\windows\\\\registration\\\\crmlog\\\\|\\\\spool\\\\drivers\\\\color\\\\|\\\\spool\\\\printers\\\\|\\\\com\\\\dmp\\\\)")
+        OR match(proc, "(?i)^[a-z]:\\\\programdata\\\\.+")
+        OR match(proc, "(?i)^[a-z]:\\\\users\\\\[^\\\\]+\\\\[^\\\\]+\\.(exe|dll)$")
+        OR match(proc, "(?i)^[a-z]:\\\\windows\\\\[^\\\\]+\\.(exe|dll)$")
+    | where NOT match(proc, "(?i)\\\\windows\\\\(system32|syswow64)\\\\")
+    | where NOT match(proc, "(?i)\\\\users\\\\[^\\\\]+\\\\(appdata|desktop|documents|downloads)\\\\")
+    | where NOT match(proc, "(?i)\\\\programdata\\\\(microsoft|package cache|packages|usoshared|software distribution)\\\\")
+    | stats count min(_time) as firstTime values(CommandLine) as command values(ParentProcessName) as parent by Computer, SubjectUserName, proc

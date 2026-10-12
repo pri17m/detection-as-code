@@ -1,8 +1,8 @@
 id: DAC-WIN-0110
 title: Scheduled task created with LOLBin/SYSTEM
-description: '4698 TaskContent LOLBin/SYSTEM; Sysmon 1 schtasks /create | checklist:
-  macros only; no index=; EventCode on allowlisted channel; coalesce classic/XML aliases;
-  fieldsummary required before telemetry_validated=true; FP baseline pending org allowlists'
+description: '4698 TaskContent LOLBin/SYSTEM; Sysmon 1 schtasks /create | checklist: macros only; no index=;
+  EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before telemetry_validated=true;
+  FP baseline pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -48,10 +48,11 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security
-    OR sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational)
-    (`windows_security` EventCode=4698) OR (`windows_sysmon` EventCode=1 Image="*\\schtasks.exe"
-    CommandLine="*/create*")
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security OR sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+    OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational) (`windows_security` (EventCode=4698
+    OR EventID=4698)) OR (`windows_sysmon` (EventCode=1 OR EventID=1) Image="*\\schtasks.exe" CommandLine="*/create*")
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval TaskName=coalesce(TaskName, Task_Name)
 
@@ -63,11 +64,9 @@ query:
 
     | eval CommandLine=coalesce(CommandLine, process_command_line, cmdline)
 
-    | search EventCode=4698 (TaskContent="*powershell*" OR TaskContent="*-enc*" OR
-    TaskContent="*cmd.exe*" OR TaskContent="*mshta*" OR TaskContent="*http*" OR TaskContent="*SYSTEM*")
-    OR EventCode=1
+    | search (EventCode=4698 OR EventID=4698) (TaskContent="*powershell*" OR TaskContent="*-enc*" OR TaskContent="*cmd.exe*"
+    OR TaskContent="*mshta*" OR TaskContent="*http*" OR TaskContent="*SYSTEM*") OR (EventCode=1 OR EventID=1)
 
-    | table _time host EventCode TaskName TaskContent Image CommandLine SubjectUserName
-    User
+    | table _time host EventCode TaskName TaskContent Image CommandLine SubjectUserName User
 
     '

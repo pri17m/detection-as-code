@@ -1,8 +1,11 @@
 severity: medium
 query:
-  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) EventCode=4769
+  splunk: '(sourcetype=XmlWinEventLog:Security OR sourcetype=WinEventLog:Security) (EventCode=4769 OR
+    EventID=4769)
 
     | search TicketEncryptionType="0x17"
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
 

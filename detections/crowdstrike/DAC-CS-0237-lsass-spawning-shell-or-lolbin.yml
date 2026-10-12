@@ -1,0 +1,43 @@
+id: DAC-CS-0237
+title: LSASS spawning a shell, script host or LOLBin
+description: Detects ProcessRollup2 events where the parent is lsass.exe and the child is a command shell, PowerShell, script host or common proxy binary (cmd, powershell, pwsh, wscript, cscript, mshta, rundll32, regsvr32, net, whoami). LSASS does not launch interactive tooling in normal operation; a shell under LSASS indicates code execution inside the process, for example after exploitation of an authentication service. Rare parent/child lineage.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - lateral-movement
+  - execution
+  techniques:
+  - T1210
+  - T1059
+severity: critical
+false_positives:
+- None expected for the listed children; investigate every hit.
+references:
+- https://attack.mitre.org/techniques/T1210/
+- https://attack.mitre.org/techniques/T1059/
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Using%20correlate()%20to%20hunt%20process%20lineage.md
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Hunting%20bcdedit.exe%20usage.md
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- FileName
+- CommandLine
+- ParentBaseFileName
+- GrandParentBaseFileName
+tags:
+- behavioural
+- clean-room
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Win ParentBaseFileName=/^lsass\.exe$/i
+    | FileName=/^(cmd|powershell|pwsh|wscript|cscript|mshta|rundll32|regsvr32|net|net1|whoami)\.exe$/i
+    | groupBy([aid, ComputerName, FileName, ParentBaseFileName, GrandParentBaseFileName], function=[count(as=executions), collect([UserName, CommandLine])])

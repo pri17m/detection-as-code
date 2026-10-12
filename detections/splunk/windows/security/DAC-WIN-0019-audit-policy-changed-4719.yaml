@@ -1,7 +1,7 @@
 id: DAC-WIN-0019
 title: Audit policy changed (4719)
-description: Detects changes to local audit policy (4719), which can be used to impair
-  logging and evade detection.
+description: Detects changes to local audit policy (4719), which can be used to impair logging and evade
+  detection.
 author: DaC
 status: experimental
 platforms:
@@ -10,14 +10,15 @@ sourcetypes:
 - WinEventLog:Security
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562.002
+  - T1685.001
 severity: high
 false_positives:
 - Planned policy changes via GPO or security tooling.
 references:
 - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4719
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 telemetry_validated: false
 required_fields:
 - EventCode
@@ -31,3 +32,5 @@ query:
     | stats count values(AuditPolicyChanges) as changes by user, host
 
     '
+tags:
+- attack-v19-remap

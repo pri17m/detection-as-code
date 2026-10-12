@@ -10,21 +10,23 @@ sourcetypes:
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1070.001
+  - T1685.005
 severity: medium
 false_positives:
 - Tune to your environment and allowlist known tooling.
 references:
 - https://www.crowdstrike.com/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 telemetry_validated: false
 required_fields:
 - ImageFileName
 - CommandLine
 - ParentBaseFileName
 query:
-  crowdstrike: 'falcon_ioa_pattern: ImageFileName="wevtutil.exe" AND CommandLine CONTAINS_ALL
-    ["cl"]
+  crowdstrike: 'falcon_ioa_pattern: ImageFileName="wevtutil.exe" AND CommandLine CONTAINS_ALL ["cl"]
 
     '
+tags:
+- attack-v19-remap

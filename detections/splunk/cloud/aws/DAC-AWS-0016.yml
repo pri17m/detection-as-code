@@ -1,6 +1,7 @@
 false_positives:
 - Tune after baselining; experimental sketch may be noisy.
 required_fields:
+- eventSource
 - eventName
 - userIdentity.arn
 - sourceIPAddress
@@ -18,7 +19,7 @@ title: 'AWS: EC2 CreateSnapshot then share or copy to another account'
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 
-    | search eventName="ModifySnapshotAttribute"
+    | search eventSource="ec2.amazonaws.com" eventName="ModifySnapshotAttribute"
 
     | search requestParameters.attributeType="CREATE_VOLUME_PERMISSION" OR requestParameters.createVolumePermission="*"
 
@@ -34,6 +35,6 @@ tags:
 - wave-c
 - P1
 - phase2-related
-description: "CreateSnapshot \u2192 ModifySnapshotAttribute"
+description: CreateSnapshot → ModifySnapshotAttribute
 sourcetypes:
 - aws:cloudtrail

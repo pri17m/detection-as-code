@@ -1,0 +1,43 @@
+id: DAC-CS-0227
+title: macOS process executed from a temp or shared path with an Apple-style or hidden name
+description: Detects macOS ProcessRollup2 executions whose image lives directly in /tmp, /private/tmp or /Users/Shared and whose basename imitates Apple components (com.apple.*, softwareupdate, mdworker, launchd, cfprefsd) or is dot-prefixed and Apple-styled. Genuine Apple binaries live in /System, /usr and /Library; combining a world-writable location, a hidden or Apple-lookalike name and execution is the masquerading behaviour. Both /tmp and /private/tmp forms are matched because the recorded form is not documented.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - stealth
+  techniques:
+  - T1036.005
+  - T1564.001
+severity: high
+false_positives:
+- Installer helpers that unpack into /tmp with vendor names; Apple names should not appear there. Allowlist by parent and team ID when confirmed.
+references:
+- https://attack.mitre.org/techniques/T1036/005/
+- https://attack.mitre.org/techniques/T1564/001/
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Queries/%5BT1087.001%5D%20Account%20Discovery%20-%20Local%20Accounts%20-%20Mac.logscale
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- UID
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Mac
+    | ImageFileName=/^(\/private)?\/tmp\/[^\/]+$|^\/Users\/Shared\/[^\/]+$/
+    | ImageFileName=/\/\.?(com\.apple\.[^\/]+|softwareupdate[^\/]*|mdworker[^\/]*|launchd[^\/]*|cfprefsd[^\/]*)$/i
+    | case { ImageFileName=/\/\.[^\/]+$/ | Hidden:="yes"; * | Hidden:="no" }
+    | groupBy([aid, ComputerName, ImageFileName, ParentBaseFileName, UID, Hidden], function=[count(as=executions), collect([CommandLine])])

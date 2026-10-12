@@ -1,8 +1,8 @@
 id: DAC-WIN-0113
 title: WmiPrvSE / wsmprovhost unusual children
-description: 'Sysmon 1 Parent WmiPrvSE/wsmprovhost to cmd/powershell/LOLBins | checklist:
-  macros only; no index=; EventCode on allowlisted channel; coalesce classic/XML aliases;
-  fieldsummary required before telemetry_validated=true; FP baseline pending org allowlists'
+description: 'Sysmon 1 Parent WmiPrvSE/wsmprovhost to cmd/powershell/LOLBins | checklist: macros only;
+  no index=; EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary required before
+  telemetry_validated=true; FP baseline pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -44,7 +44,9 @@ tags:
 - windows
 query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
-    OR sourcetype=sysmon) `windows_sysmon` EventCode=1
+    OR sourcetype=sysmon) `windows_sysmon` (EventCode=1 OR EventID=1)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval ParentImage=coalesce(ParentImage, ParentProcessName, parent_process)
 
@@ -54,12 +56,10 @@ query:
 
     | eval User=coalesce(User, UserName, SubjectUserName)
 
-    | search ParentImage="*\\WmiPrvSE.exe" OR ParentImage="*\\wsmprovhost.exe" OR
-    ParentImage="*\\winrshost.exe"
+    | search ParentImage="*\\WmiPrvSE.exe" OR ParentImage="*\\wsmprovhost.exe" OR ParentImage="*\\winrshost.exe"
 
-    | search Image="*\\cmd.exe" OR Image="*\\powershell.exe" OR Image="*\\pwsh.exe"
-    OR Image="*\\certutil.exe" OR Image="*\\mshta.exe" OR Image="*\\rundll32.exe"
-    OR Image="*\\bitsadmin.exe"
+    | search Image="*\\cmd.exe" OR Image="*\\powershell.exe" OR Image="*\\pwsh.exe" OR Image="*\\certutil.exe"
+    OR Image="*\\mshta.exe" OR Image="*\\rundll32.exe" OR Image="*\\bitsadmin.exe"
 
     | table _time host ParentImage Image CommandLine User
 

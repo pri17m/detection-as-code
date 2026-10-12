@@ -3,8 +3,8 @@ status: experimental
 severity: medium
 author: DaC
 false_positives:
-- "Legitimate admin or software deployment matching ImageFileName/CommandLine patterns \u2014 baseline\
-  \ before promote."
+- Legitimate admin or software deployment matching ImageFileName/CommandLine patterns — baseline before
+  promote.
 - Tune ParentBaseFileName allowlists for known management tools.
 sourcetypes:
 - falcon:process
@@ -16,14 +16,14 @@ platforms:
 title: 'Falcon: EDRCHOKER - QoS Policy Abuse Targeting EDR/AV Processes'
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1562
-  - T1562.001
+  - T1685
 references:
 - https://attack.mitre.org/techniques/T1562/
 - https://attack.mitre.org/techniques/T1562/001/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/edrchoker_qos_policy_abuse_targeting_edr_av_processes.yml
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 query:
   crowdstrike: "case {\n  #event_simpleName=ProcessRollup2\n  | CommandLine=/New-NetQosPolicy|Set-NetQosPolicy/i\n\
     \  | CommandLine=/ThrottleRateActionBitsPerSecond|AppPathNameMatchCondition/i\n  | CommandLine=/(SenseIR\\\
@@ -53,3 +53,4 @@ tags:
 - tp-quality-v2
 - esn:ProcessRollup2
 - esn:RegGenericValue
+- attack-v19-remap

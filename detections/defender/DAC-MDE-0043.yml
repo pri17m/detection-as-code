@@ -1,6 +1,7 @@
 author: Detection Engineer
 references:
 - https://attack.mitre.org/techniques/T1070/001/
+- https://attack.mitre.org/resources/updates/updates-april-2026/
 title: 'MDE: wevtutil clear Security log'
 description: DeviceProcessEvents
 severity: high
@@ -20,6 +21,7 @@ tags:
 - wave-a
 - P0
 - parity:DAC-CS-0043
+- attack-v19-remap
 query:
   defender: 'DeviceProcessEvents
 
@@ -32,6 +34,6 @@ sourcetypes:
 - mde:advanced_hunting
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
-  - T1070.001
+  - T1685.005

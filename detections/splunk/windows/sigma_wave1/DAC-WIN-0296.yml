@@ -1,7 +1,9 @@
 severity: high
 query:
   splunk: '(sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
-    OR sourcetype=sysmon) EventCode=3
+    OR sourcetype=sysmon) (EventCode=3 OR EventID=3)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval user=coalesce(TargetUserName, Account_Name, User, SubjectUserName, user)
 

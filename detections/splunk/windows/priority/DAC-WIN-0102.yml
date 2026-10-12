@@ -1,9 +1,8 @@
 id: DAC-WIN-0102
 title: Kerberoasting RC4 TGS burst
-description: 'Security 4769 TicketEncryptionType=0x17; burst distinct ServiceName
-  | checklist: macros only; no index=; EventCode on allowlisted channel; coalesce
-  classic/XML aliases; fieldsummary required before telemetry_validated=true; FP baseline
-  pending org allowlists'
+description: 'Security 4769 TicketEncryptionType=0x17; burst distinct ServiceName | checklist: macros
+  only; no index=; EventCode on allowlisted channel; coalesce classic/XML aliases; fieldsummary required
+  before telemetry_validated=true; FP baseline pending org allowlists'
 author: Detection Engineer
 status: experimental
 platforms:
@@ -41,8 +40,10 @@ tags:
 - tier:P0
 - windows
 query:
-  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security)
-    `windows_security` EventCode=4769
+  splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
+    (EventCode=4769 OR EventID=4769)
+
+    | eval EventCode=coalesce(EventCode, EventID)
 
     | eval TargetUserName=coalesce(TargetUserName, Account_Name, user)
 
@@ -58,8 +59,8 @@ query:
 
     | bin _time span=15m
 
-    | stats dc(ServiceName) AS spn_count values(ServiceName) AS spns by _time TargetUserName
-    IpAddress host
+    | stats dc(ServiceName) AS spn_count values(ServiceName) AS spns by _time TargetUserName IpAddress
+    host
 
     | where spn_count > 10
 
