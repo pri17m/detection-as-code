@@ -33,7 +33,7 @@ references:
 - https://attack.mitre.org/techniques/T1671/
 mitre:
   tactics:
-  - defense-evasion
+  - persistence
   techniques:
   - T1671
 author: Detection Engineer

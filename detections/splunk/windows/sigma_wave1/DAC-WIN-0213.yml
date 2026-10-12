@@ -41,7 +41,7 @@ mitre:
   tactics:
   - credential-access
   - execution
-  - defense-evasion
+  - stealth
   techniques:
   - T1003.001
   - T1059.001

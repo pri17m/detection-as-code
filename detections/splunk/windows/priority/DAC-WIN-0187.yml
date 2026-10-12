@@ -12,7 +12,7 @@ sourcetypes:
 - sysmon
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1070.003
 severity: medium

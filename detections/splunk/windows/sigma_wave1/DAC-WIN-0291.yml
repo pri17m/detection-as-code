@@ -39,7 +39,7 @@ id: DAC-WIN-0291
 description: Detects a remote DLL load event via "rundll32.exe".
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - persistence
   techniques:
   - T1218.011

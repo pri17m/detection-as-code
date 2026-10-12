@@ -6,7 +6,7 @@ description: 'Part 2 advanced evasion: CreateUser (success or attempt) with look
 mitre:
   tactics:
   - persistence
-  - defense-evasion
+  - stealth
   techniques:
   - T1136.003
   - T1036.005

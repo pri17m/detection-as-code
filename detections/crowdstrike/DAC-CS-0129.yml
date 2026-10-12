@@ -28,7 +28,7 @@ query:
     '
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1574.001
 title: 'Falcon: ClassifiedModuleLoad into Signed Microsoft Binary from User Path'

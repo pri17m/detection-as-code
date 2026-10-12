@@ -42,6 +42,7 @@ tags:
 - tp-quality-v2
 - src:hidden_scheduled_tasks.yml
 - esn:ScheduledTaskRegistered
+- needs-review
 severity: medium
 required_fields:
 - '#event_simpleName'

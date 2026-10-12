@@ -3,7 +3,7 @@
     "detections_total": 862,
     "detections_with_mitre": 862,
     "detections_with_mitre_percent": 100.0,
-    "unique_techniques": 209,
+    "unique_techniques": 208,
     "platform_counts": {
       "crowdstrike": 160,
       "defender": 71,
@@ -1351,8 +1351,10 @@
       "DAC-WIN-0293"
     ],
     "T1574.001": [
+      "DAC-CS-0126",
       "DAC-CS-0128",
       "DAC-CS-0129",
+      "DAC-WIN-0083",
       "DAC-WIN-0171",
       "DAC-WIN-0172",
       "DAC-WIN-0220",
@@ -1369,11 +1371,6 @@
       "DAC-WIN-0299",
       "DAC-WIN-0312",
       "DAC-WIN-0313"
-    ],
-    "T1574.002": [
-      "DAC-CS-0126",
-      "DAC-CS-0128",
-      "DAC-WIN-0083"
     ],
     "T1578": [
       "DAC-AWS-0016",

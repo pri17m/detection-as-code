@@ -10,7 +10,7 @@ sourcetypes:
 mitre:
   tactics:
     - execution
-    - defense-evasion
+    - stealth
   techniques:
     - T1204.002
     - T1036.005

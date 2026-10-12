@@ -39,7 +39,7 @@ description: Detects file access requests to potentially sensitive files hosted 
   share.
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1484.001
   - T1552.006

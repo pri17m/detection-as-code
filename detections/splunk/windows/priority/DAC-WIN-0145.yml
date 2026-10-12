@@ -9,7 +9,7 @@ platforms:
 severity: medium
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1218.011
 sourcetypes:

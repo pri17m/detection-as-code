@@ -10,7 +10,7 @@ sourcetypes:
 - vmware:esxlog*
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - initial-access
   techniques:
   - T1078

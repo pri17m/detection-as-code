@@ -30,7 +30,7 @@ query:
 mitre:
   tactics:
   - command-and-control
-  - defense-evasion
+  - stealth
   techniques:
   - T1071
   - T1218

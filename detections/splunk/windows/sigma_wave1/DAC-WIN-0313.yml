@@ -38,7 +38,7 @@ id: DAC-WIN-0313
 description: Rundll32 can be use by Cobalt Strike with StartW function to load DLLs from the command line.
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - persistence
   techniques:
   - T1218.011

@@ -31,7 +31,7 @@ references:
 - https://attack.mitre.org/techniques/T1195/002/
 mitre:
   tactics:
-  - defense-evasion
+  - initial-access
   techniques:
   - T1195.002
 author: Detection Engineer

@@ -38,7 +38,7 @@ id: DAC-WIN-0312
 description: F-Secure C3 produces DLLs with a default exported StartNodeRelay function.
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - persistence
   techniques:
   - T1218.011

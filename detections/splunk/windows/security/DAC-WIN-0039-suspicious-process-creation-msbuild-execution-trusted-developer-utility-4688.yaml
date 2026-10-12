@@ -12,7 +12,7 @@ sourcetypes:
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - stealth
   techniques:
   - T1127.001
 severity: medium

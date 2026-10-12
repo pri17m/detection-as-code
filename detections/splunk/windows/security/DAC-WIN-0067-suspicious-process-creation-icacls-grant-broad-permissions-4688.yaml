@@ -11,7 +11,7 @@ sourcetypes:
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1222.001
 severity: medium
