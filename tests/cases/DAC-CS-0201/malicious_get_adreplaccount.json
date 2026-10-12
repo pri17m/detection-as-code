@@ -1,0 +1,8 @@
+{
+  "label": "malicious",
+  "source": "Atomic T1003.006 test a0bced08",
+  "CommandLine": "powershell.exe -Command Get-ADReplAccount -All -Server dc01.lab.local",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+  "RemotePort": 389,
+  "expect_alert": true
+}

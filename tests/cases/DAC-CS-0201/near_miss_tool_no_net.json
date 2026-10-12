@@ -1,0 +1,8 @@
+{
+  "label": "near-miss",
+  "source": "secretsdump process without NetworkConnectIP4 join",
+  "CommandLine": "secretsdump.py lab/admin@dc01",
+  "ImageFileName": "C:\\\\Tools\\\\secretsdump.exe",
+  "expect_alert": false,
+  "note": "selfJoinFilter requires net stage"
+}

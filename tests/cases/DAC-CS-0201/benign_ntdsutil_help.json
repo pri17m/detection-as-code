@@ -1,0 +1,7 @@
+{
+  "label": "benign",
+  "source": "ntdsutil without ifm/dcsync tokens and without net join",
+  "CommandLine": "ntdsutil.exe help",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\ntdsutil.exe",
+  "expect_alert": false
+}
