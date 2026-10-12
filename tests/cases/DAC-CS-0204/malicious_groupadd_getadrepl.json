@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "source": "Atomic T1003.006 + well-known SID 512",
+  "GroupRidDec": 512,
+  "CommandLine": "powershell.exe Get-ADReplAccount -All -Server dc01",
+  "expect_alert": true
+}

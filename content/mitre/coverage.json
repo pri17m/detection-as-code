@@ -3,7 +3,7 @@
     "detections_total": 862,
     "detections_with_mitre": 862,
     "detections_with_mitre_percent": 100.0,
-    "unique_techniques": 208,
+    "unique_techniques": 209,
     "platform_counts": {
       "crowdstrike": 160,
       "defender": 71,
@@ -658,6 +658,9 @@
       "DAC-ENTRA-0029",
       "DAC-ENTRA-0030",
       "DAC-MDE-0084"
+    ],
+    "T1098.007": [
+      "DAC-CS-0204"
     ],
     "T1105": [
       "DAC-CS-0011",
