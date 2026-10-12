@@ -1,0 +1,8 @@
+{
+  "label": "benign",
+  "source": "Microsoft\\\\Windows\\\\ tasks excluded by TaskName filter",
+  "TaskName": "\\\\Microsoft\\\\Windows\\\\WindowsUpdate\\\\Scheduled Start",
+  "TaskExecCommand": "powershell.exe",
+  "TaskExecArguments": "-EncodedCommand SQBFAFgA",
+  "expect_alert": false
+}

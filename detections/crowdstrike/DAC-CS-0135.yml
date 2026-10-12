@@ -23,8 +23,8 @@ query:
 
     | (TaskExecCommand=/(-enc|-encodedcommand)/i OR TaskExecArguments=/(-enc|-encodedcommand)/i)
 
-    | (TaskExecCommand=/(downloadstring|downloadfile|iex|invoke-expression|frombase64string|net\.webclient)/i
-    OR TaskExecArguments=/(downloadstring|downloadfile|iex|invoke-expression|frombase64string|net\.webclient)/i)
+    | (TaskExecCommand=/(downloadstring|downloadfile|downloaddata|iex|invoke-expression|frombase64string|net\.webclient|SQBFAFgA|aQBlAHgA)/i
+    OR TaskExecArguments=/(downloadstring|downloadfile|downloaddata|iex|invoke-expression|frombase64string|net\.webclient|SQBFAFgA|aQBlAHgA)/i)
 
     | groupBy([aid, ComputerName, TaskName, TaskExecCommand, TaskExecArguments], function=count())
 
@@ -44,6 +44,7 @@ references:
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/suspicious_scheduled_task_creation.yml
 - "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
+- reviewed-batch1
 - cs-query-hub
 - safe-esn-wave
 - tp-quality-v2

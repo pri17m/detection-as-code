@@ -1,0 +1,8 @@
+{
+  "label": "near-miss",
+  "source": "encoded but no download/exec intent token",
+  "TaskName": "\\\\IT\\\\Report",
+  "TaskExecCommand": "powershell.exe",
+  "TaskExecArguments": "-EncodedCommand RwBlAHQALQBEAGEAdABlAA==",
+  "expect_alert": false
+}

