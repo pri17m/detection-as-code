@@ -23,6 +23,7 @@ references:
 - https://attack.mitre.org/techniques/T1059/001/
 - https://attack.mitre.org/techniques/T1204/002/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/jar_file_executed_from_appdata.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: '#event_simpleName=ProcessRollup2
 

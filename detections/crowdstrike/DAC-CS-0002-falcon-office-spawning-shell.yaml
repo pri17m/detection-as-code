@@ -47,3 +47,4 @@ references:
 - https://attack.mitre.org/techniques/T1204/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/attachments_send_by_outlook.yml
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Hunt_links_opened_from_Outlook.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"

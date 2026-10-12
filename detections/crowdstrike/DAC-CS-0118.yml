@@ -38,6 +38,7 @@ references:
 - https://attack.mitre.org/techniques/T1197/
 - https://attack.mitre.org/techniques/T1105/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/hunting_bitsadmin_usage.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

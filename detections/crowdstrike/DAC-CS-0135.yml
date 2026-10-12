@@ -42,6 +42,7 @@ references:
 - https://attack.mitre.org/techniques/T1053/005/
 - https://attack.mitre.org/techniques/T1059/001/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/suspicious_scheduled_task_creation.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

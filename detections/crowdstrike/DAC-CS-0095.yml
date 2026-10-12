@@ -35,6 +35,7 @@ status: experimental
 references:
 - https://attack.mitre.org/techniques/T1053/005/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/startup_events.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

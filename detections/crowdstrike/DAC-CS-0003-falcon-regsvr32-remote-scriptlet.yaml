@@ -51,3 +51,4 @@ platforms:
 references:
 - https://attack.mitre.org/techniques/T1218/010/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/LOLBin_Regsvr32.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"

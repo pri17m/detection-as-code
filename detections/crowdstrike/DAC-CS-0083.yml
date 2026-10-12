@@ -21,6 +21,7 @@ mitre:
 references:
 - https://attack.mitre.org/techniques/T1059/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/ROKRAT_Malware_APT_37.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "case {\n  #event_simpleName=ProcessRollup2\n  | in(field=SHA256HashData, values=[\"3fa06c290c477c133ca58512c7852fc998632721f2dc3a0984f18fbe86451e18\"\
     ,\"ccb6ca4cb385db50dad2e3b7c68a90ddee62398edb0fd41afdb793287cfbe8e6\",\"9eca7ab62e3ad40b79116ad713462e3ae4d9610345952e5dd279f0b481870d4f\"\

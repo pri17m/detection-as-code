@@ -22,6 +22,7 @@ mitre:
 references:
 - https://attack.mitre.org/techniques/T1059/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/snowman.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: "#event_simpleName=ProcessRollup2\n| ImageFileName=/\\\\(Acrobat|AcroRd32|AcroRd64)\\.exe$/i\n\
     | rename(field=TargetProcessId, as=AdobePid)\n| join({\n    in(#event_simpleName, values=[\"NetworkConnectIP4\"\

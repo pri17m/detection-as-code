@@ -49,3 +49,4 @@ references:
 - https://attack.mitre.org/techniques/T1218/011/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/LOLBin_Rundll32.yml
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Rundll32_Remote_UNC_DLL_Ordinal_Execution.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"

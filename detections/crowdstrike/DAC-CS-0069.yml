@@ -22,6 +22,7 @@ mitre:
 references:
 - https://attack.mitre.org/techniques/T1059/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/chromium_based_browser_hunting_via_dll_load.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: 'defineTable(query={#event_simpleName=ClassifiedModuleLoad
 

@@ -40,6 +40,7 @@ references:
 - https://attack.mitre.org/techniques/T1204/
 - https://attack.mitre.org/techniques/T1059/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/clickfix_run_dialog_command_detection.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

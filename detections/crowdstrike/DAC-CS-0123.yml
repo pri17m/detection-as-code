@@ -38,6 +38,7 @@ references:
 - https://attack.mitre.org/techniques/T1112/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Suspicious_Registry_Modifications.yml
 - https://attack.mitre.org/resources/updates/updates-april-2026/
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

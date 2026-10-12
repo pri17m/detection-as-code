@@ -36,6 +36,7 @@ references:
 - https://attack.mitre.org/techniques/T1068/
 - https://attack.mitre.org/techniques/T1014/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/byovd_driver_load_with_edr_av_process_termination_medusa_ransomware.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 tags:
 - cs-query-hub
 - safe-esn-wave

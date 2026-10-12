@@ -26,6 +26,7 @@ references:
 - https://attack.mitre.org/techniques/T1059/
 - https://attack.mitre.org/techniques/T1071/001/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/Detection_of_External_Direct_IP_Usage_in_CommandLine_Windows_and_Mac.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
 query:
   crowdstrike: 'in(#event_simpleName, values=["ProcessRollup2","SyntheticProcessRollup2"])
 

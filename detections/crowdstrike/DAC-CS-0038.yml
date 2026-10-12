@@ -52,3 +52,4 @@ platforms:
 references:
 - https://attack.mitre.org/techniques/T1047/
 - https://github.com/ByteRay-Labs/Query-Hub/blob/main/queries/LOLBin_WMIC.yml
+- "Attribution: adapted from ByteRay-Labs Query-Hub (MIT License, https://github.com/ByteRay-Labs/Query-Hub); see THIRD_PARTY_NOTICES.md"
