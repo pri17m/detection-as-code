@@ -1,0 +1,23 @@
+{
+  "label": "malicious",
+  "source": "bcdedit safeboot (Microsoft bcdedit docs) plus SafeBoot\\Minimal service key, per rule description",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "FileName": "bcdedit.exe",
+      "CommandLine": "bcdedit /set {default} safeboot minimal"
+    },
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "FileName": "reg.exe",
+      "CommandLine": "reg add HKLM\\SYSTEM\\CurrentControlSet\\Control\\SafeBoot\\Minimal\\svcx /ve /t REG_SZ /d Service /f"
+    }
+  ],
+  "expect_alert": true,
+  "result": "not run"
+}

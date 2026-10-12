@@ -1,0 +1,16 @@
+{
+  "label": "benign",
+  "source": "bcdedit safeboot alone without SafeBoot registry write",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "FileName": "bcdedit.exe",
+      "CommandLine": "bcdedit /set {default} safeboot network"
+    }
+  ],
+  "expect_alert": false,
+  "result": "not run"
+}
