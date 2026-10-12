@@ -27,7 +27,7 @@ query:
     '
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - command-and-control
   techniques:
   - T1105

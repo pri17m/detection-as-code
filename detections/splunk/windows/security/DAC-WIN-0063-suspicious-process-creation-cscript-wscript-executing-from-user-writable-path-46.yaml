@@ -12,7 +12,6 @@ sourcetypes:
 mitre:
   tactics:
   - execution
-  - defense-evasion
   techniques:
   - T1059.005
 severity: medium

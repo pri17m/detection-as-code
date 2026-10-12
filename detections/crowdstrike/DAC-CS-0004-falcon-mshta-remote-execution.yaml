@@ -23,7 +23,7 @@ tags:
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - stealth
   techniques:
   - T1218.005
 id: DAC-CS-0004

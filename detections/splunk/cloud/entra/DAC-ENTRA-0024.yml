@@ -30,7 +30,7 @@ references:
 - https://attack.mitre.org/techniques/T1556/007/
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1556.007
 author: Detection Engineer

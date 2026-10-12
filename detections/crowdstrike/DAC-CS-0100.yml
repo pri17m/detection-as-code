@@ -29,7 +29,7 @@ query:
     '
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - persistence
   - credential-access
   techniques:

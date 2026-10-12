@@ -9,7 +9,7 @@ telemetry_validated: false
 author: Detection Engineer
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1685.002
 id: DAC-AWS-0008

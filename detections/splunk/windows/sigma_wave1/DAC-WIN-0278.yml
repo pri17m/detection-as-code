@@ -39,7 +39,7 @@ id: DAC-WIN-0278
 description: Detects Obfuscated Powershell via use Rundll32 in Scripts
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - persistence
   - execution
   techniques:

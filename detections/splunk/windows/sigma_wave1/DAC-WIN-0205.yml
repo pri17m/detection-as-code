@@ -39,7 +39,7 @@ description: Detect lateral movement using GPO scheduled task, usually used to d
 mitre:
   tactics:
   - persistence
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1053.005
   - T1484.001

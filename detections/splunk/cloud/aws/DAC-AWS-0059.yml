@@ -4,7 +4,7 @@ description: "Part 2 defense-evasion: same AssumedRole ARN performs Bedrock APIs
   \ within 2h (Region hop us-east-1\u2192us-east-2 pattern)."
 mitre:
   tactics:
-  - defense-evasion
+  - impact
   - discovery
   techniques:
   - T1496

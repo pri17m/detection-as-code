@@ -10,7 +10,8 @@ sourcetypes:
 - vmware:esxlog*
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
+  - stealth
   techniques:
   - T1690
   - T1070

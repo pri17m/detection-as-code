@@ -23,7 +23,7 @@ tags:
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - command-and-control
   techniques:
   - T1105
 id: DAC-CS-0012

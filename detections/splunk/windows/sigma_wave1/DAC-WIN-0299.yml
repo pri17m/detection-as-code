@@ -38,7 +38,7 @@ id: DAC-WIN-0299
 description: Detects a rundll32 that communicates with public IP addresses
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - persistence
   techniques:
   - T1218.011

@@ -26,7 +26,6 @@ query:
 mitre:
   tactics:
   - command-and-control
-  - defense-evasion
   techniques:
   - T1071.004
   - T1568

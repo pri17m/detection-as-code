@@ -43,6 +43,7 @@ tags:
 - tp-quality-v2
 - src:Dll-Side_Loading_Detection_Query.yml
 - esn:ClassifiedModuleLoad
+- needs-review
 severity: medium
 required_fields:
 - '#event_simpleName'

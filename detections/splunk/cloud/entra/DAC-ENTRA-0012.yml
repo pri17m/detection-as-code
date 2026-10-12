@@ -25,7 +25,7 @@ references:
 - https://attack.mitre.org/techniques/T1550/001/
 mitre:
   tactics:
-  - defense-evasion
+  - lateral-movement
   techniques:
   - T1550.001
 author: Detection Engineer
