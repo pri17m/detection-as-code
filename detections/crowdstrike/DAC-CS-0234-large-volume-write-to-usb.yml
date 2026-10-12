@@ -1,0 +1,42 @@
+id: DAC-CS-0234
+title: Large volume of files written to USB removable media from one host
+description: Sums Size and counts files from *FileWritten events on USB media (Windows DiskParentDeviceInstanceId=USB*, macOS IsOnRemovableDisk=1) per host over a 1-hour window and alerts above 500 MB or 200 files. Only typed *FileWritten events carry these fields, so totals are a lower bound (untyped files such as .txt/.csv may be missed). Thresholds are tuning knobs; the vendor example uses 5 MB / 10 files. Spotlight index files are excluded.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - exfiltration
+  techniques:
+  - T1052.001
+severity: medium
+false_positives:
+- Approved backups to encrypted USB drives; allowlist device IDs or hosts with a USB-exception policy.
+references:
+- https://attack.mitre.org/techniques/T1052/001/
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Files%20Written%20to%20Removable%20Media.md
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Log-Sources/CrowdStrike/FLTR/crowdstrike-fltrdevicecontrol/src/dashboards/FileswrittentoUSB.yaml
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- TargetFileName
+- Size
+- DiskParentDeviceInstanceId
+- IsOnRemovableDisk
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  crowdstrike: |
+    #event_simpleName=/FileWritten$/
+    | (event_platform=Win DiskParentDeviceInstanceId="USB*") OR (event_platform=Mac IsOnRemovableDisk=1)
+    | TargetFileName!="*.Spotlight-V100*"
+    | groupBy([aid, ComputerName], function=[sum(Size, as=TotalBytes), count(TargetFileName, as=TotalFiles), collect([TargetFileName], limit=50)])
+    | TotalBytes > 524288000 OR TotalFiles > 200

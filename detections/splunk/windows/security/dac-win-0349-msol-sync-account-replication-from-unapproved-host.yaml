@@ -1,0 +1,49 @@
+id: DAC-WIN-0349
+title: Entra Connect MSOL_ account performing directory replication from an unapproved source IP
+description: Re-platformed from Falcon to Windows Security logs. Event 4662 where SubjectUserName starts with MSOL_ and Properties contains a replication control-access right (DS-Replication-Get-Changes 1131f6aa-9c07-11d1-f79f-00c04fc2dcd2 or DS-Replication-Get-Changes-All 1131f6ad-9c07-11d1-f79f-00c04fc2dcd2) is joined to the 4624 logon with the same logon ID (TargetLogonId = SubjectLogonId) to recover the source IpAddress, which must not be in the entra_connect_sync_servers lookup. The MSOL_ account legitimately replicates from the Entra Connect server only; use from elsewhere means its credential was stolen for DCSync. Requires a SACL on the domain object for 4662. Narrower than DAC-WIN-0332 (generic DCSync).
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1003.006
+severity: critical
+false_positives:
+- A newly built or migrated Entra Connect server not yet in entra_connect_sync_servers.
+references:
+- https://attack.mitre.org/techniques/T1003/006/
+- https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/reference-connect-accounts-permissions
+- https://learn.microsoft.com/en-us/windows/win32/adschema/r-ds-replication-get-changes-all
+- https://learn.microsoft.com/en-us/windows/win32/adschema/r-ds-replication-get-changes
+- https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4662
+- https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4624
+telemetry_validated: false
+required_fields:
+- EventCode
+- SubjectUserName
+- SubjectLogonId
+- Properties
+- TargetLogonId
+- IpAddress
+- host
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  splunk: |
+    `windows_security` ((EventCode=4662 SubjectUserName="MSOL_*" (Properties="*1131f6aa-9c07-11d1-f79f-00c04fc2dcd2*" OR Properties="*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2*")) OR EventCode=4624)
+    | eval logon_id=lower(if(EventCode==4662, SubjectLogonId, TargetLogonId))
+    | eval dc=coalesce(Computer, host)
+    | eval repl=if(EventCode==4662, 1, 0), src_ip=if(EventCode==4624, IpAddress, null())
+    | stats max(repl) as replication values(src_ip) as src_ip values(SubjectUserName) as account min(_time) as first_seen by dc logon_id
+    | where replication=1 AND isnotnull(src_ip)
+    | mvexpand src_ip
+    | lookup entra_connect_sync_servers ip AS src_ip OUTPUT ip AS approved_ip
+    | where isnull(approved_ip) AND src_ip!="-" AND src_ip!="::1" AND src_ip!="127.0.0.1"
+    | table first_seen dc account src_ip logon_id

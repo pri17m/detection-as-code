@@ -1,0 +1,54 @@
+id: DAC-CS-0235
+title: Safe Mode boot configured and a service registered to run in Safe Mode on the same host
+description: 'Within 1 hour on one host: bcdedit sets safeboot minimal or network, and a command line writes under HKLM\SYSTEM\CurrentControlSet\Control\SafeBoot\Minimal or \Network (reg.exe or PowerShell). Ransomware operators use this pair to reboot into Safe Mode, where most EDR services do not start, while keeping their own service running. Registry events are not used because Falcon''s coverage of SafeBoot keys is undocumented. Different from DAC-CS-0047 (recoveryenabled).'
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1688
+  - T1112
+severity: critical
+false_positives:
+- Vendor recovery tooling that legitimately configures Safe Mode support for its own service; allowlist by service name.
+references:
+- https://attack.mitre.org/techniques/T1688/
+- https://attack.mitre.org/techniques/T1112/
+- https://learn.microsoft.com/en-us/previous-versions/windows/desktop/bcd/bcdlibrary-safeboot
+- https://learn.microsoft.com/en-us/troubleshoot/azure/virtual-machines/windows/troubleshoot-rdp-safe-mode
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Hunting%20bcdedit.exe%20usage.md
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Combine%20ProcessRollup2%20and%20NetworkConnectIP4%20Events.md
+- https://library.humio.com/data-analysis/functions-correlate.html
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- FileName
+- CommandLine
+- ParentBaseFileName
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  crowdstrike: |
+    correlate(
+      safeboot: {
+        #event_simpleName=ProcessRollup2 event_platform=Win FileName=/^bcdedit\.exe$/i
+        | CommandLine=/safeboot\s+(minimal|network)/i
+      } include: [aid, ComputerName, UserName, CommandLine, ParentBaseFileName],
+      safebootsvc: {
+        #event_simpleName=ProcessRollup2 event_platform=Win
+        | CommandLine=/\\SafeBoot\\(Network|Minimal)\\/i
+        | aid <=> safeboot.aid
+      } include: [FileName, CommandLine, ParentBaseFileName],
+      within=1h
+    )

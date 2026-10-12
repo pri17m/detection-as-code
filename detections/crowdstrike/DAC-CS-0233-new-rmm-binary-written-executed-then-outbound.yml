@@ -1,0 +1,65 @@
+id: DAC-CS-0233
+title: Newly written remote-access tool executed and connecting out within 30 minutes
+description: 'Three-stage sequence on one host within 30 minutes: a PE/Mach-O/ELF file whose name matches CrowdStrike''s rmm_tools.csv is written, a process with that file name starts, and that process (falconPID = TargetProcessId / ContextProcessId) makes a NetworkConnectIP4. Sanctioned RMM tools are removed with a sanctioned_rmm.csv lookup (column rmm_binary plus sanctioned=yes). The new part over DAC-CS-0065 and DAC-MDE-0066 is install-to-network timing. Upload CrowdStrike''s rmm_tools.csv and maintain sanctioned_rmm.csv before enabling. Scheduled search only.'
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1219
+severity: high
+false_positives:
+- Approved RMM roll-outs not yet in sanctioned_rmm.csv; keep the allowlist current.
+references:
+- https://attack.mitre.org/techniques/T1219/
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Misc/crwd_live_rmm/RMMHunting.yaml
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Misc/crwd_live_rmm/rmm_tools.csv
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Combine%20ProcessRollup2%20and%20NetworkConnectIP4%20Events.md
+- https://library.humio.com/data-analysis/functions-correlate.html
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- aid
+- ComputerName
+- UserName
+- FileName
+- TargetFileName
+- ImageFileName
+- CommandLine
+- TargetProcessId
+- ContextProcessId
+- RemoteAddressIP4
+- RemotePort
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  crowdstrike: |
+    correlate(
+      written: {
+        #event_simpleName=/^(Pe|MachO|ELF)FileWritten$/
+        | match(file="rmm_tools.csv", field=[FileName], column=rmm_binary, mode=glob, strict=true, ignoreCase=true, include=[rmm_tool])
+      } include: [aid, ComputerName, FileName, TargetFileName, rmm_tool],
+      started: {
+        in(field="#event_simpleName", values=[ProcessRollup2, SyntheticProcessRollup2])
+        | match(file="sanctioned_rmm.csv", field=[FileName], column=rmm_binary, mode=glob, strict=false, ignoreCase=true, include=[sanctioned])
+        | default(field=sanctioned, value="no")
+        | sanctioned="no"
+        | falconPID:=TargetProcessId
+        | aid <=> written.aid
+        | FileName <=> written.FileName
+      } include: [UserName, ImageFileName, CommandLine, ParentBaseFileName, falconPID],
+      outbound: {
+        #event_simpleName=NetworkConnectIP4
+        | falconPID:=ContextProcessId
+        | aid <=> started.aid
+        | falconPID <=> started.falconPID
+      } include: [RemoteAddressIP4, RemotePort],
+      sequence=true, within=30m
+    )

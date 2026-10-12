@@ -1,0 +1,56 @@
+id: DAC-CS-0228
+title: macOS quarantine attribute removed and the same file executed within 15 minutes
+description: 'Sequence: xattr is run with com.apple.quarantine (-d/-c/-r) or with a clear flag against a path, then that exact path is executed from a temp, Downloads or /Users/Shared location within 15 minutes on the same host. Stripping quarantine bypasses Gatekeeper checks for the following launch. Falcon has no public xattr event, so this uses ProcessRollup2 command lines; quarantine removal through APIs (no xattr process) is a blind spot. The stripped path is parsed from the last command-line token; /tmp vs /private/tmp differences can break the link.'
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-impairment
+  - execution
+  techniques:
+  - T1553.001
+  - T1204.002
+severity: high
+false_positives:
+- Developers clearing quarantine on self-built tools before running them; allowlist by UID and path pattern.
+references:
+- https://attack.mitre.org/techniques/T1553/001/
+- https://attack.mitre.org/techniques/T1204/002/
+- https://developer.apple.com/forums/thread/706442
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Queries/%5BT1087.001%5D%20Account%20Discovery%20-%20Local%20Accounts%20-%20Mac.logscale
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Hunting%20bcdedit.exe%20usage.md
+- https://library.humio.com/data-analysis/functions-correlate.html
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+- UID
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  crowdstrike: |
+    correlate(
+      strip: {
+        #event_simpleName=ProcessRollup2 event_platform=Mac ImageFileName=/\/xattr$/
+        | CommandLine=/com\.apple\.quarantine/ OR CommandLine=/\s-[a-z]*c[a-z]*\s/
+        | regex("(?<StrippedPath>\/[^\s\"']+)[\"']?\s*$", field=CommandLine, strict=true)
+      } include: [aid, ComputerName, UID, CommandLine, ParentBaseFileName, StrippedPath],
+      launch: {
+        #event_simpleName=ProcessRollup2 event_platform=Mac
+        | ImageFileName=/^(\/private)?\/(tmp|var\/folders)\/|^\/Users\/[^\/]+\/Downloads\/|^\/Users\/Shared\//
+        | aid <=> strip.aid
+        | ImageFileName <=> strip.StrippedPath
+      } include: [ImageFileName, CommandLine, ParentBaseFileName],
+      sequence=true, within=15m
+    )

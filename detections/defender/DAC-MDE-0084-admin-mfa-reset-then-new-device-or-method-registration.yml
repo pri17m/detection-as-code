@@ -1,0 +1,58 @@
+id: DAC-MDE-0084
+title: Admin reset of a user's security info followed by new device or authentication-method registration
+description: 'Joins Entra AuditLogs admin-initiated security-info or password resets (Admin deleted/updated/registered security info, Reset password (by admin), Admin started password reset) to a registration by the same user within 24 hours: Register device (excluding ProvisioningManagement), User registered security info, User registered all required security info, Add Passkey (device-bound) or Add Windows Hello for Business credential. This is the helpdesk vishing pattern: the attacker gets a reset, then enrols their own device or factor.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:AuditLogs
+mitre:
+  tactics:
+  - persistence
+  - credential-access
+  techniques:
+  - T1098.005
+  - T1556.006
+severity: high
+false_positives:
+- Genuine lost-phone resets followed by the user re-enrolling; check whether the enrolment IP and device match the user's history.
+references:
+- https://attack.mitre.org/techniques/T1098/005/
+- https://attack.mitre.org/techniques/T1556/006/
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/auditlogs
+- https://learn.microsoft.com/en-us/entra/identity/monitoring-health/reference-audit-activities
+- https://github.com/Azure/Azure-Sentinel/blob/master/Hunting%20Queries/MultipleDataSources/HighRiskSignInAroundAuthMethodOrDeviceRegistration.yaml
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- OperationName
+- Category
+- Result
+- TargetResources
+- InitiatedBy
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  defender: |
+    let Window = 24h;
+    let Resets = AuditLogs
+    | where OperationName in ("Admin deleted security info", "Admin updated security info", "Admin registered security info", "Reset password (by admin)", "Admin started password reset")
+    | where Result =~ "success"
+    | extend TargetUserId = tostring(TargetResources[0].id), TargetUPN = tostring(TargetResources[0].userPrincipalName)
+    | extend ResetBy = tostring(InitiatedBy.user.userPrincipalName)
+    | where isnotempty(TargetUserId)
+    | project ResetTime = TimeGenerated, TargetUserId, TargetUPN, ResetBy, ResetOperation = OperationName;
+    let Enrolments = AuditLogs
+    | where (OperationName == "Register device" and Category != "ProvisioningManagement")
+        or OperationName in ("User registered security info", "User registered all required security info", "Add Passkey (device-bound)", "Add Windows Hello for Business credential")
+    | where Result =~ "success"
+    | extend EnrolUserId = tostring(InitiatedBy.user.id), EnrolIP = tostring(InitiatedBy.user.ipAddress)
+    | where isnotempty(EnrolUserId)
+    | project EnrolTime = TimeGenerated, EnrolUserId, EnrolIP, EnrolOperation = OperationName, EnrolTarget = tostring(TargetResources[0].displayName);
+    Resets
+    | join kind=inner Enrolments on $left.TargetUserId == $right.EnrolUserId
+    | where EnrolTime between (ResetTime .. ResetTime + Window)
+    | summarize FirstEnrol = min(EnrolTime), EnrolOperations = make_set(EnrolOperation), EnrolIPs = make_set(EnrolIP, 10), EnrolTargets = make_set(EnrolTarget, 10) by ResetTime, TargetUPN, TargetUserId, ResetBy, ResetOperation
