@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "source": "GTFOBins python file-write pattern (https://gtfobins.github.io/gtfobins/python/) with a versioned interpreter",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Lin",
+  "ImageFileName": "/usr/bin/python3.11",
+  "ParentBaseFileName": "bash",
+  "CommandLine": "python3.11 -c 'open(\"/usr/lib64/security/pam_x.so\",\"wb\").write(b\"x\")'",
+  "expect_alert": true,
+  "result": "not run"
+}

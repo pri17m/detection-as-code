@@ -4,9 +4,9 @@ description: >-
   Detects (A) ELF .so writes under documented PAM module directories,
   (B) gcc/cc/clang/ld -shared builds targeting those directories or Atomic-style
   /tmp/pam_*.so|/dev/shm/*.so, (C) GTFOBins transfer/write binaries (excluding
-  wget/curl) whose CommandLine references a PAM path or /etc/pam.d/, and
-  (D) sed/tee/awk edits under /etc/pam.d/. Clean-room draft for T1556.003.
-  Package-manager and PAM-config-tool parents are allowlisted from Elastic's
+  wget/curl) whose CommandLine has a PAM path or /etc/pam.d/ as the write
+  destination, and (D) sed/awk edits under /etc/pam.d/. Clean-room draft for T1556.003.
+  Package-manager and PAM-config-tool parents and writing processes are allowlisted from Elastic's
   published false-positive list. telemetry_validated false; not run in tenant.
 author: DaC
 status: experimental
@@ -34,7 +34,6 @@ references:
 - https://github.com/zephrax/linux-pam-backdoor
 - https://www.trendmicro.com/en_us/research/19/i/skidmap-linux-malware-uses-rootkit-capabilities-to-hide-cryptocurrency-mining-payload.html
 - https://manpages.debian.org/bookworm/libpam-runtime/pam.conf.5.en.html
-- https://github.com/CrowdStrike/logscale-community-content/blob/main/Misc/crwd_live_rmm/RMMHunting.yaml
 - https://gtfobins.github.io/
 telemetry_validated: false
 required_fields:
@@ -44,6 +43,7 @@ required_fields:
 - ComputerName
 - ImageFileName
 - ParentBaseFileName
+- ContextBaseFileName
 - CommandLine
 - TargetFileName
 - FileName
@@ -57,7 +57,10 @@ query:
   crowdstrike: |
     in(#event_simpleName, values=["ProcessRollup2", "ELFFileWritten"])
     | event_platform=Lin
-    | ParentBaseFileName!=/^(dpkg|dpkg-divert|rpm|yum|yum-cron|dnf|dnf5|dnf-automatic|microdnf|apt|apt-get|aptitude|pacman|apk|snapd|packagekitd|pam-auth-update|pam-config|authconfig|puppet|chef-client|podman|buildah|dockerd|crio|systemd)$/i
+    // allowlist applied to the parent, the writing process on file events, and the process itself
+    | NOT ParentBaseFileName=/^(dpkg|dpkg-divert|rpm|yum|yum-cron|dnf|dnf5|dnf-automatic|microdnf|apt|apt-get|aptitude|pacman|apk|snapd|packagekitd|pam-auth-update|pam-config|authconfig|puppet|chef-client|podman|buildah|dockerd|crio|systemd)$/i
+    | NOT ContextBaseFileName=/^(dpkg|dpkg-divert|rpm|yum|yum-cron|dnf|dnf5|dnf-automatic|microdnf|apt|apt-get|aptitude|pacman|apk|snapd|packagekitd|pam-auth-update|pam-config|authconfig|puppet|chef-client|podman|buildah|dockerd|crio|systemd)$/i
+    | NOT ImageFileName=/\/(dpkg|dpkg-divert|rpm|yum|yum-cron|dnf|dnf5|dnf-automatic|microdnf|apt|apt-get|aptitude|pacman|apk|snapd|packagekitd|pam-auth-update|pam-config|authconfig|puppet|chef-client|podman|buildah|dockerd|crio|systemd)$/i
     | case {
         #event_simpleName=ELFFileWritten
           TargetFileName=/^\/(lib|lib64|usr\/lib|usr\/lib64|lib\/x86_64-linux-gnu|usr\/lib\/x86_64-linux-gnu)\/security\/[^\/]+\.so$/i;
@@ -66,13 +69,14 @@ query:
           CommandLine=/\s-shared\b/i
           CommandLine=/(\/(lib|lib64|usr\/lib|usr\/lib64|lib\/x86_64-linux-gnu|usr\/lib\/x86_64-linux-gnu)\/security\/|\/tmp\/pam_[^ ]*\.so|\/dev\/shm\/[^ ]*\.so)/i;
         #event_simpleName=ProcessRollup2
-          ImageFileName=/\/(scp|sftp|openssl|socat|nc|ncat|tftp|ftp|python3?|perl|ruby|php|dd|cp|tee|xxd|busybox)$/i
-          CommandLine=/(\/(lib|lib64|usr\/lib|usr\/lib64|lib\/x86_64-linux-gnu|usr\/lib\/x86_64-linux-gnu)\/security\/|\/etc\/pam\.d\/)/i;
+          ImageFileName=/\/(scp|sftp|openssl|socat|nc|ncat|tftp|ftp|python[0-9.]*|perl[0-9.]*|ruby[0-9.]*|php[0-9.]*|dd|cp|tee|xxd|busybox)$/i
+          // PAM path must be the destination: last argument, after of=/-o/-O/-out/>, or a write-mode open()/file_put_contents()
+          CommandLine=/((of=|\s-o\s*|\s-O\s+|\s-out\s+|>>?\s*)['"]?(\/(lib|lib64|usr\/lib|usr\/lib64|lib\/x86_64-linux-gnu|usr\/lib\/x86_64-linux-gnu)\/security\/|\/etc\/pam\.d\/)|\s['"]?(\/(lib|lib64|usr\/lib|usr\/lib64|lib\/x86_64-linux-gnu|usr\/lib\/x86_64-linux-gnu)\/security\/|\/etc\/pam\.d\/)[^\s'"]*['"]?\s*$|open\(\s*['"](\/(lib|lib64|usr\/lib|usr\/lib64|lib\/x86_64-linux-gnu|usr\/lib\/x86_64-linux-gnu)\/security\/|\/etc\/pam\.d\/)[^'"]*['"]\s*,\s*['"][wa]|file_put_contents\(\s*['"](\/(lib|lib64|usr\/lib|usr\/lib64|lib\/x86_64-linux-gnu|usr\/lib\/x86_64-linux-gnu)\/security\/|\/etc\/pam\.d\/))/i;
         #event_simpleName=ProcessRollup2
-          ImageFileName=/\/(sed|tee|awk)$/i
+          ImageFileName=/\/(sed|awk)$/i
           CommandLine=/\/etc\/pam\.d\//i;
       }
     | groupBy(
-        [aid, ComputerName, #event_simpleName, ImageFileName, ParentBaseFileName, CommandLine, TargetFileName, FileName],
+        [aid, ComputerName, #event_simpleName, ImageFileName, ContextBaseFileName, ParentBaseFileName, CommandLine, TargetFileName, FileName],
         function=count()
       )
