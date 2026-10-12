@@ -1,0 +1,17 @@
+{
+  "label": "benign",
+  "source": "One-off keyword grep, below threshold",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "aid": "h1",
+      "UID": "1000",
+      "ImageFileName": "/usr/bin/grep",
+      "CommandLine": "grep -r token ./src"
+    }
+  ],
+  "expect_alert": false,
+  "result": "not run"
+}
