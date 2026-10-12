@@ -1,0 +1,11 @@
+{
+  "label": "near_miss",
+  "source": "Synthetic: PAM config is the copy source, not the destination (read/backup)",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Lin",
+  "ImageFileName": "/usr/bin/cp",
+  "ParentBaseFileName": "bash",
+  "CommandLine": "cp /etc/pam.d/sshd /root/sshd.bak",
+  "expect_alert": false,
+  "result": "not run"
+}

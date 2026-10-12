@@ -1,0 +1,12 @@
+{
+  "label": "benign",
+  "source": "Elastic persistence_pluggable_authentication_module_creation.toml false-positive list (dnf); writer is dnf, parent is sudo",
+  "event_simpleName": "ELFFileWritten",
+  "event_platform": "Lin",
+  "TargetFileName": "/usr/lib64/security/pam_unix.so",
+  "FileName": "pam_unix.so",
+  "ContextBaseFileName": "dnf",
+  "ParentBaseFileName": "sudo",
+  "expect_alert": false,
+  "result": "not run"
+}

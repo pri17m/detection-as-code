@@ -7,10 +7,10 @@ New rule. No prior coverage of T1556.003 PAM module write/build/config on Linux 
 Four clean-room branches on `event_platform=Lin`:
 1. `ELFFileWritten` of `.so` under documented PAM module directories (`/lib/security`, `/lib64/security`, `/usr/lib/security`, `/usr/lib64/security`, `/lib/x86_64-linux-gnu/security`, `/usr/lib/x86_64-linux-gnu/security`).
 2. `ProcessRollup2` for `gcc`/`cc`/`clang`/`g++`/`ld` with `-shared` and a PAM path or Atomic-style `/tmp/pam_*.so` / `/dev/shm/*.so`.
-3. `ProcessRollup2` for GTFOBins transfer/write binaries (excluding wget/curl) whose `CommandLine` references a PAM module path or `/etc/pam.d/`.
-4. `ProcessRollup2` for `sed`/`tee`/`awk` editing `/etc/pam.d/`.
+3. `ProcessRollup2` for GTFOBins transfer/write binaries (excluding wget/curl; interpreters match versioned names such as `python3.11`, `perl5.36`) where a PAM module path or `/etc/pam.d/` is the **destination**: the last argument, after `of=`/`-o`/`-O`/`-out`/`>`/`>>`, or inside a write-mode `open("...","w|a...")` / `file_put_contents("...")`.
+4. `ProcessRollup2` for `sed`/`awk` editing `/etc/pam.d/` (`tee` is covered by branch 3).
 
-Package-manager and PAM-config-tool parents are allowlisted.
+The package-manager / PAM-config-tool allowlist is applied to `ParentBaseFileName`, to `ContextBaseFileName` (writing process on file events; field used on `*FileWritten` in CrowdStrike's public RMMHunting.yaml, https://github.com/CrowdStrike/logscale-community-content/blob/main/Misc/crwd_live_rmm/RMMHunting.yaml , population on Linux `ELFFileWritten` unconfirmed), and to the process's own `ImageFileName`. `NOT field=/re/` is used so a missing field does not drop the event.
 
 ## ATT&CK mapping check (v19.2)
 - T1556.003 Pluggable Authentication Modules — tactics on the technique page are Defense Impairment, Persistence, Credential Access. Mapped as `defense-impairment`, `persistence`, `credential-access`. Correct. https://attack.mitre.org/techniques/T1556/003/
@@ -20,6 +20,22 @@ Package-manager and PAM-config-tool parents are allowlisted.
 - Compiler/linker command lines containing both `-shared` and a PAM/`/tmp/pam_`/`/dev/shm` `.so` path.
 - Named writer/transfer binaries with a PAM path or `/etc/pam.d/` substring in `CommandLine`.
 - `sed`/`tee`/`awk` with `/etc/pam.d/` in `CommandLine`.
+
+## Ponytail review fixes (2026-10-13)
+| # | change | why |
+|---|---|---|
+| 1 | Allowlist also on writer (`ContextBaseFileName`) and `ImageFileName` | `sudo dnf update pam`: writer dnf, parent sudo previously alerted |
+| 3 | Branch C requires PAM path as destination | `cp /etc/pam.d/sshd /root/bak` (a read) previously alerted |
+| 4 | `python[0-9.]*`, `perl[0-9.]*`, `ruby[0-9.]*`, `php[0-9.]*` | `/usr/bin/python3.11` previously missed |
+| 8 | `tee` removed from branch D | duplicate of branch C |
+| 9 | RMMHunting.yaml removed from rule references | not a PAM source (kept here only as the field-name source for ContextBaseFileName) |
+| — | ATT&CK tactic check | v19.2 STIX `enterprise-attack-19.2.json`: T1556.003 kill_chain_phases = defense-impairment, persistence, credential-access (https://github.com/mitre-attack/attack-stix-data/blob/v19.2/enterprise-attack/enterprise-attack-19.2.json). Unchanged. |
+
+### Destination-matching limits (known misses)
+- Interpreter writes where the path is built in code (variables, concatenation, `os.path.join`), Perl `open(FH, ">$p")`, Ruby `File.write`, here-docs, or `python script.py` with the path inside the script.
+- Shell redirection (`cat x > /lib/security/...`) is done by the shell, so `ProcessRollup2` of the writer has no path; branch A (`ELFFileWritten`) is the fallback.
+- Tools with the destination before other trailing args (`scp dst` patterns with extra flags after the path, `cp -t /lib/security/ x.so`). `cp -t` is a miss.
+- Branch A still covers any `.so` written into the PAM dirs regardless of tool, if the ESN fires.
 
 ## Bypass table
 | bypass | technique ID | source | telemetry available | noise risk | decision | reason |
@@ -60,6 +76,7 @@ Package-manager and PAM-config-tool parents are allowlisted.
 - Noise overall: **not measured**.
 
 ## Tests
+Added in ponytail fix: `benign_sudo_dnf_writer.json`, `near_miss_cp_read_pam_d.json`, `malicious_python311_write_pam_dir.json`.
 Tests added as synthetic data files under `tests/cases/DAC-CS-0239/`; no per-rule test runner exists in the repo (CI only runs `validate_repo.py`), so results are **not run**.
 
 ## Reviewer status: pending human approval
