@@ -22,7 +22,6 @@ platforms:
 tags:
 - wave-b
 - P0
-- needs-review
 telemetry_validated: false
 required_fields:
 - operationName
@@ -33,7 +32,7 @@ references:
 - https://attack.mitre.org/techniques/T1078/004/
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1078.004
 author: Detection Engineer

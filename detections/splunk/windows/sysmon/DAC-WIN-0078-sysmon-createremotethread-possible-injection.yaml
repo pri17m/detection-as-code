@@ -10,7 +10,7 @@ sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1055
 severity: high
@@ -36,5 +36,3 @@ query:
     | stats count values(src) as sources values(tgt) as targets by host, User
 
     '
-tags:
-- needs-review

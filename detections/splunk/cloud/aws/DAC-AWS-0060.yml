@@ -13,7 +13,7 @@ sourcetypes:
 - aws:cloudtrail:event
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - lateral-movement
   techniques:
   - T1078.004
@@ -39,7 +39,6 @@ tags:
 - P0
 - tp-quality
 - region-hop
-- needs-review
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 

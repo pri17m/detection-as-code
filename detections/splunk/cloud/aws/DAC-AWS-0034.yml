@@ -10,7 +10,7 @@ telemetry_validated: false
 author: Detection Engineer
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1556.006
 id: DAC-AWS-0034
@@ -33,7 +33,6 @@ tags:
 - wave-c
 - P0
 - phase2-next
-- needs-review
 description: DeactivateMFADevice
 sourcetypes:
 - aws:cloudtrail

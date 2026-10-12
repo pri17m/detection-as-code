@@ -30,7 +30,6 @@ tags:
 - P0
 - windows_sysmon
 - sigma:rules/windows/image_load/image_load_dll_comsvcs_load_renamed_version_by_rundll32.yml
-- needs-review
 title: Suspicious Renamed Comsvcs DLL Loaded By Rundll32
 author: Detection Engineer
 sourcetypes:
@@ -40,7 +39,7 @@ id: DAC-WIN-0220
 description: Detects rundll32 loading a renamed comsvcs.dll to dump process memory
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - credential-access
   - persistence
   techniques:

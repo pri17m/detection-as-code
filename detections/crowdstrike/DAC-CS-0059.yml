@@ -19,7 +19,6 @@ tags:
 - wave-a
 - P0
 - parity:DAC-WIN-0173
-- needs-review
 query:
   crowdstrike: 'TargetFileName CONTAINS "lsass" OR CommandLine CONTAINS "lsass" OR ImageFileName CONTAINS
     "lsass"
@@ -31,6 +30,6 @@ sourcetypes:
 - falcon:process
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1055

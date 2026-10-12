@@ -20,7 +20,6 @@ tags:
 - wave-a
 - P0
 - parity:DAC-CS-0059
-- needs-review
 query:
   defender: 'DeviceProcessEvents
 
@@ -37,6 +36,6 @@ sourcetypes:
 - mde:advanced_hunting
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1055

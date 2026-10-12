@@ -28,7 +28,7 @@ query:
 mitre:
   tactics:
   - command-and-control
-  - defense-evasion
+  - stealth
   techniques:
   - T1197
   - T1105
@@ -44,7 +44,6 @@ tags:
 - tp-quality-v2
 - src:hunting_bitsadmin_usage.yml
 - esn:ScriptControlScanV2
-- needs-review
 severity: high
 required_fields:
 - '#event_simpleName'

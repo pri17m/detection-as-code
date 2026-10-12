@@ -11,7 +11,7 @@ sourcetypes:
 - XmlWinEventLog:Security
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1053.005
   - T1070
@@ -52,4 +52,3 @@ tags:
 - windows
 - P2
 - persistence
-- needs-review

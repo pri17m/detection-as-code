@@ -30,7 +30,6 @@ tags:
 - P1
 - windows_security
 - sigma:rules/windows/builtin/security/win_security_invoke_obfuscation_via_use_rundll32_services_security.yml
-- needs-review
 title: Invoke-Obfuscation Via Use Rundll32 - Security
 author: Detection Engineer
 sourcetypes:
@@ -40,7 +39,7 @@ id: DAC-WIN-0278
 description: Detects Obfuscated Powershell via use Rundll32 in Scripts
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - persistence
   - execution
   techniques:

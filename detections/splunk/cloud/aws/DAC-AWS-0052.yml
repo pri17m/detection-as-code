@@ -6,7 +6,7 @@ description: 'Part 2 Event 2: ConsoleLogin Success with additionalEventData.MFAU
 mitre:
   tactics:
   - initial-access
-  - defense-evasion
+  - stealth
   techniques:
   - T1078.004
 severity: high
@@ -29,7 +29,6 @@ tags:
 - P0
 - tp-quality
 - console-login
-- needs-review
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 

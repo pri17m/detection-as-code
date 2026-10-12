@@ -9,7 +9,7 @@ All counts below are computed from `detections/**` plus `content/mitre/coverage.
 - **Total detections**: 806
 - **Rules per platform**: Splunk 602 • CrowdStrike 148 • Defender 56
 - **Splunk pack breakdown**: Windows 330 • Cloud 181 • GitHub 54 • VMware ESXi 37
-- **ATT&CK coverage**: 203 unique techniques • tactics normalized from `mitre.tactics` (ATT&CK v19 remap: revoked T1562/T1070.001 folded into T1685/T1686)
+- **ATT&CK coverage**: 202 unique techniques • tactics normalized from `mitre.tactics` (ATT&CK v19 remap: revoked T1562/T1070.001 folded into T1685/T1686)
 - **ATT&CK mapping completeness**: 806/806 detections include `mitre.techniques` (100%)
 
 | Platform | Rules | Query format |

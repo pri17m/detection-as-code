@@ -31,11 +31,11 @@ query:
     '
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
+  - execution
   - persistence
   techniques:
   - T1574.001
-  - T1574.002
 title: 'Falcon: ClassifiedModuleLoad from Temp or AppData'
 status: experimental
 references:
@@ -49,7 +49,6 @@ tags:
 - src:Dll-Side_Loading_Detection_Query.yml
 - esn:ClassifiedModuleLoad
 - esn:ProcessRollup2
-- needs-review
 severity: high
 required_fields:
 - '#event_simpleName'

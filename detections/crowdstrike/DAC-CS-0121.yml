@@ -31,7 +31,7 @@ query:
 mitre:
   tactics:
   - persistence
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1547.001
   - T1112
@@ -51,7 +51,6 @@ tags:
 - tp-quality-v2
 - src:Suspicious_Registry_Modifications.yml
 - esn:RegGenericValue
-- needs-review
 severity: high
 required_fields:
 - '#event_simpleName'

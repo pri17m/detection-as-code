@@ -5,7 +5,7 @@ description: 'Part 2 role/user name imitation: CreateRole/CreateUser with names 
 mitre:
   tactics:
   - persistence
-  - defense-evasion
+  - stealth
   techniques:
   - T1036.005
   - T1098.003
@@ -25,7 +25,6 @@ tags:
 - P0
 - tp-quality
 - evasion
-- needs-review
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 

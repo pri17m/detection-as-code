@@ -11,9 +11,10 @@ sourcetypes:
 mitre:
   tactics:
   - persistence
-  - defense-evasion
+  - stealth
+  - execution
   techniques:
-  - T1574.002
+  - T1574.001
 severity: medium
 false_positives:
 - Some applications legitimately load plugins from user directories; tune by signer and process allowlists.
@@ -39,5 +40,3 @@ query:
     | stats count values(loaded) as loaded_dlls values(img) as images by host, User
 
     '
-tags:
-- needs-review

@@ -20,7 +20,6 @@ tags:
 - wave-b
 - P0
 - phase2-next
-- needs-review
 telemetry_validated: false
 required_fields:
 - operationName
@@ -31,7 +30,7 @@ references:
 - https://attack.mitre.org/techniques/T1556/007/
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1556.007
 author: Detection Engineer

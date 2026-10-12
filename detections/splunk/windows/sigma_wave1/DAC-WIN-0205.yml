@@ -29,7 +29,6 @@ tags:
 - P0
 - windows_security
 - sigma:rules/windows/builtin/security/win_security_gpo_scheduledtasks.yml
-- needs-review
 title: Persistence and Execution at Scale via GPO Scheduled Task
 author: Detection Engineer
 sourcetypes:
@@ -40,7 +39,7 @@ description: Detect lateral movement using GPO scheduled task, usually used to d
 mitre:
   tactics:
   - persistence
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1053.005
   - T1484.001

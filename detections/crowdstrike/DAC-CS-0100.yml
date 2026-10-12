@@ -29,7 +29,7 @@ query:
     '
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - persistence
   - credential-access
   techniques:
@@ -47,7 +47,6 @@ tags:
 - tp-quality-v2
 - src:Honey_Token_Account_Logon.yml
 - esn:UserLogon
-- needs-review
 severity: high
 required_fields:
 - '#event_simpleName'

@@ -24,10 +24,11 @@ query:
     '
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
+  - execution
   techniques:
   - T1036
-  - T1574.002
+  - T1574.001
 title: 'Falcon: ClassifiedModuleLoad Original Filename Mismatch'
 status: experimental
 references:
@@ -40,7 +41,6 @@ tags:
 - tp-quality-v2
 - src:Dll-Side_Loading_Detection_Query.yml
 - esn:ClassifiedModuleLoad
-- needs-review
 severity: medium
 required_fields:
 - '#event_simpleName'

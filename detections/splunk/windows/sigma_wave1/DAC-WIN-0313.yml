@@ -29,7 +29,6 @@ tags:
 - P1
 - windows_sysmon
 - sigma:rules/windows/process_creation/proc_creation_win_hktl_cobaltstrike_load_by_rundll32.yml
-- needs-review
 title: CobaltStrike Load by Rundll32
 author: Detection Engineer
 sourcetypes:
@@ -39,7 +38,7 @@ id: DAC-WIN-0313
 description: Rundll32 can be use by Cobalt Strike with StartW function to load DLLs from the command line.
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - persistence
   techniques:
   - T1218.011

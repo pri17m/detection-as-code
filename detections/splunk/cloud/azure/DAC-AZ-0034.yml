@@ -9,7 +9,7 @@ telemetry_validated: false
 author: Detection Engineer
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1556
 id: DAC-AZ-0034
@@ -33,7 +33,6 @@ platforms:
 tags:
 - wave-c
 - P1
-- needs-review
 description: config/authsettings write enabled false
 sourcetypes:
 - azure:monitor:activity

@@ -11,7 +11,7 @@ mitre:
   tactics:
   - persistence
   - privilege-escalation
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1484.001
   - T1053.005
@@ -39,7 +39,6 @@ tags:
 - ad
 - gpo
 - tp-quality
-- needs-review
 query:
   crowdstrike: |
     #event_simpleName=/FileWritten$/ event_platform=Win

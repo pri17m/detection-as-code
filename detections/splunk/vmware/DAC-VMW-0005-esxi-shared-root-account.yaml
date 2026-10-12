@@ -10,7 +10,7 @@ sourcetypes:
 - vmware:esxlog*
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1078
 severity: high
@@ -25,7 +25,6 @@ tags:
 - vmware
 - esxi
 - escu
-- needs-review
 query:
   splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*root*" Message="*logged in*" NOT Message="*root@127.0.0.1*"
 

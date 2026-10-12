@@ -29,7 +29,6 @@ tags:
 - P0
 - windows_sysmon
 - sigma:rules/windows/create_remote_thread/create_remote_thread_win_susp_password_dumper_lsass.yml
-- needs-review
 title: Password Dumper Remote Thread in LSASS
 author: Detection Engineer
 sourcetypes:
@@ -43,7 +42,7 @@ description: 'Detects password dumper activity by monitoring remote thread creat
 mitre:
   tactics:
   - credential-access
-  - defense-evasion
+  - stealth
   techniques:
   - T1003.001
   - T1055

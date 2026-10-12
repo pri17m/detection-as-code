@@ -28,7 +28,6 @@ tags:
 - P1
 - windows_security
 - sigma:rules/windows/builtin/security/win_security_default_domain_gpo_modification.yml
-- needs-review
 title: Windows Default Domain GPO Modification
 author: Detection Engineer
 sourcetypes:
@@ -41,7 +40,7 @@ description: 'Detects modifications to Default Domain or Default Domain Controll
   Adversaries may modify these default GPOs to deploy malicious configurations across the domain.'
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1484.001
 required_fields:

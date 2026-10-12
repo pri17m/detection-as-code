@@ -9,7 +9,7 @@ platforms:
 severity: medium
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1197
   - T1105
@@ -40,7 +40,6 @@ tags:
 - remapped_from:DAC-WIN-0051
 - tier:P1
 - windows
-- needs-review
 query:
   splunk: '(sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational OR sourcetype=WinEventLog:Microsoft-Windows-Sysmon/Operational
     OR sourcetype=sysmon) `windows_sysmon`
