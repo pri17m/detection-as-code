@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "ParentBaseFileName": "splunkd.exe",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\wscript.exe",
+  "CommandLine": "wscript.exe C:\\\\Windows\\\\Temp\\\\a.vbs",
+  "expect_alert": true
+}

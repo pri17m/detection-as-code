@@ -31,6 +31,7 @@ required_fields:
 - CommandLine
 - ParentBaseFileName
 tags:
+- reviewed-batch1
 - wave1
 - splunk-rce
 - tp-quality
@@ -38,6 +39,6 @@ query:
   crowdstrike: |
     in(#event_simpleName, values=["ProcessRollup2","ProcessBlocked"])
     | ParentBaseFileName=/^splunkd(\.exe)?$/i
-    | ImageFileName=/\\(cmd|powershell|pwsh|bash|sh|dash|zsh|certutil|mshta|rundll32|regsvr32|curl|wget)\.exe$/i OR ImageFileName=/\/(bash|sh|dash|zsh|curl|wget)$/i
+    | ImageFileName=/\\(cmd|powershell|pwsh|bash|sh|dash|zsh|certutil|mshta|rundll32|regsvr32|curl|wget|wscript|cscript|bitsadmin)\.exe$/i OR ImageFileName=/\/(bash|sh|dash|zsh|curl|wget)$/i
     | CommandLine!=/\b(splunk\s+cmd|instrumentation)\b/i
     | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

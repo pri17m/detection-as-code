@@ -1,0 +1,7 @@
+{
+  "label": "near-miss",
+  "note": "python intentionally not added",
+  "ParentBaseFileName": "splunkd.exe",
+  "ImageFileName": "/opt/splunk/bin/python3",
+  "expect_alert": false
+}
