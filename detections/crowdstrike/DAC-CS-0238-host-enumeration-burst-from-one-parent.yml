@@ -1,0 +1,49 @@
+id: DAC-CS-0238
+title: Burst of host and network discovery commands from a single parent process
+description: Groups discovery utilities (whoami, systeminfo, ipconfig, hostname, net, net1, nltest, tasklist, quser, netstat, arp, route, nslookup) by host and parent process ID and alerts when 5 or more distinct utilities run under the same parent in the window. Hands-on-keyboard operators and implants run these in quick succession from one shell; admins rarely run five different tools from one parent within minutes. Schedule every 10 minutes over a 10-minute window.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1082
+  - T1016
+  - T1033
+  - T1057
+  - T1049
+severity: medium
+false_positives:
+- Inventory or support scripts (RMM, login scripts); allowlist by ParentBaseFileName and signed script path.
+references:
+- https://attack.mitre.org/techniques/T1082/
+- https://attack.mitre.org/techniques/T1016/
+- https://attack.mitre.org/techniques/T1033/
+- https://attack.mitre.org/techniques/T1057/
+- https://attack.mitre.org/techniques/T1049/
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Using%20correlate()%20to%20hunt%20process%20lineage.md
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Combine%20ProcessRollup2%20and%20NetworkConnectIP4%20Events.md
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- FileName
+- CommandLine
+- ParentProcessId
+- ParentBaseFileName
+tags:
+- behavioural
+- clean-room
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Win
+    | FileName=/^(whoami|systeminfo|ipconfig|hostname|net|net1|nltest|tasklist|quser|netstat|arp|route|nslookup)\.exe$/i
+    | groupBy([aid, ComputerName, ParentProcessId, ParentBaseFileName], function=[count(FileName, distinct=true, as=distinctTools), collect([UserName, FileName, CommandLine], limit=30)])
+    | distinctTools >= 5

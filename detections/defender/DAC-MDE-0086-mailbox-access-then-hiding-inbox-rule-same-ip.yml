@@ -1,0 +1,57 @@
+id: DAC-MDE-0086
+title: Mailbox read followed by a hiding or forwarding inbox rule from the same IP within 1 hour
+description: 'Sequence in CloudAppEvents (Microsoft Exchange Online): MailItemsAccessed for an account, then New-InboxRule or Set-InboxRule by the same AccountObjectId from the same IPAddress within 1 hour, where the rule parameters delete, move, mark as read, forward or redirect mail (DeleteMessage, MoveToFolder, MarkAsRead, ForwardTo, ForwardAsAttachmentTo, RedirectTo). Reading mail and then hiding or forwarding replies is the business-email-compromise pattern.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - collection
+  - stealth
+  techniques:
+  - T1114.003
+  - T1564.008
+severity: high
+false_positives:
+- Users creating their own filing rules right after reading mail; the same-IP link and hiding/forwarding actions limit this. Allowlist known corporate egress IPs only if noisy.
+references:
+- https://attack.mitre.org/techniques/T1114/003/
+- https://attack.mitre.org/techniques/T1564/008/
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-cloudappevents-table
+- https://learn.microsoft.com/en-us/defender-xdr/alert-grading-playbook-inbox-manipulation-rules
+- https://learn.microsoft.com/en-us/powershell/module/exchangepowershell/new-inboxrule
+- https://learn.microsoft.com/en-us/purview/audit-log-activities
+telemetry_validated: false
+required_fields:
+- Timestamp
+- Application
+- ActionType
+- AccountObjectId
+- AccountDisplayName
+- IPAddress
+- CountryCode
+- RawEventData
+tags:
+- behavioural
+- clean-room
+query:
+  defender: |
+    let Lookback = 1d;
+    let Window = 1h;
+    let Reads = CloudAppEvents
+    | where Timestamp > ago(Lookback)
+    | where Application == "Microsoft Exchange Online" and ActionType == "MailItemsAccessed"
+    | summarize ReadTime = min(Timestamp), ReadEvents = count() by AccountObjectId, IPAddress;
+    let Rules = CloudAppEvents
+    | where Timestamp > ago(Lookback)
+    | where Application == "Microsoft Exchange Online" and ActionType in ("New-InboxRule", "Set-InboxRule")
+    | extend RuleParams = tostring(RawEventData.Parameters)
+    | where RuleParams has_any ("DeleteMessage", "MoveToFolder", "MarkAsRead", "ForwardTo", "ForwardAsAttachmentTo", "RedirectTo")
+    | project RuleTime = Timestamp, AccountObjectId, AccountDisplayName, IPAddress, CountryCode, ActionType, RuleParams;
+    Reads
+    | join kind=inner Rules on AccountObjectId, IPAddress
+    | where RuleTime between (ReadTime .. ReadTime + Window)
+    | project RuleTime, ReadTime, AccountDisplayName, AccountObjectId, IPAddress, CountryCode, ActionType, ReadEvents, RuleParams

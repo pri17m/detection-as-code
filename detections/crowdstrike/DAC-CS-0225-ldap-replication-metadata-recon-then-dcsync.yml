@@ -1,0 +1,58 @@
+id: DAC-CS-0225
+title: Replication-metadata reconnaissance followed by DCSync from the same host
+description: 'Correlates replication-metadata reconnaissance on a workstation (repadmin /showobjmeta, or PowerShell Get-ADReplicationAttributeMetadata / msDS-ReplAttributeMetaData in ProcessRollup2 or ScriptControl content) with a DCSyncAttempted event on a domain controller whose RemoteAddressIP4 is that workstation, within 1 hour. Falcon does not expose LDAP filters, so the recon stage is command-line based. Run as a scheduled search (correlate() is not allowed in Filter Alerts). Unconfirmed fields: LocalAddressIP4 on ProcessRollup2/ScriptControl events (may need aid_master enrichment) and the requester/account fields on DCSyncAttempted.'
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - discovery
+  - credential-access
+  techniques:
+  - T1003.006
+  - T1087.002
+severity: high
+false_positives:
+- AD replication troubleshooting by directory admins from a jump host followed by a sanctioned replication test; allowlist admin hosts.
+- 'Tuning knob: within=1h; widen to 4h for slow operators.'
+references:
+- https://attack.mitre.org/techniques/T1003/006/
+- https://attack.mitre.org/techniques/T1087/002/
+- https://learn.microsoft.com/en-us/powershell/module/activedirectory/get-adreplicationattributemetadata
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Combine%20ProcessRollup2%20and%20NetworkConnectIP4%20Events.md
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Script%20Content%20Entropy.md
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Log-Sources/CrowdStrike/FLTR/crowdstrike-fltrcore/src/dashboards/Search-ByIPAddress.yaml
+- https://library.humio.com/data-analysis/functions-correlate.html
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- CommandLine
+- ScriptContent
+- LocalAddressIP4
+- RemoteAddressIP4
+tags:
+- behavioural
+- clean-room
+- wave2
+- needs-review
+query:
+  crowdstrike: |
+    correlate(
+      recon: {
+        (#event_simpleName=ProcessRollup2 event_platform=Win ImageFileName=/\\repadmin\.exe$/i CommandLine=/\/showobjmeta/i)
+        OR (#event_simpleName=ProcessRollup2 event_platform=Win CommandLine=/(Get-ADReplicationAttributeMetadata|msDS-ReplAttributeMetaData)/i)
+        OR (#event_simpleName=/^ScriptControl/ event_platform=Win ScriptContent=/(Get-ADReplicationAttributeMetadata|msDS-ReplAttributeMetaData)/i)
+      } include: [aid, ComputerName, UserName, CommandLine, LocalAddressIP4],
+      dcsync: {
+        #event_simpleName=DCSyncAttempted
+        | RemoteAddressIP4 <=> recon.LocalAddressIP4
+      } include: [aid, ComputerName, RemoteAddressIP4],
+      sequence=true, within=1h
+    )

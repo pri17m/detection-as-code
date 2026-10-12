@@ -1,0 +1,57 @@
+id: DAC-WIN-0348
+title: Vulnerable driver load followed by multiple security-process terminations on the same host
+description: 'Per host within 10 minutes: Sysmon event 6 loads a driver whose hash is in a lookup built from Microsoft''s recommended driver block rules, then 3 or more distinct security-product processes (from a security_process_names lookup) terminate (Sysmon event 5 or Security 4689). Sysmon 6 does not record the loading process, so correlation is by host. BYOVD drivers are validly signed, so signature fields are not used. Prerequisites: Sysmon DriverLoad and ProcessTerminate enabled with SHA256 hashing; Audit Process Termination for 4689 (off by default). sysmon:linux is excluded. Unconfirmed: Splunk TA field extraction names for Sysmon Hashes, and whether Sysmon 5 fires when a protected process is killed from kernel mode.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- XmlWinEventLog:Security
+mitre:
+  tactics:
+  - defense-impairment
+  - privilege-escalation
+  techniques:
+  - T1685
+  - T1068
+severity: critical
+false_positives:
+- Security-product upgrades that stop their own services after a (non-blocklisted) driver update; the blocklist lookup limits this.
+references:
+- https://attack.mitre.org/techniques/T1685/
+- https://attack.mitre.org/techniques/T1068/
+- https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon
+- https://github.com/microsoft/SysmonCommon/blob/main/manifest.xml
+- https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/design/microsoft-recommended-driver-block-rules
+- https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4689
+telemetry_validated: false
+required_fields:
+- EventCode
+- host
+- ImageLoaded
+- Hashes
+- Image
+- ProcessName
+tags:
+- behavioural
+- clean-room
+- wave2
+- needs-review
+query:
+  splunk: |
+    (`windows_sysmon` NOT sourcetype="sysmon:linux" (EventCode=6 OR EventCode=5)) OR (`windows_security` EventCode=4689)
+    | eval src_host=coalesce(Computer, host)
+    | rex field=Hashes "SHA256=(?<driver_sha256>[A-Fa-f0-9]{64})"
+    | eval driver_sha256=lower(driver_sha256)
+    | lookup ms_vulnerable_driver_blocklist sha256 AS driver_sha256 OUTPUT sha256 AS blocklisted_sha256
+    | eval proc_path=lower(coalesce(Image, ProcessName))
+    | rex field=proc_path "(?<proc_name>[^\\\\]+)$"
+    | lookup security_process_names process_name AS proc_name OUTPUT process_name AS security_proc
+    | eval stage=case(EventCode==6 AND isnotnull(blocklisted_sha256), "driver", (EventCode==5 OR EventCode==4689) AND isnotnull(security_proc), "kill", true(), null())
+    | where isnotnull(stage)
+    | eval killed_proc=if(stage=="kill", security_proc, null()), driver=if(stage=="driver", ImageLoaded, null())
+    | transaction src_host startswith=eval(stage=="driver") maxspan=10m
+    | eval kill_count=mvcount(mvdedup(killed_proc))
+    | where kill_count>=3
+    | table _time src_host driver killed_proc kill_count duration

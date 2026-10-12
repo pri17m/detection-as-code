@@ -1,0 +1,45 @@
+id: DAC-MDE-0088
+title: One Entra sign-in session used from two or more countries within 1 hour
+description: Groups successful SigninLogs events by SessionId and user in 1-hour bins and alerts when the same session appears from two or more Location country codes and two or more AutonomousSystemNumbers. A session ID is issued at sign-in and should follow one device; reuse from another country and network points to a stolen session cookie (adversary-in-the-middle phishing).
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:SigninLogs
+mitre:
+  tactics:
+  - lateral-movement
+  - credential-access
+  techniques:
+  - T1550.004
+  - T1539
+severity: high
+false_positives:
+- Users on VPNs or Global Secure Access that egress in different countries; exclude IsThroughGlobalSecureAccess and corporate VPN ASNs.
+references:
+- https://attack.mitre.org/techniques/T1550/004/
+- https://attack.mitre.org/techniques/T1539/
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/signinlogs
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- SessionId
+- UserPrincipalName
+- UserId
+- Location
+- IPAddress
+- AutonomousSystemNumber
+- ResultType
+- IsThroughGlobalSecureAccess
+tags:
+- behavioural
+- clean-room
+query:
+  defender: |
+    SigninLogs
+    | where TimeGenerated > ago(1d)
+    | where ResultType == "0" and isnotempty(SessionId) and isnotempty(Location)
+    | where IsThroughGlobalSecureAccess != true
+    | summarize Countries = make_set(Location, 10), CountryCount = dcount(Location), ASNs = make_set(AutonomousSystemNumber, 10), AsnCount = dcount(AutonomousSystemNumber), IPs = make_set(IPAddress, 10), Apps = make_set(AppDisplayName, 10), FirstSeen = min(TimeGenerated), LastSeen = max(TimeGenerated) by SessionId, UserPrincipalName, UserId, bin(TimeGenerated, 1h)
+    | where CountryCount >= 2 and AsnCount >= 2

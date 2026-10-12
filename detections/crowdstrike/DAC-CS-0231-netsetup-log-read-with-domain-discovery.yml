@@ -1,0 +1,56 @@
+id: DAC-CS-0231
+title: NetSetup.log accessed by a user process alongside domain discovery tooling
+description: Within 1 hour on one host, a non-SYSTEM process or script references %windir%\debug\netsetup.log (type, copy, findstr, Get-Content, robocopy) and domain discovery tooling runs (nltest, dsquery, AdFind, net group /domain, Get-ADUser/Group/Computer/DomainController). NetSetup.log records domain-join details (domain, DC, joining account); reading it together with AD enumeration is reconnaissance rather than join troubleshooting. Falcon exposes no file-read event, so the netsetup stage is command-line and ScriptControl based.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1087.002
+  - T1482
+  - T1069.002
+severity: medium
+false_positives:
+- Desktop support troubleshooting a failed domain join while running nltest; allowlist support accounts.
+references:
+- https://attack.mitre.org/techniques/T1087/002/
+- https://attack.mitre.org/techniques/T1482/
+- https://attack.mitre.org/techniques/T1069/002/
+- https://attack.mitre.org/software/S0552/
+- https://learn.microsoft.com/en-us/troubleshoot/windows-server/active-directory/troubleshoot-errors-join-computer-to-domain
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Combine%20ProcessRollup2%20and%20NetworkConnectIP4%20Events.md
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Script%20Content%20Entropy.md
+- https://library.humio.com/data-analysis/functions-correlate.html
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- ImageFileName
+- CommandLine
+- ScriptContent
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  crowdstrike: |
+    correlate(
+      netsetup: {
+        (#event_simpleName=ProcessRollup2 event_platform=Win CommandLine=/netsetup\.log/i UserName!=/^(SYSTEM|LOCAL SERVICE|NETWORK SERVICE)$/i)
+        OR (#event_simpleName=/^ScriptControl/ event_platform=Win ScriptContent=/netsetup\.log/i)
+      } include: [aid, ComputerName, UserName, CommandLine, ScriptContent],
+      addiscovery: {
+        #event_simpleName=ProcessRollup2 event_platform=Win
+        | ImageFileName=/\\(nltest|dsquery|adfind)\.exe$/i OR CommandLine=/\bnet1?(\.exe)?["']?\s+group\b.*\/domain/i OR CommandLine=/Get-AD(User|Group|Computer|DomainController)\b/i
+        | aid <=> netsetup.aid
+      } include: [ImageFileName, CommandLine],
+      within=1h
+    )

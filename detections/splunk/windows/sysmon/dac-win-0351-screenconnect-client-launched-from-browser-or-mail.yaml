@@ -1,0 +1,44 @@
+id: DAC-WIN-0351
+title: ScreenConnect client launched directly by a browser or email client
+description: 'Sysmon event 1 where the parent is a browser or mail client (chrome, msedge, firefox, brave, opera, outlook, thunderbird) and the child image, OriginalFileName, Product or command line names ScreenConnect. Support-scam and phishing lures deliver a pre-configured ScreenConnect client that the victim opens straight from the browser or mail; managed deployments come from software-distribution agents instead. Unconfirmed: the exact Product and OriginalFileName values ScreenConnect binaries carry, so a substring match is used.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+mitre:
+  tactics:
+  - command-and-control
+  - execution
+  techniques:
+  - T1219
+  - T1204.002
+severity: high
+false_positives:
+- Help-desk sessions where a technician asks a user to run the client from a support portal; confirm against ticket.
+references:
+- https://attack.mitre.org/techniques/T1219/
+- https://attack.mitre.org/techniques/T1204/002/
+- https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon
+- https://github.com/microsoft/SysmonCommon/blob/main/manifest.xml
+telemetry_validated: false
+required_fields:
+- EventCode
+- host
+- Image
+- ParentImage
+- CommandLine
+- OriginalFileName
+- Product
+- User
+tags:
+- behavioural
+- clean-room
+- needs-review
+query:
+  splunk: |
+    `windows_sysmon` NOT sourcetype="sysmon:linux" EventCode=1
+    | eval parent=lower(ParentImage), img=lower(Image), ident=lower(Image." ".coalesce(OriginalFileName,"")." ".coalesce(Product,"")." ".coalesce(CommandLine,""))
+    | where match(parent, "\\\\(chrome|msedge|firefox|brave|opera|outlook|thunderbird)\.exe$") AND match(ident, "screenconnect")
+    | stats count min(_time) as first_seen values(Image) as child values(CommandLine) as child_cmd values(ParentImage) as parent_image by host User

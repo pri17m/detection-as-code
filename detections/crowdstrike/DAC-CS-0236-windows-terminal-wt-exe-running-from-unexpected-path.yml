@@ -1,0 +1,50 @@
+id: DAC-CS-0236
+title: wt.exe running from a rare path outside Windows Terminal install locations
+description: 'Detects ProcessRollup2 events for wt.exe whose FilePath is not the packaged Windows Terminal location (Program Files\WindowsApps\Microsoft.WindowsTerminal_*_8wekyb3d8bbwe), not the per-user WindowsApps execution alias, and not in the wt_unpackaged_paths.csv allowlist (GitHub zip, Scoop, Chocolatey, winget portable paths, maintained per org). Results are kept only when the path is seen on 3 or fewer hosts, so rare copies stand out. Attackers name loaders wt.exe to blend into developer workstations. Unconfirmed: the path Falcon records when wt.exe is launched through the App Execution Alias.'
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - stealth
+  - execution
+  techniques:
+  - T1036.005
+  - T1059
+severity: medium
+false_positives:
+- Windows Terminal Preview or Canary builds and unpackaged installs; add their paths to wt_unpackaged_paths.csv.
+references:
+- https://attack.mitre.org/techniques/T1036/005/
+- https://attack.mitre.org/techniques/T1059/
+- https://learn.microsoft.com/en-us/windows/terminal/install
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Look%20for%20files%20running%20outside%20Windows%20systems%20folders%20with%20name%20masquerading.md
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- FileName
+- FilePath
+- CommandLine
+- ParentBaseFileName
+tags:
+- behavioural
+- clean-room
+- wave2
+- needs-review
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Win FileName=/^wt\.exe$/i
+    | FilePath!=/\\Program Files\\WindowsApps\\Microsoft\.WindowsTerminal_[^\\]+__?8wekyb3d8bbwe\\/i
+    | FilePath!=/\\AppData\\Local\\Microsoft\\WindowsApps\\/i
+    | match(file="wt_unpackaged_paths.csv", field=[FilePath], column=path_glob, mode=glob, strict=false, ignoreCase=true, include=[allowlisted])
+    | default(field=allowlisted, value="no")
+    | allowlisted="no"
+    | groupBy([FilePath], function=[count(aid, distinct=true, as=hostCount), collect([aid, ComputerName, UserName, CommandLine, ParentBaseFileName], limit=20)])
+    | hostCount <= 3

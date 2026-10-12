@@ -1,0 +1,56 @@
+id: DAC-CS-0226
+title: DsrmAdminLogonBehavior change followed by built-in Administrator logon on the same host
+description: 'Sequence on one host within 24 hours: a process or script sets DsrmAdminLogonBehavior (reg add, Set-ItemProperty/New-ItemProperty, or ScriptControl content) and then a UserLogon with a UserSid ending -500 (built-in Administrator) and LogonType 2, 3 or 10. On a domain controller a -500 local logon is only possible through the DSRM account, so the chain marks DSRM backdoor use. The registry event itself is not used because Falcon''s registry coverage of this key is undocumented.'
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - persistence
+  - defense-impairment
+  techniques:
+  - T1078.003
+  - T1112
+severity: critical
+false_positives:
+- Documented DSRM recovery drills; schedule them and suppress by change ticket.
+- Non-DC hosts where the built-in Administrator is used after an unrelated registry script; scope to domain controllers with a DC host group (aid_master ProductType=2).
+references:
+- https://attack.mitre.org/techniques/T1078/003/
+- https://attack.mitre.org/techniques/T1112/
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Combine%20ProcessRollup2%20and%20NetworkConnectIP4%20Events.md
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Script%20Content%20Entropy.md
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/UserLogon.md
+- https://library.humio.com/data-analysis/functions-correlate.html
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- CommandLine
+- ScriptContent
+- UserSid
+- LogonType
+tags:
+- behavioural
+- clean-room
+- wave2
+query:
+  crowdstrike: |
+    correlate(
+      setdsrm: {
+        (#event_simpleName=ProcessRollup2 event_platform=Win CommandLine=/DsrmAdminLogonBehavior/i)
+        OR (#event_simpleName=/^ScriptControl/ event_platform=Win ScriptContent=/DsrmAdminLogonBehavior/i)
+      } include: [aid, ComputerName, UserName, CommandLine],
+      dsrmlogon: {
+        #event_simpleName=UserLogon event_platform=Win UserSid=/-500$/
+        | in(LogonType, values=["2","3","10"])
+        | aid <=> setdsrm.aid
+      } include: [UserName, UserSid, LogonType],
+      sequence=true, within=24h
+    )
