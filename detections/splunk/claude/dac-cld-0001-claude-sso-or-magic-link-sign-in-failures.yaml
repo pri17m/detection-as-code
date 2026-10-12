@@ -1,0 +1,38 @@
+id: DAC-CLD-0001
+title: Claude SSO or magic-link sign-in failures
+description: >-
+  Alerts when the same account fails Claude SSO or magic-link sign-in five or more times.
+  Attackers use those failures to test stolen or guessed passwords against the organization's
+  Claude login.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: medium
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1110.001
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "A user who mistypes a password or whose identity-provider session expired. Raise the threshold if a helpdesk reset wave trips it."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1110/001/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("sso_login_failed", "magic_link_login_failed")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id
+    | where count >= 5

@@ -1,0 +1,37 @@
+id: DAC-CLD-0009
+title: Claude primary owner transferred
+description: >-
+  Alerts when the Claude organization primary owner is transferred to another member. Attackers
+  transfer that role so they keep full control of the organization after the real owner is locked
+  out.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: critical
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1098
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "A planned ownership change during an offboarding. The new owner is not a separate field on this sourcetype, so confirm who actor_email transferred it to."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1098/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("primary_owner_transferred")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id

@@ -1,0 +1,36 @@
+id: DAC-CLD-0015
+title: Claude organization or workspace spend limit deleted
+description: >-
+  Alerts when an organization or workspace Claude spend limit is deleted. Attackers remove that
+  cap so a stolen API key can keep running after it would have been stopped.
+author: Detection Engineer
+status: experimental
+platforms:
+  - splunk
+severity: medium
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1496
+sourcetypes:
+  - anthropic:compliance:activity
+required_fields:
+  - event_type
+  - actor_email
+  - actor_ip_address
+  - organization_id
+telemetry_validated: false
+false_positives:
+  - "Finance removing a limit while moving the organization to a different billing plan. Per-member limit deletions are not in this rule."
+references:
+  - https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+  - https://github.com/splunk-platform-apps/anthropic_compliance_app_for_splunk
+  - https://attack.mitre.org/techniques/T1496/
+tags:
+  - quality-wave
+  - claude-compliance
+query:
+  splunk: |
+    sourcetype="anthropic:compliance:activity" event_type IN ("platform_spend_limit_deleted", "workspace_spend_limit_deleted")
+    | stats count values(event_type) as events values(actor_ip_address) as source_ips values(actor_user_id) as actor_ids by actor_email organization_id
