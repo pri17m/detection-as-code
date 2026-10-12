@@ -1,0 +1,54 @@
+{
+  "label": "malicious",
+  "source": "Bypass from ponytail finding 8: each tool under its own cmd /c; caught by host+user grouping",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ParentProcessId": "20",
+      "ParentBaseFileName": "cmd.exe",
+      "FileName": "whoami.exe"
+    },
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ParentProcessId": "21",
+      "ParentBaseFileName": "cmd.exe",
+      "FileName": "systeminfo.exe"
+    },
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ParentProcessId": "22",
+      "ParentBaseFileName": "cmd.exe",
+      "FileName": "ipconfig.exe"
+    },
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ParentProcessId": "23",
+      "ParentBaseFileName": "cmd.exe",
+      "FileName": "nltest.exe"
+    },
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ParentProcessId": "24",
+      "ParentBaseFileName": "cmd.exe",
+      "FileName": "tasklist.exe"
+    }
+  ],
+  "expect_alert": true,
+  "result": "not run"
+}
