@@ -1,0 +1,17 @@
+{
+  "label": "malicious",
+  "source": "Rule lineage: cmd.exe child of lsass.exe",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "ParentBaseFileName": "lsass.exe",
+      "FileName": "cmd.exe",
+      "CommandLine": "cmd.exe /c whoami"
+    }
+  ],
+  "expect_alert": true,
+  "result": "not run"
+}
