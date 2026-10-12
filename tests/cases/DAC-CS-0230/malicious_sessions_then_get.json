@@ -1,0 +1,25 @@
+{
+  "label": "malicious",
+  "source": "Subcommand sequence from Microsoft klist docs https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/klist (sessions, then get for an SPN)",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ImageFileName": "C:\\Windows\\System32\\klist.exe",
+      "CommandLine": "klist sessions"
+    },
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ImageFileName": "C:\\Windows\\System32\\klist.exe",
+      "CommandLine": "klist get cifs/fs01"
+    }
+  ],
+  "expect_alert": true,
+  "result": "not run"
+}

@@ -1,0 +1,33 @@
+{
+  "label": "near_miss",
+  "source": "Three runs of one subcommand: alerts under the runs>=3 path as documented (any matching subcommand, not only -li 0x3e7)",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ImageFileName": "C:\\Windows\\System32\\klist.exe",
+      "CommandLine": "klist tgt"
+    },
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ImageFileName": "C:\\Windows\\System32\\klist.exe",
+      "CommandLine": "klist tgt"
+    },
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ImageFileName": "C:\\Windows\\System32\\klist.exe",
+      "CommandLine": "klist tgt"
+    }
+  ],
+  "expect_alert": true,
+  "result": "not run"
+}

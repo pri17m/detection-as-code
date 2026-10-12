@@ -1,0 +1,17 @@
+{
+  "label": "benign",
+  "source": "Single klist purge, excluded subcommand (Microsoft klist docs https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/klist)",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ImageFileName": "C:\\Windows\\System32\\klist.exe",
+      "CommandLine": "klist purge"
+    }
+  ],
+  "expect_alert": false,
+  "result": "not run"
+}

@@ -1,6 +1,6 @@
 id: DAC-CS-0230
 title: Multiple advanced klist Kerberos subcommands by one user on one host
-description: Counts distinct advanced klist subcommands (tgt, sessions, kcd_cache, get, query_bind, add_bind, purge_bind) per host and user over the search window and alerts at 2 or more distinct subcommands, or 3 or more runs including -li 0x3e7 (SYSTEM logon session). Plain klist, klist tickets and klist purge are excluded. Operators enumerating sessions, then requesting tickets for SPNs, produce this burst; single admin troubleshooting runs do not. Related to DAC-CS-0080 (klist from a shell parent). Schedule hourly over a 1-hour window.
+description: Counts distinct advanced klist subcommands (tgt, sessions, kcd_cache, get, query_bind, add_bind, purge_bind) per host and user over the search window and alerts at 2 or more distinct subcommands, or 3 or more runs that match any listed subcommand or -li 0x3e7 (the runs count is not limited to -li 0x3e7, because Microsoft documents klist -li 0x3e7 as a routine troubleshooting command, so it is not used as a standalone indicator). Plain klist, klist tickets and klist purge are excluded. Operators enumerating sessions, then requesting tickets for SPNs, produce this burst; single admin troubleshooting runs do not. Related to DAC-CS-0080 (klist from a shell parent). Schedule hourly over a 1-hour window.
 author: DaC
 status: experimental
 platforms:
