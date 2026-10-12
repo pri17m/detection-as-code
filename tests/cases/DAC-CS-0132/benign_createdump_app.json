@@ -1,0 +1,8 @@
+{
+  "label": "benign",
+  "source": "Sigma createdump FP note: 'Command lines that use the same flags'",
+  "CommandLine": "createdump.exe -u -f C:\\Temp\\myapp.dmp 4242",
+  "ImageFileName": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\5.0.17\\createdump.exe",
+  "expect_alert": false,
+  "note": "no lsass token \u2014 should not match tightened regex"
+}

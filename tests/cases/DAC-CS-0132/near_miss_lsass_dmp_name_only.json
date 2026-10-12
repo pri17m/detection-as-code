@@ -1,0 +1,8 @@
+{
+  "label": "near-miss",
+  "source": "existing rule already matches lsass.dmp; renamed tool keeping flag",
+  "CommandLine": "helper.exe -ma keyiso.exe C:\\Temp\\out.dmp",
+  "ImageFileName": "C:\\Users\\Public\\helper.exe",
+  "expect_alert": false,
+  "note": "keyiso is in Sigma procdump rule; not added here without further review"
+}

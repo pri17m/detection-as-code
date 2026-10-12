@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "source": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.001/T1003.001.yaml#L (test 47a539d1)",
+  "CommandLine": "rdrleakdiag.exe /p 832 /o C:\\Temp /fullmemdmp /wait 1",
+  "ImageFileName": "C:\\Windows\\System32\\rdrleakdiag.exe",
+  "expect_alert": true
+}

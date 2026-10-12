@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "source": "Atomic T1003.001 test 9d0072c8",
+  "CommandLine": "createdump.exe -u -f C:\\Temp\\dotnet-lsass.dmp 708",
+  "ImageFileName": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\5.0.17\\createdump.exe",
+  "expect_alert": true
+}

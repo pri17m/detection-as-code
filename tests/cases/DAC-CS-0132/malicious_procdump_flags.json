@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "source": "Atomic T1003.001 test 0be2230c",
+  "CommandLine": "pd.exe -accepteula -ma lsass.exe C:\\Temp\\lsass.dmp",
+  "ImageFileName": "C:\\Users\\Public\\pd.exe",
+  "expect_alert": true
+}

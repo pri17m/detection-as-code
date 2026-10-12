@@ -1,0 +1,7 @@
+{
+  "label": "benign",
+  "source": "common admin backup of non-credential hive",
+  "CommandLine": "reg.exe save HKLM\\SOFTWARE C:\\Backup\\software.hiv",
+  "ImageFileName": "C:\\Windows\\System32\\reg.exe",
+  "expect_alert": false
+}
