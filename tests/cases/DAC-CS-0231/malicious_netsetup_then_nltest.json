@@ -1,0 +1,25 @@
+{
+  "label": "malicious",
+  "source": "NetSetup.log path from Microsoft domain-join troubleshooting doc; nltest from ATT&CK T1482",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ImageFileName": "C:\\Windows\\System32\\cmd.exe",
+      "CommandLine": "cmd /c type C:\\Windows\\debug\\NetSetup.LOG"
+    },
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ImageFileName": "C:\\Windows\\System32\\nltest.exe",
+      "CommandLine": "nltest /domain_trusts"
+    }
+  ],
+  "expect_alert": true,
+  "result": "not run"
+}

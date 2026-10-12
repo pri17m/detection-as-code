@@ -1,0 +1,17 @@
+{
+  "label": "benign",
+  "source": "NetSetup.log read with no domain discovery in window",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "UserName": "u1",
+      "ImageFileName": "C:\\Windows\\System32\\notepad.exe",
+      "CommandLine": "notepad C:\\Windows\\debug\\NetSetup.LOG"
+    }
+  ],
+  "expect_alert": false,
+  "result": "not run"
+}
