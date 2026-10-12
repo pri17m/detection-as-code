@@ -1,0 +1,8 @@
+{
+  "label": "benign",
+  "source": "existing exclusion",
+  "ParentBaseFileName": "splunkd.exe",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\cmd.exe",
+  "CommandLine": "cmd.exe /c splunk cmd python /opt/splunk/bin/foo.py",
+  "expect_alert": false
+}

