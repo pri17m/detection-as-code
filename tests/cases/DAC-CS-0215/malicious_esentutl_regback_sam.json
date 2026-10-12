@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "source": "Sigma esentutl_sensitive_file_copy RegBack path",
+  "CommandLine": "esentutl.exe /y /vss C:\\\\Windows\\\\System32\\\\config\\\\RegBack\\\\SAM /d C:\\\\Temp\\\\sam",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\esentutl.exe",
+  "expect_alert": true
+}

@@ -1,0 +1,7 @@
+{
+  "label": "benign",
+  "source": "LOLBAS Esentutl general Copy use case",
+  "CommandLine": "esentutl.exe /y C:\\\\Temp\\\\a.vbs /d C:\\\\Temp\\\\b.vbs /o",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\esentutl.exe",
+  "expect_alert": false
+}

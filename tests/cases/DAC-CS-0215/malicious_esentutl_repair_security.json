@@ -1,0 +1,7 @@
+{
+  "label": "malicious",
+  "source": "Sigma repair path",
+  "CommandLine": "esentutl.exe /y C:\\\\Windows\\\\repair\\\\security /d C:\\\\Temp\\\\security",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\esentutl.exe",
+  "expect_alert": true
+}

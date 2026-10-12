@@ -4,7 +4,7 @@ description: >-
   Alerts when esentutl.exe is started with /y against ntds.dit or the SAM, SYSTEM, or SECURITY
   hive. Attackers use that copy mode, often with /vss, to steal the Active Directory database or
   local credential stores from a locked file.
-author: Detection Engineer
+author: DaC
 status: experimental
 platforms:
 - crowdstrike
@@ -13,6 +13,7 @@ mitre:
   tactics:
   - credential-access
   techniques:
+  - T1003.002
   - T1003.003
 sourcetypes:
 - falcon:process
@@ -32,6 +33,7 @@ references:
 - https://attack.mitre.org/techniques/T1003/003/
 - https://docs.panther.com/data-onboarding/supported-logs/crowdstrike/falcon-data-replicator
 tags:
+- reviewed-batch1
 - quality-wave
 - lolbas
 - parity:DAC-WIN-0355
@@ -42,5 +44,5 @@ query:
     | event_platform=Win
     | ImageFileName=/\\esentutl\.exe$/i
     | CommandLine=/\/y/i
-    | CommandLine=/(\/vss|ntds\.dit|\\config\\sam|\\config\\system|\\config\\security|\\ntds\\)/i
+    | CommandLine=/(\/vss|ntds\.dit|\\config\\sam|\\config\\system|\\config\\security|\\config\\regback\\(sam|system|security)|\\repair\\(sam|system|security)|\\ntds\\)/i
     | groupBy([aid, ComputerName, ImageFileName, CommandLine, ParentBaseFileName], function=count())

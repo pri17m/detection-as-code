@@ -1,0 +1,6 @@
+{
+  "label": "near-miss",
+  "CommandLine": "esentutl.exe /y C:\\\\Data\\\\app.edb /d C:\\\\Backup\\\\app.edb",
+  "ImageFileName": "C:\\\\Windows\\\\System32\\\\esentutl.exe",
+  "expect_alert": false
+}
