@@ -1,0 +1,12 @@
+{
+  "label": "benign",
+  "source": "Same sequence, binary listed in sanctioned_rmm.csv with sanctioned=yes",
+  "synthetic": true,
+  "events": [
+    {
+      "note": "as malicious case, FileName present in sanctioned_rmm.csv"
+    }
+  ],
+  "expect_alert": false,
+  "result": "not run"
+}

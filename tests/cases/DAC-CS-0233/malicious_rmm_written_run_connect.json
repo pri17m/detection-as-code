@@ -1,0 +1,29 @@
+{
+  "label": "malicious",
+  "source": "Sequence per rule description; binary name must exist in CrowdStrike rmm_tools.csv (rmm_binary column) - name below is a placeholder to replace with a real row",
+  "synthetic": true,
+  "events": [
+    {
+      "event_simpleName": "PeFileWritten",
+      "aid": "h1",
+      "FileName": "<rmm_binary from rmm_tools.csv>",
+      "TargetFileName": "C:\\Users\\u1\\Downloads\\<rmm_binary>"
+    },
+    {
+      "event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "h1",
+      "FileName": "<rmm_binary from rmm_tools.csv>",
+      "TargetProcessId": "111"
+    },
+    {
+      "event_simpleName": "NetworkConnectIP4",
+      "aid": "h1",
+      "ContextProcessId": "111",
+      "RemoteAddressIP4": "192.0.2.10",
+      "RemotePort": "443"
+    }
+  ],
+  "expect_alert": true,
+  "result": "not run"
+}
