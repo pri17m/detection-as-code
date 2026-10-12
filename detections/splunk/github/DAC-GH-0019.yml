@@ -33,7 +33,7 @@ references:
 - https://attack.mitre.org/techniques/T1677/
 mitre:
   tactics:
-  - defense-evasion
+  - execution
   techniques:
   - T1677
 author: Detection Engineer

@@ -25,6 +25,7 @@ tags:
 - vmware
 - esxi
 - escu
+- needs-review
 query:
   splunk: '(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*root*" Message="*logged in*" NOT Message="*root@127.0.0.1*"
 

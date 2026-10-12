@@ -26,7 +26,7 @@ query:
 mitre:
   tactics:
   - privilege-escalation
-  - defense-evasion
+  - stealth
   techniques:
   - T1068
   - T1014

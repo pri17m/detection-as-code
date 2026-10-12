@@ -51,6 +51,7 @@ tags:
 - tp-quality-v2
 - src:Suspicious_Registry_Modifications.yml
 - esn:RegGenericValue
+- needs-review
 severity: high
 required_fields:
 - '#event_simpleName'

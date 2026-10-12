@@ -20,6 +20,7 @@ tags:
 - wave-a
 - P0
 - parity:DAC-CS-0059
+- needs-review
 query:
   defender: 'DeviceProcessEvents
 

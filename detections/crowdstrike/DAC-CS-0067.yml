@@ -16,7 +16,7 @@ title: 'Falcon: CVE-2025-53770 - SharePoint ToolShell'
 mitre:
   tactics:
   - initial-access
-  - defense-evasion
+  - stealth
   techniques:
   - T1190
   - T1620

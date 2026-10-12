@@ -39,6 +39,7 @@ tags:
 - P0
 - tp-quality
 - region-hop
+- needs-review
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 

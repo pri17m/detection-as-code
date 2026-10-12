@@ -29,6 +29,7 @@ tags:
 - P0
 - tp-quality
 - console-login
+- needs-review
 query:
   splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
 

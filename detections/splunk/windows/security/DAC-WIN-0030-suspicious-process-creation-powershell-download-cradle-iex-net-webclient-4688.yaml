@@ -12,7 +12,7 @@ sourcetypes:
 mitre:
   tactics:
   - execution
-  - defense-evasion
+  - command-and-control
   techniques:
   - T1105
 severity: medium

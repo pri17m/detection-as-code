@@ -49,6 +49,7 @@ tags:
 - src:Dll-Side_Loading_Detection_Query.yml
 - esn:ClassifiedModuleLoad
 - esn:ProcessRollup2
+- needs-review
 severity: high
 required_fields:
 - '#event_simpleName'

@@ -13,7 +13,6 @@ sourcetypes:
 mitre:
   tactics:
   - impact
-  - defense-evasion
   techniques:
   - T1490
 severity: high

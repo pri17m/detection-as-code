@@ -38,6 +38,7 @@ tags:
 - wave1
 - skeleton-key
 - lsass
+- needs-review
 query:
   splunk: |
     `windows_sysmon` EventCode=10

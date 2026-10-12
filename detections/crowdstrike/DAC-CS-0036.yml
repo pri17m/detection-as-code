@@ -18,6 +18,7 @@ status: experimental
 tags:
 - wave-a
 - P0
+- needs-review
 query:
   crowdstrike: 'ImageFileName="msbuild.exe" AND (CommandLine CONTAINS "\\Users\\" OR ParentBaseFileName
     NOT IN ["devenv.exe","MSBuild.exe"])

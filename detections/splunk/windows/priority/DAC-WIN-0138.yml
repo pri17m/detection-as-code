@@ -38,6 +38,7 @@ tags:
 - remapped_from:DAC-WIN-0039
 - tier:P1
 - windows
+- needs-review
 query:
   splunk: '(sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) `windows_security`
 

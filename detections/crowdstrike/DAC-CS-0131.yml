@@ -28,7 +28,7 @@ query:
     '
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   - execution
   techniques:
   - T1218.005

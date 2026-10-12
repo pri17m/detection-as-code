@@ -30,6 +30,7 @@ tags:
 - P1
 - windows_sysmon
 - sigma:rules/windows/image_load/image_load_rundll32_remote_share_load.yml
+- needs-review
 title: Remote DLL Load Via Rundll32.EXE
 author: Detection Engineer
 sourcetypes:

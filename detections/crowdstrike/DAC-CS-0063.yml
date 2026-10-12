@@ -15,7 +15,7 @@ platforms:
 title: 'Falcon: LOLBin Msiexec'
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1218.007
 references:

@@ -33,6 +33,7 @@ tags:
 - wave-c
 - P0
 - phase2-next
+- needs-review
 description: DeactivateMFADevice
 sourcetypes:
 - aws:cloudtrail

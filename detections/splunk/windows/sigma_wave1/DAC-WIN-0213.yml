@@ -30,6 +30,7 @@ tags:
 - P0
 - windows_sysmon
 - sigma:rules/windows/create_remote_thread/create_remote_thread_win_powershell_lsass.yml
+- needs-review
 title: Potential Credential Dumping Attempt Via PowerShell Remote Thread
 author: Detection Engineer
 sourcetypes:

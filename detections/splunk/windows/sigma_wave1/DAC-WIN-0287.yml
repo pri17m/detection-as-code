@@ -29,6 +29,7 @@ tags:
 - P1
 - windows_sysmon
 - sigma:rules/windows/file/file_access/file_access_win_susp_gpo_files.yml
+- needs-review
 title: Access To Potentially Sensitive Sysvol Files By Uncommon Applications
 author: Detection Engineer
 sourcetypes:

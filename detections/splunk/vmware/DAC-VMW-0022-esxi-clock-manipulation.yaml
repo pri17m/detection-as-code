@@ -10,7 +10,7 @@ sourcetypes:
 - vmware:esxlog*
 mitre:
   tactics:
-  - defense-evasion
+  - stealth
   techniques:
   - T1070.006
 severity: medium

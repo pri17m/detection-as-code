@@ -29,6 +29,7 @@ tags:
 - P1
 - windows_sysmon
 - sigma:rules/windows/process_creation/proc_creation_win_hktl_cobaltstrike_load_by_rundll32.yml
+- needs-review
 title: CobaltStrike Load by Rundll32
 author: Detection Engineer
 sourcetypes:

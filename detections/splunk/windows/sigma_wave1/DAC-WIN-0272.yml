@@ -28,6 +28,7 @@ tags:
 - P1
 - windows_security
 - sigma:rules/windows/builtin/security/win_security_default_domain_gpo_modification.yml
+- needs-review
 title: Windows Default Domain GPO Modification
 author: Detection Engineer
 sourcetypes:

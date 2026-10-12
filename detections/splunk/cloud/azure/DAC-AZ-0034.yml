@@ -33,6 +33,7 @@ platforms:
 tags:
 - wave-c
 - P1
+- needs-review
 description: config/authsettings write enabled false
 sourcetypes:
 - azure:monitor:activity

@@ -44,6 +44,7 @@ tags:
 - tp-quality-v2
 - src:hunting_bitsadmin_usage.yml
 - esn:ScriptControlScanV2
+- needs-review
 severity: high
 required_fields:
 - '#event_simpleName'

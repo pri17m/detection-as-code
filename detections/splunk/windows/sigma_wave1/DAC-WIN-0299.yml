@@ -29,6 +29,7 @@ tags:
 - P1
 - windows_sysmon
 - sigma:rules/windows/network_connection/net_connection_win_rundll32_net_connections.yml
+- needs-review
 title: Rundll32 Internet Connection
 author: Detection Engineer
 sourcetypes:

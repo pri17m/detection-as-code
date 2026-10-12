@@ -21,6 +21,7 @@ tags:
 - wave-b
 - P0
 - phase2-next
+- needs-review
 telemetry_validated: false
 required_fields:
 - operationName

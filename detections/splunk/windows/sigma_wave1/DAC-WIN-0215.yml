@@ -29,6 +29,7 @@ tags:
 - P0
 - windows_sysmon
 - sigma:rules/windows/create_remote_thread/create_remote_thread_win_susp_password_dumper_lsass.yml
+- needs-review
 title: Password Dumper Remote Thread in LSASS
 author: Detection Engineer
 sourcetypes:

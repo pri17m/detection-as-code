@@ -32,6 +32,7 @@ platforms:
 tags:
 - wave-c
 - P1
+- needs-review
 description: DeleteOrgPolicy
 sourcetypes:
 - gcp:audit

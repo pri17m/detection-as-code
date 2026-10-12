@@ -32,7 +32,7 @@ sourcetypes:
 - WinEventLog:Microsoft-Windows-Sysmon/Operational
 mitre:
   tactics:
-  - defense-evasion
+  - defense-impairment
   techniques:
   - T1685
 id: DAC-WIN-0323

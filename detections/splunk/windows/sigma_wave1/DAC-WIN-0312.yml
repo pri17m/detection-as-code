@@ -29,6 +29,7 @@ tags:
 - P1
 - windows_sysmon
 - sigma:rules/windows/process_creation/proc_creation_win_hktl_c3_rundll32_pattern.yml
+- needs-review
 title: HackTool - F-Secure C3 Load by Rundll32
 author: Detection Engineer
 sourcetypes:

@@ -30,6 +30,7 @@ tags:
 - P1
 - windows_security
 - sigma:rules/windows/builtin/security/win_security_invoke_obfuscation_via_use_mshta_services_security.yml
+- needs-review
 title: Invoke-Obfuscation Via Use MSHTA - Security
 author: Detection Engineer
 sourcetypes:

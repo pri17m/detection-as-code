@@ -39,3 +39,5 @@ query:
     | stats count values(loaded) as loaded_dlls values(img) as images by host, User
 
     '
+tags:
+- needs-review
