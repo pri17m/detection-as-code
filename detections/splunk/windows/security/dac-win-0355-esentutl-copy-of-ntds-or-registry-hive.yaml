@@ -1,4 +1,4 @@
-id: DAC-WIN-0336
+id: DAC-WIN-0355
 title: esentutl copy of NTDS or registry hive
 description: >-
   Alerts when esentutl.exe is started with /y against ntds.dit or the SAM, SYSTEM, or SECURITY

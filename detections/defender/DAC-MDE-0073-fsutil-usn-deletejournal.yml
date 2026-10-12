@@ -29,7 +29,7 @@ references:
 - https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceprocessevents-table
 tags:
 - quality-wave
-- parity:DAC-WIN-0340
+- parity:DAC-WIN-0359
 query:
   defender: |
     DeviceProcessEvents

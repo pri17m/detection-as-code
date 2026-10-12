@@ -30,7 +30,7 @@ references:
 - https://learn.microsoft.com/defender-xdr/advanced-hunting-deviceregistryevents-table
 tags:
 - quality-wave
-- parity:DAC-WIN-0338
+- parity:DAC-WIN-0357
 query:
   defender: |
     DeviceRegistryEvents

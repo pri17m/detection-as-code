@@ -1,4 +1,4 @@
-id: DAC-WIN-0338
+id: DAC-WIN-0357
 title: UAC bypass registry hijack of ms-settings or mscfile
 description: >-
   Alerts when a command is written to the ms-settings or mscfile shell-open key in the

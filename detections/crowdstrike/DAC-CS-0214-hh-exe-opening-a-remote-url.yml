@@ -33,7 +33,7 @@ references:
 tags:
 - quality-wave
 - lolbas
-- parity:DAC-WIN-0335
+- parity:DAC-WIN-0354
 - parity:DAC-MDE-0068
 query:
   crowdstrike: |

@@ -1,9 +1,9 @@
-id: DAC-WIN-0341
-title: pcalua proxy execution of a script, DLL, or user-writable file
+id: DAC-WIN-0356
+title: desktopimgdownldr lockscreen URL outside Microsoft
 description: >-
-  Alerts when pcalua.exe is told to launch a script, DLL, CPL, URL, UNC path, or a file under a
-  user-writable folder. Attackers use the Program Compatibility Assistant as a signed proxy to
-  start that payload.
+  Alerts when desktopimgdownldr.exe is pointed at a lock-screen URL that is not a Microsoft
+  Spotlight host. Attackers use this signed downloader to pull a payload from a server they
+  control.
 author: Detection Engineer
 status: experimental
 platforms:
@@ -11,9 +11,9 @@ platforms:
 severity: high
 mitre:
   tactics:
-  - defense-evasion
+  - command-and-control
   techniques:
-  - T1202
+  - T1105
 sourcetypes:
 - WinEventLog:Security
 - XmlWinEventLog:Security
@@ -26,21 +26,21 @@ required_fields:
 - ParentProcessName
 telemetry_validated: false
 false_positives:
-- "Compatibility shims that launch a vendor binary from a user-writable path. Allowlist that path."
+- "A management tool that sets a custom lock-screen URL on a non-Microsoft host."
 references:
-- https://lolbas-project.github.io/lolbas/Binaries/Pcalua/
-- https://attack.mitre.org/techniques/T1202/
+- https://lolbas-project.github.io/lolbas/Binaries/Desktopimgdownldr/
+- https://attack.mitre.org/techniques/T1105/
 - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4688
 tags:
 - quality-wave
 - lolbas
-- parity:DAC-MDE-0074
-- parity:DAC-CS-0219
+- parity:DAC-MDE-0070
+- parity:DAC-CS-0216
 query:
   splunk: |
     ((sourcetype=WinEventLog:Security OR sourcetype=XmlWinEventLog:Security) EventCode=4688) OR (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
     | eval cmd=lower(coalesce(CommandLine, Process_Command_Line, cmdline))
     | eval proc=lower(coalesce(NewProcessName, Image, process_path, process))
     | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, parent_process_name, ParentImage))
-    | where match(proc, "(^|\\)pcalua\.exe$") AND match(cmd, "(^|\s)-a(\s|$)") AND match(cmd, "(\\\\|\\users\\|\\temp\\|\\public\\|\\appdata\\|\\programdata\\|https?://|\.dll\b|\.cpl\b|\.js\b|\.vbs\b|\.hta\b|\.bat\b|\.cmd\b|\.ps1\b)")
+    | where match(proc, "(^|\\)desktopimgdownldr\.exe$") AND match(cmd, "lockscreenurl") AND NOT match(cmd, "lockscreenurl:\s*https?://([a-z0-9.-]*\.)?(microsoft\.com|windows\.com|live\.com|bing\.com|msn\.com|azureedge\.net|microsoftonline\.com)([/:?\s]|$)")
     | stats count values(proc) as processes values(parent) as parents values(cmd) as commands by host
