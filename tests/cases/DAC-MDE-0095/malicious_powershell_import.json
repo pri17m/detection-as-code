@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ActionType": "RegistryValueSet",
+  "RegistryKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\89ABCDEF0123456789ABCDEF0123456789ABCDEF",
+  "RegistryValueName": "Blob",
+  "InitiatingProcessFileName": "powershell.exe",
+  "InitiatingProcessFolderPath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "expected_severity": "high"
+}
