@@ -1,0 +1,77 @@
+id: DAC-CS-0244
+title: "Falcon: root CA added to the machine Root store with certutil -addstore or certmgr -add localMachine"
+description: >-
+  Detects a process command line that adds a certificate to the machine-scope Root (or AuthRoot) store using
+  certutil-style syntax (-addstore [-f] [-enterprise] root, not -user) or certmgr-style syntax
+  (-add <file> [-c] [-s] -r localMachine root). Matching is on the arguments, not the image name, so
+  renamed or copied certutil/certmgr binaries still match (ProcessRollup2 carries no OriginalFilename in
+  the public field references). Escalates to high when the image is not certutil.exe in System32/SysWOW64
+  or certmgr.exe under Windows Kits, or the parent is not cmd/powershell/pwsh/msiexec/ccmexec/explorer.
+  telemetry_validated false; not run in a tenant.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- "falcon:process"
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1553.004
+severity: medium
+false_positives:
+- "IT or helpdesk installing a corporate or proxy root CA by hand with certutil -addstore root from an admin shell (alerts at medium; allowlist by host group or ticketed change window after measuring - not measured)."
+- "Software installers and agents that ship their own certmgr.exe or certutil wrapper (Elastic's published rule allowlists ?:\\ProgramData\\Logishrd\\LogiOptionsPlus\\Plugins\\64\\certmgr.exe); these alert at high because the path is unexpected - allowlist by SHA256 plus path, never by name."
+- "Developer machines using Windows SDK certmgr.exe from Windows Kits for test certificates."
+references:
+- https://attack.mitre.org/techniques/T1553/004/
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certutil_certificate_installation.yml
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certmgr_certificate_installation.yml
+- https://github.com/splunk/security_content/blob/develop/detections/endpoint/windows_certutil_root_certificate_addition.yml
+- https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certutil
+- https://learn.microsoft.com/en-us/windows/win32/seccrypto/certmgr-exe
+telemetry_validated: false
+required_fields:
+- "#event_simpleName"
+- "event_platform"
+- "aid"
+- "ComputerName"
+- "UserName"
+- "UserSid"
+- "ImageFileName"
+- "CommandLine"
+- "ParentBaseFileName"
+- "SHA256HashData"
+tags:
+- behavioural
+- root-ca
+- process-creation
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Win
+    | CommandLine=/[-\/]add(store)?\b/i
+    | case {
+        CommandLine=/[-\/]addstore\b/i
+          CommandLine!=/\s[-\/]user\b/i
+          | Tool := "certutil-style" ;
+        CommandLine=/[-\/]add\b/i
+          CommandLine=/[-\/]r\s+"?localmachine"?\b/i
+          | Tool := "certmgr-style" ;
+      }
+    | CommandLine=/(^|\s)"?(auth)?root"?(\s|$)/i
+    | case {
+        ImageFileName=/\\Windows\\(System32|SysWOW64)\\certutil\.exe$/i | PathFlag := "expected" ;
+        ImageFileName=/\\Windows Kits\\[^"]*\\certmgr\.exe$/i | PathFlag := "expected" ;
+        * | PathFlag := "unexpected_path_or_name" ;
+      }
+    | case {
+        ParentBaseFileName=/^(cmd|powershell|pwsh|msiexec|ccmexec|explorer)\.exe$/i | ParentFlag := "expected" ;
+        * | ParentFlag := "unexpected_parent" ;
+      }
+    | case {
+        PathFlag="unexpected_path_or_name" | Severity := "high" ;
+        ParentFlag="unexpected_parent" | Severity := "high" ;
+        * | Severity := "medium" ;
+      }
+    | table([@timestamp, aid, ComputerName, UserName, UserSid, Tool, Severity, PathFlag, ParentFlag, ImageFileName, CommandLine, ParentBaseFileName, SHA256HashData])

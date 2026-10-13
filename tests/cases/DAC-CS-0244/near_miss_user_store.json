@@ -1,0 +1,9 @@
+{
+  "label": "near-miss",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "\\Device\\HarddiskVolume3\\Windows\\System32\\certutil.exe",
+  "CommandLine": "certutil -addstore -user root C:\\tmp\\dev.cer",
+  "ParentBaseFileName": "cmd.exe"
+}

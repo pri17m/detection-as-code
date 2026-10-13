@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "\\Device\\HarddiskVolume3\\ProgramData\\ContosoAgent\\bin\\x64\\certmgr.exe",
+  "CommandLine": "certmgr.exe -add -c C:\\ProgramData\\ContosoAgent\\upd.cer -s -r localMachine root",
+  "ParentBaseFileName": "ContosoAgentSvc.exe",
+  "UserSid": "S-1-5-18",
+  "expected_severity": "high"
+}

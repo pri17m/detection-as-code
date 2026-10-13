@@ -1,0 +1,11 @@
+{
+  "label": "benign",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "\\Device\\HarddiskVolume3\\Windows\\System32\\certutil.exe",
+  "CommandLine": "certutil -addstore root \\\\fs01\\pki\\CorpRoot.cer",
+  "ParentBaseFileName": "cmd.exe",
+  "expected_severity": "medium",
+  "note": "legitimate admin action still alerts at medium by design"
+}
