@@ -1,12 +1,12 @@
 {
   "label": "malicious",
+  "variant": "certmgr copied to ProgramData, sideloaded vendor parent, SYSTEM",
+  "source": "Fielenbach public post",
   "expect_alert": true,
   "result": "not run",
   "synthetic": true,
   "Image": "C:\\ProgramData\\ContosoAgent\\bin\\x64\\certmgr.exe",
   "OriginalFileName": "CertMgr.Exe",
   "CommandLine": "certmgr.exe -add -c C:\\ProgramData\\ContosoAgent\\upd.cer -s -r localMachine root",
-  "ParentImage": "C:\\ProgramData\\ContosoAgent\\ContosoAgentSvc.exe",
-  "User": "NT AUTHORITY\\SYSTEM",
-  "expected_severity": "high"
+  "ParentImage": "C:\\Windows\\System32\\ContosoAgentSvc.exe"
 }

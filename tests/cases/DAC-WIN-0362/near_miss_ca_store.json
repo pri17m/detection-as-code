@@ -1,0 +1,12 @@
+{
+  "label": "near-miss",
+  "variant": "certutil -addstore CA (intermediate, out of scope)",
+  "source": "Microsoft certutil docs",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "Image": "C:\\Windows\\System32\\certutil.exe",
+  "OriginalFileName": "CertUtil.exe",
+  "CommandLine": "certutil -addstore CA int.cer",
+  "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+}

@@ -7,6 +7,9 @@ description: >-
   OriginalFileName to the Image name to flag renamed copies. severity high when renamed, outside
   System32/SysWOW64 (certutil) or Windows Kits (certmgr), or launched by an unexpected parent.
   Fixes the gap in DAC-WIN-0253, whose query has no -addstore/root filter. telemetry_validated false.
+  Hardened: also covers -importpfx root, PowerShell cert-provider writes (Import-Certificate,
+  Move-Item/Copy-Item to Cert:\LocalMachine\Root), X509Store('Root','LocalMachine').Add(), and reg add of a Root
+  Blob; normalises Unicode dashes, quotes and carets before matching. See REVIEW.md variant matrix.
 author: DaC
 status: experimental
 platforms:
@@ -33,6 +36,9 @@ references:
 - https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certutil
 - https://learn.microsoft.com/en-us/windows/win32/seccrypto/certmgr-exe
 - https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1553.004/T1553.004.md
+- https://learn.microsoft.com/en-us/powershell/module/pki/import-certificate
+- https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509store
 telemetry_validated: false
 required_fields:
 - "_time"
@@ -54,12 +60,17 @@ query:
   splunk: |
     (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype=sysmon) (EventCode=1 OR EventID=1)
     | eval EventCode=coalesce(EventCode, EventID)
-    | where match(CommandLine, "(?i)[-/]add(store)?\b")
-    | eval tool=case(match(CommandLine, "(?i)[-/]addstore\b") AND NOT match(CommandLine, "(?i)\s[-/]user\b"), "certutil-style", match(CommandLine, "(?i)[-/]add\b") AND match(CommandLine, "(?i)[-/]r\s+\x22?localmachine\x22?\b"), "certmgr-style")
-    | where isnotnull(tool) AND match(CommandLine, "(?i)(^|\s)\x22?(auth)?root\x22?(\s|$)")
+    | eval cmd=replace(replace(lower(CommandLine), "[‐‑‒–—―−]", "-"), "[\^\x22']", "")
+    | eval tool=case(
+        match(cmd, "[-/](addstore|importpfx)\b") AND NOT match(cmd, "\s[-/]user\b") AND match(cmd, "(^|\s)(auth)?root(\s|$)"), "certutil-style",
+        match(cmd, "[-/]add\b") AND match(cmd, "[-/]r\s+localmachine\b") AND match(cmd, "(^|\s)(auth)?root(\s|$)"), "certmgr-style",
+        match(cmd, "cert:\\\\localmachine\\\\(auth)?root\b") AND match(cmd, "(import-(pfx)?certificate|(^|[^a-z])(move|copy)-item|\bmove\b|\bmi\b|\bcopy\b|\bcpi\b|\.add\()"), "powershell-certprovider",
+        match(cmd, "x509store") AND match(cmd, "localmachine") AND match(cmd, "\b(auth)?root\b") AND match(cmd, "\.add\("), "powershell-x509store",
+        match(cmd, "\breg(\.exe)?\s+add\b") AND match(cmd, "(hklm|hkey_local_machine)\\\\software\\\\(policies\\\\)?microsoft\\\\(systemcertificates|enterprisecertificates)\\\\(auth)?root\\\\certificates"), "reg-add")
+    | where isnotnull(tool)
     | eval img_name=lower(replace(Image, "^.*\\\\", "")), orig=lower(OriginalFileName)
-    | eval renamed=if(orig IN ("certutil.exe","certmgr.exe","certmgt.exe") AND NOT img_name IN ("certutil.exe","certmgr.exe","certmgt.exe"), 1, 0)
-    | eval expected_path=if(match(Image, "(?i)^[a-z]:\\\\windows\\\\(system32|syswow64)\\\\certutil\.exe$") OR match(Image, "(?i)\\\\Windows Kits\\\\.*\\\\certmgr\.exe$"), 1, 0)
+    | eval renamed=if(isnotnull(orig) AND orig IN ("certutil.exe","certmgr.exe","certmgt.exe","powershell.exe","pwsh.dll","reg.exe") AND img_name!=orig AND NOT (orig="certmgt.exe" AND img_name="certmgr.exe") AND NOT (orig="pwsh.dll" AND img_name="pwsh.exe"), 1, 0)
+    | eval expected_path=if(match(Image, "(?i)^[a-z]:\\\\windows\\\\(system32|syswow64)\\\\(certutil|reg)\.exe$") OR match(Image, "(?i)^[a-z]:\\\\windows\\\\(system32|syswow64)\\\\windowspowershell\\\\v1\.0\\\\powershell\.exe$") OR match(Image, "(?i)\\\\program files\\\\powershell\\\\[0-9]+\\\\pwsh\.exe$") OR match(Image, "(?i)\\\\Windows Kits\\\\.*\\\\certmgr\.exe$"), 1, 0)
     | eval parent_name=lower(replace(ParentImage, "^.*\\\\", ""))
     | eval unexpected_parent=if(parent_name IN ("cmd.exe","powershell.exe","pwsh.exe","msiexec.exe","ccmexec.exe","explorer.exe"), 0, 1)
     | eval severity=if(renamed=1 OR expected_path=0 OR unexpected_parent=1, "high", "medium")

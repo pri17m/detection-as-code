@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "variant": "X509Store StoreName/StoreLocation enums",
+  "source": ".NET X509Store docs",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "OriginalFileName": "PowerShell.EXE",
+  "CommandLine": "pwsh -c \"$s=[System.Security.Cryptography.X509Certificates.X509Store]::new([System.Security.Cryptography.X509Certificates.StoreName]::Root,[System.Security.Cryptography.X509Certificates.StoreLocation]::LocalMachine);$s.Open(1);$s.Add($c)\"",
+  "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+}

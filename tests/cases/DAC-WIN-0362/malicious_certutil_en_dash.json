@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "variant": "en dash –addstore",
+  "source": "Common command-line obfuscation (dash/quote/caret); Sigma |windash modifier",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "Image": "C:\\Windows\\System32\\certutil.exe",
+  "OriginalFileName": "CertUtil.exe",
+  "CommandLine": "certutil –addstore root ca.cer",
+  "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+}

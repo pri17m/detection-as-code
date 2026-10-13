@@ -38,6 +38,64 @@ Recommendation: registry (Root/AuthRoot Certificates key) is the primary, tool-a
 
 Known gaps (documented, not fixed): PowerShell `Import-Certificate -CertStoreLocation Cert:\LocalMachine\Root` and direct CryptoAPI calls do not use these binaries - covered by the companion registry rule. Command-line obfuscation (caret insertion, quoted flag fragments) is not normalised.
 
+
+## Variant matrix (hardening pass, ponytail)
+| Variant | Source | Caught before | Caught after | Fixture |
+|---|---|---|---|---|
+| certutil -f -addstore root | Atomic Red Team T1553.004 | yes | yes | malicious_certutil_f_addstore_root |
+| certutil -addstore -enterprise root | Microsoft certutil docs | yes | yes | malicious_certutil_enterprise_root |
+| certutil -grouppolicy -addstore root | Microsoft certutil docs | yes | yes | malicious_certutil_grouppolicy_root |
+| certutil -v -addstore authroot | Microsoft certutil docs | yes | yes | malicious_certutil_v_authroot |
+| certutil /addstore root | SigmaHQ certutil/certmgr rules | yes | yes | malicious_certutil_slash_form |
+| en dash –addstore | Common command-line obfuscation (dash/quote/caret); Sigma |windash modifier | **no** | yes | malicious_certutil_en_dash |
+| em dash —addstore | Common command-line obfuscation (dash/quote/caret); Sigma |windash modifier | **no** | yes | malicious_certutil_em_dash |
+| U+2010 hyphen | Common command-line obfuscation (dash/quote/caret); Sigma |windash modifier | **no** | yes | malicious_certutil_u2010_hyphen |
+| quoted "Root" | Common command-line obfuscation (dash/quote/caret); Sigma |windash modifier | yes | yes | malicious_certutil_quoted_store |
+| quote inside flag -"addstore" | Common command-line obfuscation (dash/quote/caret); Sigma |windash modifier | **no** | yes | malicious_certutil_quote_in_flag |
+| caret left in child command line | Common command-line obfuscation (dash/quote/caret); Sigma |windash modifier | **no** | yes | malicious_certutil_caret_in_child |
+| certutil -importpfx root | Microsoft certutil docs | **no** | yes | malicious_certutil_importpfx_root |
+| certmgr /add /all ... /s /r localMachine root | Microsoft certmgr docs; Sigma example | yes | yes | malicious_certmgr_all_flag |
+| certmgr -add -c x -r localMachine -s root | Microsoft certmgr docs | yes | yes | malicious_certmgr_arg_order |
+| certmgr copied to ProgramData, sideloaded vendor parent, SYSTEM | Fielenbach public post | yes | yes | malicious_certmgr_programdata_vendor_parent |
+| renamed certutil (OriginalFileName CertUtil.exe) | Splunk/Sigma OriginalFileName pattern | yes | yes | malicious_renamed_certutil |
+| Import-Certificate -CertStoreLocation Cert:\LocalMachine\Root | SigmaHQ posh_ps_root_certificate_installed | **no** | yes | malicious_ps_import_certificate |
+| Move-Item to Cert:\LocalMachine\Root | Atomic Red Team T1553.004 | **no** | yes | malicious_ps_move_item |
+| cpi alias to Cert:\LocalMachine\AuthRoot | PowerShell certificate provider docs | **no** | yes | malicious_ps_copy_item_alias |
+| X509Store('Root','LocalMachine').Add() | .NET X509Store docs | **no** | yes | malicious_ps_x509store_add |
+| X509Store StoreName/StoreLocation enums | .NET X509Store docs | **no** | yes | malicious_ps_x509store_enum |
+| reg add HKLM ...\ROOT\Certificates\<t> /v Blob | Sigma/Elastic registry rules (path) | **no** | yes | malicious_reg_add_blob |
+| certutil from a scheduled task (svchost parent) | ATT&CK T1053 context | yes | yes | malicious_scheduled_task_parent |
+| certutil from a service (services.exe child) | ATT&CK T1543.003 context | yes | yes | malicious_service_parent |
+| certutil from msiexec custom action | MSI custom action pattern | yes | yes | malicious_msiexec_custom_action |
+| reg import root.reg (content not on command line) | Sigma/Elastic registry rules | **no** | **no** | knowngap_reg_import |
+| powershell -enc (script hidden) | Common PowerShell obfuscation | **no** | **no** | knowngap_ps_encoded |
+| rundll32 cryptext.dll,CryptExtAddCER (UI wizard) | LOLBAS-style shell handler for .cer | **no** | **no** | knowngap_rundll32_cryptext |
+| %VAR% left unexpanded in child (e.g. launched without cmd) | Common command-line obfuscation (dash/quote/caret); Sigma |windash modifier | **no** | **no** | knowngap_env_var_in_child |
+| certutil -verifystore root | Microsoft certutil docs | no alert (correct) | no alert (correct) | near_miss_verifystore_root |
+| certutil -viewstore root | Microsoft certutil docs | no alert (correct) | no alert (correct) | near_miss_viewstore_root |
+| certutil -user -addstore root (user scope, out of scope) | Microsoft certutil docs | no alert (correct) | no alert (correct) | near_miss_user_root |
+| certutil –user –addstore root | Microsoft certutil docs | no alert (correct) | no alert (correct) | near_miss_user_root_unicode_dash |
+| certutil -addstore CA (intermediate, out of scope) | Microsoft certutil docs | no alert (correct) | no alert (correct) | near_miss_ca_store |
+| certutil -addstore TrustedPublisher (code-signing trust, out of scope) | Microsoft certutil docs | no alert (correct) | no alert (correct) | near_miss_trustedpublisher |
+| certutil -addstore Disallowed (removes trust) | Microsoft certutil docs | no alert (correct) | no alert (correct) | near_miss_disallowed |
+| certutil -delstore root | Microsoft certutil docs | no alert (correct) | no alert (correct) | near_miss_delstore_root |
+| root only in a file path | SigmaHQ certutil/certmgr rules | no alert (correct) | no alert (correct) | near_miss_root_in_path_only |
+| certmgr -r currentUser root | Microsoft certmgr docs | no alert (correct) | no alert (correct) | near_miss_certmgr_currentuser |
+| Get-ChildItem Cert:\LocalMachine\Root (read) | PowerShell certificate provider docs | no alert (correct) | no alert (correct) | near_miss_ps_read_root |
+| Import-Certificate to Cert:\CurrentUser\Root (user scope) | Atomic Red Team T1553.004 | no alert (correct) | no alert (correct) | near_miss_ps_import_currentuser |
+
+### Scope decisions
+- In scope: machine-scope **Root** and **AuthRoot** (trust anchors), including the Enterprise (`-enterprise`) and Group Policy (`-grouppolicy`, `Policies\...`) machine stores.
+- Out of scope, documented: **CA** (intermediate store, does not create trust on its own), **TrustedPublisher** (code-signing publisher trust, closer to T1553.002/.006), **Disallowed** (removes trust; delstore-style tampering), and all **user-scope** stores (`-user`, `Cert:\CurrentUser`, HKCU/HKU). Atomic test 7 (CurrentUser via RemoteCertTrust.ps1) is therefore intentionally not covered.
+- Caret insertion and `%VAR%` / `%VAR:~x,y%` substring obfuscation are resolved by cmd.exe **before** the child process starts, so certutil's own command line is normally clean; the rules also strip `^`, quotes and Unicode dashes (U+2010-U+2015, U+2212) in case the child line carries them (e.g. launched via PowerShell or CreateProcess). Unexpanded `%VAR%` in a child launched without cmd is a known gap.
+- msiexec stays an "expected" parent (medium) because legitimate MSI custom actions install corporate roots; scheduled tasks (svchost parent), services (services.exe) and sideloaded vendor agents are unexpected (high).
+
+### Remaining gaps (stand-in matcher misses)
+knowngap_reg_import, knowngap_ps_encoded, knowngap_rundll32_cryptext, knowngap_env_var_in_child
+Known-gap fixtures (expected misses, covered elsewhere): knowngap_reg_import -> registry rule DAC-MDE-0095/DAC-WIN-0363; knowngap_ps_encoded -> script block rule DAC-WIN-0364 (Splunk) / registry rules; knowngap_rundll32_cryptext -> registry rule DAC-MDE-0095/DAC-WIN-0363; knowngap_env_var_in_child -> registry rule DAC-MDE-0095/DAC-WIN-0363
+
+Stand-in matcher: `/workspace/rootca-gen/gen2.py` (Python re reimplementation of the query logic, run on the box 2026-10-13). It is not the SIEM engine; CQL/KQL/SPL escaping and Unicode handling remain unverified until run in a tenant.
+
 ## Field verification
 | Field | Status |
 |---|---|

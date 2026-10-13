@@ -1,9 +1,12 @@
 {
   "label": "near-miss",
+  "variant": "certutil -verifystore root",
+  "source": "Microsoft certutil docs",
   "expect_alert": false,
   "result": "not run",
   "synthetic": true,
   "Image": "C:\\Windows\\System32\\certutil.exe",
-  "CommandLine": "certutil -viewstore root",
+  "OriginalFileName": "CertUtil.exe",
+  "CommandLine": "certutil -verifystore root",
   "ParentImage": "C:\\Windows\\System32\\cmd.exe"
 }
