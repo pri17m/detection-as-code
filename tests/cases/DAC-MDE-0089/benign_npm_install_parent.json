@@ -1,0 +1,11 @@
+{
+  "label": "benign",
+  "source": "node child of npm.cmd during install",
+  "expect_alert": false,
+  "result": "not run",
+  "InitiatingProcessFileName": "node.exe",
+  "InitiatingProcessParentFileName": "npm.cmd",
+  "InitiatingProcessCommandLine": "node.exe npm-cli.js install lodash",
+  "RemoteUrl_a": "https://api.github.com/",
+  "RemoteUrl_b": "https://registry.npmjs.org/lodash"
+}
