@@ -1,0 +1,67 @@
+id: DAC-CS-0241
+title: "Falcon: bcdedit safeboot or SafeBoot registry write followed by shutdown /r"
+description: >-
+  Within 1 hour on one host: (A) bcdedit sets safeboot minimal or network, or a
+  ProcessRollup2 command line writes under HKLM\SYSTEM\CurrentControlSet\Control\SafeBoot\Minimal|Network,
+  and (B) shutdown.exe /r runs. Ransomware operators force Safe Mode so EDR agents
+  do not load, then reboot. Complements DAC-CS-0235 (bcdedit + SafeBoot service
+  registration) by requiring the reboot stage instead of service registration.
+  Based on detections.ai rule https://detections.ai/rules/01a13345-5468-734a-9ae1-a3a3c8c60322
+  by Fatima Suvaid (@arhaminafs). telemetry_validated false; not run in a tenant.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1688
+  - T1685
+severity: critical
+false_positives:
+- IT imaging or AV remediation that configures Safe Mode and reboots; allowlist admin jump hosts and sanctioned parents (sccm, intune).
+references:
+- https://detections.ai/rules/01a13345-5468-734a-9ae1-a3a3c8c60322
+- https://attack.mitre.org/techniques/T1688/
+- https://attack.mitre.org/techniques/T1685/
+- https://learn.microsoft.com/en-us/previous-versions/windows/desktop/bcd/bcdlibrary-safeboot
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Hunting%20bcdedit.exe%20usage.md
+- https://library.humio.com/data-analysis/functions-correlate.html
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- ImageFileName
+- FileName
+- CommandLine
+- ParentBaseFileName
+tags:
+- behavioural
+- ransomware
+- needs-review
+- detections-ai
+query:
+  crowdstrike: |
+    correlate(
+      safemode: {
+        #event_simpleName=ProcessRollup2 event_platform=Win
+        | (
+            (FileName=/^bcdedit\.exe$/i CommandLine=/safeboot\s+(minimal|network)/i)
+            OR
+            (CommandLine=/\\SafeBoot\\(Minimal|Network)\\/i)
+          )
+      } include: [aid, ComputerName, UserName, ImageFileName, CommandLine, ParentBaseFileName],
+      reboot: {
+        #event_simpleName=ProcessRollup2 event_platform=Win
+        | ImageFileName=/\\shutdown\.exe$/i
+        | CommandLine=/(\/r|\-r)(\s|$)/i
+        | aid <=> safemode.aid
+      } include: [ImageFileName, CommandLine, ParentBaseFileName, UserName],
+      within=1h
+    )
