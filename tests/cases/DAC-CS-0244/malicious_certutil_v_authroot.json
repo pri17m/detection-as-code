@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "variant": "certutil -v -addstore authroot",
+  "source": "Microsoft certutil docs",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "C:\\Windows\\System32\\certutil.exe",
+  "CommandLine": "certutil -v -addstore AuthRoot ca.cer",
+  "ParentBaseFileName": "cmd.exe"
+}

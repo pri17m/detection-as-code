@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "variant": "reg add HKLM ...\\ROOT\\Certificates\\<t> /v Blob",
+  "source": "Sigma/Elastic registry rules (path)",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "C:\\Windows\\System32\\reg.exe",
+  "CommandLine": "reg add HKLM\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567 /v Blob /t REG_BINARY /d 0300 /f",
+  "ParentBaseFileName": "cmd.exe"
+}
