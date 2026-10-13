@@ -1,0 +1,12 @@
+{
+  "label": "near-miss",
+  "variant": "HKLM CA store",
+  "source": "SigmaHQ certutil/certmgr rules",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 13,
+  "TargetObject": "HKLM\\SOFTWARE\\Microsoft\\SystemCertificates\\CA\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567\\Blob",
+  "Image": "C:\\ProgramData\\x\\a.exe",
+  "Details": "Binary Data"
+}

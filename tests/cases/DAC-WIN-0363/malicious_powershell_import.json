@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "variant": "PowerShell Import-Certificate / Move-Item / X509Store.Add",
+  "source": "Atomic Red Team T1553.004",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 13,
+  "TargetObject": "HKLM\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567\\Blob",
+  "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "Details": "Binary Data"
+}

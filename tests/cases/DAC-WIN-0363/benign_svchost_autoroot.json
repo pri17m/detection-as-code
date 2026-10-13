@@ -1,9 +1,12 @@
 {
   "label": "benign",
+  "variant": "CryptSvc root auto-update (AuthRoot)",
+  "source": "Elastic exclusions",
   "expect_alert": false,
   "result": "not run",
   "synthetic": true,
   "EventCode": 13,
-  "TargetObject": "HKLM\\SOFTWARE\\Microsoft\\SystemCertificates\\AuthRoot\\Certificates\\FEDCBA9876543210FEDCBA9876543210FEDCBA98\\Blob",
-  "Image": "C:\\Windows\\System32\\svchost.exe"
+  "TargetObject": "HKLM\\SOFTWARE\\Microsoft\\SystemCertificates\\AuthRoot\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567\\Blob",
+  "Image": "C:\\Windows\\System32\\svchost.exe",
+  "Details": "Binary Data"
 }

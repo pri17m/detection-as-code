@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "variant": "AuthRoot written by non-system process",
+  "source": "Elastic registry rule",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 13,
+  "TargetObject": "HKLM\\SOFTWARE\\Microsoft\\SystemCertificates\\AuthRoot\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567\\Blob",
+  "Image": "C:\\Users\\Public\\a.exe",
+  "Details": "Binary Data"
+}

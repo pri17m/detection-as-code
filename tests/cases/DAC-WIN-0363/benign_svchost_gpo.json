@@ -1,0 +1,12 @@
+{
+  "label": "benign",
+  "variant": "Group Policy (svchost) writes Policies Root",
+  "source": "Elastic exclusions",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 13,
+  "TargetObject": "HKLM\\SOFTWARE\\Policies\\Microsoft\\SystemCertificates\\Root\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567\\Blob",
+  "Image": "C:\\Windows\\System32\\svchost.exe",
+  "Details": "Binary Data"
+}

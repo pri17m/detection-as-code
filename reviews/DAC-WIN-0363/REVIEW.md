@@ -38,6 +38,45 @@ Recommendation: registry (Root/AuthRoot Certificates key) is the primary, tool-a
 
 Known gaps: Sysmon/MDE registry coverage of this key is config/sampling dependent. Baseline comparison of new thumbprints against a known-good list (Fielenbach's hunting idea) is left to a lookup the org must maintain.
 
+
+## Variant matrix (hardening pass, ponytail)
+| Variant | Source | Caught before | Caught after | Fixture |
+|---|---|---|---|---|
+| certutil writes HKLM Root | Atomic Red Team T1553.004 | yes | yes | malicious_certutil_writer |
+| relocated certmgr in ProgramData | Fielenbach public post | yes | yes | malicious_programdata_certmgr |
+| PowerShell Import-Certificate / Move-Item / X509Store.Add | Atomic Red Team T1553.004 | yes | yes | malicious_powershell_import |
+| reg import of a Blob | Sigma/Elastic registry rules | yes | yes | malicious_reg_import |
+| custom binary calling crypt32 CertAddEncodedCertificateToStore | ATT&CK T1553.004 (Hikit S0009) | yes | yes | malicious_custom_crypt32_binary |
+| rundll32 cryptext.dll wizard | LOLBAS-style .cer handler | yes | yes | malicious_rundll32_cryptext |
+| msiexec custom action writes Root | MSI custom action pattern | **no** | yes | malicious_msiexec_custom_action |
+| Certificates MMC snap-in import | Microsoft certificate MMC docs | **no** | yes | malicious_mmc_snapin |
+| key create for thumbprint (Sysmon 12 / RegistryKeyCreated) | Sysmon schema | yes | yes | malicious_key_create |
+| Policies\...\Root (GP store) written by non-GP process | Microsoft certutil docs -grouppolicy | yes | yes | malicious_policies_root_by_evil |
+| EnterpriseCertificates\Root | Microsoft certutil docs -enterprise | yes | yes | malicious_enterprise_root |
+| AuthRoot written by non-system process | Elastic registry rule | yes | yes | malicious_authroot_by_evil |
+| sideloaded vendor agent under Program Files | Fielenbach public post | yes | yes | malicious_program_files_vendor |
+| \REGISTRY\MACHINE prefix form | Elastic registry rule path forms | yes | yes | malicious_registry_machine_prefix |
+| Group Policy (svchost) writes Policies Root | Elastic exclusions | no alert (correct) | no alert (correct) | benign_svchost_gpo |
+| CryptSvc root auto-update (AuthRoot) | Elastic exclusions | no alert (correct) | no alert (correct) | benign_svchost_autoroot |
+| SCCM agent | Elastic exclusions | no alert (correct) | no alert (correct) | benign_ccmexec |
+| HKCU Root (user scope, out of scope; Atomic test 7 class) | Atomic Red Team T1553.004 | no alert (correct) | no alert (correct) | near_miss_hkcu_root |
+| HKLM CA store | SigmaHQ certutil/certmgr rules | no alert (correct) | no alert (correct) | near_miss_ca_store |
+| HKLM TrustedPublisher | Microsoft certutil docs | no alert (correct) | no alert (correct) | near_miss_trustedpublisher |
+| HKLM Disallowed | Microsoft certutil docs | no alert (correct) | no alert (correct) | near_miss_disallowed |
+| non-Blob value under thumbprint | Sigma registry rule | no alert (correct) | no alert (correct) | near_miss_friendlyname_value |
+
+### Scope decisions
+- In scope: machine-scope **Root** and **AuthRoot** (trust anchors), including the Enterprise (`-enterprise`) and Group Policy (`-grouppolicy`, `Policies\...`) machine stores.
+- Out of scope, documented: **CA** (intermediate store, does not create trust on its own), **TrustedPublisher** (code-signing publisher trust, closer to T1553.002/.006), **Disallowed** (removes trust; delstore-style tampering), and all **user-scope** stores (`-user`, `Cert:\CurrentUser`, HKCU/HKU). Atomic test 7 (CurrentUser via RemoteCertTrust.ps1) is therefore intentionally not covered.
+- Caret insertion and `%VAR%` / `%VAR:~x,y%` substring obfuscation are resolved by cmd.exe **before** the child process starts, so certutil's own command line is normally clean; the rules also strip `^`, quotes and Unicode dashes (U+2010-U+2015, U+2212) in case the child line carries them (e.g. launched via PowerShell or CreateProcess). Unexpanded `%VAR%` in a child launched without cmd is a known gap.
+- msiexec stays an "expected" parent (medium) because legitimate MSI custom actions install corporate roots; scheduled tasks (svchost parent), services (services.exe) and sideloaded vendor agents are unexpected (high).
+
+### Remaining gaps (stand-in matcher misses)
+none beyond the known-gap fixtures listed as expected misses
+
+
+Stand-in matcher: `/workspace/rootca-gen/gen2.py` (Python re reimplementation of the query logic, run on the box 2026-10-13). It is not the SIEM engine; CQL/KQL/SPL escaping and Unicode handling remain unverified until run in a tenant.
+
 ## Field verification
 | Field | Status |
 |---|---|

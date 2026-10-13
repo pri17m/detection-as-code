@@ -7,6 +7,7 @@ description: >-
   (certutil, certmgr, Import-Certificate, reg import, custom CryptoAPI). Severity high when the writer runs from
   ProgramData, Users, Windows\Temp or PerfLogs, or is a LOLBin. Mirrors the Sigma registry_set and Elastic rules.
   Requires a Sysmon config that logs these keys. telemetry_validated false.
+  Hardened: msiexec, mmc and dllhost in System32 are no longer excluded (medium). See REVIEW.md variant matrix.
 author: DaC
 status: experimental
 platforms:
@@ -30,6 +31,7 @@ references:
 - https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_install_root_or_ca_certificat.yml
 - https://github.com/elastic/detection-rules/blob/main/rules/windows/defense_evasion_create_mod_root_certificate.toml
 - https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1553.004/T1553.004.md
 telemetry_validated: false
 required_fields:
 - "_time"
@@ -53,10 +55,11 @@ query:
     | where (EventCode=12 AND NOT match(TargetObject, "(?i)\\\\Blob$")) OR (EventCode=13 AND match(TargetObject, "(?i)\\\\Blob$"))
     | eval proc=lower(replace(Image, "^.*\\\\", ""))
     | eval sys_dir=if(match(Image, "(?i)^[a-z]:\\\\windows\\\\(system32|syswow64)\\\\"), 1, 0)
-    | eval lolbin=if(proc IN ("certutil.exe","certmgr.exe","reg.exe","rundll32.exe","regsvr32.exe","mshta.exe","powershell.exe","pwsh.exe","cmd.exe","cscript.exe","wscript.exe","wmiprvse.exe","expand.exe","xcopy.exe"), 1, 0)
+    | eval lolbin=if(proc IN ("certutil.exe","certmgr.exe","reg.exe","rundll32.exe","regsvr32.exe","mshta.exe","powershell.exe","pwsh.exe","cmd.exe","cscript.exe","wscript.exe","wmiprvse.exe","expand.exe","xcopy.exe","msiexec.exe","mmc.exe","dllhost.exe"), 1, 0)
     | where NOT (sys_dir=1 AND lolbin=0)
     | where NOT match(Image, "(?i)^[a-z]:\\\\windows\\\\(winsxs|ccm|ccmsetup)\\\\")
     | rex field=TargetObject "(?i)\\\\Certificates\\\\(?<thumbprint>[0-9A-F]{40})"
     | eval user_writable=if(match(Image, "(?i)^[a-z]:\\\\(programdata|users|windows\\\\temp|perflogs)\\\\"), 1, 0)
-    | eval severity=if(user_writable=1 OR lolbin=1, "high", "medium")
+    | eval admin_tool=if(proc IN ("msiexec.exe","mmc.exe","dllhost.exe"), 1, 0)
+    | eval severity=if(user_writable=1 OR (lolbin=1 AND admin_tool=0), "high", "medium")
     | table _time host EventCode User Image TargetObject thumbprint severity user_writable lolbin ProcessGuid
