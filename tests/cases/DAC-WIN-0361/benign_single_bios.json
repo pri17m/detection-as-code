@@ -1,0 +1,9 @@
+{
+  "label": "benign",
+  "source": "Only Win32_BIOS",
+  "expect_alert": false,
+  "result": "not run",
+  "EventCode": 11,
+  "ClientProcessId": 100,
+  "Operation": "Start IWbemServices::ExecQuery - root\\cimv2 : SELECT SerialNumber FROM Win32_BIOS"
+}

@@ -1,0 +1,64 @@
+id: DAC-WIN-0361
+title: Five WMI host-fingerprint queries from one process within 5 minutes
+description: >-
+  Detects a single process (ClientProcessId) on one host issuing at least four of
+  the five WMI class queries used for host fingerprinting in public reporting on
+  Earth Sirrush / UAC-0099 tooling (ASHVEIN/CINDERBLOT): Win32_BIOS SerialNumber,
+  Win32_DiskDrive SerialNumber, Win32_BaseBoard SerialNumber, Win32_Processor
+  ProcessorId, and Win32_ComputerSystem. Requires the Win32_ComputerSystem query
+  among the set. Uses Microsoft-Windows-WMI-Activity Event ID 11 (Trace channel;
+  must be enabled and ingested — see REVIEW.md). Based on detections.ai rule
+  https://detections.ai/rules/01a130b2-62e5-7332-9d5c-0d19c3cb0750 by Adarsh Pandey
+  (@Pandeyadarsh). telemetry_validated false; not run.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- WinEventLog
+- XmlWinEventLog
+mitre:
+  tactics:
+  - discovery
+  - execution
+  techniques:
+  - T1082
+  - T1047
+severity: medium
+false_positives:
+- Inventory or ITAM agents that enumerate the same WMI classes in a burst; allowlist those ClientProcessId images after joining to process telemetry (join not in this rule).
+references:
+- https://detections.ai/rules/01a130b2-62e5-7332-9d5c-0d19c3cb0750
+- https://attack.mitre.org/techniques/T1082/
+- https://attack.mitre.org/techniques/T1047/
+- https://learn.microsoft.com/en-us/windows/win32/wmisdk/tracing-wmi-activity
+- https://isc.sans.edu/diary/25012
+telemetry_validated: false
+required_fields:
+- _time
+- host
+- source
+- EventCode
+- Operation
+- ClientProcessId
+tags:
+- behavioural
+- wmi
+- needs-review
+- detections-ai
+query:
+  splunk: |
+    (sourcetype=WinEventLog OR sourcetype=XmlWinEventLog) (source="*WMI-Activity*" OR source="*WMI Activity*")
+    (EventCode=11 OR EventID=11)
+    | eval q=coalesce(Operation, Query, message, _raw)
+    | eval is_bios=if(match(q, "(?i)Win32_BIOS") AND match(q, "(?i)SerialNumber"), 1, 0)
+    | eval is_disk=if(match(q, "(?i)Win32_DiskDrive") AND match(q, "(?i)SerialNumber"), 1, 0)
+    | eval is_board=if(match(q, "(?i)Win32_BaseBoard") AND match(q, "(?i)SerialNumber"), 1, 0)
+    | eval is_cpu=if(match(q, "(?i)Win32_Processor") AND match(q, "(?i)ProcessorId"), 1, 0)
+    | eval is_cs=if(match(q, "(?i)Win32_ComputerSystem"), 1, 0)
+    | where is_bios=1 OR is_disk=1 OR is_board=1 OR is_cpu=1 OR is_cs=1
+    | bin _time span=5m
+    | stats max(is_bios) AS bios, max(is_disk) AS disk, max(is_board) AS board, max(is_cpu) AS cpu, max(is_cs) AS cs, min(_time) AS first_seen BY host, ClientProcessId, _time
+    | eval distinct_queries=bios+disk+board+cpu+cs
+    | where distinct_queries>=4 AND cs=1
+    | table first_seen, host, ClientProcessId, distinct_queries, bios, disk, board, cpu, cs

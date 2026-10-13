@@ -1,0 +1,15 @@
+{
+  "label": "malicious",
+  "source": "ASHVEIN-style five WMI fingerprint queries",
+  "expect_alert": true,
+  "result": "not run",
+  "EventCode": 11,
+  "ClientProcessId": 4242,
+  "operations": [
+    "Start IWbemServices::ExecQuery - root\\cimv2 : SELECT SerialNumber FROM Win32_BIOS",
+    "Start IWbemServices::ExecQuery - root\\cimv2 : SELECT SerialNumber FROM Win32_DiskDrive WHERE Index=0",
+    "Start IWbemServices::ExecQuery - root\\cimv2 : SELECT SerialNumber FROM Win32_BaseBoard",
+    "Start IWbemServices::ExecQuery - root\\cimv2 : SELECT ProcessorId FROM Win32_Processor",
+    "Start IWbemServices::ExecQuery - root\\cimv2 : Select * from Win32_ComputerSystem"
+  ]
+}
