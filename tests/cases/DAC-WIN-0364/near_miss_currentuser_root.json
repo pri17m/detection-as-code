@@ -1,0 +1,10 @@
+{
+  "label": "near-miss",
+  "variant": "Import-Certificate to Cert:\\CurrentUser\\Root (user scope)",
+  "source": "Atomic Red Team T1553.004",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 4104,
+  "ScriptBlockText": "Import-Certificate -FilePath x.cer -CertStoreLocation Cert:\\CurrentUser\\Root"
+}

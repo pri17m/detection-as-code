@@ -1,0 +1,10 @@
+{
+  "label": "near-miss",
+  "variant": "Get-ChildItem Cert:\\LocalMachine\\Root",
+  "source": "PowerShell certificate provider docs",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 4104,
+  "ScriptBlockText": "Get-ChildItem Cert:\\LocalMachine\\Root | Select Subject"
+}

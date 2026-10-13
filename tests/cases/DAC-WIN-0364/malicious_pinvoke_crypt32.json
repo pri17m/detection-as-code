@@ -1,0 +1,10 @@
+{
+  "label": "malicious",
+  "variant": "P/Invoke CertAddEncodedCertificateToStore to LocalMachine Root",
+  "source": "Microsoft crypt32 docs",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 4104,
+  "ScriptBlockText": "$h=[C]::CertOpenStore(10,0,0,0x20000,'Root'); [C]::CertAddEncodedCertificateToStore($h,1,$b,$b.Length,4,[ref]0)"
+}

@@ -1,0 +1,10 @@
+{
+  "label": "malicious",
+  "variant": "Move-Item to Cert:\\LocalMachine\\Root",
+  "source": "Atomic Red Team T1553.004",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 4104,
+  "ScriptBlockText": "$cert = Import-Certificate -FilePath x.cer -CertStoreLocation Cert:\\LocalMachine\\My\nMove-Item -Path $cert.PSPath -Destination \"Cert:\\LocalMachine\\Root\""
+}
