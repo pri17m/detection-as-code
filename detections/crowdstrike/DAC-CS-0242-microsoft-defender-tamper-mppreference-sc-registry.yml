@@ -1,0 +1,74 @@
+id: DAC-CS-0242
+title: "Falcon: Microsoft Defender tamper via MpPreference, MpCmdRun, sc, or registry tools"
+description: >-
+  Detects process-creation patterns that disable or hollow Microsoft Defender:
+  Set-MpPreference/Add-MpPreference exclusion or real-time-protection flags,
+  MpCmdRun -RemoveDefinitions -All, reg.exe or PowerShell ItemProperty edits under
+  Windows Defender Exclusions / Policies / TamperProtection, and sc.exe or
+  PowerShell Stop-Service/Set-Service against WinDefend or Sense. Tool-name-only
+  IOCs from the source (DefenderControl, dControl) were dropped in favour of
+  these behavioural command lines. Based on detections.ai rule
+  https://detections.ai/rules/01a13344-944a-7211-9fc7-f5b1002993b6 by Fatima Suvaid
+  (@arhaminafs). telemetry_validated false; not run in a tenant.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+mitre:
+  tactics:
+  - defense-impairment
+  - persistence
+  techniques:
+  - T1685
+  - T1112
+severity: high
+false_positives:
+- SCCM/Intune or security tooling deploying approved Defender exclusions; allowlist ParentBaseFileName for those agents after measuring noise (not measured).
+- Installers that temporarily add exclusions for SQL or backup paths.
+references:
+- https://detections.ai/rules/01a13344-944a-7211-9fc7-f5b1002993b6
+- https://attack.mitre.org/techniques/T1685/
+- https://attack.mitre.org/techniques/T1112/
+- https://learn.microsoft.com/en-us/powershell/module/defender/set-mppreference
+- https://learn.microsoft.com/en-us/microsoft-365/security/defender-endpoint/command-line-arguments-microsoft-defender-antivirus
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- ImageFileName
+- CommandLine
+- ParentBaseFileName
+tags:
+- behavioural
+- defender-tamper
+- needs-review
+- detections-ai
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Win
+    | case {
+        CommandLine=/(Set|Add)-MpPreference/i
+          CommandLine=/-(ExclusionPath|ExclusionProcess|ExclusionExtension|DisableRealtimeMonitoring|DisableIOAVProtection|DisableScriptScanning|DisableBehaviorMonitoring|DisableTamperProtection)/i
+          | detection := "MpPreferenceTamper" ;
+        ImageFileName=/\\MpCmdRun\.exe$/i
+          CommandLine=/-RemoveDefinitions/i
+          CommandLine=/-All\b/i
+          | detection := "MpCmdRunRemoveDefinitionsAll" ;
+        CommandLine=/(reg(\.exe)?\s+(add|delete)|New-ItemProperty|Set-ItemProperty|Remove-ItemProperty)/i
+          CommandLine=/(Windows Defender\\Exclusions|Policies\\Microsoft\\Windows Defender|TamperProtection)/i
+          | detection := "DefenderRegistryTamper" ;
+        ImageFileName=/\\sc\.exe$/i
+          CommandLine=/\s(stop|config|delete)\s+(WinDefend|Sense)\b/i
+          | detection := "ScDefenderServiceTamper" ;
+        CommandLine=/(Stop-Service|Set-Service)/i
+          CommandLine=/\b(WinDefend|Sense)\b/i
+          | detection := "PowerShellDefenderServiceTamper" ;
+        * | detection := ""
+      }
+    | detection != ""
+    | groupBy([aid, ComputerName, UserName, detection, ImageFileName, ParentBaseFileName, CommandLine], function=count())
