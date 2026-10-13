@@ -1,0 +1,90 @@
+id: DAC-MDE-0092
+title: Cloud sync root registered under SyncRootManager by an unexpected process
+description: >-
+  Detects creation or value-set under
+  HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\SyncRootManager\
+  (the documented shell registration path for a Cloud Filter / cloud storage
+  sync root) by a process that is not a known cloud-sync client name and is not
+  running from that client's Program Files directory. When DeviceFileCertificateInfo
+  is available, also requires the initiating process to be unsigned or signed by
+  a publisher outside the small Microsoft/Dropbox/Google/Box allowlist. Written
+  as generic behaviour: the detections.ai source tied this to CVE-2026-69414 /
+  "ShieldCrash", but NVD/MSRC describe CVE-2026-69414 as Microsoft Defender
+  Malware Protection Engine elevation of privilege ("ShieldBreak"), not Cloud
+  Filter, so the CVE is omitted from references. Based on detections.ai rule
+  https://detections.ai/rules/01a095bb-647d-771a-9ed0-c98dc5b7a276 by Arnold Chan
+  (@slaz). telemetry_validated false; not run in a tenant.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - defense-impairment
+  - persistence
+  techniques:
+  - T1112
+  - T1553.002
+severity: high
+false_positives:
+- New or niche sync clients (Nextcloud, ownCloud, vendor-specific agents) registering a sync root; extend the allowlists after measuring noise (not measured).
+- Enterprise software deployment that writes SyncRootManager keys via msiexec or a custom installer.
+references:
+- https://detections.ai/rules/01a095bb-647d-771a-9ed0-c98dc5b7a276
+- https://attack.mitre.org/techniques/T1112/
+- https://attack.mitre.org/techniques/T1553/002/
+- https://learn.microsoft.com/en-us/windows/win32/shell/integrate-cloud-storage
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceregistryevents-table
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicefilecertificateinfo-table
+telemetry_validated: false
+required_fields:
+- Timestamp
+- DeviceId
+- DeviceName
+- ActionType
+- RegistryKey
+- RegistryValueName
+- InitiatingProcessFileName
+- InitiatingProcessFolderPath
+- InitiatingProcessCommandLine
+- InitiatingProcessSHA1
+tags:
+- behavioural
+- cloud-filter
+- needs-review
+- detections-ai
+query:
+  defender: |
+    let Lookback = 1d;
+    let KnownSyncClients = dynamic([
+      "OneDrive.exe", "OneDriveStandaloneUpdater.exe",
+      "Dropbox.exe", "DropboxUpdate.exe",
+      "GoogleDriveFS.exe", "googledrivesync.exe",
+      "Box.exe", "BoxSync.exe", "boxdrive.exe"
+    ]);
+    let KnownSyncPaths = dynamic([
+      @"\Program Files\Microsoft OneDrive\",
+      @"\Program Files (x86)\Microsoft OneDrive\",
+      @"\Program Files\Dropbox\",
+      @"\Program Files (x86)\Dropbox\",
+      @"\Program Files\Google\Drive File Stream\",
+      @"\Program Files\Box\",
+      @"\Program Files (x86)\Box\"
+    ]);
+    DeviceRegistryEvents
+    | where Timestamp > ago(Lookback)
+    | where ActionType in ("RegistryKeyCreated", "RegistryValueSet")
+    | where RegistryKey has @"\Explorer\SyncRootManager\"
+    | where InitiatingProcessFileName !in~ (KnownSyncClients)
+    | where not(InitiatingProcessFolderPath has_any (KnownSyncPaths))
+    | join kind=leftouter (
+        DeviceFileCertificateInfo
+        | project InitiatingProcessSHA1 = SHA1, IsSigned, Signer
+      ) on InitiatingProcessSHA1
+    | where isnull(IsSigned) or IsSigned == false
+        or not(Signer has_any ("Microsoft Corporation", "Dropbox, Inc.", "Google LLC", "Box, Inc."))
+    | project Timestamp, DeviceId, DeviceName, ActionType, RegistryKey, RegistryValueName,
+        InitiatingProcessFileName, InitiatingProcessFolderPath, InitiatingProcessCommandLine,
+        InitiatingProcessSHA1, IsSigned, Signer
