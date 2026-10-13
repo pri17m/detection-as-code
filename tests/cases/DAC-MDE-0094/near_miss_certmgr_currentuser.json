@@ -1,0 +1,10 @@
+{
+  "label": "near-miss",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "FileName": "certmgr.exe",
+  "FolderPath": "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.22621.0\\x64\\certmgr.exe",
+  "ProcessCommandLine": "certmgr.exe -add -c test.cer -s -r currentUser root",
+  "InitiatingProcessFileName": "cmd.exe"
+}

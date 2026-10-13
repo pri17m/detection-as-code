@@ -1,0 +1,80 @@
+id: DAC-MDE-0094
+title: "Root CA added to the machine Root store with certutil -addstore or certmgr -add localMachine"
+description: >-
+  DeviceProcessEvents: a command line that adds a certificate to the machine-scope Root or AuthRoot
+  store with certutil-style (-addstore [-f] [-enterprise] root, not -user) or certmgr-style
+  (-add <file> [-c] [-s] -r localMachine root) arguments. Argument-based, and also reports
+  ProcessVersionInfoOriginalFileName so renamed copies (OriginalFileName CertUtil.exe / CertMgr.Exe /
+  CERTMGT.EXE) are flagged. Severity high when renamed, outside System32/SysWOW64 (certutil) or Windows Kits
+  (certmgr), or launched by an unexpected parent; otherwise medium. telemetry_validated false.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1553.004
+severity: medium
+false_positives:
+- "IT or helpdesk installing a corporate or proxy root CA by hand with certutil -addstore root from an admin shell (alerts at medium; allowlist by host group or ticketed change window after measuring - not measured)."
+- "Software installers and agents that ship their own certmgr.exe or certutil wrapper (Elastic's published rule allowlists ?:\\ProgramData\\Logishrd\\LogiOptionsPlus\\Plugins\\64\\certmgr.exe); these alert at high because the path is unexpected - allowlist by SHA256 plus path, never by name."
+- "Developer machines using Windows SDK certmgr.exe from Windows Kits for test certificates."
+references:
+- https://attack.mitre.org/techniques/T1553/004/
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certutil_certificate_installation.yml
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certmgr_certificate_installation.yml
+- https://github.com/splunk/security_content/blob/develop/detections/endpoint/windows_certutil_root_certificate_addition.yml
+- https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certutil
+- https://learn.microsoft.com/en-us/windows/win32/seccrypto/certmgr-exe
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "AccountName"
+- "AccountSid"
+- "FileName"
+- "FolderPath"
+- "ProcessCommandLine"
+- "ProcessVersionInfoOriginalFileName"
+- "InitiatingProcessFileName"
+- "InitiatingProcessFolderPath"
+- "InitiatingProcessCommandLine"
+- "SHA256"
+- "ReportId"
+tags:
+- behavioural
+- root-ca
+- process-creation
+query:
+  defender: |
+    let Lookback = 1d;
+    let ExpectedParents = dynamic(["cmd.exe","powershell.exe","pwsh.exe","msiexec.exe","ccmexec.exe","explorer.exe"]);
+    let CertNames = dynamic(["certutil.exe","certmgr.exe","certmgt.exe"]);
+    DeviceProcessEvents
+    | where Timestamp > ago(Lookback)
+    | where ProcessCommandLine matches regex @"(?i)[-/]add(store)?\b"
+    | extend Orig = tolower(ProcessVersionInfoOriginalFileName), Img = tolower(FileName)
+    | extend Tool = case(
+        ProcessCommandLine matches regex @"(?i)[-/]addstore\b"
+          and not(ProcessCommandLine matches regex @"(?i)\s[-/]user\b"), "certutil-style",
+        ProcessCommandLine matches regex @"(?i)[-/]add\b"
+          and ProcessCommandLine matches regex @"(?i)[-/]r\s+\x22?localmachine\x22?\b", "certmgr-style",
+        "")
+    | where Tool != ""
+    | where ProcessCommandLine matches regex @"(?i)(^|\s)\x22?(auth)?root\x22?(\s|$)"
+    | extend Renamed = Orig in (CertNames) and Img !in (CertNames)
+    | extend ExpectedPath = (Img == "certutil.exe" and FolderPath matches regex @"(?i)^[a-z]:\\windows\\(system32|syswow64)\\certutil\.exe$")
+        or (Img == "certmgr.exe" and FolderPath has @"\Windows Kits\")
+    | extend UnexpectedParent = tolower(InitiatingProcessFileName) !in (ExpectedParents)
+    | extend RunAsSystem = AccountSid == "S-1-5-18"
+    | extend Severity = iff(Renamed or not(ExpectedPath) or UnexpectedParent, "high", "medium")
+    | project Timestamp, DeviceId, DeviceName, AccountName, AccountSid, RunAsSystem, Tool, Severity,
+        Renamed, ExpectedPath, UnexpectedParent, FileName, ProcessVersionInfoOriginalFileName, FolderPath,
+        ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessFolderPath, InitiatingProcessCommandLine,
+        SHA256, ReportId
