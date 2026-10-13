@@ -1,0 +1,9 @@
+{
+  "label": "benign",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 13,
+  "TargetObject": "HKLM\\SOFTWARE\\Microsoft\\SystemCertificates\\AuthRoot\\Certificates\\FEDCBA9876543210FEDCBA9876543210FEDCBA98\\Blob",
+  "Image": "C:\\Windows\\System32\\svchost.exe"
+}

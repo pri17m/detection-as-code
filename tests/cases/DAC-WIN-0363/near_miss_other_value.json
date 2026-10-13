@@ -1,0 +1,9 @@
+{
+  "label": "near-miss",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 13,
+  "TargetObject": "HKLM\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567\\FriendlyName",
+  "Image": "C:\\ProgramData\\x\\evil.exe"
+}
