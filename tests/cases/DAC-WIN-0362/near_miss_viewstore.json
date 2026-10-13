@@ -1,0 +1,9 @@
+{
+  "label": "near-miss",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "Image": "C:\\Windows\\System32\\certutil.exe",
+  "CommandLine": "certutil -viewstore root",
+  "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+}

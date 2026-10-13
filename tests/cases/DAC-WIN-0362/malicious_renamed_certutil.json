@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "Image": "C:\\Users\\Public\\svc.exe",
+  "OriginalFileName": "CertUtil.exe",
+  "CommandLine": "svc.exe -addstore -f root C:\\Users\\Public\\ca.cer",
+  "ParentImage": "C:\\Windows\\System32\\rundll32.exe",
+  "expected_severity": "high"
+}
