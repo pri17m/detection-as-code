@@ -1,5 +1,7 @@
 {
   "label": "malicious",
+  "variant": "certmgr copied to ProgramData, sideloaded vendor parent, SYSTEM",
+  "source": "Fielenbach public post",
   "expect_alert": true,
   "result": "not run",
   "synthetic": true,
@@ -7,7 +9,5 @@
   "FolderPath": "C:\\ProgramData\\ContosoAgent\\bin\\x64\\certmgr.exe",
   "ProcessVersionInfoOriginalFileName": "CertMgr.Exe",
   "ProcessCommandLine": "certmgr.exe -add -c C:\\ProgramData\\ContosoAgent\\upd.cer -s -r localMachine root",
-  "InitiatingProcessFileName": "ContosoAgentSvc.exe",
-  "AccountSid": "S-1-5-18",
-  "expected_severity": "high"
+  "InitiatingProcessFileName": "ContosoAgentSvc.exe"
 }

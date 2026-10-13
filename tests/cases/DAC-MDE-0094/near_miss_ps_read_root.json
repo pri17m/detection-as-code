@@ -1,0 +1,13 @@
+{
+  "label": "near-miss",
+  "variant": "Get-ChildItem Cert:\\LocalMachine\\Root (read)",
+  "source": "PowerShell certificate provider docs",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "FileName": "powershell.exe",
+  "FolderPath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "ProcessVersionInfoOriginalFileName": "PowerShell.EXE",
+  "ProcessCommandLine": "powershell -c Get-ChildItem Cert:\\LocalMachine\\Root",
+  "InitiatingProcessFileName": "cmd.exe"
+}

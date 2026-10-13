@@ -1,0 +1,14 @@
+{
+  "label": "known-gap",
+  "variant": "powershell -enc (script hidden)",
+  "source": "Common PowerShell obfuscation",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "note": "expected to be MISSED by this rule; see REVIEW.md",
+  "FileName": "powershell.exe",
+  "FolderPath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "ProcessVersionInfoOriginalFileName": "PowerShell.EXE",
+  "ProcessCommandLine": "powershell -enc SQBtAHAAbwByAHQALQBDAGUAcgB0AGkAZgBpAGMAYQB0AGUA",
+  "InitiatingProcessFileName": "cmd.exe"
+}

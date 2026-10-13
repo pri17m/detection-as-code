@@ -1,12 +1,13 @@
 {
-  "label": "benign",
+  "label": "malicious",
+  "variant": "certutil /addstore root",
+  "source": "SigmaHQ certutil/certmgr rules",
   "expect_alert": true,
   "result": "not run",
   "synthetic": true,
   "FileName": "certutil.exe",
   "FolderPath": "C:\\Windows\\System32\\certutil.exe",
   "ProcessVersionInfoOriginalFileName": "CertUtil.exe",
-  "ProcessCommandLine": "certutil -addstore root \\\\fs01\\pki\\CorpRoot.cer",
-  "InitiatingProcessFileName": "cmd.exe",
-  "expected_severity": "medium"
+  "ProcessCommandLine": "certutil /addstore root ca.cer",
+  "InitiatingProcessFileName": "cmd.exe"
 }

@@ -7,6 +7,9 @@ description: >-
   ProcessVersionInfoOriginalFileName so renamed copies (OriginalFileName CertUtil.exe / CertMgr.Exe /
   CERTMGT.EXE) are flagged. Severity high when renamed, outside System32/SysWOW64 (certutil) or Windows Kits
   (certmgr), or launched by an unexpected parent; otherwise medium. telemetry_validated false.
+  Hardened: also covers -importpfx root, PowerShell cert-provider writes (Import-Certificate,
+  Move-Item/Copy-Item to Cert:\LocalMachine\Root), X509Store('Root','LocalMachine').Add(), and reg add of a Root
+  Blob; normalises Unicode dashes, quotes and carets before matching. See REVIEW.md variant matrix.
 author: DaC
 status: experimental
 platforms:
@@ -31,6 +34,9 @@ references:
 - https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certutil
 - https://learn.microsoft.com/en-us/windows/win32/seccrypto/certmgr-exe
 - https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1553.004/T1553.004.md
+- https://learn.microsoft.com/en-us/powershell/module/pki/import-certificate
+- https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509store
 telemetry_validated: false
 required_fields:
 - "Timestamp"
@@ -55,21 +61,28 @@ query:
   defender: |
     let Lookback = 1d;
     let ExpectedParents = dynamic(["cmd.exe","powershell.exe","pwsh.exe","msiexec.exe","ccmexec.exe","explorer.exe"]);
-    let CertNames = dynamic(["certutil.exe","certmgr.exe","certmgt.exe"]);
+    let KnownNames = dynamic(["certutil.exe","certmgr.exe","certmgt.exe","powershell.exe","pwsh.exe","pwsh.dll","reg.exe"]);
     DeviceProcessEvents
     | where Timestamp > ago(Lookback)
-    | where ProcessCommandLine matches regex @"(?i)[-/]add(store)?\b"
-    | extend Orig = tolower(ProcessVersionInfoOriginalFileName), Img = tolower(FileName)
+    | extend Cmd = replace_regex(replace_regex(tolower(ProcessCommandLine), @"[‐‑‒–—―−]", "-"), @"[\^\x22']", "")
+    | where Cmd has_any ("addstore", "importpfx", "localmachine", "x509store", "systemcertificates", "enterprisecertificates")
     | extend Tool = case(
-        ProcessCommandLine matches regex @"(?i)[-/]addstore\b"
-          and not(ProcessCommandLine matches regex @"(?i)\s[-/]user\b"), "certutil-style",
-        ProcessCommandLine matches regex @"(?i)[-/]add\b"
-          and ProcessCommandLine matches regex @"(?i)[-/]r\s+\x22?localmachine\x22?\b", "certmgr-style",
+        Cmd matches regex @"[-/](addstore|importpfx)\b" and not(Cmd matches regex @"\s[-/]user\b")
+          and Cmd matches regex @"(^|\s)(auth)?root(\s|$)", "certutil-style",
+        Cmd matches regex @"[-/]add\b" and Cmd matches regex @"[-/]r\s+localmachine\b"
+          and Cmd matches regex @"(^|\s)(auth)?root(\s|$)", "certmgr-style",
+        Cmd matches regex @"cert:\\localmachine\\(auth)?root\b"
+          and Cmd matches regex @"(import-(pfx)?certificate|(^|[^a-z])(move|copy)-item|\bmove\b|\bmi\b|\bcopy\b|\bcpi\b|\.add\()", "powershell-certprovider",
+        Cmd has "x509store" and Cmd has "localmachine" and Cmd matches regex @"\b(auth)?root\b" and Cmd has ".add(", "powershell-x509store",
+        Cmd matches regex @"\breg(\.exe)?\s+add\b"
+          and Cmd matches regex @"(hklm|hkey_local_machine)\\software\\(policies\\)?microsoft\\(systemcertificates|enterprisecertificates)\\(auth)?root\\certificates", "reg-add",
         "")
     | where Tool != ""
-    | where ProcessCommandLine matches regex @"(?i)(^|\s)\x22?(auth)?root\x22?(\s|$)"
-    | extend Renamed = Orig in (CertNames) and Img !in (CertNames)
-    | extend ExpectedPath = (Img == "certutil.exe" and FolderPath matches regex @"(?i)^[a-z]:\\windows\\(system32|syswow64)\\certutil\.exe$")
+    | extend Orig = tolower(ProcessVersionInfoOriginalFileName), Img = tolower(FileName)
+    | extend Renamed = isnotempty(Orig) and Orig in (KnownNames) and Img != Orig and not(Orig == "certmgt.exe" and Img == "certmgr.exe")
+    | extend ExpectedPath = FolderPath matches regex @"(?i)^[a-z]:\\windows\\(system32|syswow64)\\(certutil|reg)\.exe$"
+        or FolderPath matches regex @"(?i)^[a-z]:\\windows\\(system32|syswow64)\\windowspowershell\\v1\.0\\powershell\.exe$"
+        or FolderPath matches regex @"(?i)\\program files\\powershell\\[0-9]+\\pwsh\.exe$"
         or (Img == "certmgr.exe" and FolderPath has @"\Windows Kits\")
     | extend UnexpectedParent = tolower(InitiatingProcessFileName) !in (ExpectedParents)
     | extend RunAsSystem = AccountSid == "S-1-5-18"
