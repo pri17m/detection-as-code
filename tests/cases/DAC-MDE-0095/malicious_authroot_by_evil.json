@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "variant": "AuthRoot written by non-system process",
+  "source": "Elastic registry rule",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ActionType": "RegistryValueSet",
+  "RegistryKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\SystemCertificates\\AuthRoot\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567",
+  "RegistryValueName": "Blob",
+  "InitiatingProcessFileName": "a.exe",
+  "InitiatingProcessFolderPath": "C:\\Users\\Public\\a.exe"
+}

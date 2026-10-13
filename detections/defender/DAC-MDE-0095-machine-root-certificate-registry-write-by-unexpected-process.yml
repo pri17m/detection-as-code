@@ -8,6 +8,7 @@ description: >-
   custom CertAddCertificateContextToStore call all land, so it is tool-agnostic. Severity high when the writer
   runs from a user-writable path (ProgramData, Users, Windows\Temp, PerfLogs) or is a LOLBin/certutil/certmgr.
   Logic follows Elastic's published registry rule (Program Files is NOT excluded here). telemetry_validated false.
+  Hardened: msiexec, mmc and dllhost in System32 are no longer excluded (medium). See REVIEW.md variant matrix.
 author: DaC
 status: experimental
 platforms:
@@ -29,6 +30,7 @@ references:
 - https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_install_root_or_ca_certificat.yml
 - https://github.com/elastic/detection-rules/blob/main/rules/windows/defense_evasion_create_mod_root_certificate.toml
 - https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceregistryevents-table
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1553.004/T1553.004.md
 telemetry_validated: false
 required_fields:
 - "Timestamp"
@@ -52,8 +54,10 @@ tags:
 query:
   defender: |
     let Lookback = 1d;
+    let AdminTools = dynamic(["msiexec.exe","mmc.exe","dllhost.exe"]);
     let SuspiciousSystemBins = dynamic(["certutil.exe","certmgr.exe","reg.exe","rundll32.exe","regsvr32.exe","mshta.exe",
-      "powershell.exe","pwsh.exe","cmd.exe","cscript.exe","wscript.exe","wmiprvse.exe","expand.exe","xcopy.exe"]);
+      "powershell.exe","pwsh.exe","cmd.exe","cscript.exe","wscript.exe","wmiprvse.exe","expand.exe","xcopy.exe",
+      "msiexec.exe","mmc.exe","dllhost.exe"]);
     DeviceRegistryEvents
     | where Timestamp > ago(Lookback)
     | where ActionType in ("RegistryValueSet", "RegistryKeyCreated")
@@ -64,7 +68,7 @@ query:
     | where not(PPath matches regex @"^[a-z]:\\windows\\(winsxs|ccm|ccmsetup)\\")
     | extend Thumbprint = extract(@"(?i)\\Certificates\\([0-9A-F]{40})$", 1, RegistryKey)
     | extend UserWritable = PPath matches regex @"(?i)^[a-z]:\\(programdata|users|windows\\temp|perflogs)\\"
-    | extend Severity = iff(UserWritable or Proc in (SuspiciousSystemBins), "high", "medium")
+    | extend Severity = iff(UserWritable or (Proc in (SuspiciousSystemBins) and Proc !in (AdminTools)), "high", "medium")
     | project Timestamp, DeviceId, DeviceName, ActionType, RegistryKey, RegistryValueName, Thumbprint, Severity, UserWritable,
         InitiatingProcessFileName, InitiatingProcessFolderPath, InitiatingProcessCommandLine,
         InitiatingProcessAccountSid, InitiatingProcessParentFileName, InitiatingProcessSHA256, ReportId

@@ -1,10 +1,12 @@
 {
   "label": "near-miss",
+  "variant": "HKCU Root (user scope, out of scope; Atomic test 7 class)",
+  "source": "Atomic Red Team T1553.004",
   "expect_alert": false,
   "result": "not run",
   "synthetic": true,
   "ActionType": "RegistryValueSet",
-  "RegistryKey": "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\SystemCertificates\\Root\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567",
+  "RegistryKey": "HKU\\S-1-5-21-1-2-3-1001\\SOFTWARE\\Microsoft\\SystemCertificates\\Root\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567",
   "RegistryValueName": "Blob",
   "InitiatingProcessFileName": "evil.exe",
   "InitiatingProcessFolderPath": "C:\\Users\\bob\\AppData\\Local\\Temp\\evil.exe"

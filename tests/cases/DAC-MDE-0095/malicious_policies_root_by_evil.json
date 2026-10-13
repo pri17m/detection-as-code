@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "variant": "Policies\\...\\Root (GP store) written by non-GP process",
+  "source": "Microsoft certutil docs -grouppolicy",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ActionType": "RegistryValueSet",
+  "RegistryKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\SystemCertificates\\Root\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567",
+  "RegistryValueName": "Blob",
+  "InitiatingProcessFileName": "a.exe",
+  "InitiatingProcessFolderPath": "C:\\ProgramData\\x\\a.exe"
+}
