@@ -19,11 +19,18 @@ DAC-CS-0235 already correlates bcdedit safeboot with a SafeBoot service registra
 | 3 | Should | Source used AsepValueUpdate/RegGenericValueUpdate for SafeBoot keys — Falcon coverage of those keys undocumented (same reason DAC-CS-0235 avoided them) | Missing registry events → miss | Use ProcessRollup2 CommandLine containing `\SafeBoot\(Minimal|Network)\` instead |
 | 4 | Nice | Overlap with DAC-CS-0235 | — | Documented: 0235 = service registration; 0241 = reboot |
 
+### Merge-time ponytail pass (2026-10-17)
+
+| # | Sev | Finding | Failing input | Fix applied |
+|---|---|---|---|---|
+| 5 | Must | Title/description say safe-mode stage "followed by" `shutdown /r`, but `correlate()` defaults to `sequence=false` (any order), so a reboot that happened before the safeboot change also matched | `shutdown /r /t 0` at 10:00, then `bcdedit /set {current} safeboot minimal` at 10:20 on the same aid | Added `sequence=true` (library.humio.com functions-correlate: "Events in a constellation must occur in the order that queries are defined"). Fixture `near_miss_reboot_before_safeboot.json` |
+| 6 | Should | SafeBoot registry branch matched any command line naming `\SafeBoot\Minimal\` or `\Network\`, including read-only or delete commands, though the description says "writes" | `reg query HKLM\SYSTEM\CurrentControlSet\Control\SafeBoot\Minimal\ /s` then `shutdown /r` | Require a write verb in the same command line: `add`, `import`, `copy`, `New-Item`, `New-ItemProperty`, `Set-ItemProperty`. Fixture `near_miss_reg_query_safeboot.json` |
+
 ## Field verification
 | Field / ESN | Status | Source |
 |---|---|---|
 | ProcessRollup2, FileName, CommandLine, aid | verified | LCC Hunting bcdedit.exe usage.md |
-| correlate() | verified | library.humio.com functions-correlate; used by DAC-CS-0235 |
+| correlate(), sequence=true | verified | https://library.humio.com/data-analysis/functions-correlate.html ; used by DAC-CS-0235 |
 | AsepValueUpdate / RegGenericValueUpdate on SafeBoot | unverified for this key path (not used) | — |
 | ServiceInstalled | unverified (removed) | 0 LCC hits |
 

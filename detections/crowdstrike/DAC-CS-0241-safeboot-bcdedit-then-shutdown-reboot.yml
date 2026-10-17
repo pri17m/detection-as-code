@@ -54,7 +54,7 @@ query:
         | (
             (FileName=/^bcdedit\.exe$/i CommandLine=/safeboot\s+(minimal|network)/i)
             OR
-            (CommandLine=/\\SafeBoot\\(Minimal|Network)\\/i)
+            (CommandLine=/\\SafeBoot\\(Minimal|Network)\\/i CommandLine=/\b(add|import|copy|New-Item|New-ItemProperty|Set-ItemProperty)\b/i)
           )
       } include: [aid, ComputerName, UserName, ImageFileName, CommandLine, ParentBaseFileName],
       reboot: {
@@ -63,5 +63,6 @@ query:
         | CommandLine=/(\/r|\-r)(\s|$)/i
         | aid <=> safemode.aid
       } include: [ImageFileName, CommandLine, ParentBaseFileName, UserName],
+      sequence=true,
       within=1h
     )
