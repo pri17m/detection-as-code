@@ -53,8 +53,12 @@ query:
     #event_simpleName=ProcessRollup2 event_platform=Win
     | case {
         CommandLine=/(Set|Add)-MpPreference/i
-          CommandLine=/-(ExclusionPath|ExclusionProcess|ExclusionExtension|DisableRealtimeMonitoring|DisableIOAVProtection|DisableScriptScanning|DisableBehaviorMonitoring|DisableTamperProtection)/i
-          | detection := "MpPreferenceTamper" ;
+          CommandLine=/-(ExclusionPath|ExclusionProcess|ExclusionExtension)\b/i
+          | detection := "MpPreferenceExclusion" ;
+        CommandLine=/Set-MpPreference/i
+          CommandLine=/-(DisableRealtimeMonitoring|DisableIOAVProtection|DisableScriptScanning|DisableBehaviorMonitoring|DisableTamperProtection)\b/i
+          CommandLine!=/-Disable(RealtimeMonitoring|IOAVProtection|ScriptScanning|BehaviorMonitoring|TamperProtection)(\s*:\s*|\s+)(\$false|0)\b/i
+          | detection := "MpPreferenceDisable" ;
         ImageFileName=/\\MpCmdRun\.exe$/i
           CommandLine=/-RemoveDefinitions/i
           CommandLine=/-All\b/i

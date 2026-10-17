@@ -16,6 +16,12 @@ Based on detections.ai rule https://detections.ai/rules/01a13344-944a-7211-9fc7-
 | 3 | Should | Source missed `-DisableTamperProtection` / `-DisableBehaviorMonitoring` on Set-MpPreference | `Set-MpPreference -DisableTamperProtection $true` | Added those flags (https://learn.microsoft.com/en-us/powershell/module/defender/set-mppreference) |
 | 4 | Nice | No aggregation | — | groupBy for Filter Alerts shape |
 
+### Merge-time ponytail pass (2026-10-17)
+
+| # | Sev | Finding | Failing input | Fix applied |
+|---|---|---|---|---|
+| 5 | Must | The Disable* flag branch fired on any mention of the flag, including the command that turns protection back ON, which is the opposite of the described behaviour and a common admin step after troubleshooting | `powershell Set-MpPreference -DisableRealtimeMonitoring $false` | Split into `MpPreferenceExclusion` (Set/Add + Exclusion*) and `MpPreferenceDisable` (Set-MpPreference + Disable*), and the Disable branch now drops command lines where the flag is set to `$false` or `0` (Microsoft documents these parameters as Boolean: https://learn.microsoft.com/en-us/powershell/module/defender/set-mppreference). Fixture `near_miss_reenable_rtp.json`. Known gap: a single command setting one Disable* flag to `$true` and another to `$false` is dropped |
+
 ## Field verification
 | Field | Status | Source |
 |---|---|---|
