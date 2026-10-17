@@ -1,0 +1,17 @@
+{
+  "label": "malicious",
+  "source": "Snatch/BlackCat Safe Mode reboot tradecraft",
+  "expect_alert": true,
+  "result": "not run",
+  "note": "correlate pair",
+  "event_a": {
+    "event_simpleName": "ProcessRollup2",
+    "FileName": "bcdedit.exe",
+    "CommandLine": "bcdedit /set {current} safeboot minimal"
+  },
+  "event_b": {
+    "event_simpleName": "ProcessRollup2",
+    "ImageFileName": "C:\\Windows\\System32\\shutdown.exe",
+    "CommandLine": "shutdown /r /t 0"
+  }
+}

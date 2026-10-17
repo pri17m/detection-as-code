@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "synthetic; F1 regression: candidate gap must not be in its own baseline",
+  "sourcetype": "beyondtrust:sra",
+  "host": "bt-appliance-03",
+  "baseline_gaps": "50 gaps of 1800s ending >24h ago",
+  "gap_sec": 21600,
+  "expect_alert": true,
+  "result": "not run"
+}
