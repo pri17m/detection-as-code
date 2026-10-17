@@ -1,0 +1,231 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1110.003/okta_multiple_users_from_ip/okta_multiple_users_from_ip.log",
+  "modification": "payload session.start failures all relabelled to one user (brute force, not spray)",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user1@example.com"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "reason": "INVALID_CREDENTIALS",
+        "result": "FAILURE"
+      },
+      "published": "2024-02-28T19:10:32.404Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "0b46e9a0-d66d-11ee-9b09-397b8f897d74"
+    },
+    {
+      "actor": {
+        "alternateId": "user1@example.com"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "reason": "INVALID_CREDENTIALS",
+        "result": "FAILURE"
+      },
+      "published": "2024-02-28T19:10:24.161Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "065d21b8-d66d-11ee-b24b-6d537ebcc61a"
+    },
+    {
+      "actor": {
+        "alternateId": "user1@example.com"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "reason": "INVALID_CREDENTIALS",
+        "result": "FAILURE"
+      },
+      "published": "2024-02-28T19:10:15.754Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "015a52fe-d66d-11ee-ba0c-83340c10c07e"
+    },
+    {
+      "actor": {
+        "alternateId": "user1@example.com"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "reason": "INVALID_CREDENTIALS",
+        "result": "FAILURE"
+      },
+      "published": "2024-02-28T19:10:15.754Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "015a52fe-d66d-11ee-ba0c-83340c10c07e"
+    },
+    {
+      "actor": {
+        "alternateId": "user1@example.com"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "reason": "INVALID_CREDENTIALS",
+        "result": "FAILURE"
+      },
+      "published": "2024-02-28T19:10:15.754Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "015a52fe-d66d-11ee-ba0c-83340c10c07e"
+    },
+    {
+      "actor": {
+        "alternateId": "user1@example.com"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "reason": "INVALID_CREDENTIALS",
+        "result": "FAILURE"
+      },
+      "published": "2024-02-28T19:10:15.754Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "015a52fe-d66d-11ee-ba0c-83340c10c07e"
+    },
+    {
+      "actor": {
+        "alternateId": "user1@example.com"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "reason": "INVALID_CREDENTIALS",
+        "result": "FAILURE"
+      },
+      "published": "2024-02-28T19:10:15.754Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "015a52fe-d66d-11ee-ba0c-83340c10c07e"
+    },
+    {
+      "actor": {
+        "alternateId": "user1@example.com"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "reason": "INVALID_CREDENTIALS",
+        "result": "FAILURE"
+      },
+      "published": "2024-02-28T19:10:15.754Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "015a52fe-d66d-11ee-ba0c-83340c10c07e"
+    },
+    {
+      "actor": {
+        "alternateId": "user1@example.com"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "reason": "INVALID_CREDENTIALS",
+        "result": "FAILURE"
+      },
+      "published": "2024-02-28T19:10:15.754Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "015a52fe-d66d-11ee-ba0c-83340c10c07e"
+    },
+    {
+      "actor": {
+        "alternateId": "user1@example.com"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "reason": "INVALID_CREDENTIALS",
+        "result": "FAILURE"
+      },
+      "published": "2024-02-28T19:10:15.754Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "015a52fe-d66d-11ee-ba0c-83340c10c07e"
+    }
+  ]
+}
