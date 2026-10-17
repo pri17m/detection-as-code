@@ -1,0 +1,19 @@
+{
+  "label": "near_miss",
+  "source": "Ordering check for correlate(sequence=true)",
+  "expect_alert": false,
+  "result": "not run",
+  "note": "reboot (event_b) occurs 20 minutes BEFORE the safeboot change (event_a)",
+  "event_a": {
+    "event_simpleName": "ProcessRollup2",
+    "timestamp": "2026-10-17T10:20:00Z",
+    "FileName": "bcdedit.exe",
+    "CommandLine": "bcdedit /set {current} safeboot minimal"
+  },
+  "event_b": {
+    "event_simpleName": "ProcessRollup2",
+    "timestamp": "2026-10-17T10:00:00Z",
+    "ImageFileName": "C:\\Windows\\System32\\shutdown.exe",
+    "CommandLine": "shutdown /r /t 0"
+  }
+}
