@@ -1,0 +1,47 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1078.004/okta_single_factor_auth/okta_single_factor_auth.log",
+  "modification": "payload policy event with outcome.result=DENY",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user85540a@example.com"
+      },
+      "client": {
+        "ipAddress": "66.66.66.66"
+      },
+      "displayMessage": "Evaluation of sign-on policy",
+      "eventType": "policy.evaluate_sign_on",
+      "outcome": {
+        "result": "DENY"
+      },
+      "published": "2024-04-08T19:08:01.516Z",
+      "target": [
+        {
+          "detailEntry": {},
+          "displayName": "Okta Dashboard",
+          "type": "AppInstance"
+        },
+        {
+          "detailEntry": {
+            "policyRuleFactorMode": "1FA"
+          },
+          "displayName": "Default Rule",
+          "type": "Rule"
+        },
+        {
+          "detailEntry": {
+            "policyRuleFactorMode": "1FA"
+          },
+          "displayName": "sfa",
+          "type": "Rule"
+        }
+      ],
+      "uuid": "51dd3b1c-f5db-11ee-aecd-25e6f8ae02c1"
+    }
+  ]
+}
