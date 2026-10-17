@@ -1,6 +1,6 @@
 id: DAC-BT-0003
-title: 'BeyondTrust RS/PRA: new user, API account, security provider, or log/outbound destination change'
-description: 'Detects BeyondTrust syslog events that create access or redirect telemetry: user_added, api_account_added/changed, security_provider_* and security_provider_setting_*, syslog_server_changed, outbound_event HTTP/email recipient added/changed, and admin_password_reset_to_factory_default. Mandiant''s ARMORY CASTLE guidance names these events for review when they have no change ticket.'
+title: 'BeyondTrust RS/PRA: API account, security provider, or log/outbound destination change'
+description: 'Detects BeyondTrust syslog events that create access or redirect telemetry: api_account_added, api_account_changed (only when enabled or client_secret changes), security_provider_* and security_provider_setting_*, syslog_server_changed, outbound_event HTTP/email recipient added/changed, and admin_password_reset_to_factory_default. Mandiant''s ARMORY CASTLE guidance names these events for review when they have no change ticket.'
 author: DaC
 status: experimental
 platforms:
@@ -13,7 +13,6 @@ mitre:
   - credential-access
   - defense-impairment
   techniques:
-  - T1136
   - T1098
   - T1556
   - T1562.006
@@ -35,16 +34,22 @@ required_fields:
 - site
 - client_id
 - syslog_servers
+- new_enabled
+- new_client_secret
 tags:
 - beyondtrust
 - remote-support
 - pra
 - bomgar
 query:
-  splunk: 'sourcetype=beyondtrust:sra (event=user_added OR event=api_account_added OR event=api_account_changed OR event=security_provider_added OR event=security_provider_changed OR event=security_provider_removed OR event=security_provider_setting_added OR event=security_provider_setting_changed OR event=security_provider_setting_removed OR event=syslog_server_changed OR event=outbound_event_http_recipient_added OR event=outbound_event_http_recipient_changed OR event=outbound_event_email_recipient_added OR event=outbound_event_email_recipient_changed OR event=admin_password_reset_to_factory_default)
+  splunk: 'sourcetype=beyondtrust:sra (event=api_account_added OR event=api_account_changed OR event=security_provider_added OR event=security_provider_changed OR event=security_provider_removed OR event=security_provider_setting_added OR event=security_provider_setting_changed OR event=security_provider_setting_removed OR event=syslog_server_changed OR event=outbound_event_http_recipient_added OR event=outbound_event_http_recipient_changed OR event=outbound_event_email_recipient_added OR event=outbound_event_email_recipient_changed OR event=admin_password_reset_to_factory_default)
+
+    | where event!="api_account_changed" OR isnotnull(''new_enabled'') OR isnotnull(''new_client_secret'')
+
+    | eval change_class=case(match(event, "^api_account_"), "api_account", match(event, "^security_provider"), "auth_provider", event="syslog_server_changed", "log_destination", match(event, "^outbound_event_"), "outbound_event", true(), "admin_reset")
 
     | fillnull value="unknown" site who who_ip
 
-    | stats count min(_time) as firstTime max(_time) as lastTime values(event) as event values(client_id) as client_id values(syslog_servers) as syslog_servers by site, who, who_ip
+    | stats count min(_time) as firstTime max(_time) as lastTime values(event) as event values(change_class) as change_class dc(change_class) as change_classes values(client_id) as client_id values(syslog_servers) as syslog_servers by site, who, who_ip
 
     '

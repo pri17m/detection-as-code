@@ -1,5 +1,6 @@
 {
   "label": "malicious",
+  "synthetic": true,
   "source": "BeyondTrust syslog_server_changed",
   "sourcetype": "beyondtrust:sra",
   "event": "syslog_server_changed",

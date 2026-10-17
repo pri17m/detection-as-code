@@ -1,5 +1,6 @@
 {
   "label": "malicious",
+  "synthetic": true,
   "source": "BeyondTrust security_provider_added",
   "sourcetype": "beyondtrust:sra",
   "event": "security_provider_added",

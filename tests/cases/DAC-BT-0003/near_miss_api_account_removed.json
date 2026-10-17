@@ -1,5 +1,6 @@
 {
   "label": "near_miss",
+  "synthetic": true,
   "source": "removal excluded on purpose",
   "sourcetype": "beyondtrust:sra",
   "event": "api_account_removed",

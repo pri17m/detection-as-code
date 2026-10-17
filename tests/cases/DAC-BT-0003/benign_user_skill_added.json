@@ -1,5 +1,6 @@
 {
   "label": "benign",
+  "synthetic": true,
   "source": "not in event list",
   "sourcetype": "beyondtrust:sra",
   "event": "user_skill_added",

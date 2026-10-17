@@ -1,5 +1,6 @@
 {
   "label": "malicious",
+  "synthetic": true,
   "source": "BeyondTrust API account event",
   "sourcetype": "beyondtrust:sra",
   "event": "api_account_added",
