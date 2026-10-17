@@ -1,0 +1,15 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "synthetic; api_account_changed comments only",
+  "sourcetype": "beyondtrust:sra",
+  "event": "api_account_changed",
+  "who": "Admin(admin) using password",
+  "who_ip": "10.0.0.5",
+  "site": "support.example.com",
+  "old_client_id": "abc123",
+  "old_comments": "CI",
+  "new_comments": "CI pipeline",
+  "expect_alert": false,
+  "result": "not run"
+}
