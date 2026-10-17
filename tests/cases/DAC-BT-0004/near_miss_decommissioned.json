@@ -1,0 +1,11 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "synthetic; host silent for 10 days (gap started >72h ago)",
+  "sourcetype": "beyondtrust:sra",
+  "host": "bt-old-01",
+  "synthetic_now": 1,
+  "last_event_age_sec": 864000,
+  "expect_alert": false,
+  "result": "not run"
+}

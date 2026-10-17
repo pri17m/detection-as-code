@@ -1,13 +1,13 @@
 {
   "summary": {
-    "detections_total": 867,
-    "detections_with_mitre": 867,
+    "detections_total": 868,
+    "detections_with_mitre": 868,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 211,
     "platform_counts": {
       "crowdstrike": 161,
       "defender": 72,
-      "splunk": 634
+      "splunk": 635
     }
   },
   "techniques": {
@@ -1300,7 +1300,8 @@
       "DAC-MDE-0079"
     ],
     "T1562.006": [
-      "DAC-BT-0003"
+      "DAC-BT-0003",
+      "DAC-BT-0004"
     ],
     "T1564.001": [
       "DAC-CS-0227",
