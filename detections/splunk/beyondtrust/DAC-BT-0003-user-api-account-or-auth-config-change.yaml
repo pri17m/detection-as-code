@@ -1,0 +1,50 @@
+id: DAC-BT-0003
+title: 'BeyondTrust RS/PRA: new user, API account, security provider, or log/outbound destination change'
+description: 'Detects BeyondTrust syslog events that create access or redirect telemetry: user_added, api_account_added/changed, security_provider_* and security_provider_setting_*, syslog_server_changed, outbound_event HTTP/email recipient added/changed, and admin_password_reset_to_factory_default. Mandiant''s ARMORY CASTLE guidance names these events for review when they have no change ticket.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- beyondtrust:sra
+mitre:
+  tactics:
+  - persistence
+  - credential-access
+  - defense-impairment
+  techniques:
+  - T1136
+  - T1098
+  - T1556
+  - T1562.006
+severity: medium
+false_positives:
+- Routine admin changes. Correlate with change tickets; suppress known automation who/who_ip after review.
+references:
+- https://cloud.google.com/blog/topics/threat-intelligence/armory-castle-exploits-beyondtrust
+- https://nvd.nist.gov/vuln/detail/CVE-2026-102764
+- https://docs.beyondtrust.com/rs/docs/events
+- https://docs.beyondtrust.com/rs/docs/message-format
+- https://docs.beyondtrust.com/pra/docs/events
+- https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/BeyondTrust/sra/
+telemetry_validated: false
+required_fields:
+- event
+- who
+- who_ip
+- site
+- client_id
+- syslog_servers
+tags:
+- beyondtrust
+- remote-support
+- pra
+- bomgar
+query:
+  splunk: 'sourcetype=beyondtrust:sra (event=user_added OR event=api_account_added OR event=api_account_changed OR event=security_provider_added OR event=security_provider_changed OR event=security_provider_removed OR event=security_provider_setting_added OR event=security_provider_setting_changed OR event=security_provider_setting_removed OR event=syslog_server_changed OR event=outbound_event_http_recipient_added OR event=outbound_event_http_recipient_changed OR event=outbound_event_email_recipient_added OR event=outbound_event_email_recipient_changed OR event=admin_password_reset_to_factory_default)
+
+    | fillnull value="unknown" site who who_ip
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(event) as event values(client_id) as client_id values(syslog_servers) as syslog_servers by site, who, who_ip
+
+    '

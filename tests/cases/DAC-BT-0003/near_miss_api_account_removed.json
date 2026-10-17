@@ -1,0 +1,11 @@
+{
+  "label": "near_miss",
+  "source": "removal excluded on purpose",
+  "sourcetype": "beyondtrust:sra",
+  "event": "api_account_removed",
+  "who": "Admin(admin) using password",
+  "who_ip": "10.0.0.5",
+  "site": "support.example.com",
+  "expect_alert": false,
+  "result": "not run"
+}
