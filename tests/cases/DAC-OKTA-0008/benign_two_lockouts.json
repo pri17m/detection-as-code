@@ -1,0 +1,49 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1110/okta_multiple_accounts_lockout/okta_multiple_accounts_lockout.log",
+  "modification": "first two payload lockouts only",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user5ccf7d@example.com",
+        "id": "00uffks4r9kkYNxpj5d7"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Max sign in attempts exceeded",
+      "eventType": "user.account.lock",
+      "outcome": {
+        "reason": "LOCKED_OUT"
+      },
+      "published": "2024-03-01T20:49:05.312Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "2478924e-d80d-11ee-84c2-77b4fb701038"
+    },
+    {
+      "actor": {
+        "alternateId": "user8cf5a9@example.com",
+        "id": "o1MrJgGbSqU575f7YXqX"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Max sign in attempts exceeded",
+      "eventType": "user.account.lock",
+      "outcome": {
+        "reason": "LOCKED_OUT"
+      },
+      "published": "2024-03-01T20:49:05.312Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "2478924e-d80d-11ee-84c2-77b4fb701038"
+    }
+  ]
+}

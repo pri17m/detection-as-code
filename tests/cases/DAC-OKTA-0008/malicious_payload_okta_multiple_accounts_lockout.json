@@ -1,0 +1,164 @@
+{
+  "label": "malicious",
+  "synthetic": false,
+  "source": "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1110/okta_multiple_accounts_lockout/okta_multiple_accounts_lockout.log",
+  "source_commit_note": "attack_data master, downloaded 2026-10-17",
+  "source_lines": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "modifications": [
+    "trimmed to required_fields plus published/uuid/eventType/displayMessage",
+    "gmail.com / mail.com addresses pseudonymised to user<hash>@example.com"
+  ],
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": true,
+  "local_standin_match_rows": 1,
+  "local_standin_rows": [
+    {
+      "src_ip": "120.1.121.43",
+      "locked_users": 6
+    }
+  ],
+  "result": "not run by CI (no Splunk runner); local Python stand-in matched, see REVIEW.md",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user5ccf7d@example.com",
+        "id": "00uffks4r9kkYNxpj5d7"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Max sign in attempts exceeded",
+      "eventType": "user.account.lock",
+      "outcome": {
+        "reason": "LOCKED_OUT"
+      },
+      "published": "2024-03-01T20:49:05.312Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "2478924e-d80d-11ee-84c2-77b4fb701038"
+    },
+    {
+      "actor": {
+        "alternateId": "user8cf5a9@example.com",
+        "id": "o1MrJgGbSqU575f7YXqX"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Max sign in attempts exceeded",
+      "eventType": "user.account.lock",
+      "outcome": {
+        "reason": "LOCKED_OUT"
+      },
+      "published": "2024-03-01T20:49:05.312Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "2478924e-d80d-11ee-84c2-77b4fb701038"
+    },
+    {
+      "actor": {
+        "alternateId": "user35317b@example.com",
+        "id": "opVh04b0BQtay7oO9pBY"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Max sign in attempts exceeded",
+      "eventType": "user.account.lock",
+      "outcome": {
+        "reason": "LOCKED_OUT"
+      },
+      "published": "2024-03-01T20:49:05.312Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "2478924e-d80d-11ee-84c2-77b4fb701038"
+    },
+    {
+      "actor": {
+        "alternateId": "user071499@example.com",
+        "id": "B0JBZDIueRi3KsvgVx13"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Max sign in attempts exceeded",
+      "eventType": "user.account.lock",
+      "outcome": {
+        "reason": "LOCKED_OUT"
+      },
+      "published": "2024-03-01T20:49:05.312Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "2478924e-d80d-11ee-84c2-77b4fb701038"
+    },
+    {
+      "actor": {
+        "alternateId": "user37fa60@example.com",
+        "id": "diENfoR3EcbQWV7BdBfy"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Max sign in attempts exceeded",
+      "eventType": "user.account.lock",
+      "outcome": {
+        "reason": "LOCKED_OUT"
+      },
+      "published": "2024-03-01T20:49:05.312Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "2478924e-d80d-11ee-84c2-77b4fb701038"
+    },
+    {
+      "actor": {
+        "alternateId": "user947013@example.com",
+        "id": "AUrSm5axYHCjeTmkEeNY"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Max sign in attempts exceeded",
+      "eventType": "user.account.lock",
+      "outcome": {
+        "reason": "LOCKED_OUT"
+      },
+      "published": "2024-03-01T20:49:05.312Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "2478924e-d80d-11ee-84c2-77b4fb701038"
+    },
+    {
+      "actor": {
+        "alternateId": "userc90d5d@example.com",
+        "id": "AUrSm5axYHCjeTmkEeNY"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Max sign in attempts exceeded",
+      "eventType": "user.account.lock",
+      "outcome": {
+        "reason": "LOCKED_OUT"
+      },
+      "published": "2024-03-01T20:49:05.312Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum"
+      },
+      "uuid": "2478924e-d80d-11ee-84c2-77b4fb701038"
+    }
+  ]
+}
