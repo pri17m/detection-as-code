@@ -1,0 +1,8 @@
+{
+  "label": "near-miss",
+  "source": "Only api.github.com, no npm registry",
+  "expect_alert": false,
+  "result": "not run",
+  "InitiatingProcessFileName": "node.exe",
+  "RemoteUrl_a": "https://api.github.com/repos/x/y"
+}

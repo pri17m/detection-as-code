@@ -1,0 +1,76 @@
+id: DAC-MDE-0089
+title: Node or Bun process contacting both api.github.com and registry.npmjs.org within 30 minutes
+description: >-
+  Correlates one Node or Bun process (same DeviceId, InitiatingProcessId and
+  InitiatingProcessCreationTime) that reaches api.github.com and registry.npmjs.org
+  within 30 minutes. Matches the Shai-Hulud / Tensorlake worm sequence of GitHub
+  token checks plus npm registry republish. Excludes command lines that look like
+  a normal package-manager install (npm-cli.js, npm install/ci, yarn, pnpm) and
+  parents named npm/yarn/pnpm. Based on detections.ai rule
+  https://detections.ai/rules/01a130ac-86a8-7113-bc06-13f2c89caa15 by Adarsh Pandey
+  (@Pandeyadarsh). telemetry_validated false; not run in a tenant.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - command-and-control
+  - initial-access
+  techniques:
+  - T1071.001
+  - T1102
+  - T1195.002
+severity: high
+false_positives:
+- Custom release scripts that call both the GitHub API and the npm registry from a Node process; allowlist those command lines or service accounts after measuring noise (not measured).
+references:
+- https://detections.ai/rules/01a130ac-86a8-7113-bc06-13f2c89caa15
+- https://attack.mitre.org/techniques/T1071/001/
+- https://attack.mitre.org/techniques/T1102/
+- https://attack.mitre.org/techniques/T1195/002/
+- https://www.endorlabs.com/learn/tensorlake-npm-package-compromised-by-shai-hulud-in-latest-software-supply-chain-attack
+- https://securitylabs.datadoghq.com/articles/shai-hulud-2.0-npm-worm/
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicenetworkevents-table
+telemetry_validated: false
+required_fields:
+- Timestamp
+- DeviceId
+- DeviceName
+- InitiatingProcessId
+- InitiatingProcessCreationTime
+- InitiatingProcessFileName
+- InitiatingProcessCommandLine
+- InitiatingProcessParentFileName
+- RemoteUrl
+tags:
+- behavioural
+- supply-chain
+- shai-hulud
+- needs-review
+- detections-ai
+query:
+  defender: |
+    let Lookback = 1d;
+    let WindowMinutes = 30;
+    let Runtimes = dynamic(["node.exe", "node", "bun.exe", "bun"]);
+    let gh = DeviceNetworkEvents
+    | where Timestamp > ago(Lookback)
+    | where InitiatingProcessFileName in~ (Runtimes)
+    | where RemoteUrl has "api.github.com"
+    | where InitiatingProcessParentFileName !~ "npm.exe" and InitiatingProcessParentFileName !~ "npm.cmd"
+      and InitiatingProcessParentFileName !~ "yarn.exe" and InitiatingProcessParentFileName !~ "pnpm.exe"
+    | where not(InitiatingProcessCommandLine has_any ("npm-cli.js", "npm install", "npm ci", "yarn", "pnpm"))
+    | project DeviceId, DeviceName, InitiatingProcessId, InitiatingProcessCreationTime, InitiatingProcessFileName, InitiatingProcessCommandLine, InitiatingProcessParentFileName, GhTime = Timestamp;
+    let npm = DeviceNetworkEvents
+    | where Timestamp > ago(Lookback)
+    | where InitiatingProcessFileName in~ (Runtimes)
+    | where RemoteUrl has "registry.npmjs.org"
+    | project DeviceId, InitiatingProcessId, InitiatingProcessCreationTime, NpmTime = Timestamp;
+    gh
+    | join kind=inner (npm) on DeviceId, InitiatingProcessId, InitiatingProcessCreationTime
+    | where abs(datetime_diff("minute", GhTime, NpmTime)) <= WindowMinutes
+    | summarize FirstGh = min(GhTime), FirstNpm = min(NpmTime), PairCount = count()
+        by DeviceId, DeviceName, InitiatingProcessId, InitiatingProcessCreationTime, InitiatingProcessFileName, InitiatingProcessCommandLine, InitiatingProcessParentFileName
