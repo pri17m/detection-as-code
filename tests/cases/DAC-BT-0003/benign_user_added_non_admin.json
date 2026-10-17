@@ -1,0 +1,14 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "synthetic; routine onboarding, out of scope after F1",
+  "sourcetype": "beyondtrust:sra",
+  "event": "user_added",
+  "who": "Helpdesk Lead(hdlead) using password",
+  "who_ip": "10.0.0.8",
+  "site": "support.example.com",
+  "username": "newtech1",
+  "permissions:admin": "0",
+  "expect_alert": false,
+  "result": "not run"
+}
