@@ -1,0 +1,12 @@
+{
+  "label": "near-miss",
+  "variant": "root only in a file path",
+  "source": "SigmaHQ certutil/certmgr rules",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "Image": "C:\\Windows\\System32\\certutil.exe",
+  "OriginalFileName": "CertUtil.exe",
+  "CommandLine": "certutil -addstore My C:\\root\\client.cer",
+  "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+}

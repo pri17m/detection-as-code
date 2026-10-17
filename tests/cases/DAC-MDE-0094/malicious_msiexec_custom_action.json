@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "variant": "certutil from msiexec custom action",
+  "source": "MSI custom action pattern",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "FileName": "certutil.exe",
+  "FolderPath": "C:\\Windows\\System32\\certutil.exe",
+  "ProcessVersionInfoOriginalFileName": "CertUtil.exe",
+  "ProcessCommandLine": "certutil -addstore root C:\\Windows\\Installer\\ca.cer",
+  "InitiatingProcessFileName": "msiexec.exe"
+}

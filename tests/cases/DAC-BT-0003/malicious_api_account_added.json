@@ -1,0 +1,15 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "BeyondTrust API account event",
+  "sourcetype": "beyondtrust:sra",
+  "event": "api_account_added",
+  "who": "Admin(admin) using password",
+  "who_ip": "203.0.113.50",
+  "site": "support.example.com",
+  "client_id": "abc123",
+  "client_secret": "***",
+  "enabled": "1",
+  "expect_alert": true,
+  "result": "not run"
+}

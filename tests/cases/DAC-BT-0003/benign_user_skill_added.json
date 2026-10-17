@@ -1,0 +1,12 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "not in event list",
+  "sourcetype": "beyondtrust:sra",
+  "event": "user_skill_added",
+  "who": "Admin(admin) using password",
+  "who_ip": "10.0.0.5",
+  "site": "support.example.com",
+  "expect_alert": false,
+  "result": "not run"
+}

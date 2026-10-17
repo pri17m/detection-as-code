@@ -1,0 +1,10 @@
+{
+  "label": "near-miss",
+  "source": "Same dir but DLL has valid signature flags \u2014 must not alert",
+  "expect_alert": false,
+  "result": "not run",
+  "host_ImageFileName": "C:\\Users\\bob\\Downloads\\app.exe",
+  "dll_ImageFileName": "C:\\Users\\bob\\Downloads\\partner.dll",
+  "SIGNATURE_FLAG_HAS_VALID_SIGNATURE": true,
+  "SIGNATURE_FLAG_NO_SIGNATURE": false
+}

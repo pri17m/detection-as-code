@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "variant": "certutil -grouppolicy -addstore root",
+  "source": "Microsoft certutil docs",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "FileName": "certutil.exe",
+  "FolderPath": "C:\\Windows\\System32\\certutil.exe",
+  "ProcessVersionInfoOriginalFileName": "CertUtil.exe",
+  "ProcessCommandLine": "certutil -grouppolicy -addstore root ca.cer",
+  "InitiatingProcessFileName": "cmd.exe"
+}

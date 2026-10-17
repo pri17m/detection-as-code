@@ -1,0 +1,12 @@
+{
+  "label": "known-gap",
+  "variant": "%VAR% left unexpanded in child (e.g. launched without cmd)",
+  "source": "Common command-line obfuscation (dash/quote/caret); Sigma |windash modifier",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "note": "expected to be MISSED by this rule; see REVIEW.md",
+  "ImageFileName": "C:\\Windows\\System32\\certutil.exe",
+  "CommandLine": "certutil -addstore %STORE% ca.cer",
+  "ParentBaseFileName": "ContosoAgentSvc.exe"
+}

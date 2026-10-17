@@ -1,0 +1,11 @@
+{
+  "label": "near-miss",
+  "variant": "certutil -addstore TrustedPublisher (code-signing trust, out of scope)",
+  "source": "Microsoft certutil docs",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "C:\\Windows\\System32\\certutil.exe",
+  "CommandLine": "certutil -addstore TrustedPublisher pub.cer",
+  "ParentBaseFileName": "cmd.exe"
+}
