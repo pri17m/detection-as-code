@@ -1,0 +1,131 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1621/okta_multiple_failed_mfa_pushes/okta_multiple_failed_mfa_pushes.log",
+  "modification": "payload responses with only 2 of the 7 denies kept",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxZnKxjXeESPO0dycoRd9yhw"
+      },
+      "client": {
+        "ipAddress": "100.1.121.33"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_APPROVE"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-18T16:37:19.234Z",
+      "uuid": "c991bec8-e545-11ee-b8e7-f9c990bca30b"
+    },
+    {
+      "actor": {
+        "alternateId": "user12@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxiiDSIWJxR--Gvc_e3e6IXQ"
+      },
+      "client": {
+        "ipAddress": "23.93.210.147"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_APPROVE"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-18T15:56:55.741Z",
+      "uuid": "250e0fb6-e540-11ee-9193-d71346744bcd"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxrqHou_Z9T7qXzaVeH4-qOQ"
+      },
+      "client": {
+        "ipAddress": "100.1.121.33"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_APPROVE"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-18T15:47:42.439Z",
+      "uuid": "db42df76-e53e-11ee-b23f-c1595244d6a2"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx8gY6RvUfQ62dtpFCYoTUFg"
+      },
+      "client": {
+        "ipAddress": "100.1.121.33"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-18T16:37:09.358Z",
+      "uuid": "c3aec8eb-e545-11ee-bb53-1129838dedec"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx9VoQ-hwIR4STUicVwCbDKA"
+      },
+      "client": {
+        "ipAddress": "100.1.121.33"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-18T16:36:59.929Z",
+      "uuid": "be1008a8-e545-11ee-af27-059bf2cc6cd2"
+    }
+  ]
+}

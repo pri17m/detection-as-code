@@ -1,0 +1,834 @@
+{
+  "label": "malicious",
+  "synthetic": false,
+  "source": "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1621/okta_multiple_failed_mfa_requests/okta_multiple_failed_mfa_requests.log",
+  "source_commit_note": "attack_data master, downloaded 2026-10-17",
+  "source_lines": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33
+  ],
+  "modifications": [
+    "trimmed to required_fields plus published/uuid/eventType/displayMessage",
+    "gmail.com / mail.com addresses pseudonymised to user<hash>@example.com"
+  ],
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": true,
+  "local_standin_match_rows": 1,
+  "local_standin_rows": [
+    {
+      "user": "user15@splunkresearch.com",
+      "denies": 16,
+      "approvals": 0,
+      "approved_after_denies": 0
+    }
+  ],
+  "result": "not run by CI (no Splunk runner); local Python stand-in matched, see REVIEW.md",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxkrV0kJrQSbe-I3yZfh6Jug"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:14:11.819Z",
+      "uuid": "c900abf8-db13-11ee-915f-81ce500def4f"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxkrV0kJrQSbe-I3yZfh6Jug"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:14:09.671Z",
+      "uuid": "c7b8ea29-db13-11ee-b621-457cf516b847"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx-Gb6a0z-Qo-lyIDIp67kUg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:14:02.461Z",
+      "uuid": "c36cc16b-db13-11ee-999c-fb83059b366f"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx-Gb6a0z-Qo-lyIDIp67kUg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:13:59.973Z",
+      "uuid": "c1f11d71-db13-11ee-9b76-e7abcfe6f215"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx17jwJNjkR-aa17Z-kVYV7A"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:13:54.506Z",
+      "uuid": "beaeeb6e-db13-11ee-abfd-e9cc78898d8f"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx17jwJNjkR-aa17Z-kVYV7A"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:13:51.438Z",
+      "uuid": "bcdac73f-db13-11ee-8e80-c1472063399a"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxRD3HfhpWRaWwpvXJU2Wx0Q"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:13:45.164Z",
+      "uuid": "b91d70db-db13-11ee-b24b-6d537ebcc61a"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxRD3HfhpWRaWwpvXJU2Wx0Q"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:13:42.661Z",
+      "uuid": "b79f839b-db13-11ee-915f-81ce500def4f"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxUXWxZgSPQXGfW9nESYVSqA"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:13:36.059Z",
+      "uuid": "b3b02153-db13-11ee-820e-9b729c0be761"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxUXWxZgSPQXGfW9nESYVSqA"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:13:33.769Z",
+      "uuid": "b252b3b7-db13-11ee-8ce5-493d3e5f17d6"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx7LzFGuONTz6vEnNg0QtRzg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:13:27.896Z",
+      "uuid": "aed28e66-db13-11ee-b200-57a5e28fa6ff"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx7LzFGuONTz6vEnNg0QtRzg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:13:25.591Z",
+      "uuid": "ad72d704-db13-11ee-af57-f3d6e1a21c89"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxQ2k90UJRQUW3IYhEfbSF9A"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:13:20.588Z",
+      "uuid": "aa77716e-db13-11ee-ba0c-83340c10c07e"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxQ2k90UJRQUW3IYhEfbSF9A"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:13:17.503Z",
+      "uuid": "a8a0b4f5-db13-11ee-b621-457cf516b847"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx5i2TNfnGSz-npj82ZWVgpg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:13:13.312Z",
+      "uuid": "a6213685-db13-11ee-9a94-b342bccb63da"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx5i2TNfnGSz-npj82ZWVgpg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:13:11.102Z",
+      "uuid": "a4cffed4-db13-11ee-af57-f3d6e1a21c89"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxz5cdCiTjTiinpRjwMrjOcg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:13:06.015Z",
+      "uuid": "a1c7c779-db13-11ee-849c-030e99e06db7"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxz5cdCiTjTiinpRjwMrjOcg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:13:03.706Z",
+      "uuid": "a06773b6-db13-11ee-b621-457cf516b847"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxGYwGt3ZgR82O_zOdhF8a9Q"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:12:57.163Z",
+      "uuid": "9c811223-db13-11ee-9b09-397b8f897d74"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxGYwGt3ZgR82O_zOdhF8a9Q"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:12:53.770Z",
+      "uuid": "9a7b573a-db13-11ee-b24b-6d537ebcc61a"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxkGX908EPQUGQ9atkIIWOLw"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:12:44.975Z",
+      "uuid": "953d5405-db13-11ee-81f3-45d33b91d3ec"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxkGX908EPQUGQ9atkIIWOLw"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:12:42.108Z",
+      "uuid": "9387dcb6-db13-11ee-a7fa-afb7837002bb"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxnt1gNhQASXKXmsXcIyROzQ"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:12:35.301Z",
+      "uuid": "8f793172-db13-11ee-9ae5-63aa3cc8107e"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxnt1gNhQASXKXmsXcIyROzQ"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:12:32.591Z",
+      "uuid": "8ddbaeb9-db13-11ee-999c-fb83059b366f"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx9SmJ3YEQTD67Ejr5xD0KNA"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:12:24.273Z",
+      "uuid": "88e674b5-db13-11ee-ae7c-57dd17b1dae4"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idx9SmJ3YEQTD67Ejr5xD0KNA"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:12:21.531Z",
+      "uuid": "87440ef3-db13-11ee-8e80-c1472063399a"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxa7_znUX1SnW5181dYBioLw"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:12:16.149Z",
+      "uuid": "840ed484-db13-11ee-849c-030e99e06db7"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxa7_znUX1SnW5181dYBioLw"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:12:12.783Z",
+      "uuid": "820d3887-db13-11ee-9aac-bde5171569b7"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxuCrccqsMQZK1tEVS8mn7Rw"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:12:06.894Z",
+      "uuid": "7e8aa1cc-db13-11ee-8ce5-493d3e5f17d6"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxuCrccqsMQZK1tEVS8mn7Rw"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:12:03.560Z",
+      "uuid": "7c8de699-db13-11ee-9a94-b342bccb63da"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxuCrccqsMQZK1tEVS8mn7Rw"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:12:00.734Z",
+      "uuid": "7adeb033-db13-11ee-b24b-6d537ebcc61a"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxrn8-L4l_SLiHyc_OYBwP8A"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_DENY"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-05T17:11:51.616Z",
+      "uuid": "756f64f2-db13-11ee-af85-f3aa7b184f13"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxrn8-L4l_SLiHyc_OYBwP8A"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-05T17:11:44.502Z",
+      "uuid": "7131e208-db13-11ee-9083-0ba968dc1b96"
+    }
+  ]
+}
