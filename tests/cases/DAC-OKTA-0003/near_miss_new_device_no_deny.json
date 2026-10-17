@@ -1,0 +1,266 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1621/okta_mismatch/okta_mismatch.log",
+  "modification": "payload session with the deny response removed (new device, push approved)",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "acme@daftpunk.local"
+      },
+      "authenticationContext": {
+        "externalSessionId": "zzxTuSsen_TRk-zzN3ISn3Ozz"
+      },
+      "client": {
+        "ipAddress": "118.99.201.94"
+      },
+      "debugContext": {
+        "debugData": {
+          "factor": "OKTA_VERIFY_PUSH",
+          "pushOnlyResponseType": "OV_RESPONSE_APPROVE"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-11-18T22:34:58.324Z",
+      "uuid": "5763c615-a5fd-11ef-9503-5b333daffabe"
+    },
+    {
+      "actor": {
+        "alternateId": "acme@acme.local"
+      },
+      "authenticationContext": {
+        "externalSessionId": "zzxTuSsen_TRk-zzN3ISn3Ozz"
+      },
+      "client": {
+        "ipAddress": "49.208.55.61"
+      },
+      "debugContext": {
+        "debugData": {
+          "behaviors": "{New Geo-Location=POSITIVE, New Device=POSITIVE, New IP=POSITIVE, New State=POSITIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}"
+        }
+      },
+      "displayMessage": "A push was sent to a user for verification",
+      "eventType": "system.push.send_factor_verify_push",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-11-18T22:34:55.603Z",
+      "uuid": "55c49482-a5fd-11ef-b5fc-ebe43e59e1ea"
+    },
+    {
+      "actor": {
+        "alternateId": "acme@acme.local"
+      },
+      "authenticationContext": {
+        "externalSessionId": "zzxTuSsen_TRk-zzN3ISn3Ozz"
+      },
+      "client": {
+        "ipAddress": "49.208.55.61"
+      },
+      "debugContext": {
+        "debugData": {
+          "behaviors": "{New Geo-Location=POSITIVE, New Device=POSITIVE, New IP=POSITIVE, New State=POSITIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}"
+        }
+      },
+      "displayMessage": "A push was sent to a user for verification",
+      "eventType": "system.push.send_factor_verify_push",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-11-18T22:34:55.590Z",
+      "uuid": "55c298af-a5fd-11ef-b5fc-ebe43e59e1ea"
+    },
+    {
+      "actor": {
+        "alternateId": "acme@acme.local"
+      },
+      "authenticationContext": {
+        "externalSessionId": "zzxTuSsen_TRk-zzN3ISn3Ozz"
+      },
+      "client": {
+        "ipAddress": "49.208.55.61"
+      },
+      "debugContext": {
+        "debugData": {
+          "behaviors": "{New Geo-Location=POSITIVE, New Device=POSITIVE, New IP=POSITIVE, New State=POSITIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-11-18T22:34:50.926Z",
+      "uuid": "52faed29-a5fd-11ef-805f-11829f439539"
+    },
+    {
+      "actor": {
+        "alternateId": "acme@acme.local"
+      },
+      "authenticationContext": {
+        "externalSessionId": "zzxTuSsen_TRk-zzN3ISn3Ozz"
+      },
+      "client": {
+        "ipAddress": "49.208.55.61"
+      },
+      "debugContext": {
+        "debugData": {
+          "behaviors": "{New Geo-Location=POSITIVE, New Device=POSITIVE, New IP=POSITIVE, New State=POSITIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}"
+        }
+      },
+      "displayMessage": "A push was sent to a user for verification",
+      "eventType": "system.push.send_factor_verify_push",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-11-18T22:34:46.458Z",
+      "uuid": "505129bf-a5fd-11ef-8f35-5578bd03893a"
+    },
+    {
+      "actor": {
+        "alternateId": "acme@acme.local"
+      },
+      "authenticationContext": {
+        "externalSessionId": "zzxTuSsen_TRk-zzN3ISn3Ozz"
+      },
+      "client": {
+        "ipAddress": "49.208.55.61"
+      },
+      "debugContext": {
+        "debugData": {
+          "behaviors": "{New Geo-Location=POSITIVE, New Device=POSITIVE, New IP=POSITIVE, New State=POSITIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}"
+        }
+      },
+      "displayMessage": "A push was sent to a user for verification",
+      "eventType": "system.push.send_factor_verify_push",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-11-18T22:34:46.398Z",
+      "uuid": "504801fe-a5fd-11ef-8f35-5578bd03893a"
+    },
+    {
+      "actor": {
+        "alternateId": "acme@acme.local"
+      },
+      "authenticationContext": {
+        "externalSessionId": "zzxTuSsen_TRk-zzN3ISn3Ozz"
+      },
+      "client": {
+        "ipAddress": "49.208.55.61"
+      },
+      "debugContext": {
+        "debugData": {
+          "behaviors": "{New Geo-Location=POSITIVE, New Device=POSITIVE, New IP=POSITIVE, New State=POSITIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}"
+        }
+      },
+      "displayMessage": "User login to Okta",
+      "eventType": "user.session.start",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-11-18T22:34:31.709Z",
+      "uuid": "4786a4ef-a5fd-11ef-9bf2-477c6c2dd8de"
+    },
+    {
+      "actor": {
+        "alternateId": "acme@acme.local"
+      },
+      "authenticationContext": {
+        "externalSessionId": "zzxTuSsen_TRk-zzN3ISn3Ozz"
+      },
+      "client": {
+        "ipAddress": "49.208.55.61"
+      },
+      "debugContext": {
+        "debugData": {
+          "behaviors": "{New Geo-Location=POSITIVE, New Device=POSITIVE, New IP=POSITIVE, New State=POSITIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}",
+          "factor": "PASSWORD_AS_FACTOR"
+        }
+      },
+      "displayMessage": "Authentication of user via MFA",
+      "eventType": "user.authentication.auth_via_mfa",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-11-18T22:34:31.692Z",
+      "uuid": "47840cde-a5fd-11ef-9bf2-477c6c2dd8de"
+    },
+    {
+      "actor": {
+        "alternateId": "acme@acme.local"
+      },
+      "authenticationContext": {
+        "externalSessionId": "zzxTuSsen_TRk-zzN3ISn3Ozz"
+      },
+      "client": {
+        "ipAddress": "49.208.55.61"
+      },
+      "debugContext": {
+        "debugData": {
+          "behaviors": "{New Geo-Location=POSITIVE, New Device=POSITIVE, New IP=POSITIVE, New State=POSITIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}"
+        }
+      },
+      "displayMessage": "Max sign in attempts exceeded",
+      "eventType": "user.account.lock",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-11-18T22:34:31.656Z",
+      "uuid": "477e8e9d-a5fd-11ef-9bf2-477c6c2dd8de"
+    },
+    {
+      "actor": {
+        "alternateId": "acme@acme.local"
+      },
+      "authenticationContext": {
+        "externalSessionId": "zzxTuSsen_TRk-zzN3ISn3Ozz"
+      },
+      "client": {
+        "ipAddress": "49.208.55.61"
+      },
+      "debugContext": {
+        "debugData": {
+          "behaviors": "{New Geo-Location=POSITIVE, New Device=POSITIVE, New IP=POSITIVE, New State=POSITIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}"
+        }
+      },
+      "displayMessage": "Authenticate user with AD agent",
+      "eventType": "user.authentication.auth_via_AD_agent",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-11-18T22:34:31.474Z",
+      "uuid": "4762c934-a5fd-11ef-9bf2-477c6c2dd8de"
+    },
+    {
+      "actor": {
+        "alternateId": "acme@acme.local"
+      },
+      "authenticationContext": {
+        "externalSessionId": "zzxTuSsen_TRk-zzN3ISn3Ozz"
+      },
+      "client": {
+        "ipAddress": "49.208.55.61"
+      },
+      "debugContext": {
+        "debugData": {
+          "behaviors": "{New Geo-Location=POSITIVE, New Device=POSITIVE, New IP=POSITIVE, New State=POSITIVE, New Country=NEGATIVE, Velocity=NEGATIVE, New City=NEGATIVE}"
+        }
+      },
+      "displayMessage": "Evaluation of sign-on policy",
+      "eventType": "policy.evaluate_sign_on",
+      "outcome": {
+        "result": "CHALLENGE"
+      },
+      "published": "2024-11-18T22:34:01.440Z",
+      "uuid": "357bf601-a5fd-11ef-9bb6-e7c4f146bf86"
+    }
+  ]
+}
