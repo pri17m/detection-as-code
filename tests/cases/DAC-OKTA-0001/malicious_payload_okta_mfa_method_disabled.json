@@ -1,0 +1,125 @@
+{
+  "label": "malicious",
+  "synthetic": false,
+  "source": "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1556.006/okta_mfa_method_disabled/okta_mfa_method_disabled.log",
+  "source_commit_note": "attack_data master, downloaded 2026-10-17",
+  "source_lines": [
+    1,
+    2,
+    3
+  ],
+  "modifications": [
+    "trimmed to required_fields plus published/uuid/eventType/displayMessage",
+    "gmail.com / mail.com addresses pseudonymised to user<hash>@example.com"
+  ],
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": true,
+  "local_standin_match_rows": 1,
+  "local_standin_rows": [
+    {
+      "actor_id": "00ufb5gta21oowKfZ5d7",
+      "actor": "user15@splunkresearch.com",
+      "target_user_id": "00uffks4r9kkYNxpj5d7",
+      "other_user": 1,
+      "factors_reset": 3,
+      "factor": [
+        "OKTA_SOFT_TOKEN",
+        "OKTA_VERIFY_PUSH",
+        "SIGNED_NONCE"
+      ]
+    }
+  ],
+  "result": "not run by CI (no Splunk runner); local Python stand-in matched, see REVIEW.md",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com",
+        "id": "00ufb5gta21oowKfZ5d7"
+      },
+      "authenticationContext": {
+        "externalSessionId": "102xP96gJgFT32rsDF3o7IHRg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Reset factor for user",
+      "eventType": "user.mfa.factor.deactivate",
+      "outcome": {
+        "reason": "User reset OKTA_VERIFY_PUSH factor",
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-11T16:28:18.167Z",
+      "target": [
+        {
+          "alternateId": "user15o@splunkresearch.com",
+          "id": "00uffks4r9kkYNxpj5d7",
+          "type": "User"
+        }
+      ],
+      "transaction": {
+        "id": "5e32024c5d1d1ed06a7d7d7bcce98d24"
+      },
+      "uuid": "5e2d38e1-dfc4-11ee-be83-538191b64b24"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com",
+        "id": "00ufb5gta21oowKfZ5d7"
+      },
+      "authenticationContext": {
+        "externalSessionId": "102xP96gJgFT32rsDF3o7IHRg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Reset factor for user",
+      "eventType": "user.mfa.factor.deactivate",
+      "outcome": {
+        "reason": "User reset OKTA_SOFT_TOKEN factor",
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-11T16:28:18.155Z",
+      "target": [
+        {
+          "alternateId": "user15@splunkresearch.com",
+          "id": "00uffks4r9kkYNxpj5d7",
+          "type": "User"
+        }
+      ],
+      "transaction": {
+        "id": "5e32024c5d1d1ed06a7d7d7bcce98d24"
+      },
+      "uuid": "5e2b641e-dfc4-11ee-be83-538191b64b24"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com",
+        "id": "00ufb5gta21oowKfZ5d7"
+      },
+      "authenticationContext": {
+        "externalSessionId": "102xP96gJgFT32rsDF3o7IHRg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Reset factor for user",
+      "eventType": "user.mfa.factor.deactivate",
+      "outcome": {
+        "reason": "User reset SIGNED_NONCE factor",
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-11T16:28:18.144Z",
+      "target": [
+        {
+          "alternateId": "user15o@splunkresearch.com",
+          "id": "00uffks4r9kkYNxpj5d7",
+          "type": "User"
+        }
+      ],
+      "transaction": {
+        "id": "5e32024c5d1d1ed06a7d7d7bcce98d24"
+      },
+      "uuid": "5e29b66b-dfc4-11ee-be83-538191b64b24"
+    }
+  ]
+}

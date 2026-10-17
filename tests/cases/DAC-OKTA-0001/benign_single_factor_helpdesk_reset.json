@@ -1,0 +1,41 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1556.006/okta_mfa_method_disabled/okta_mfa_method_disabled.log",
+  "modification": "payload line event with only one factor reset kept (the other two removed)",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com",
+        "id": "00ufb5gta21oowKfZ5d7"
+      },
+      "authenticationContext": {
+        "externalSessionId": "102xP96gJgFT32rsDF3o7IHRg"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "displayMessage": "Reset factor for user",
+      "eventType": "user.mfa.factor.deactivate",
+      "outcome": {
+        "reason": "User reset OKTA_VERIFY_PUSH factor",
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-11T16:28:18.167Z",
+      "target": [
+        {
+          "alternateId": "user15o@splunkresearch.com",
+          "id": "00uffks4r9kkYNxpj5d7",
+          "type": "User"
+        }
+      ],
+      "transaction": {
+        "id": "5e32024c5d1d1ed06a7d7d7bcce98d24"
+      },
+      "uuid": "5e2d38e1-dfc4-11ee-be83-538191b64b24"
+    }
+  ]
+}

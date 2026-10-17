@@ -1,0 +1,55 @@
+id: DAC-OKTA-0001
+title: 'Okta: two or more MFA factors reset for one user by the same actor'
+description: Detects Okta System Log user.mfa.factor.deactivate events with outcome.result=SUCCESS where one actor resets two or more distinct factors (parsed from outcome.reason "User reset <FACTOR> factor") on the same target user (target{}.id of type User). Stripping every enrolled factor lets an attacker who controls the session or an admin account enrol their own factor. other_user=1 marks an actor resetting someone else's factors. Built only from field paths and values in the Splunk attack_data sample okta_mfa_method_disabled.log. Run over a 60-minute window.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- OktaIM2:log
+mitre:
+  tactics:
+  - defense-impairment
+  - persistence
+  - credential-access
+  techniques:
+  - T1556.006
+severity: high
+false_positives:
+- Help-desk or self-service "reset all factors" for a user who lost their phone. Confirm a ticket and that the actor is a help-desk admin; other_user=0 means the user reset their own factors.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/okta_multi_factor_authentication_disabled.yml
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1556.006/okta_mfa_method_disabled/okta_mfa_method_disabled.log
+- https://developer.okta.com/docs/okta-event-types.csv
+- https://developer.okta.com/docs/reference/system-log-query/
+- https://splunk.github.io/splunk-add-on-for-okta-identity-cloud/Sourcetypes/
+- 'Attribution: splunk/security_content and splunk/attack_data (Apache-2.0), see THIRD_PARTY_NOTICES.md'
+telemetry_validated: false
+required_fields:
+- eventType
+- outcome.result
+- outcome.reason
+- actor.id
+- actor.alternateId
+- target{}.id
+- target{}.type
+- target{}.alternateId
+- client.ipAddress
+- authenticationContext.externalSessionId
+- transaction.id
+tags:
+- okta
+- mfa
+- okta-system-log
+- attack-data-payload
+query:
+  splunk: |
+    sourcetype="OktaIM2:log" eventType="user.mfa.factor.deactivate" outcome.result="SUCCESS"
+    | eval actor_id='actor.id', actor='actor.alternateId', src_ip='client.ipAddress', session='authenticationContext.externalSessionId', txn='transaction.id'
+    | eval target_user_id=mvindex('target{}.id', mvfind('target{}.type', "^User$"))
+    | rex field=outcome.reason "^User reset (?<factor>\S+) factor$"
+    | eval factor=coalesce(factor, 'outcome.reason')
+    | eval other_user=if(isnotnull(target_user_id) AND actor_id!=target_user_id, 1, 0)
+    | fillnull value="unknown" target_user_id
+    | stats min(_time) as firstTime max(_time) as lastTime dc(factor) as factors_reset values(factor) as factor values(target{}.alternateId) as target_login values(src_ip) as src_ip values(session) as session values(txn) as txn by actor_id actor target_user_id other_user
+    | where factors_reset>=2
