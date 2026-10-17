@@ -1,0 +1,12 @@
+{
+  "label": "known-gap",
+  "variant": "reg import root.reg (content not on command line)",
+  "source": "Sigma/Elastic registry rules",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "note": "expected to be MISSED by this rule; see REVIEW.md",
+  "ImageFileName": "C:\\Windows\\System32\\reg.exe",
+  "CommandLine": "reg import C:\\Users\\Public\\r.reg",
+  "ParentBaseFileName": "cmd.exe"
+}

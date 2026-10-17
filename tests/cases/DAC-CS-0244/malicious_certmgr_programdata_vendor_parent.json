@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "variant": "certmgr copied to ProgramData, sideloaded vendor parent, SYSTEM",
+  "source": "Fielenbach public post",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "C:\\ProgramData\\ContosoAgent\\bin\\x64\\certmgr.exe",
+  "CommandLine": "certmgr.exe -add -c C:\\ProgramData\\ContosoAgent\\upd.cer -s -r localMachine root",
+  "ParentBaseFileName": "ContosoAgentSvc.exe"
+}

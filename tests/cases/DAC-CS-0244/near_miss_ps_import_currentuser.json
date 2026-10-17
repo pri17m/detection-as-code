@@ -1,0 +1,11 @@
+{
+  "label": "near-miss",
+  "variant": "Import-Certificate to Cert:\\CurrentUser\\Root (user scope)",
+  "source": "Atomic Red Team T1553.004",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "CommandLine": "powershell -c Import-Certificate -FilePath ca.cer -CertStoreLocation Cert:\\CurrentUser\\Root",
+  "ParentBaseFileName": "cmd.exe"
+}

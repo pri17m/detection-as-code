@@ -1,0 +1,11 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "synthetic; only 2 baseline gaps (<20)",
+  "sourcetype": "beyondtrust:sra",
+  "host": "bt-lab-09",
+  "baseline_n": 2,
+  "gap_sec": 30000,
+  "expect_alert": false,
+  "result": "not run"
+}

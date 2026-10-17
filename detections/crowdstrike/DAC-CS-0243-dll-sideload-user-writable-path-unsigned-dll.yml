@@ -1,0 +1,92 @@
+id: DAC-CS-0243
+title: "Falcon: executable from a user-writable path loading an unsigned DLL from the same directory"
+description: >-
+  Correlates a ProcessRollup2 host executable running from a user-writable
+  directory (Users\*\AppData|Downloads, ProgramData, Windows\Temp, Users\Public)
+  with an ImageHash module-load of a .dll from the same directory into that
+  process, and requires SignInfoFlags to indicate no signature
+  (SIGNATURE_FLAG_NO_SIGNATURE) or lack of a valid signature flag. No
+  hard-coded vendor executable name list. Based on detections.ai rule
+  https://detections.ai/rules/01a13344-3442-756a-a20a-02d8b048c3f5 by Fatima Suvaid
+  (@arhaminafs). Uses T1574.001 (T1574.002 is revoked in ATT&CK v19.2) and
+  T1036.005. telemetry_validated false; SignInfoFlags on ImageHash unverified —
+  see REVIEW.md.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+- falcon:module
+mitre:
+  tactics:
+  - stealth
+  - execution
+  techniques:
+  - T1574.001
+  - T1036.005
+severity: high
+false_positives:
+- Portable apps (VLC, Notepad++, WinRAR) run from Downloads that load their own unsigned or delay-signed plugins from the same folder; allowlist by aid or SHA256 after measuring noise (not measured).
+- Per-user installs under AppData (Zoom, Teams, OneDrive) loading partner DLLs.
+references:
+- https://detections.ai/rules/01a13344-3442-756a-a20a-02d8b048c3f5
+- https://attack.mitre.org/techniques/T1574/001/
+- https://attack.mitre.org/techniques/T1036/005/
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Decode%20SignInfoFlags.md
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Log-Sources/CrowdStrike/FLTR/crowdstrike-fltrcore/src/dashboards/Search-ByProcessContext.yaml
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- ImageFileName
+- CommandLine
+- TargetProcessId
+- ContextProcessId
+- SignInfoFlags
+tags:
+- behavioural
+- sideload
+- needs-review
+- detections-ai
+query:
+  crowdstrike: |
+    (#event_simpleName=ProcessRollup2 OR #event_simpleName=ImageHash)
+    | event_platform=Win
+    | case {
+        #event_simpleName=ProcessRollup2
+          ImageFileName=/\\(Users\\[^\\]+\\(AppData|Downloads)|ProgramData|Windows\\Temp|Users\\Public)\\/i
+          ImageFileName=/\.exe$/i
+          | Role := "host"
+          | Dir := replace(field=ImageFileName, regex="\\\\[^\\\\]+$", with="")
+          | ProcKey := TargetProcessId
+          | select([aid, ProcKey, ImageFileName, CommandLine, UserName, ComputerName, Dir, Role, @timestamp]) ;
+        #event_simpleName=ImageHash
+          ImageFileName=/\\(Users\\[^\\]+\\(AppData|Downloads)|ProgramData|Windows\\Temp|Users\\Public)\\/i
+          ImageFileName=/\.dll$/i
+          SignInfoFlags=*
+          | bitfield:extractFlags(
+              field=SignInfoFlags,
+              output=[
+                [9, SIGNATURE_FLAG_NO_SIGNATURE],
+                [18, SIGNATURE_FLAG_HAS_VALID_SIGNATURE]
+              ]
+            )
+          | (SIGNATURE_FLAG_NO_SIGNATURE=true OR SIGNATURE_FLAG_HAS_VALID_SIGNATURE!=true)
+          | Role := "dll"
+          | Dir := replace(field=ImageFileName, regex="\\\\[^\\\\]+$", with="")
+          | ProcKey := coalesce([ContextProcessId, TargetProcessId])
+          | DllName := ImageFileName
+          | select([aid, ProcKey, DllName, ImageFileName, Dir, Role, SignInfoFlags, @timestamp])
+      }
+    | groupBy(
+        [aid, ProcKey, Dir],
+        function=[
+          collect([ImageFileName, CommandLine, UserName, ComputerName, DllName, Role, SignInfoFlags]),
+          count(Role, distinct=true, as=RoleCount)
+        ]
+      )
+    | RoleCount >= 2
