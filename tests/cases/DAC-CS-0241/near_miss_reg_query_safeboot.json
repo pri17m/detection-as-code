@@ -1,0 +1,16 @@
+{
+  "label": "near_miss",
+  "source": "Read-only SafeBoot key query followed by reboot",
+  "expect_alert": false,
+  "result": "not run",
+  "event_a": {
+    "event_simpleName": "ProcessRollup2",
+    "FileName": "reg.exe",
+    "CommandLine": "reg query HKLM\\SYSTEM\\CurrentControlSet\\Control\\SafeBoot\\Minimal\\ /s"
+  },
+  "event_b": {
+    "event_simpleName": "ProcessRollup2",
+    "ImageFileName": "C:\\Windows\\System32\\shutdown.exe",
+    "CommandLine": "shutdown /r /t 0"
+  }
+}

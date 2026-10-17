@@ -1,0 +1,11 @@
+{
+  "label": "benign",
+  "source": "Kernel service from System32 (no user path)",
+  "expect_alert": false,
+  "result": "not run",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Win",
+  "ImageFileName": "C:\\Windows\\System32\\sc.exe",
+  "CommandLine": "sc create NetBt type= kernel binPath= C:\\Windows\\System32\\drivers\\netbt.sys",
+  "ParentBaseFileName": "services.exe"
+}

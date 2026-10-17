@@ -1,0 +1,9 @@
+{
+  "label": "near-miss",
+  "source": "Known BYOVD basename but System32 path \u2014 must not alert after ponytail fix",
+  "expect_alert": false,
+  "result": "not run",
+  "event_simpleName": "DriverLoad",
+  "event_platform": "Win",
+  "ImageFileName": "C:\\Windows\\System32\\drivers\\truesight.sys"
+}

@@ -1,0 +1,16 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "BeyondTrust Message format example: old_ snapshot only",
+  "sourcetype": "beyondtrust:sra",
+  "event": "user_changed",
+  "who": "Admin(admin) using password",
+  "who_ip": "10.0.0.5",
+  "site": "support.example.com",
+  "old_username": "jsmith",
+  "old_permissions:admin": "1",
+  "old_display_name": "John Smith",
+  "new_display_name": "John D. Smith",
+  "expect_alert": false,
+  "result": "not run"
+}

@@ -1,0 +1,10 @@
+{
+  "label": "benign",
+  "source": "Only IMDS \u2014 below threshold",
+  "expect_alert": false,
+  "result": "not run",
+  "InitiatingProcessFileName": "node.exe",
+  "endpoints": [
+    "IMDS"
+  ]
+}

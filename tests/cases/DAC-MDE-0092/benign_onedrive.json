@@ -1,0 +1,12 @@
+{
+  "label": "benign",
+  "source": "OneDrive from Program Files",
+  "expect_alert": false,
+  "result": "not run",
+  "RegistryKey": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\SyncRootManager\\OneDrive!S-1-5-21!acct",
+  "ActionType": "RegistryValueSet",
+  "InitiatingProcessFileName": "OneDrive.exe",
+  "InitiatingProcessFolderPath": "C:\\Program Files\\Microsoft OneDrive\\\\",
+  "IsSigned": true,
+  "Signer": "Microsoft Corporation"
+}
