@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "BeyondTrust syslog_server_changed",
+  "sourcetype": "beyondtrust:sra",
+  "event": "syslog_server_changed",
+  "who": "Admin(admin) using password",
+  "who_ip": "203.0.113.50",
+  "site": "support.example.com",
+  "syslog_servers": "192.0.2.9",
+  "expect_alert": true,
+  "result": "not run"
+}

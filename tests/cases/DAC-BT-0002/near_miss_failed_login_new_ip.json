@@ -1,0 +1,15 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "status=failure",
+  "sourcetype": "beyondtrust:sra",
+  "event": "login",
+  "status": "failure",
+  "reason": "failed",
+  "target": "web/login",
+  "who": "Administrator(admin) using password",
+  "who_ip": "198.51.100.77",
+  "site": "support.example.com",
+  "expect_alert": false,
+  "result": "not run"
+}
