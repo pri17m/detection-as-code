@@ -1,5 +1,6 @@
 {
   "label": "malicious",
+  "synthetic": true,
   "source": "Mandiant blog Fig.6",
   "sourcetype": "beyondtrust:sra",
   "event": "login",

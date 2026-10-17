@@ -1,5 +1,6 @@
 {
   "label": "near_miss",
+  "synthetic": true,
   "source": "status=failure",
   "sourcetype": "beyondtrust:sra",
   "event": "login",

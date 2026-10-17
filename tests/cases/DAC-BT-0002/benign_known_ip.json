@@ -1,5 +1,6 @@
 {
   "label": "benign",
+  "synthetic": true,
   "source": "baseline",
   "sourcetype": "beyondtrust:sra",
   "event": "login",
