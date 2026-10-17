@@ -1,0 +1,19 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "synthetic; who format per BeyondTrust Message format; display name contains parentheses",
+  "sourcetype": "beyondtrust:sra",
+  "event": "login",
+  "status": "success",
+  "target": "web/appliance",
+  "who": "Jane Doe (Contractor)(jdoe) using password",
+  "who_ip": "203.0.113.50",
+  "site": "support.example.com",
+  "history": "jdoe seen from 10.1.2.0/24 for 30d; 203.0.113.0/24 first seen today",
+  "expect_alert": true,
+  "expect_fields": {
+    "actor": "jdoe",
+    "src_net": "203.0.113.0/24"
+  },
+  "result": "not run"
+}
