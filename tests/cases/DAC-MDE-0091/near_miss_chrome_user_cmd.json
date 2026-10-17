@@ -1,0 +1,9 @@
+{
+  "label": "near-miss",
+  "source": "Chrome spawns cmd as user, not SYSTEM",
+  "expect_alert": false,
+  "result": "not run",
+  "InitiatingProcessFileName": "chrome.exe",
+  "AccountName": "alice",
+  "FileName": "cmd.exe"
+}
