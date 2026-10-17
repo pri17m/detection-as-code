@@ -1,0 +1,9 @@
+{
+  "label": "near-miss",
+  "source": "Routine reboot only",
+  "expect_alert": false,
+  "result": "not run",
+  "event_simpleName": "ProcessRollup2",
+  "ImageFileName": "C:\\Windows\\System32\\shutdown.exe",
+  "CommandLine": "shutdown /r /t 0"
+}
