@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "variant": "reg import of a Blob",
+  "source": "Sigma/Elastic registry rules",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ActionType": "RegistryValueSet",
+  "RegistryKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567",
+  "RegistryValueName": "Blob",
+  "InitiatingProcessFileName": "reg.exe",
+  "InitiatingProcessFolderPath": "C:\\Windows\\System32\\reg.exe"
+}

@@ -1,0 +1,12 @@
+{
+  "label": "known-gap",
+  "variant": "rundll32 cryptext.dll,CryptExtAddCER (UI wizard)",
+  "source": "LOLBAS-style shell handler for .cer",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "note": "expected to be MISSED by this rule; see REVIEW.md",
+  "ImageFileName": "C:\\Windows\\System32\\rundll32.exe",
+  "CommandLine": "rundll32.exe cryptext.dll,CryptExtAddCER C:\\Users\\Public\\ca.cer",
+  "ParentBaseFileName": "explorer.exe"
+}

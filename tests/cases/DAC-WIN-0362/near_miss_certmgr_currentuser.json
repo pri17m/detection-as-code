@@ -1,0 +1,12 @@
+{
+  "label": "near-miss",
+  "variant": "certmgr -r currentUser root",
+  "source": "Microsoft certmgr docs",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "Image": "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.22621.0\\x64\\certmgr.exe",
+  "OriginalFileName": "CertMgr.Exe",
+  "CommandLine": "certmgr.exe -add -c test.cer -s -r currentUser root",
+  "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+}

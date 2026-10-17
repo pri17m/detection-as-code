@@ -1,0 +1,90 @@
+id: DAC-CS-0244
+title: "Falcon: root CA added to the machine Root store with certutil -addstore or certmgr -add localMachine"
+description: >-
+  Detects a process command line that adds a certificate to the machine-scope Root (or AuthRoot) store using
+  certutil-style syntax (-addstore [-f] [-enterprise] root, not -user) or certmgr-style syntax
+  (-add <file> [-c] [-s] -r localMachine root). Matching is on the arguments, not the image name, so
+  renamed or copied certutil/certmgr binaries still match (ProcessRollup2 carries no OriginalFilename in
+  the public field references). Escalates to high when the image is not certutil.exe in System32/SysWOW64
+  or certmgr.exe under Windows Kits, or the parent is not cmd/powershell/pwsh/msiexec/ccmexec/explorer.
+  telemetry_validated false; not run in a tenant.
+  Hardened: also covers -importpfx root, PowerShell cert-provider writes (Import-Certificate,
+  Move-Item/Copy-Item to Cert:\LocalMachine\Root), X509Store('Root','LocalMachine').Add(), and reg add of a Root
+  Blob; normalises Unicode dashes, quotes and carets before matching. See REVIEW.md variant matrix.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- "falcon:process"
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1553.004
+severity: medium
+false_positives:
+- "IT or helpdesk installing a corporate or proxy root CA by hand with certutil -addstore root from an admin shell (alerts at medium; allowlist by host group or ticketed change window after measuring - not measured)."
+- "Software installers and agents that ship their own certmgr.exe or certutil wrapper (Elastic's published rule allowlists ?:\\ProgramData\\Logishrd\\LogiOptionsPlus\\Plugins\\64\\certmgr.exe); these alert at high because the path is unexpected - allowlist by SHA256 plus path, never by name."
+- "Developer machines using Windows SDK certmgr.exe from Windows Kits for test certificates."
+references:
+- https://attack.mitre.org/techniques/T1553/004/
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certutil_certificate_installation.yml
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certmgr_certificate_installation.yml
+- https://github.com/splunk/security_content/blob/develop/detections/endpoint/windows_certutil_root_certificate_addition.yml
+- https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certutil
+- https://learn.microsoft.com/en-us/windows/win32/seccrypto/certmgr-exe
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1553.004/T1553.004.md
+- https://learn.microsoft.com/en-us/powershell/module/pki/import-certificate
+- https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509store
+telemetry_validated: false
+required_fields:
+- "#event_simpleName"
+- "event_platform"
+- "aid"
+- "ComputerName"
+- "UserName"
+- "UserSid"
+- "ImageFileName"
+- "CommandLine"
+- "ParentBaseFileName"
+- "SHA256HashData"
+tags:
+- behavioural
+- root-ca
+- process-creation
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Win
+    | Cmd := lower(CommandLine)
+    | Cmd := replace(field=Cmd, regex="[‐‑‒–—―−]", with="-")
+    | Cmd := replace(field=Cmd, regex="[\^\"']", with="")
+    | case {
+        Cmd=/[-\/](addstore|importpfx)\b/ Cmd!=/\s[-\/]user\b/ Cmd=/(^|\s)(auth)?root(\s|$)/
+          | Tool := "certutil-style" ;
+        Cmd=/[-\/]add\b/ Cmd=/[-\/]r\s+localmachine\b/ Cmd=/(^|\s)(auth)?root(\s|$)/
+          | Tool := "certmgr-style" ;
+        Cmd=/cert:\\localmachine\\(auth)?root\b/ Cmd=/(import-(pfx)?certificate|(^|[^a-z])(move|copy)-item|\bmove\b|\bmi\b|\bcopy\b|\bcpi\b|\.add\()/
+          | Tool := "powershell-certprovider" ;
+        Cmd=/x509store/ Cmd=/localmachine/ Cmd=/\b(auth)?root\b/ Cmd=/\.add\(/
+          | Tool := "powershell-x509store" ;
+        Cmd=/\breg(\.exe)?\s+add\b/ Cmd=/(hklm|hkey_local_machine)\\software\\(policies\\)?microsoft\\(systemcertificates|enterprisecertificates)\\(auth)?root\\certificates/
+          | Tool := "reg-add" ;
+      }
+    | case {
+        ImageFileName=/\\Windows\\(System32|SysWOW64)\\(certutil|reg)\.exe$/i | PathFlag := "expected" ;
+        ImageFileName=/\\Windows\\(System32|SysWOW64)\\WindowsPowerShell\\v1\.0\\powershell\.exe$/i | PathFlag := "expected" ;
+        ImageFileName=/\\Program Files\\PowerShell\\[0-9]+\\pwsh\.exe$/i | PathFlag := "expected" ;
+        ImageFileName=/\\Windows Kits\\[^"]*\\certmgr\.exe$/i | PathFlag := "expected" ;
+        * | PathFlag := "unexpected_path_or_name" ;
+      }
+    | case {
+        ParentBaseFileName=/^(cmd|powershell|pwsh|msiexec|ccmexec|explorer)\.exe$/i | ParentFlag := "expected" ;
+        * | ParentFlag := "unexpected_parent" ;
+      }
+    | case {
+        PathFlag="unexpected_path_or_name" | Severity := "high" ;
+        ParentFlag="unexpected_parent" | Severity := "high" ;
+        * | Severity := "medium" ;
+      }
+    | table([@timestamp, aid, ComputerName, UserName, UserSid, Tool, Severity, PathFlag, ParentFlag, ImageFileName, CommandLine, ParentBaseFileName, SHA256HashData])

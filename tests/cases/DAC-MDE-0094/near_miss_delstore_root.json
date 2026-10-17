@@ -1,0 +1,13 @@
+{
+  "label": "near-miss",
+  "variant": "certutil -delstore root",
+  "source": "Microsoft certutil docs",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "FileName": "certutil.exe",
+  "FolderPath": "C:\\Windows\\System32\\certutil.exe",
+  "ProcessVersionInfoOriginalFileName": "CertUtil.exe",
+  "ProcessCommandLine": "certutil -delstore root 0123456789ABCDEF0123456789ABCDEF01234567",
+  "InitiatingProcessFileName": "cmd.exe"
+}

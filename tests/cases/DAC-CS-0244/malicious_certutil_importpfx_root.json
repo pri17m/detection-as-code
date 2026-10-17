@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "variant": "certutil -importpfx root",
+  "source": "Microsoft certutil docs",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "C:\\Windows\\System32\\certutil.exe",
+  "CommandLine": "certutil -f -p x -importpfx root C:\\Users\\Public\\a.pfx",
+  "ParentBaseFileName": "cmd.exe"
+}

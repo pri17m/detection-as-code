@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "variant": "caret left in child command line",
+  "source": "Common command-line obfuscation (dash/quote/caret); Sigma |windash modifier",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "Image": "C:\\Windows\\System32\\certutil.exe",
+  "OriginalFileName": "CertUtil.exe",
+  "CommandLine": "certutil -add^store ro^ot ca.cer",
+  "ParentImage": "C:\\Windows\\System32\\powershell.exe"
+}

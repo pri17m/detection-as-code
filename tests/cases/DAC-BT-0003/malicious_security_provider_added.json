@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "BeyondTrust security_provider_added",
+  "sourcetype": "beyondtrust:sra",
+  "event": "security_provider_added",
+  "who": "Admin(admin) using password",
+  "who_ip": "203.0.113.50",
+  "site": "support.example.com",
+  "expect_alert": true,
+  "result": "not run"
+}

@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "variant": "renamed certutil (OriginalFileName CertUtil.exe)",
+  "source": "Splunk/Sigma OriginalFileName pattern",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "C:\\Users\\Public\\svc.exe",
+  "CommandLine": "svc.exe -addstore -f root C:\\Users\\Public\\ca.cer",
+  "ParentBaseFileName": "rundll32.exe"
+}

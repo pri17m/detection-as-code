@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "variant": "certutil from a service (services.exe child)",
+  "source": "ATT&CK T1543.003 context",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "C:\\Windows\\System32\\certutil.exe",
+  "CommandLine": "certutil -addstore root C:\\Windows\\Temp\\ca.cer",
+  "ParentBaseFileName": "services.exe"
+}

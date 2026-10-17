@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "variant": "Certificates MMC snap-in import",
+  "source": "Microsoft certificate MMC docs",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ActionType": "RegistryValueSet",
+  "RegistryKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567",
+  "RegistryValueName": "Blob",
+  "InitiatingProcessFileName": "mmc.exe",
+  "InitiatingProcessFolderPath": "C:\\Windows\\System32\\mmc.exe"
+}
