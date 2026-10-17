@@ -1,0 +1,10 @@
+{
+  "label": "malicious",
+  "variant": "script decoded from -enc (4104 logs decoded text)",
+  "source": "Microsoft about_Logging docs",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 4104,
+  "ScriptBlockText": "Import-Certificate -FilePath $env:TEMP\\u.cer -CertStoreLocation Cert:\\LocalMachine\\AuthRoot"
+}

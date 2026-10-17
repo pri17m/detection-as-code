@@ -1,0 +1,10 @@
+{
+  "label": "near-miss",
+  "variant": "Remove-Item from Cert:\\LocalMachine\\Root",
+  "source": "Atomic Red Team T1553.004 cleanup",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 4104,
+  "ScriptBlockText": "Get-ChildItem Cert:\\LocalMachine\\Root\\0123456789ABCDEF0123456789ABCDEF01234567 | Remove-Item"
+}

@@ -1,0 +1,10 @@
+{
+  "label": "malicious",
+  "variant": "Import-Certificate ... Cert:\\LocalMachine\\Root",
+  "source": "SigmaHQ posh_ps_root_certificate_installed",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 4104,
+  "ScriptBlockText": "Import-Certificate -FilePath C:\\t\\ca.cer -CertStoreLocation Cert:\\LocalMachine\\Root"
+}

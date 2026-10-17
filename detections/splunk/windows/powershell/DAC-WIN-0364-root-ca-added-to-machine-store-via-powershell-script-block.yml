@@ -1,0 +1,58 @@
+id: DAC-WIN-0364
+title: "Root CA added to the machine Root store via PowerShell (script block 4104)"
+description: >-
+  PowerShell Operational Event ID 4104 script block text that writes a certificate to the machine Root or
+  AuthRoot store: Import-Certificate / Import-PfxCertificate / Move-Item / Copy-Item targeting
+  Cert:\LocalMachine\Root, X509Store('Root','LocalMachine').Add(), or P/Invoke of crypt32
+  CertAddEncodedCertificateToStore / CertAddCertificateContextToStore with a LocalMachine store flag.
+  Catches script files and -EncodedCommand payloads that process-creation rules cannot see. Read-only
+  (Get-ChildItem) and CurrentUser variants are excluded. Requires Script Block Logging. telemetry_validated false.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- "XmlWinEventLog:Microsoft-Windows-PowerShell/Operational"
+- "WinEventLog:Microsoft-Windows-PowerShell/Operational"
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1553.004
+severity: medium
+false_positives:
+- "Admin or deployment scripts that install a corporate root via Import-Certificate; allowlist by script Path or signer after measuring (not measured)."
+- "Configuration management (DSC, Ansible win_certificate_store) that uses X509Store to install roots."
+references:
+- https://attack.mitre.org/techniques/T1553/004/
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/powershell/powershell_script/posh_ps_root_certificate_installed.yml
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1553.004/T1553.004.md
+- https://learn.microsoft.com/en-us/powershell/module/pki/import-certificate
+- https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509store
+- https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logging_windows
+telemetry_validated: false
+required_fields:
+- "_time"
+- "host"
+- "EventCode"
+- "ScriptBlockText"
+- "ScriptBlockId"
+- "Path"
+- "UserID"
+- "Computer"
+tags:
+- behavioural
+- root-ca
+- powershell
+- windows_powershell
+query:
+  splunk: |
+    (sourcetype="XmlWinEventLog:Microsoft-Windows-PowerShell/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-PowerShell/Operational") (EventCode=4104 OR EventID=4104)
+    | eval EventCode=coalesce(EventCode, EventID)
+    | eval sb=lower(ScriptBlockText)
+    | eval variant=case(
+        match(sb, "cert:\\\\localmachine\\\\(auth)?root\b") AND match(sb, "(import-(pfx)?certificate|(^|[^a-z])(move|copy)-item|\bmove\b|\bmi\b|\bcopy\b|\bcpi\b|\.add\()"), "cert-provider",
+        match(sb, "x509store") AND match(sb, "localmachine") AND match(sb, "\b(auth)?root\b") AND match(sb, "\.add\("), "x509store-add",
+        match(sb, "certadd(encoded)?certificate(context)?tostore") AND match(sb, "\b(auth)?root\b") AND match(sb, "local_?machine|0x0*20000|131072"), "crypt32-pinvoke")
+    | where isnotnull(variant)
+    | table _time host UserID Computer variant ScriptBlockId Path ScriptBlockText

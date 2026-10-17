@@ -1,0 +1,10 @@
+{
+  "label": "known-gap",
+  "variant": "store path built by string concatenation",
+  "source": "Common command-line obfuscation (dash/quote/caret); Sigma |windash modifier",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 4104,
+  "ScriptBlockText": "$p='Cert:\\Local'+'Machine\\Ro'+'ot'; Import-Certificate -FilePath x.cer -CertStoreLocation $p"
+}
