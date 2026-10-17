@@ -1,0 +1,78 @@
+id: DAC-CS-0240
+title: "Falcon: BYOVD-style kernel driver load or sc.exe kernel service from a user-writable path"
+description: >-
+  Detects Bring-Your-Own-Vulnerable-Driver staging used to kill EDR: (A) sc.exe
+  creating a type=kernel service whose binPath is under Temp, ProgramData,
+  Users\Public or Downloads; (B) a DriverLoad whose ImageFileName is under those
+  same user-writable paths; (C) sc.exe create/config/start naming a publicly
+  reported abused driver basename (truesight, procexp152, zemana, and similar)
+  with a user-writable path still required so a rename alone is not enough.
+  Based on detections.ai rule https://detections.ai/rules/01a13344-27be-72b1-ba24-630ada1d8f86
+  by Fatima Suvaid (@arhaminafs). telemetry_validated false; not run in a tenant.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- falcon:process
+- falcon:driver
+mitre:
+  tactics:
+  - privilege-escalation
+  - defense-impairment
+  - persistence
+  techniques:
+  - T1068
+  - T1685
+  - T1543.003
+severity: high
+false_positives:
+- Admins running Process Explorer, ThrottleStop or similar tools that load a driver from Downloads or Temp; allowlist by SHA256 or aid.
+- Vendor installers that stage a signed driver under ProgramData or Temp before moving it; tighten to unsigned-only once SignInfoFlags on DriverLoad is confirmed in-tenant.
+references:
+- https://detections.ai/rules/01a13344-27be-72b1-ba24-630ada1d8f86
+- https://attack.mitre.org/techniques/T1068/
+- https://attack.mitre.org/techniques/T1685/
+- https://attack.mitre.org/techniques/T1543/003/
+- https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Enumerate%20Windows%20Driver%20Loads.md
+- https://www.loldrivers.io/
+telemetry_validated: false
+required_fields:
+- '#event_simpleName'
+- event_platform
+- aid
+- ComputerName
+- UserName
+- ImageFileName
+- FilePath
+- CommandLine
+- ParentBaseFileName
+tags:
+- behavioural
+- byovd
+- needs-review
+- detections-ai
+query:
+  crowdstrike: |
+    #event_simpleName=/^(ProcessRollup2|DriverLoad)$/ event_platform=Win
+    | case {
+        #event_simpleName=ProcessRollup2
+          ImageFileName=/\\sc\.exe$/i
+          CommandLine=/\bcreate\b/i
+          CommandLine=/type\s*=\s*kernel/i
+          CommandLine=/(\\Temp\\|\\ProgramData\\|\\Users\\Public\\|\\Downloads\\)/i
+          | detection := "KernelServiceUserPath" ;
+        #event_simpleName=DriverLoad
+          | DrvPath := coalesce([ImageFileName, FilePath])
+          | DrvPath=/(\\Temp\\|\\ProgramData\\|\\Users\\Public\\|\\Downloads\\)/i
+          | detection := "DriverLoadUserPath" ;
+        #event_simpleName=ProcessRollup2
+          ImageFileName=/\\sc\.exe$/i
+          CommandLine=/\b(create|config|start)\b/i
+          CommandLine=/(truesight|procexp152|zemana|blacksnufflesdriver|throttlestop|rentdrv|aukill|edrkillshifter|terminator)/i
+          CommandLine=/(\\Temp\\|\\ProgramData\\|\\Users\\Public\\|\\Downloads\\)/i
+          | detection := "KnownBYOVDServiceCmdUserPath" ;
+        * | detection := ""
+      }
+    | detection != ""
+    | groupBy([aid, ComputerName, UserName, #event_simpleName, detection, ImageFileName, FilePath, CommandLine, ParentBaseFileName], function=count())
