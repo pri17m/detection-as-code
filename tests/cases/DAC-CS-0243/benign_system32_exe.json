@@ -1,0 +1,8 @@
+{
+  "label": "benign",
+  "source": "exe from System32 \u2014 outside user-writable path filter",
+  "expect_alert": false,
+  "result": "not run",
+  "host_ImageFileName": "C:\\Windows\\System32\\notepad.exe",
+  "dll_ImageFileName": "C:\\Windows\\System32\\foo.dll"
+}
