@@ -1,13 +1,13 @@
 {
   "summary": {
-    "detections_total": 882,
-    "detections_with_mitre": 882,
+    "detections_total": 883,
+    "detections_with_mitre": 883,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 213,
     "platform_counts": {
       "crowdstrike": 166,
       "defender": 78,
-      "splunk": 638
+      "splunk": 639
     }
   },
   "techniques": {
@@ -669,7 +669,8 @@
     "T1098.005": [
       "DAC-ENTRA-0029",
       "DAC-ENTRA-0030",
-      "DAC-MDE-0084"
+      "DAC-MDE-0084",
+      "DAC-OKTA-0011"
     ],
     "T1098.007": [
       "DAC-CS-0204"

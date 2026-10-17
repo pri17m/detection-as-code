@@ -1,0 +1,68 @@
+id: DAC-OKTA-0011
+title: 'Okta: new unmanaged Okta Verify device enrolled on an account'
+description: 'Detects successful Okta System Log device.enrollment.create events ("Enroll new device") and returns one row per actor and enrolled device, taken from the target element whose type is UDDevice. Okta documents this event as a new device registered for Okta Verify. An attacker who has a user''s password or session can enrol their own phone as an Okta Verify authenticator and then approve their own push challenges (T1098.005 Device Registration). Devices whose target detailEntry.managed is not "false" are dropped, so MDM-managed corporate enrolments do not alert. Triage columns: devices_enrolled_by_actor / multi_device=1 when one actor enrols two or more devices in the search window, and via_proxy=1 when securityContext.isProxy is not "false"; rows are sorted with those first. Built only from field paths and values in the Splunk attack_data sample okta_new_device_enrolled.log. Run hourly over the last 24 hours and throttle on device_id.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- OktaIM2:log
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1098.005
+severity: medium
+false_positives:
+- A user replacing or adding a personal (BYOD, unmanaged) phone for Okta Verify. Confirm with the user out of band (not via the new device), check that the enrolment followed a normal sign-in from their usual IP/ASN, and look for a help-desk ticket. Expect roughly one alert per unmanaged phone change per user.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/okta_new_device_enrolled_on_account.yml
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1098.005/okta_new_device_enrolled/okta_new_device_enrolled.log
+- https://developer.okta.com/docs/okta-event-types.csv
+- https://developer.okta.com/docs/reference/system-log-query/
+- https://splunk.github.io/splunk-add-on-for-okta-identity-cloud/Sourcetypes/
+- 'Attribution: splunk/security_content and splunk/attack_data (Apache-2.0), see THIRD_PARTY_NOTICES.md'
+telemetry_validated: false
+required_fields:
+- eventType
+- outcome.result
+- actor.id
+- actor.alternateId
+- target{}.id
+- target{}.type
+- target{}.displayName
+- target{}.detailEntry.managed
+- target{}.detailEntry.osPlatform
+- target{}.detailEntry.deviceStatus
+- client.ipAddress
+- client.geographicalContext.country
+- securityContext.asOrg
+- securityContext.isProxy
+- authenticationContext.externalSessionId
+- debugContext.debugData.requestUri
+tags:
+- okta
+- mfa
+- device-registration
+- okta-system-log
+- attack-data-payload
+query:
+  splunk: |
+    sourcetype="OktaIM2:log" eventType="device.enrollment.create" outcome.result="SUCCESS"
+    | spath output=tgt path=target{}
+    | mvexpand tgt
+    | spath input=tgt output=tgt_type path=type
+    | where tgt_type="UDDevice"
+    | spath input=tgt output=device_id path=id
+    | spath input=tgt output=device_name path=displayName
+    | spath input=tgt output=managed path=detailEntry.managed
+    | spath input=tgt output=os_platform path=detailEntry.osPlatform
+    | spath input=tgt output=device_status path=detailEntry.deviceStatus
+    | where coalesce(managed, "false")="false"
+    | eval via_proxy=if(coalesce('securityContext.isProxy', "false")="false", 0, 1)
+    | fillnull value="unknown" device_id
+    | stats min(_time) as firstTime max(_time) as lastTime values(device_name) as device_name values(os_platform) as os_platform values(device_status) as device_status values(managed) as managed values(client.ipAddress) as src_ip values(client.geographicalContext.country) as country values(securityContext.asOrg) as as_org max(via_proxy) as via_proxy values(authenticationContext.externalSessionId) as session values(debugContext.debugData.requestUri) as request_uri by actor.id actor.alternateId device_id
+    | eventstats dc(device_id) as devices_enrolled_by_actor by actor.id
+    | eval multi_device=if(devices_enrolled_by_actor>=2, 1, 0)
+    | sort 0 - multi_device - via_proxy - lastTime

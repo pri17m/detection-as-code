@@ -1,0 +1,97 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1098.005/okta_new_device_enrolled/okta_new_device_enrolled.log",
+  "modification": "both payload events with the target type changed from UDDevice to User (no device element)",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user14@splunkresearch.com",
+        "id": "00udumbe8xQoWoPtg5d7"
+      },
+      "authenticationContext": {
+        "externalSessionId": "trs7Q_Izld-TpaPqrW90Kx8Yg"
+      },
+      "client": {
+        "geographicalContext": {
+          "country": "United States"
+        },
+        "ipAddress": "120.1.210.147"
+      },
+      "debugContext": {
+        "debugData": {
+          "requestUri": "/idp/authenticators"
+        }
+      },
+      "displayMessage": "Enroll new device",
+      "eventType": "device.enrollment.create",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-02-29T22:52:54.451Z",
+      "securityContext": {
+        "asOrg": "sonic.net  llc",
+        "isProxy": false
+      },
+      "target": [
+        {
+          "detailEntry": {
+            "deviceStatus": "CREATED",
+            "managed": "false",
+            "osPlatform": "ANDROID"
+          },
+          "displayName": "OnePlus 7T",
+          "id": "guofgmdwohKN0DZ2h5d7",
+          "type": "User"
+        }
+      ],
+      "uuid": "462b7846-d755-11ee-8e80-c1472063399a"
+    },
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com",
+        "id": "00uffks4r9kkYNxpj5d7"
+      },
+      "authenticationContext": {
+        "externalSessionId": "trsxusk49ExRkGsBg3rDqNjZQ"
+      },
+      "client": {
+        "geographicalContext": {
+          "country": "United States"
+        },
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "requestUri": "/idp/authenticators"
+        }
+      },
+      "displayMessage": "Enroll new device",
+      "eventType": "device.enrollment.create",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-02-29T21:30:32.117Z",
+      "securityContext": {
+        "asOrg": "twc internal spectrum",
+        "isProxy": false
+      },
+      "target": [
+        {
+          "detailEntry": {
+            "deviceStatus": "CREATED",
+            "managed": "false",
+            "osPlatform": "IOS"
+          },
+          "displayName": "myIphone",
+          "id": "guofgkgif6Rfvzahn5d7",
+          "type": "User"
+        }
+      ],
+      "uuid": "c44f2692-d749-11ee-92e0-0bb73c4d640e"
+    }
+  ]
+}
