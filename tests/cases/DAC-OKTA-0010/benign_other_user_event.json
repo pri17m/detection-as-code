@@ -1,0 +1,33 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1078/okta_suspicious_activity_reported_by_user/okta_suspicious_activity_reported_by_user.log",
+  "modification": "payload event with eventType changed (synthetic)",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43"
+      },
+      "debugContext": {
+        "debugData": {
+          "suspiciousActivityEventCity": "Ohio",
+          "suspiciousActivityEventCountry": "United States",
+          "suspiciousActivityEventIp": "120.1.121.43",
+          "suspiciousActivityEventTransactionId": "5e32024c5d1d1ed06a7d7d7bcce98d24",
+          "suspiciousActivityEventType": "system.email.mfa_reset_notification.sent_message",
+          "suspiciousActivityTimestamp": "2024-03-11T16:28:18.184Z"
+        }
+      },
+      "displayMessage": "User report suspicious activity",
+      "eventType": "user.account.update_profile",
+      "published": "2024-03-11T16:28:40.048Z",
+      "uuid": "6b37ffcf-dfc4-11ee-aa5e-573f33f244ef"
+    }
+  ]
+}
