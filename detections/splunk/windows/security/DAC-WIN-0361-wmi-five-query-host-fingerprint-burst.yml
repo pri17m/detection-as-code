@@ -1,5 +1,5 @@
 id: DAC-WIN-0361
-title: Five WMI host-fingerprint queries from one process within 5 minutes
+title: Four or more of five WMI host-fingerprint queries (including Win32_ComputerSystem) from one process in a 5-minute bucket
 description: >-
   Detects a single process (ClientProcessId) on one host issuing at least four of
   the five WMI class queries used for host fingerprinting in public reporting on
@@ -57,8 +57,9 @@ query:
     | eval is_cpu=if(match(q, "(?i)Win32_Processor") AND match(q, "(?i)ProcessorId"), 1, 0)
     | eval is_cs=if(match(q, "(?i)Win32_ComputerSystem"), 1, 0)
     | where is_bios=1 OR is_disk=1 OR is_board=1 OR is_cpu=1 OR is_cs=1
+    | eval event_time=_time
     | bin _time span=5m
-    | stats max(is_bios) AS bios, max(is_disk) AS disk, max(is_board) AS board, max(is_cpu) AS cpu, max(is_cs) AS cs, min(_time) AS first_seen BY host, ClientProcessId, _time
+    | stats max(is_bios) AS bios, max(is_disk) AS disk, max(is_board) AS board, max(is_cpu) AS cpu, max(is_cs) AS cs, min(event_time) AS first_seen, max(event_time) AS last_seen BY host, ClientProcessId, _time
     | eval distinct_queries=bios+disk+board+cpu+cs
     | where distinct_queries>=4 AND cs=1
-    | table first_seen, host, ClientProcessId, distinct_queries, bios, disk, board, cpu, cs
+    | table first_seen, last_seen, host, ClientProcessId, distinct_queries, bios, disk, board, cpu, cs
