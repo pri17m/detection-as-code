@@ -1,0 +1,8 @@
+{
+  "label": "near-miss",
+  "source": "APC only, no remote memory join",
+  "expect_alert": false,
+  "result": "not run",
+  "ActionType_apc": "QueueUserApcRemoteApiCall",
+  "ActionType_remote": null
+}

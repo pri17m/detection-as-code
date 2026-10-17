@@ -1,0 +1,93 @@
+id: DAC-MDE-0094
+title: "Root CA added to the machine Root store with certutil -addstore or certmgr -add localMachine"
+description: >-
+  DeviceProcessEvents: a command line that adds a certificate to the machine-scope Root or AuthRoot
+  store with certutil-style (-addstore [-f] [-enterprise] root, not -user) or certmgr-style
+  (-add <file> [-c] [-s] -r localMachine root) arguments. Argument-based, and also reports
+  ProcessVersionInfoOriginalFileName so renamed copies (OriginalFileName CertUtil.exe / CertMgr.Exe /
+  CERTMGT.EXE) are flagged. Severity high when renamed, outside System32/SysWOW64 (certutil) or Windows Kits
+  (certmgr), or launched by an unexpected parent; otherwise medium. telemetry_validated false.
+  Hardened: also covers -importpfx root, PowerShell cert-provider writes (Import-Certificate,
+  Move-Item/Copy-Item to Cert:\LocalMachine\Root), X509Store('Root','LocalMachine').Add(), and reg add of a Root
+  Blob; normalises Unicode dashes, quotes and carets before matching. See REVIEW.md variant matrix.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1553.004
+severity: medium
+false_positives:
+- "IT or helpdesk installing a corporate or proxy root CA by hand with certutil -addstore root from an admin shell (alerts at medium; allowlist by host group or ticketed change window after measuring - not measured)."
+- "Software installers and agents that ship their own certmgr.exe or certutil wrapper (Elastic's published rule allowlists ?:\\ProgramData\\Logishrd\\LogiOptionsPlus\\Plugins\\64\\certmgr.exe); these alert at high because the path is unexpected - allowlist by SHA256 plus path, never by name."
+- "Developer machines using Windows SDK certmgr.exe from Windows Kits for test certificates."
+references:
+- https://attack.mitre.org/techniques/T1553/004/
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certutil_certificate_installation.yml
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certmgr_certificate_installation.yml
+- https://github.com/splunk/security_content/blob/develop/detections/endpoint/windows_certutil_root_certificate_addition.yml
+- https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certutil
+- https://learn.microsoft.com/en-us/windows/win32/seccrypto/certmgr-exe
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1553.004/T1553.004.md
+- https://learn.microsoft.com/en-us/powershell/module/pki/import-certificate
+- https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509store
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "AccountName"
+- "AccountSid"
+- "FileName"
+- "FolderPath"
+- "ProcessCommandLine"
+- "ProcessVersionInfoOriginalFileName"
+- "InitiatingProcessFileName"
+- "InitiatingProcessFolderPath"
+- "InitiatingProcessCommandLine"
+- "SHA256"
+- "ReportId"
+tags:
+- behavioural
+- root-ca
+- process-creation
+query:
+  defender: |
+    let Lookback = 1d;
+    let ExpectedParents = dynamic(["cmd.exe","powershell.exe","pwsh.exe","msiexec.exe","ccmexec.exe","explorer.exe"]);
+    let KnownNames = dynamic(["certutil.exe","certmgr.exe","certmgt.exe","powershell.exe","pwsh.exe","pwsh.dll","reg.exe"]);
+    DeviceProcessEvents
+    | where Timestamp > ago(Lookback)
+    | extend Cmd = replace_regex(replace_regex(tolower(ProcessCommandLine), @"[‐‑‒–—―−]", "-"), @"[\^\x22']", "")
+    | where Cmd has_any ("addstore", "importpfx", "localmachine", "x509store", "systemcertificates", "enterprisecertificates")
+    | extend Tool = case(
+        Cmd matches regex @"[-/](addstore|importpfx)\b" and not(Cmd matches regex @"\s[-/]user\b")
+          and Cmd matches regex @"(^|\s)(auth)?root(\s|$)", "certutil-style",
+        Cmd matches regex @"[-/]add\b" and Cmd matches regex @"[-/]r\s+localmachine\b"
+          and Cmd matches regex @"(^|\s)(auth)?root(\s|$)", "certmgr-style",
+        Cmd matches regex @"cert:\\localmachine\\(auth)?root\b"
+          and Cmd matches regex @"(import-(pfx)?certificate|(^|[^a-z])(move|copy)-item|\bmove\b|\bmi\b|\bcopy\b|\bcpi\b|\.add\()", "powershell-certprovider",
+        Cmd has "x509store" and Cmd has "localmachine" and Cmd matches regex @"\b(auth)?root\b" and Cmd has ".add(", "powershell-x509store",
+        Cmd matches regex @"\breg(\.exe)?\s+add\b"
+          and Cmd matches regex @"(hklm|hkey_local_machine)\\software\\(policies\\)?microsoft\\(systemcertificates|enterprisecertificates)\\(auth)?root\\certificates", "reg-add",
+        "")
+    | where Tool != ""
+    | extend Orig = tolower(ProcessVersionInfoOriginalFileName), Img = tolower(FileName)
+    | extend Renamed = isnotempty(Orig) and Orig in (KnownNames) and Img != Orig and not(Orig == "certmgt.exe" and Img == "certmgr.exe") and not(Orig == "pwsh.dll" and Img == "pwsh.exe")
+    | extend ExpectedPath = FolderPath matches regex @"(?i)^[a-z]:\\windows\\(system32|syswow64)\\(certutil|reg)\.exe$"
+        or FolderPath matches regex @"(?i)^[a-z]:\\windows\\(system32|syswow64)\\windowspowershell\\v1\.0\\powershell\.exe$"
+        or FolderPath matches regex @"(?i)\\program files\\powershell\\[0-9]+\\pwsh\.exe$"
+        or (Img == "certmgr.exe" and FolderPath has @"\Windows Kits\")
+    | extend UnexpectedParent = tolower(InitiatingProcessFileName) !in (ExpectedParents)
+    | extend RunAsSystem = AccountSid == "S-1-5-18"
+    | extend Severity = iff(Renamed or not(ExpectedPath) or UnexpectedParent, "high", "medium")
+    | project Timestamp, DeviceId, DeviceName, AccountName, AccountSid, RunAsSystem, Tool, Severity,
+        Renamed, ExpectedPath, UnexpectedParent, FileName, ProcessVersionInfoOriginalFileName, FolderPath,
+        ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessFolderPath, InitiatingProcessCommandLine,
+        SHA256, ReportId

@@ -1,0 +1,13 @@
+{
+  "label": "near-miss",
+  "variant": "certutil –user –addstore root",
+  "source": "Microsoft certutil docs",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "FileName": "certutil.exe",
+  "FolderPath": "C:\\Windows\\System32\\certutil.exe",
+  "ProcessVersionInfoOriginalFileName": "CertUtil.exe",
+  "ProcessCommandLine": "certutil –user –addstore root C:\\tmp\\dev.cer",
+  "InitiatingProcessFileName": "cmd.exe"
+}

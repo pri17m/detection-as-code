@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "variant": "cpi alias to Cert:\\LocalMachine\\AuthRoot",
+  "source": "PowerShell certificate provider docs",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "FileName": "powershell.exe",
+  "FolderPath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "ProcessVersionInfoOriginalFileName": "PowerShell.EXE",
+  "ProcessCommandLine": "powershell -c cpi Cert:\\CurrentUser\\My\\0123456789ABCDEF0123456789ABCDEF01234567 Cert:\\LocalMachine\\AuthRoot",
+  "InitiatingProcessFileName": "cmd.exe"
+}
