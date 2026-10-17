@@ -12,12 +12,11 @@ Based on detections.ai rule https://detections.ai/rules/01a095bb-647d-771a-9ed0-
 - Decision per brief: write as **generic** SyncRootManager registration behaviour; **CVE omitted from references**; tag `needs-review`.
 
 ## ATT&CK v19.2
-- T1112 Modify Registry — defense-impairment, persistence (mapped persistence via stealth/persistence tactics used: stealth is T1553.002's tactic; T1112 contributes persistence)
-- T1553.002 Code Signing — defense-impairment (unsigned binary registering sync root)
+- T1112 Modify Registry — defense-impairment, persistence (tactics per https://attack.mitre.org/techniques/T1112/)
 
-Tactics on the rule: stealth, persistence (T1112 kill chain includes persistence; T1553.002 is defense-impairment — prefer defense-impairment + persistence).
+Tactics on the rule: defense-impairment, persistence.
 
-Correction: use defense-impairment + persistence to match STIX.
+T1553.002 Code Signing was removed at merge time (2026-10-17): ATT&CK defines it as adversaries creating, acquiring or stealing code-signing material to sign their own tools (https://attack.mitre.org/techniques/T1553/002/). This rule only *checks* the writer's signature as a false-positive filter; it does not observe code-signing abuse.
 
 ## Ponytail review (applied before PR)
 
@@ -26,6 +25,13 @@ Correction: use defense-impairment + persistence to match STIX.
 | 1 | Must | Source matched ActionType/AdditionalFields strings "CloudProviderRegistered", "ShieldCrash_" — none of those ActionType values appear in Microsoft Learn DeviceEvents docs; tying to CVE-2026-69414 is wrong | Any event with AdditionalFields containing ShieldCrash_ | Replaced with DeviceRegistryEvents on documented SyncRootManager key path; dropped CVE from references |
 | 2 | Should | Source `InitiatingProcessSHA1 !in ("")` is a no-op filter | empty SHA1 | Removed; leftouter join on certificate info instead |
 | 3 | Should | Hard dependency on unverified CloudProvider* ActionTypes | Tenant without those ActionTypes → silent miss | Use RegistryKeyCreated / RegistryValueSet (Learn DeviceRegistryEvents) |
+
+### Merge-time ponytail pass (2026-10-17)
+
+| # | Sev | Finding | Failing input | Fix applied |
+|---|---|---|---|---|
+| M1 | Must | leftouter join to DeviceFileCertificateInfo had no de-duplication, so one registry write fanned out to one row per certificate record for that SHA1 (duplicate alerts), and the right side scanned the full table | Writer SHA1 with 3 certificate-info rows → 3 alert rows for one registry write | Right side now `where Timestamp > ago(30d) \| summarize arg_max(Timestamp, IsSigned, Signer) by SHA1` (one row per SHA1). Columns per https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicefilecertificateinfo-table |
+| M2 | Should | ATT&CK mapping T1553.002 Code Signing does not describe the observed behaviour (sync-root registry registration) | — | Removed T1553.002 and its reference; T1112 kept |
 
 ## Field verification
 | Field | Status | Source |

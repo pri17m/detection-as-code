@@ -3,7 +3,7 @@
     "detections_total": 874,
     "detections_with_mitre": 874,
     "detections_with_mitre_percent": 100.0,
-    "unique_techniques": 213,
+    "unique_techniques": 212,
     "platform_counts": {
       "crowdstrike": 164,
       "defender": 75,
@@ -1227,9 +1227,6 @@
     ],
     "T1553.001": [
       "DAC-CS-0228"
-    ],
-    "T1553.002": [
-      "DAC-MDE-0092"
     ],
     "T1553.004": [
       "DAC-WIN-0212",

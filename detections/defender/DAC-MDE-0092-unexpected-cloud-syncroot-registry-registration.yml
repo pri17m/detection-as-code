@@ -26,7 +26,6 @@ mitre:
   - persistence
   techniques:
   - T1112
-  - T1553.002
 severity: high
 false_positives:
 - New or niche sync clients (Nextcloud, ownCloud, vendor-specific agents) registering a sync root; extend the allowlists after measuring noise (not measured).
@@ -34,7 +33,6 @@ false_positives:
 references:
 - https://detections.ai/rules/01a095bb-647d-771a-9ed0-c98dc5b7a276
 - https://attack.mitre.org/techniques/T1112/
-- https://attack.mitre.org/techniques/T1553/002/
 - https://learn.microsoft.com/en-us/windows/win32/shell/integrate-cloud-storage
 - https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceregistryevents-table
 - https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicefilecertificateinfo-table
@@ -81,6 +79,8 @@ query:
     | where not(InitiatingProcessFolderPath has_any (KnownSyncPaths))
     | join kind=leftouter (
         DeviceFileCertificateInfo
+        | where Timestamp > ago(30d)
+        | summarize arg_max(Timestamp, IsSigned, Signer) by SHA1
         | project InitiatingProcessSHA1 = SHA1, IsSigned, Signer
       ) on InitiatingProcessSHA1
     | where isnull(IsSigned) or IsSigned == false
