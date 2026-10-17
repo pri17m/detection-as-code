@@ -1,0 +1,79 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1539/okta_web_session_multiple_ip/okta_web_session_multiple_ip.log",
+  "modification": "second payload event given the first event's browser/OS/UA (only the IP changes, like a laptop moving networks)",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user0315e2@example.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxiiDSIWJxR--Gvc_e3e6IXQ"
+      },
+      "client": {
+        "geographicalContext": {
+          "country": "United States"
+        },
+        "ipAddress": "23.93.1.1",
+        "userAgent": {
+          "browser": "CHROME",
+          "os": "Mac OS 13.4.0 (Ventura)",
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "Evaluation of sign-on policy",
+      "eventType": "policy.evaluate_sign_on",
+      "outcome": {
+        "result": "ALLOW"
+      },
+      "published": "2024-03-18T16:23:02.715Z",
+      "target": [
+        {
+          "displayName": "OpenID Connect Client"
+        },
+        {
+          "displayName": "Catch-all Rule"
+        }
+      ],
+      "uuid": "cb0b5180-e543-11ee-b8e7-f9c990bca30b"
+    },
+    {
+      "actor": {
+        "alternateId": "user0315e2@example.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxiiDSIWJxR--Gvc_e3e6IXQ"
+      },
+      "client": {
+        "geographicalContext": {
+          "country": "United States"
+        },
+        "ipAddress": "18.185.207.118",
+        "userAgent": {
+          "browser": "CHROME",
+          "os": "Mac OS 13.4.0 (Ventura)",
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "Evaluation of sign-on policy",
+      "eventType": "policy.evaluate_sign_on",
+      "outcome": {
+        "result": "ALLOW"
+      },
+      "published": "2024-03-18T16:24:02.715Z",
+      "target": [
+        {
+          "displayName": "OpenID Connect Client"
+        },
+        {
+          "displayName": "Catch-all Rule"
+        }
+      ],
+      "uuid": "cb0b5180-e543-11ee-b8e7-f9c990bca30a"
+    }
+  ]
+}

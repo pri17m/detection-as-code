@@ -1,13 +1,13 @@
 {
   "summary": {
-    "detections_total": 882,
-    "detections_with_mitre": 882,
+    "detections_total": 883,
+    "detections_with_mitre": 883,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 213,
     "platform_counts": {
       "crowdstrike": 166,
       "defender": 78,
-      "splunk": 638
+      "splunk": 639
     }
   },
   "techniques": {
@@ -1209,7 +1209,8 @@
       "DAC-WIN-0300"
     ],
     "T1550.004": [
-      "DAC-MDE-0088"
+      "DAC-MDE-0088",
+      "DAC-OKTA-0005"
     ],
     "T1552": [
       "DAC-AWS-0036",
