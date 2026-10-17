@@ -21,12 +21,19 @@ New. Covers T1068 / T1685 / T1543.003 BYOVD staging on Falcon.
 | 4 | Should | No unsigned-driver gate | Signed vendor driver staged in Temp | Documented; SignInfoFlags on DriverLoad unverified in public docs — left as open question, tag needs-review |
 | 5 | Nice | Source table() only — no aggregation for Filter Alerts | — | groupBy for scheduled-search shape |
 
+### Merge-time ponytail pass (2026-10-17)
+
+| # | Sev | Finding | Failing input | Fix applied |
+|---|---|---|---|---|
+| 6 | Must | DriverLoad branch matched only `ImageFileName`, but the cited public source for DriverLoad (LCC "Enumerate Windows Driver Loads") reads the driver path from `FilePath` + `FileName`; `ImageFileName` on DriverLoad is not shown there. If the path is only in FilePath the branch never fires | DriverLoad with `FilePath=\Device\HarddiskVolume3\Windows\Temp\`, `FileName=truesight.sys`, no ImageFileName | `DrvPath := coalesce([ImageFileName, FilePath])` and match the user-writable regex on DrvPath; FilePath added to required_fields and groupBy. Fixture `malicious_driverload_filepath_only.json` |
+
 ## Field verification
 | Field / ESN | Status | Source |
 |---|---|---|
-| DriverLoad | verified | https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Enumerate%20Windows%20Driver%20Loads.md |
+| DriverLoad, FilePath, FileName | verified | https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Enumerate%20Windows%20Driver%20Loads.md |
 | ProcessRollup2, ImageFileName, CommandLine, aid, ComputerName | verified | same repo Helpful-CQL / Combine ProcessRollup2 docs |
 | ServiceInstalled | unverified (removed) | 0 matches in logscale-community-content snapshot 2026-10-13 |
+| ImageFileName on DriverLoad | unverified (kept as first coalesce choice; FilePath is the verified fallback) | not shown in LCC DriverLoad query |
 | SignInfoFlags on DriverLoad | unverified | Decode SignInfoFlags.md shows ProcessRollup2 only |
 
 ## Tests

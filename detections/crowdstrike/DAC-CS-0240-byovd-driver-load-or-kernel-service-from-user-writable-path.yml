@@ -44,6 +44,7 @@ required_fields:
 - ComputerName
 - UserName
 - ImageFileName
+- FilePath
 - CommandLine
 - ParentBaseFileName
 tags:
@@ -62,7 +63,8 @@ query:
           CommandLine=/(\\Temp\\|\\ProgramData\\|\\Users\\Public\\|\\Downloads\\)/i
           | detection := "KernelServiceUserPath" ;
         #event_simpleName=DriverLoad
-          ImageFileName=/(\\Temp\\|\\ProgramData\\|\\Users\\Public\\|\\Downloads\\)/i
+          | DrvPath := coalesce([ImageFileName, FilePath])
+          | DrvPath=/(\\Temp\\|\\ProgramData\\|\\Users\\Public\\|\\Downloads\\)/i
           | detection := "DriverLoadUserPath" ;
         #event_simpleName=ProcessRollup2
           ImageFileName=/\\sc\.exe$/i
@@ -73,4 +75,4 @@ query:
         * | detection := ""
       }
     | detection != ""
-    | groupBy([aid, ComputerName, UserName, #event_simpleName, detection, ImageFileName, CommandLine, ParentBaseFileName], function=count())
+    | groupBy([aid, ComputerName, UserName, #event_simpleName, detection, ImageFileName, FilePath, CommandLine, ParentBaseFileName], function=count())
