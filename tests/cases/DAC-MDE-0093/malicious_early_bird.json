@@ -1,0 +1,9 @@
+{
+  "label": "malicious",
+  "source": "APC + remote alloc into process created 5s earlier",
+  "expect_alert": true,
+  "result": "not run",
+  "ActionType_apc": "QueueUserApcRemoteApiCall",
+  "ActionType_remote": "NtAllocateVirtualMemoryRemoteApiCall",
+  "SecondsSinceChildCreated": 5
+}

@@ -1,0 +1,9 @@
+{
+  "label": "malicious",
+  "source": "exe+unsigned dll same user-writable dir",
+  "expect_alert": true,
+  "result": "not run",
+  "host_ImageFileName": "C:\\Users\\bob\\Downloads\\app.exe",
+  "dll_ImageFileName": "C:\\Users\\bob\\Downloads\\version.dll",
+  "SIGNATURE_FLAG_NO_SIGNATURE": true
+}

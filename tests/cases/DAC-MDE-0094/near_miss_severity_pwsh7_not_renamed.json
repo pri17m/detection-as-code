@@ -1,0 +1,14 @@
+{
+  "label": "near_miss",
+  "source": "PowerShell 7 OriginalFileName is pwsh.dll (SigmaHQ proc_creation_win_powershell_non_interactive_execution.yml)",
+  "expect_alert": true,
+  "expect_fields": {"Tool": "powershell-certprovider", "Renamed": false, "Severity": "medium"},
+  "result": "not run",
+  "note": "alert is expected (machine Root write) but must NOT be marked renamed/high",
+  "FileName": "pwsh.exe",
+  "ProcessVersionInfoOriginalFileName": "pwsh.dll",
+  "FolderPath": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+  "ProcessCommandLine": "pwsh -c Import-Certificate -FilePath c:\\temp\\corp.cer -CertStoreLocation Cert:\\LocalMachine\\Root",
+  "InitiatingProcessFileName": "explorer.exe",
+  "AccountSid": "S-1-5-21-1111111111-2222222222-3333333333-1001"
+}

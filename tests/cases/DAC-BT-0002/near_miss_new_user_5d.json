@@ -1,0 +1,15 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "synthetic; user has only 5 days of history",
+  "sourcetype": "beyondtrust:sra",
+  "event": "login",
+  "status": "success",
+  "target": "web/login",
+  "who": "New Hire(nhire) using password",
+  "who_ip": "198.51.100.10",
+  "site": "support.example.com",
+  "history": "nhire first seen 5 days ago from 10.0.0.0/24",
+  "expect_alert": false,
+  "result": "not run"
+}

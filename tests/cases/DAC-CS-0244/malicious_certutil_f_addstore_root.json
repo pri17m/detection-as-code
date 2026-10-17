@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "variant": "certutil -f -addstore root",
+  "source": "Atomic Red Team T1553.004",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "C:\\Windows\\System32\\certutil.exe",
+  "CommandLine": "certutil.exe -f -addstore root C:\\Users\\Public\\ca.cer",
+  "ParentBaseFileName": "powershell.exe"
+}

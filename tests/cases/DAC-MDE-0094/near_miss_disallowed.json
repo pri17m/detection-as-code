@@ -1,0 +1,13 @@
+{
+  "label": "near-miss",
+  "variant": "certutil -addstore Disallowed (removes trust)",
+  "source": "Microsoft certutil docs",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "FileName": "certutil.exe",
+  "FolderPath": "C:\\Windows\\System32\\certutil.exe",
+  "ProcessVersionInfoOriginalFileName": "CertUtil.exe",
+  "ProcessCommandLine": "certutil -addstore Disallowed bad.cer",
+  "InitiatingProcessFileName": "cmd.exe"
+}

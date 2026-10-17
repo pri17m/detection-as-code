@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "variant": "certutil -grouppolicy -addstore root",
+  "source": "Microsoft certutil docs",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "C:\\Windows\\System32\\certutil.exe",
+  "CommandLine": "certutil -grouppolicy -addstore root ca.cer",
+  "ParentBaseFileName": "cmd.exe"
+}

@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "variant": "certutil from a scheduled task (svchost parent)",
+  "source": "ATT&CK T1053 context",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "FileName": "certutil.exe",
+  "FolderPath": "C:\\Windows\\System32\\certutil.exe",
+  "ProcessVersionInfoOriginalFileName": "CertUtil.exe",
+  "ProcessCommandLine": "certutil -addstore root C:\\Windows\\Tasks\\ca.cer",
+  "InitiatingProcessFileName": "svchost.exe"
+}

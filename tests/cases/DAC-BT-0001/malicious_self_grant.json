@@ -1,0 +1,19 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "synthetic; fields per BeyondTrust Syslog events (user_changed, permissions:admin) and Message format (who)",
+  "sourcetype": "beyondtrust:sra",
+  "event": "user_changed",
+  "who": "Mallory Ops(mallory) using password",
+  "who_ip": "198.51.100.77",
+  "site": "support.example.com",
+  "old_username": "mallory",
+  "old_permissions:admin": "0",
+  "new_permissions:admin": "1",
+  "expect_alert": true,
+  "expect_fields": {
+    "self_grant": 1,
+    "target_user": "mallory"
+  },
+  "result": "not run"
+}

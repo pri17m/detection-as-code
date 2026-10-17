@@ -1,0 +1,13 @@
+{
+  "label": "near-miss",
+  "variant": "root only in a file path",
+  "source": "SigmaHQ certutil/certmgr rules",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "FileName": "certutil.exe",
+  "FolderPath": "C:\\Windows\\System32\\certutil.exe",
+  "ProcessVersionInfoOriginalFileName": "CertUtil.exe",
+  "ProcessCommandLine": "certutil -addstore My C:\\root\\client.cer",
+  "InitiatingProcessFileName": "cmd.exe"
+}

@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "variant": "\\REGISTRY\\MACHINE prefix form",
+  "source": "Elastic registry rule path forms",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 13,
+  "TargetObject": "\\REGISTRY\\MACHINE\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567\\Blob",
+  "Image": "C:\\ProgramData\\x\\a.exe",
+  "Details": "Binary Data"
+}

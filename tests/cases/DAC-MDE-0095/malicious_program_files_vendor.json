@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "variant": "sideloaded vendor agent under Program Files",
+  "source": "Fielenbach public post",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ActionType": "RegistryValueSet",
+  "RegistryKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567",
+  "RegistryValueName": "Blob",
+  "InitiatingProcessFileName": "agent.exe",
+  "InitiatingProcessFolderPath": "C:\\Program Files\\Contoso\\agent.exe"
+}

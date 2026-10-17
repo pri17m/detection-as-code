@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "variant": "reg import of a Blob",
+  "source": "Sigma/Elastic registry rules",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 13,
+  "TargetObject": "HKLM\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567\\Blob",
+  "Image": "C:\\Windows\\System32\\reg.exe",
+  "Details": "Binary Data"
+}

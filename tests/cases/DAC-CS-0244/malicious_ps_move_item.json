@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "variant": "Move-Item to Cert:\\LocalMachine\\Root",
+  "source": "Atomic Red Team T1553.004",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ImageFileName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "CommandLine": "powershell -c \"$c=Import-Certificate -FilePath ca.cer -CertStoreLocation Cert:\\LocalMachine\\My; Move-Item -Path $c.PSPath -Destination 'Cert:\\LocalMachine\\Root'\"",
+  "ParentBaseFileName": "cmd.exe"
+}

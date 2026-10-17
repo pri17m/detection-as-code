@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "variant": "Policies\\...\\Root (GP store) written by non-GP process",
+  "source": "Microsoft certutil docs -grouppolicy",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 13,
+  "TargetObject": "HKLM\\SOFTWARE\\Policies\\Microsoft\\SystemCertificates\\Root\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567\\Blob",
+  "Image": "C:\\ProgramData\\x\\a.exe",
+  "Details": "Binary Data"
+}

@@ -1,0 +1,74 @@
+id: DAC-MDE-0095
+title: "Machine Root/AuthRoot certificate registry key written by an unexpected process"
+description: >-
+  DeviceRegistryEvents: creation of a <SHA1 thumbprint> key, or a Blob value set, under
+  HKLM\SOFTWARE\[Policies\]Microsoft\{SystemCertificates|EnterpriseCertificates}\{Root|AuthRoot}\Certificates\
+  by any process except non-LOLBin binaries in System32/SysWOW64 (svchost for GPO and root auto-update) and
+  Windows\WinSxS|CCM|ccmsetup. This is where certutil, certmgr, PowerShell Import-Certificate, reg import or a
+  custom CertAddCertificateContextToStore call all land, so it is tool-agnostic. Severity high when the writer
+  runs from a user-writable path (ProgramData, Users, Windows\Temp, PerfLogs) or is a LOLBin/certutil/certmgr.
+  Logic follows Elastic's published registry rule (Program Files is NOT excluded here). telemetry_validated false.
+  Hardened: msiexec, mmc and dllhost in System32 are no longer excluded (medium). See REVIEW.md variant matrix.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1553.004
+severity: medium
+false_positives:
+- "Third-party software in Program Files that installs its own root (TLS-inspection proxies, AV web shields, Fiddler, VPN clients); alerts at medium - allowlist by InitiatingProcessSHA256/Image plus folder after measuring (not measured)."
+- "Group Policy and Windows root auto-update write these keys from svchost.exe in System32 and are excluded by the System32 non-LOLBin rule; if your tenant shows other System32 writers, extend the exclusion deliberately."
+- "MDM/SCCM agents under Windows\\CCM are excluded; other management agents (Intune IME, Tanium, BigFix) may need allowlisting."
+references:
+- https://attack.mitre.org/techniques/T1553/004/
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_install_root_or_ca_certificat.yml
+- https://github.com/elastic/detection-rules/blob/main/rules/windows/defense_evasion_create_mod_root_certificate.toml
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceregistryevents-table
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1553.004/T1553.004.md
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "ActionType"
+- "RegistryKey"
+- "RegistryValueName"
+- "InitiatingProcessFileName"
+- "InitiatingProcessFolderPath"
+- "InitiatingProcessCommandLine"
+- "InitiatingProcessAccountSid"
+- "InitiatingProcessParentFileName"
+- "InitiatingProcessSHA256"
+- "ReportId"
+tags:
+- behavioural
+- root-ca
+- registry
+- needs-review
+query:
+  defender: |
+    let Lookback = 1d;
+    let AdminTools = dynamic(["msiexec.exe","mmc.exe","dllhost.exe"]);
+    let SuspiciousSystemBins = dynamic(["certutil.exe","certmgr.exe","reg.exe","rundll32.exe","regsvr32.exe","mshta.exe",
+      "powershell.exe","pwsh.exe","cmd.exe","cscript.exe","wscript.exe","wmiprvse.exe","expand.exe","xcopy.exe",
+      "msiexec.exe","mmc.exe","dllhost.exe"]);
+    DeviceRegistryEvents
+    | where Timestamp > ago(Lookback)
+    | where ActionType in ("RegistryValueSet", "RegistryKeyCreated")
+    | where RegistryKey matches regex @"(?i)^HKEY_LOCAL_MACHINE\\SOFTWARE\\(Policies\\)?Microsoft\\(SystemCertificates|EnterpriseCertificates)\\(Root|AuthRoot)\\Certificates\\[0-9A-F]{40}$"
+    | where ActionType == "RegistryKeyCreated" or RegistryValueName =~ "Blob"
+    | extend Proc = tolower(InitiatingProcessFileName), PPath = tolower(InitiatingProcessFolderPath)
+    | where not(PPath matches regex @"^[a-z]:\\windows\\(system32|syswow64)\\" and Proc !in (SuspiciousSystemBins))
+    | where not(PPath matches regex @"^[a-z]:\\windows\\(winsxs|ccm|ccmsetup)\\")
+    | extend Thumbprint = extract(@"(?i)\\Certificates\\([0-9A-F]{40})$", 1, RegistryKey)
+    | extend UserWritable = PPath matches regex @"(?i)^[a-z]:\\(programdata|users|windows\\temp|perflogs)\\"
+    | extend Severity = iff(UserWritable or (Proc in (SuspiciousSystemBins) and Proc !in (AdminTools)), "high", "medium")
+    | project Timestamp, DeviceId, DeviceName, ActionType, RegistryKey, RegistryValueName, Thumbprint, Severity, UserWritable,
+        InitiatingProcessFileName, InitiatingProcessFolderPath, InitiatingProcessCommandLine,
+        InitiatingProcessAccountSid, InitiatingProcessParentFileName, InitiatingProcessSHA256, ReportId

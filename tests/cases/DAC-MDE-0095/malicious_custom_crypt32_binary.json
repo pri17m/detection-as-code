@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "variant": "custom binary calling crypt32 CertAddEncodedCertificateToStore",
+  "source": "ATT&CK T1553.004 (Hikit S0009)",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "ActionType": "RegistryValueSet",
+  "RegistryKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567",
+  "RegistryValueName": "Blob",
+  "InitiatingProcessFileName": "upd.exe",
+  "InitiatingProcessFolderPath": "C:\\Users\\bob\\AppData\\Local\\Temp\\upd.exe"
+}
