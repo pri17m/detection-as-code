@@ -1,0 +1,11 @@
+{
+  "label": "near_miss",
+  "source": "Set-MpPreference Boolean parameter set to $false re-enables protection (Microsoft Learn Set-MpPreference)",
+  "expect_alert": false,
+  "result": "not run",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Win",
+  "ImageFileName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "CommandLine": "powershell.exe Set-MpPreference -DisableRealtimeMonitoring $false",
+  "ParentBaseFileName": "cmd.exe"
+}
