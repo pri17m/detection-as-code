@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "variant": "Certificates MMC snap-in import",
+  "source": "Microsoft certificate MMC docs",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 13,
+  "TargetObject": "HKLM\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567\\Blob",
+  "Image": "C:\\Windows\\System32\\mmc.exe",
+  "Details": "Binary Data"
+}

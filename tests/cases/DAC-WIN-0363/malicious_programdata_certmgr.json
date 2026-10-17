@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "variant": "relocated certmgr in ProgramData",
+  "source": "Fielenbach public post",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 13,
+  "TargetObject": "HKLM\\SOFTWARE\\Microsoft\\SystemCertificates\\ROOT\\Certificates\\0123456789ABCDEF0123456789ABCDEF01234567\\Blob",
+  "Image": "C:\\ProgramData\\ContosoAgent\\bin\\x64\\certmgr.exe",
+  "Details": "Binary Data"
+}
