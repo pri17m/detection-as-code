@@ -79,7 +79,7 @@ query:
         "")
     | where Tool != ""
     | extend Orig = tolower(ProcessVersionInfoOriginalFileName), Img = tolower(FileName)
-    | extend Renamed = isnotempty(Orig) and Orig in (KnownNames) and Img != Orig and not(Orig == "certmgt.exe" and Img == "certmgr.exe")
+    | extend Renamed = isnotempty(Orig) and Orig in (KnownNames) and Img != Orig and not(Orig == "certmgt.exe" and Img == "certmgr.exe") and not(Orig == "pwsh.dll" and Img == "pwsh.exe")
     | extend ExpectedPath = FolderPath matches regex @"(?i)^[a-z]:\\windows\\(system32|syswow64)\\(certutil|reg)\.exe$"
         or FolderPath matches regex @"(?i)^[a-z]:\\windows\\(system32|syswow64)\\windowspowershell\\v1\.0\\powershell\.exe$"
         or FolderPath matches regex @"(?i)\\program files\\powershell\\[0-9]+\\pwsh\.exe$"

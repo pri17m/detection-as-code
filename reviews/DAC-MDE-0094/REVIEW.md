@@ -96,6 +96,12 @@ Known-gap fixtures (expected misses, covered elsewhere): knowngap_reg_import -> 
 
 Stand-in matcher: `/workspace/rootca-gen/gen2.py` (Python re reimplementation of the query logic, run on the box 2026-10-13). It is not the SIEM engine; CQL/KQL/SPL escaping and Unicode handling remain unverified until run in a tenant.
 
+## Merge-time ponytail pass (2026-10-17)
+
+| # | Sev | Finding | Failing input | Fix applied |
+|---|---|---|---|---|
+| M1 | Must | `Renamed` was true for every genuine PowerShell 7 process: `KnownNames` contains `pwsh.dll` (the OriginalFileName of pwsh.exe), but unlike DAC-WIN-0362 there was no `pwsh.dll`/`pwsh.exe` exception, so `Img != Orig` fired and every PowerShell 7 Import-Certificate / X509Store hit was escalated to high as "renamed" | `FileName=pwsh.exe`, `ProcessVersionInfoOriginalFileName=pwsh.dll`, `FolderPath=C:\Program Files\PowerShell\7\pwsh.exe`, `ProcessCommandLine=pwsh -c Import-Certificate -FilePath c:\x.cer -CertStoreLocation Cert:\LocalMachine\Root`, parent explorer.exe → was Severity=high, Renamed=true | Added `and not(Orig == "pwsh.dll" and Img == "pwsh.exe")`, matching DAC-WIN-0362. pwsh.exe ↔ OriginalFileName pwsh.dll per SigmaHQ https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_non_interactive_execution.yml . Fixture `near_miss_severity_pwsh7_not_renamed.json` |
+
 ## Field verification
 | Field | Status |
 |---|---|
