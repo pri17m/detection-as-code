@@ -1,0 +1,9 @@
+{
+  "label": "near-miss",
+  "source": "Four classes but no Win32_ComputerSystem",
+  "expect_alert": false,
+  "result": "not run",
+  "EventCode": 11,
+  "ClientProcessId": 200,
+  "note": "bios+disk+board+cpu only"
+}
