@@ -1,12 +1,12 @@
 {
   "summary": {
-    "detections_total": 864,
-    "detections_with_mitre": 864,
+    "detections_total": 865,
+    "detections_with_mitre": 865,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 211,
     "platform_counts": {
       "crowdstrike": 161,
-      "defender": 71,
+      "defender": 72,
       "splunk": 632
     }
   },
@@ -424,6 +424,7 @@
       "DAC-CS-0077",
       "DAC-CS-0124",
       "DAC-CS-0125",
+      "DAC-MDE-0091",
       "DAC-WIN-0017",
       "DAC-WIN-0190",
       "DAC-WIN-0348"
@@ -834,6 +835,7 @@
     "T1203": [
       "DAC-CS-0221",
       "DAC-MDE-0076",
+      "DAC-MDE-0091",
       "DAC-WIN-0343"
     ],
     "T1204": [
