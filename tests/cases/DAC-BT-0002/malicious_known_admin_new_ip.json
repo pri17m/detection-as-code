@@ -1,0 +1,14 @@
+{
+  "label": "malicious",
+  "source": "Mandiant blog Fig.6",
+  "sourcetype": "beyondtrust:sra",
+  "event": "login",
+  "status": "success",
+  "target": "web/login",
+  "who": "Administrator(admin) using password",
+  "who_ip": "198.51.100.77",
+  "site": "support.example.com",
+  "history": "admin seen from 10.0.0.5 for 30d; 198.51.100.77 first seen today",
+  "expect_alert": true,
+  "result": "not run"
+}

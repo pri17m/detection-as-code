@@ -1,13 +1,13 @@
 {
   "summary": {
-    "detections_total": 863,
-    "detections_with_mitre": 863,
+    "detections_total": 864,
+    "detections_with_mitre": 864,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 210,
     "platform_counts": {
       "crowdstrike": 161,
       "defender": 71,
-      "splunk": 631
+      "splunk": 632
     }
   },
   "techniques": {
@@ -479,6 +479,7 @@
       "DAC-WIN-0234"
     ],
     "T1078": [
+      "DAC-BT-0002",
       "DAC-CLD-0011",
       "DAC-CLD-0014",
       "DAC-CS-0098",

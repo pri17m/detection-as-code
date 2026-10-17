@@ -1,0 +1,14 @@
+{
+  "label": "benign",
+  "source": "baseline",
+  "sourcetype": "beyondtrust:sra",
+  "event": "login",
+  "status": "success",
+  "target": "web/login",
+  "who": "Administrator(admin) using password",
+  "who_ip": "10.0.0.5",
+  "site": "support.example.com",
+  "history": "seen daily for 30d",
+  "expect_alert": false,
+  "result": "not run"
+}

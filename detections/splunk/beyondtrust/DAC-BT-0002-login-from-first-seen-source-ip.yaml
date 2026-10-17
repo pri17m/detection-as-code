@@ -1,0 +1,54 @@
+id: DAC-BT-0002
+title: 'BeyondTrust RS/PRA: successful web login from a first-seen source IP for a known user'
+description: Detects a successful BeyondTrust /login, /appliance or API login (event=login status=success, target web/login, web/appliance or web/api) where the user/who_ip pair was never seen in a 30-day lookback but the user has older history. ARMORY CASTLE logged in to the web admin portal with compromised Administrator credentials after exploiting CVE-2026-102764.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- beyondtrust:sra
+mitre:
+  tactics:
+  - initial-access
+  - persistence
+  techniques:
+  - T1078
+severity: medium
+false_positives:
+- Admins travelling, new VPN egress IPs, or DHCP churn on admin workstations. Tune with an allowlist of corporate egress ranges.
+- The first login of a brand-new user is suppressed by design (needs older history).
+references:
+- https://cloud.google.com/blog/topics/threat-intelligence/armory-castle-exploits-beyondtrust
+- https://nvd.nist.gov/vuln/detail/CVE-2026-102764
+- https://docs.beyondtrust.com/rs/docs/events
+- https://docs.beyondtrust.com/rs/docs/message-format
+- https://docs.beyondtrust.com/pra/docs/events
+- https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/BeyondTrust/sra/
+telemetry_validated: false
+required_fields:
+- event
+- status
+- target
+- who
+- who_ip
+- site
+tags:
+- beyondtrust
+- remote-support
+- pra
+- bomgar
+- first-seen
+query:
+  splunk: 'sourcetype=beyondtrust:sra event=login status=success (target="web/login" OR target="web/appliance" OR target="web/api") earliest=-30d@d
+
+    | rex field=who "\((?<bt_user>[^)]+)\)"
+
+    | eval actor=lower(coalesce(bt_user, who))
+
+    | stats min(_time) as firstTime max(_time) as lastTime count values(target) as target by site, actor, who_ip
+
+    | eventstats min(firstTime) as actor_first_seen by site, actor
+
+    | where firstTime >= relative_time(now(), "-1d") AND actor_first_seen < relative_time(now(), "-1d")
+
+    '
