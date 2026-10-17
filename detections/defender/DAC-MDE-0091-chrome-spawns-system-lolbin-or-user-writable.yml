@@ -1,0 +1,86 @@
+id: DAC-MDE-0091
+title: Chrome process tree spawns a SYSTEM LOLBin or process from a user-writable path
+description: >-
+  Detects a process whose initiating parent is chrome.exe (or whose grandparent
+  is chrome.exe) running as SYSTEM/NT AUTHORITY while the Chrome parent is not
+  SYSTEM, the Chrome image path is under Google\Chrome\Application\, Google
+  Update/Crash Handler names are excluded, and the child is a common LOLBin
+  (cmd, powershell, pwsh, rundll32, regsvr32, mshta, wscript, cscript) or runs
+  from Temp, AppData\Local\Temp, ProgramData or Users\Public. Consistent with
+  post-exploitation local privilege escalation after a browser compromise,
+  including abuse of Windows ALPC LPE CVE-2026-85880. Based on detections.ai rule
+  https://detections.ai/rules/01a0ce0d-aa97-716a-af05-95e79cb341ae by Arnold Chan
+  (@slaz). The detections.ai title brands this "BlueMoon"; that kit name does not
+  appear in NVD or MSRC for CVE-2026-85880, so it is not used as a claim here.
+  telemetry_validated false; not run in a tenant.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - privilege-escalation
+  - execution
+  techniques:
+  - T1068
+  - T1203
+severity: critical
+false_positives:
+- Unexpected Google elevation paths not covered by the Update/Crash Handler allowlist; extend the FileName allowlist after measuring noise (not measured).
+references:
+- https://detections.ai/rules/01a0ce0d-aa97-716a-af05-95e79cb341ae
+- https://attack.mitre.org/techniques/T1068/
+- https://attack.mitre.org/techniques/T1203/
+- https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-85880
+- https://nvd.nist.gov/vuln/detail/CVE-2026-85880
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table
+telemetry_validated: false
+required_fields:
+- Timestamp
+- DeviceId
+- DeviceName
+- FileName
+- FolderPath
+- ProcessCommandLine
+- AccountName
+- AccountDomain
+- InitiatingProcessFileName
+- InitiatingProcessFolderPath
+- InitiatingProcessCommandLine
+- InitiatingProcessAccountName
+- InitiatingProcessParentFileName
+- InitiatingProcessId
+tags:
+- behavioural
+- lpe
+- needs-review
+- detections-ai
+query:
+  defender: |
+    DeviceProcessEvents
+    | where Timestamp > ago(1d)
+    | where InitiatingProcessFileName =~ "chrome.exe"
+        or InitiatingProcessParentFileName =~ "chrome.exe"
+    | where AccountName =~ "system" or AccountDomain =~ "nt authority"
+    | where InitiatingProcessAccountName !~ "system"
+    | where InitiatingProcessFolderPath has @"\Google\Chrome\Application\"
+        or InitiatingProcessParentFileName =~ "chrome.exe"
+    | where FileName !in~ (
+        "GoogleUpdate.exe",
+        "GoogleUpdateComRegisterShell64.exe",
+        "GoogleUpdateOnDemand.exe",
+        "GoogleCrashHandler.exe",
+        "GoogleCrashHandler64.exe"
+      )
+    | where FileName in~ (
+        "cmd.exe", "powershell.exe", "pwsh.exe",
+        "rundll32.exe", "regsvr32.exe", "mshta.exe",
+        "wscript.exe", "cscript.exe"
+      )
+      or FolderPath has_any (@"\Temp\", @"\AppData\Local\Temp\", @"\ProgramData\", @"\Users\Public\")
+    | project Timestamp, DeviceId, DeviceName, FileName, FolderPath, ProcessCommandLine,
+        AccountName, AccountDomain, InitiatingProcessFileName, InitiatingProcessFolderPath,
+        InitiatingProcessCommandLine, InitiatingProcessAccountName, InitiatingProcessParentFileName,
+        InitiatingProcessId

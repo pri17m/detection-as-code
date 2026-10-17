@@ -1,0 +1,9 @@
+{
+  "label": "near-miss",
+  "source": "Unrelated registry key",
+  "expect_alert": false,
+  "result": "not run",
+  "RegistryKey": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+  "ActionType": "RegistryValueSet",
+  "InitiatingProcessFileName": "payload.exe"
+}
