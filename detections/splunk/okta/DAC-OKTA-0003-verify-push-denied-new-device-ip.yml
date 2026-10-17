@@ -1,0 +1,52 @@
+id: DAC-OKTA-0003
+title: 'Okta: Verify push denied for a sign-in from a new device and new IP'
+description: Correlates, per authenticationContext.externalSessionId, Okta System Log system.push.send_factor_verify_push events whose debugContext.debugData.behaviors has New Device=POSITIVE and New IP=POSITIVE with a user.authentication.auth_via_mfa response (debugContext.debugData.factor=OKTA_VERIFY_PUSH) where debugContext.debugData.pushOnlyResponseType=OV_RESPONSE_DENY. The real user rejecting a push raised by an unfamiliar device and IP is a strong sign someone else has the password. ip_mismatch=1 when the response came from an IP that never requested a push; approved_after_deny=1 when a later push in the same session was approved (likely MFA fatigue success). Built only from field paths and values in the Splunk attack_data sample okta_mismatch.log.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- OktaIM2:log
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1621
+severity: high
+false_positives:
+- User signs in on a new laptop on a new network, then taps Deny by mistake. Confirm with the user; a single deny with no approval and no further pushes is the usual benign shape.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/okta_mismatch_between_source_and_response_for_verify_push_request.yml
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1621/okta_mismatch/okta_mismatch.log
+- https://developer.okta.com/docs/okta-event-types.csv
+- https://developer.okta.com/docs/reference/system-log-query/
+- https://splunk.github.io/splunk-add-on-for-okta-identity-cloud/Sourcetypes/
+- 'Attribution: splunk/security_content and splunk/attack_data (Apache-2.0), see THIRD_PARTY_NOTICES.md'
+telemetry_validated: false
+required_fields:
+- eventType
+- outcome.result
+- authenticationContext.externalSessionId
+- client.ipAddress
+- actor.alternateId
+- debugContext.debugData.factor
+- debugContext.debugData.pushOnlyResponseType
+- debugContext.debugData.behaviors
+tags:
+- okta
+- mfa
+- push
+- okta-system-log
+- attack-data-payload
+query:
+  splunk: |
+    sourcetype="OktaIM2:log" ((eventType="system.push.send_factor_verify_push" outcome.result="SUCCESS") OR (eventType="user.authentication.auth_via_mfa" debugContext.debugData.factor="OKTA_VERIFY_PUSH"))
+    | eval session='authenticationContext.externalSessionId', ip='client.ipAddress', behaviors='debugContext.debugData.behaviors', response='debugContext.debugData.pushOnlyResponseType'
+    | eval is_push=if(eventType="system.push.send_factor_verify_push", 1, 0)
+    | eval push_ip=if(is_push=1, ip, null()), resp_ip=if(is_push=0, ip, null())
+    | eval push_new_dev_ip=if(is_push=1 AND like(behaviors, "%New Device=POSITIVE%") AND like(behaviors, "%New IP=POSITIVE%"), 1, 0)
+    | eval deny_time=if(is_push=0 AND response="OV_RESPONSE_DENY", _time, null()), approve_time=if(is_push=0 AND response="OV_RESPONSE_APPROVE", _time, null())
+    | stats min(_time) as firstTime max(_time) as lastTime sum(is_push) as pushes count(deny_time) as denies count(approve_time) as approvals max(push_new_dev_ip) as push_new_dev_ip values(push_ip) as push_ip values(resp_ip) as responder_ip min(deny_time) as first_deny max(approve_time) as last_approve values(actor.alternateId) as user by session
+    | where pushes>0 AND denies>0 AND push_new_dev_ip=1
+    | eval ip_mismatch=if(isnotnull(responder_ip) AND mvcount(mvdedup(mvappend(push_ip, responder_ip)))>mvcount(push_ip), 1, 0)
+    | eval approved_after_deny=if(isnotnull(last_approve) AND last_approve>first_deny, 1, 0)
