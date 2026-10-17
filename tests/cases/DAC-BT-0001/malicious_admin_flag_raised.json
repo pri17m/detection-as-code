@@ -1,5 +1,6 @@
 {
   "label": "malicious",
+  "synthetic": true,
   "source": "Mandiant blog privilege raise; field per BeyondTrust Permission fields",
   "sourcetype": "beyondtrust:sra",
   "event": "user_changed",

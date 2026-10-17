@@ -15,7 +15,7 @@ mitre:
   - T1098
 severity: high
 false_positives:
-- Planned admin onboarding or role changes. Confirm a change record and that `who` is a known administrator.
+- Planned admin onboarding or role changes. Confirm a change record and that `who` is a known administrator. Expected volume is very low (admin grants are rare); self_grant=1 should be treated as high priority.
 references:
 - https://cloud.google.com/blog/topics/threat-intelligence/armory-castle-exploits-beyondtrust
 - https://nvd.nist.gov/vuln/detail/CVE-2026-102764
@@ -30,6 +30,8 @@ required_fields:
 - who_ip
 - site
 - old_username
+- new_username
+- username
 - old_permissions:admin
 - new_permissions:admin
 - permissions:admin
@@ -46,10 +48,14 @@ query:
 
     | where (event="user_changed" AND new_admin="1" AND coalesce(old_admin,"0")!="1") OR (event="user_added" AND (added_admin="1" OR new_admin="1"))
 
-    | eval target_user=coalesce(''new_username'',''old_username'',''username'')
+    | eval target_user=lower(coalesce(''old_username'',''new_username'',''username''))
 
-    | fillnull value="unknown" site who who_ip
+    | rex field=who "\\((?<actor>[^()]*)\\)(\\s+using\\s+.*)?$"
 
-    | stats count min(_time) as firstTime max(_time) as lastTime values(event) as event values(target_user) as target_user by site, who, who_ip
+    | eval actor=lower(actor), self_grant=if(isnotnull(target_user) AND actor=target_user, 1, 0)
+
+    | fillnull value="unknown" site who who_ip target_user
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(event) as event max(self_grant) as self_grant by site, who, who_ip, target_user
 
     '

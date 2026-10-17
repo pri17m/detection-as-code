@@ -1,5 +1,6 @@
 {
   "label": "benign",
+  "synthetic": true,
   "source": "BeyondTrust Message format example: old_ snapshot only",
   "sourcetype": "beyondtrust:sra",
   "event": "user_changed",

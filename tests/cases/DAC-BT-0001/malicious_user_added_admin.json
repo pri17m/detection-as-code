@@ -1,5 +1,6 @@
 {
   "label": "malicious",
+  "synthetic": true,
   "source": "BeyondTrust Syslog events: user_added + Permission fields",
   "sourcetype": "beyondtrust:sra",
   "event": "user_added",

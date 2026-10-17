@@ -1,5 +1,6 @@
 {
   "label": "near_miss",
+  "synthetic": true,
   "source": "admin removed, not granted",
   "sourcetype": "beyondtrust:sra",
   "event": "user_changed",
