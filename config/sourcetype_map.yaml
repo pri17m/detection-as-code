@@ -64,6 +64,13 @@ allowed_sourcetypes:
   # https://github.com/splunk/splunk-connect-for-syslog/blob/main/package/shared/addons/beyondtrust/app-syslog-beyondtrust_sra.conf
   - beyondtrust:sra
 
+  # --- Okta Identity Cloud System Log (Splunk Add-on for Okta Identity Cloud, Splunkbase 6553) ---
+  # "System log events coming from Okta Rest API endpoints" (add-on docs). Events are Okta
+  # LogEvent JSON; DAC-OKTA rules use raw LogEvent paths (eventType, outcome.result, ...).
+  # https://splunk.github.io/splunk-add-on-for-okta-identity-cloud/Sourcetypes/
+  # https://splunkbase.splunk.com/app/6553
+  - OktaIM2:log
+
 # ---------------------------------------------------------------------------
 # Optional: source= patterns that pair with collapsed sourcetypes
 # (not CI-enforced as sourcetype strings; documented for rule authors)
