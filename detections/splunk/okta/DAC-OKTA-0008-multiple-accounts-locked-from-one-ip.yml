@@ -1,0 +1,44 @@
+id: DAC-OKTA-0008
+title: 'Okta: three or more accounts locked out from one IP in 30 minutes'
+description: Counts Okta System Log user.account.lock events with outcome.reason=LOCKED_OUT per client.ipAddress in 30-minute bins and alerts when three or more distinct actor.id values are locked. Several lockouts from one source means a password attack crossed the lockout threshold on multiple accounts. Built only from field paths and values in the Splunk attack_data sample okta_multiple_accounts_lockout.log.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- OktaIM2:log
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1110
+severity: medium
+false_positives:
+- Shared kiosk or office NAT after a password policy change. Check securityContext.asOrg against your own egress ranges.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/okta_multiple_accounts_locked_out.yml
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1110/okta_multiple_accounts_lockout/okta_multiple_accounts_lockout.log
+- https://developer.okta.com/docs/okta-event-types.csv
+- https://developer.okta.com/docs/reference/system-log-query/
+- https://splunk.github.io/splunk-add-on-for-okta-identity-cloud/Sourcetypes/
+- 'Attribution: splunk/security_content and splunk/attack_data (Apache-2.0), see THIRD_PARTY_NOTICES.md'
+telemetry_validated: false
+required_fields:
+- eventType
+- outcome.reason
+- client.ipAddress
+- actor.id
+- actor.alternateId
+- securityContext.asOrg
+tags:
+- okta
+- brute-force
+- lockout
+- okta-system-log
+- attack-data-payload
+query:
+  splunk: |
+    sourcetype="OktaIM2:log" eventType="user.account.lock" outcome.reason="LOCKED_OUT"
+    | bin _time span=30m
+    | stats min(_time) as firstTime max(_time) as lastTime dc(actor.id) as locked_users values(actor.alternateId) as user values(securityContext.asOrg) as as_org by _time client.ipAddress
+    | where locked_users>=3
