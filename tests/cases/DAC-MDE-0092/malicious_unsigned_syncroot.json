@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "source": "Learn SyncRootManager path + unsigned process",
+  "expect_alert": true,
+  "result": "not run",
+  "RegistryKey": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\SyncRootManager\\Evil!S-1-5-21!acct",
+  "ActionType": "RegistryKeyCreated",
+  "InitiatingProcessFileName": "payload.exe",
+  "InitiatingProcessFolderPath": "C:\\Users\\Public\\payload.exe",
+  "IsSigned": false
+}
