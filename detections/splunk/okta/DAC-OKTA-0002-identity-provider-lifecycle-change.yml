@@ -1,0 +1,48 @@
+id: DAC-OKTA-0002
+title: 'Okta: identity provider created, activated, deactivated or deleted'
+description: Detects successful Okta System Log system.idp.lifecycle.create / activate / deactivate / delete events. Adding and activating an external identity provider (for example a Google OIDC IdP) gives an attacker a federated sign-in path that bypasses the org password and MFA; deactivating or deleting one can break SSO or remove evidence. new_idp_enabled=1 marks the same actor creating and activating the same IdP. Built only from field paths and values in the Splunk attack_data sample okta_idp/okta.log.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- OktaIM2:log
+mitre:
+  tactics:
+  - defense-impairment
+  - privilege-escalation
+  techniques:
+  - T1484.002
+severity: high
+false_positives:
+- Planned SSO or social-login setup by an identity admin. Confirm a change record for the IdP name/protocol shown.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/okta_idp_lifecycle_modifications.yml
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1556/okta_idp/okta.log
+- https://developer.okta.com/docs/okta-event-types.csv
+- https://developer.okta.com/docs/reference/system-log-query/
+- https://splunk.github.io/splunk-add-on-for-okta-identity-cloud/Sourcetypes/
+- 'Attribution: splunk/security_content and splunk/attack_data (Apache-2.0), see THIRD_PARTY_NOTICES.md'
+telemetry_validated: false
+required_fields:
+- eventType
+- outcome.result
+- actor.alternateId
+- target{}.id
+- target{}.type
+- target{}.displayName
+- target{}.alternateId
+- debugContext.debugData.protocol
+- client.ipAddress
+tags:
+- okta
+- federation
+- okta-system-log
+- attack-data-payload
+query:
+  splunk: |
+    sourcetype="OktaIM2:log" eventType IN ("system.idp.lifecycle.create", "system.idp.lifecycle.activate", "system.idp.lifecycle.deactivate", "system.idp.lifecycle.delete") outcome.result="SUCCESS"
+    | eval idp_id=mvindex('target{}.id', mvfind('target{}.type', "^IdentityProvider$")), idp_name=mvindex('target{}.displayName', mvfind('target{}.type', "^IdentityProvider$")), action=replace(eventType, "^system\.idp\.lifecycle\.", "")
+    | fillnull value="unknown" idp_id
+    | stats min(_time) as firstTime max(_time) as lastTime values(action) as actions values(idp_name) as idp_name values(target{}.alternateId) as idp_alias values(debugContext.debugData.protocol) as protocol values(client.ipAddress) as src_ip by actor.alternateId idp_id
+    | eval new_idp_enabled=if(isnotnull(mvfind(actions, "^create$")) AND isnotnull(mvfind(actions, "^activate$")), 1, 0)
