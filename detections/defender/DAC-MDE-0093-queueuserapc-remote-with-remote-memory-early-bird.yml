@@ -1,0 +1,90 @@
+id: DAC-MDE-0093
+title: QueueUserAPC into a remote process with remote memory and recent process creation
+description: >-
+  Correlates DeviceEvents ActionType QueueUserApcRemoteApiCall with a remote
+  memory operation (NtAllocateVirtualMemoryRemoteApiCall or
+  NtMapViewOfSectionRemoteApiCall) into the same target process by the same
+  injector, and requires the target process to have been created within 60
+  seconds before the APC (Early Bird pattern). Uses only ActionType values
+  documented in public FalconFriday / detection.wiki DeviceEvents material.
+  Based on detections.ai rule https://detections.ai/rules/01a13157-ffc9-748c-a025-4a9cec1e367e
+  by Unknown. telemetry_validated false; not run in a tenant.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - stealth
+  - privilege-escalation
+  techniques:
+  - T1055
+  - T1055.004
+severity: high
+false_positives:
+- Security products and debuggers that queue APCs into newly created processes; allowlist those InitiatingProcessFileName values after measuring noise (not measured).
+references:
+- https://detections.ai/rules/01a13157-ffc9-748c-a025-4a9cec1e367e
+- https://attack.mitre.org/techniques/T1055/
+- https://attack.mitre.org/techniques/T1055/004/
+- https://github.com/FalconForceTeam/FalconFriday/blob/main/0xFF-0081-Process_Injection_From_Untrusted_Process-Win.md
+- https://detection.wiki/defender-deviceevents/
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceevents-table
+telemetry_validated: false
+required_fields:
+- Timestamp
+- DeviceId
+- DeviceName
+- ActionType
+- InitiatingProcessFileName
+- InitiatingProcessCommandLine
+- InitiatingProcessId
+- InitiatingProcessCreationTime
+- ProcessId
+- ProcessCreationTime
+- FileName
+tags:
+- behavioural
+- process-injection
+- early-bird
+- needs-review
+- detections-ai
+query:
+  defender: |
+    let Lookback = 1d;
+    let apc = DeviceEvents
+    | where Timestamp > ago(Lookback)
+    | where ActionType == "QueueUserApcRemoteApiCall"
+    | where ProcessId != InitiatingProcessId
+    | project DeviceId, DeviceName, ApcTime = Timestamp,
+        InjectorFile = InitiatingProcessFileName, InjectorCmd = InitiatingProcessCommandLine,
+        InjectorPid = InitiatingProcessId, InjectorCreation = InitiatingProcessCreationTime,
+        TargetPid = ProcessId, TargetCreation = ProcessCreationTime, TargetFile = FileName;
+    let remote = DeviceEvents
+    | where Timestamp > ago(Lookback)
+    | where ActionType in (
+        "NtAllocateVirtualMemoryRemoteApiCall",
+        "NtMapViewOfSectionRemoteApiCall"
+      )
+    | where ProcessId != InitiatingProcessId
+    | summarize RemoteActions = make_set(ActionType, 10), RemoteTime = min(Timestamp)
+        by DeviceId,
+           InjectorPid = InitiatingProcessId,
+           InjectorCreation = InitiatingProcessCreationTime,
+           TargetPid = ProcessId,
+           TargetCreation = ProcessCreationTime;
+    let children = DeviceProcessEvents
+    | where Timestamp > ago(Lookback)
+    | project DeviceId, ChildTime = Timestamp,
+        TargetPid = ProcessId, TargetCreation = ProcessCreationTime,
+        ChildFile = FileName, ChildCmd = ProcessCommandLine,
+        ParentFile = InitiatingProcessFileName, ParentCmd = InitiatingProcessCommandLine;
+    apc
+    | join kind=inner remote on DeviceId, InjectorPid, InjectorCreation, TargetPid, TargetCreation
+    | join kind=inner children on DeviceId, TargetPid, TargetCreation
+    | extend SecondsSinceChildCreated = datetime_diff("second", ApcTime, ChildTime)
+    | where SecondsSinceChildCreated between (0 .. 60)
+    | project ApcTime, DeviceName, InjectorFile, InjectorCmd, TargetFile, TargetPid,
+        RemoteActions, ChildFile, ChildCmd, ParentFile, ParentCmd, SecondsSinceChildCreated

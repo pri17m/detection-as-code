@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "source": "sc stop WinDefend",
+  "expect_alert": true,
+  "result": "not run",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Win",
+  "ImageFileName": "C:\\Windows\\System32\\sc.exe",
+  "CommandLine": "sc stop WinDefend",
+  "ParentBaseFileName": "cmd.exe"
+}

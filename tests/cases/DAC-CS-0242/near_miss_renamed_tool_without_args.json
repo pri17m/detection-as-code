@@ -1,0 +1,11 @@
+{
+  "label": "near-miss",
+  "source": "Renamed DefenderControl with no MpPreference args \u2014 correctly no alert after IOC drop",
+  "expect_alert": false,
+  "result": "not run",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Win",
+  "ImageFileName": "C:\\Users\\Public\\DefenderControl.exe",
+  "CommandLine": "DefenderControl.exe",
+  "ParentBaseFileName": "explorer.exe"
+}

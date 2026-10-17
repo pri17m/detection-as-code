@@ -1,0 +1,55 @@
+id: DAC-BT-0004
+title: 'BeyondTrust RS/PRA: appliance syslog gap far above its own baseline'
+description: Detects a per-host gap in beyondtrust:sra events in the last 24h that is at least 4 hours and more than twice that host's 30-day 99th-percentile inter-bucket gap (baseline excludes the last 24h; ≥20 baseline gaps required), including an appliance that has been silent until now. ARMORY CASTLE deleted appliance logs. Mandiant says a forwarding gap bounded by a single session is a strong sign of tampering. Uses only host and _time.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- beyondtrust:sra
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1562.006
+severity: low
+false_positives:
+- Planned maintenance, appliance upgrades/reboots, SC4S or network outages (check other SC4S sources for the same window).
+- 'Low-activity sites: BeyondTrust only logs admin/login events, so quiet periods are normal. The baseline percentile handles this, but nights and weekends may still trip it.'
+references:
+- https://cloud.google.com/blog/topics/threat-intelligence/armory-castle-exploits-beyondtrust
+- https://nvd.nist.gov/vuln/detail/CVE-2026-102764
+- https://docs.beyondtrust.com/rs/docs/events
+- https://docs.beyondtrust.com/rs/docs/message-format
+- https://docs.beyondtrust.com/pra/docs/events
+- https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/BeyondTrust/sra/
+telemetry_validated: false
+required_fields:
+- host
+- _time
+tags:
+- beyondtrust
+- remote-support
+- pra
+- bomgar
+- log-gap
+query:
+  splunk: '| tstats count where sourcetype=beyondtrust:sra earliest=-30d@d latest=now by host _time span=10m
+
+    | append [| tstats max(_time) as lastSeen where sourcetype=beyondtrust:sra earliest=-30d@d latest=now by host | eval _time=now(), synthetic_now=1 | fields _time host synthetic_now]
+
+    | sort 0 host _time
+
+    | streamstats current=f window=1 last(_time) as prevTime by host
+
+    | eval gap_sec=_time-prevTime, baseline_gap=if(_time < relative_time(now(), "-24h"), gap_sec, null())
+
+    | eventstats perc99(baseline_gap) as p99_gap count(baseline_gap) as baseline_n by host
+
+    | where _time >= relative_time(now(), "-24h") AND prevTime >= relative_time(now(), "-72h") AND baseline_n >= 20 AND gap_sec >= 14400 AND gap_sec > 2*p99_gap
+
+    | eval gap_start=strftime(prevTime, "%F %T"), gap_end=if(synthetic_now=1, "still silent", strftime(_time, "%F %T")), gap_hours=round(gap_sec/3600, 1), p99_gap_hours=round(p99_gap/3600, 1)
+
+    | table host gap_start gap_end gap_hours p99_gap_hours baseline_n
+
+    '

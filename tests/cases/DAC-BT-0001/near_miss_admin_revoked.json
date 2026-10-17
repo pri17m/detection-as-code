@@ -1,0 +1,15 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "admin removed, not granted",
+  "sourcetype": "beyondtrust:sra",
+  "event": "user_changed",
+  "who": "Admin(admin) using password",
+  "who_ip": "10.0.0.5",
+  "site": "support.example.com",
+  "old_username": "bob",
+  "old_permissions:admin": "1",
+  "new_permissions:admin": "0",
+  "expect_alert": false,
+  "result": "not run"
+}

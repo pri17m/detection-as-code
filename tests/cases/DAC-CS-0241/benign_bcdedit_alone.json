@@ -1,0 +1,9 @@
+{
+  "label": "benign",
+  "source": "bcdedit safeboot without reboot \u2014 must not alert after ponytail fix",
+  "expect_alert": false,
+  "result": "not run",
+  "event_simpleName": "ProcessRollup2",
+  "FileName": "bcdedit.exe",
+  "CommandLine": "bcdedit /set {current} safeboot minimal"
+}

@@ -1,0 +1,10 @@
+{
+  "label": "malicious",
+  "source": "Endor Labs / Datadog Shai-Hulud network targets",
+  "expect_alert": true,
+  "result": "not run",
+  "InitiatingProcessFileName": "bun.exe",
+  "RemoteUrl_a": "https://api.github.com/user",
+  "RemoteUrl_b": "https://registry.npmjs.org/-/whoami",
+  "window_minutes": 5
+}

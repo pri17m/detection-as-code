@@ -1,0 +1,15 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "representative console, out of scope",
+  "sourcetype": "beyondtrust:sra",
+  "event": "login",
+  "status": "success",
+  "target": "rep_client",
+  "who": "Rep One(rep1) using password",
+  "who_ip": "198.51.100.80",
+  "site": "support.example.com",
+  "history": "rep1 known",
+  "expect_alert": false,
+  "result": "not run"
+}

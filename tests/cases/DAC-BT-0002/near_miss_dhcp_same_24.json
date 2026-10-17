@@ -1,0 +1,15 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "synthetic; DHCP churn inside an already-seen /24",
+  "sourcetype": "beyondtrust:sra",
+  "event": "login",
+  "status": "success",
+  "target": "web/login",
+  "who": "Administrator(admin) using password",
+  "who_ip": "10.0.0.23",
+  "site": "support.example.com",
+  "history": "admin seen from 10.0.0.5 daily for 30d",
+  "expect_alert": false,
+  "result": "not run"
+}
