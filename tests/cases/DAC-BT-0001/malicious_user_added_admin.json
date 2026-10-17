@@ -1,0 +1,13 @@
+{
+  "label": "malicious",
+  "source": "BeyondTrust Syslog events: user_added + Permission fields",
+  "sourcetype": "beyondtrust:sra",
+  "event": "user_added",
+  "who": "Admin(admin) using password",
+  "who_ip": "203.0.113.50",
+  "site": "support.example.com",
+  "username": "svc_backup2",
+  "permissions:admin": "1",
+  "expect_alert": true,
+  "result": "not run"
+}

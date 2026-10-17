@@ -1,0 +1,14 @@
+{
+  "label": "malicious",
+  "source": "Mandiant blog privilege raise; field per BeyondTrust Permission fields",
+  "sourcetype": "beyondtrust:sra",
+  "event": "user_changed",
+  "who": "Admin(admin) using password",
+  "who_ip": "203.0.113.50",
+  "site": "support.example.com",
+  "old_username": "helpdesk1",
+  "old_permissions:admin": "0",
+  "new_permissions:admin": "1",
+  "expect_alert": true,
+  "result": "not run"
+}

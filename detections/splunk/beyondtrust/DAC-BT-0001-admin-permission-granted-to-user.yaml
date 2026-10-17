@@ -1,0 +1,55 @@
+id: DAC-BT-0001
+title: 'BeyondTrust RS/PRA: administrator permission granted to a local user'
+description: Detects BeyondTrust Remote Support or Privileged Remote Access syslog user_changed events where permissions:admin changes to 1, or user_added events that create a user with permissions:admin=1. In the ARMORY CASTLE intrusion (CVE-2026-102764), the actor raised a compromised account's privileges in /login. Uses only fields documented in BeyondTrust's Syslog events reference.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- beyondtrust:sra
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1098
+severity: high
+false_positives:
+- Planned admin onboarding or role changes. Confirm a change record and that `who` is a known administrator.
+references:
+- https://cloud.google.com/blog/topics/threat-intelligence/armory-castle-exploits-beyondtrust
+- https://nvd.nist.gov/vuln/detail/CVE-2026-102764
+- https://docs.beyondtrust.com/rs/docs/events
+- https://docs.beyondtrust.com/rs/docs/message-format
+- https://docs.beyondtrust.com/pra/docs/events
+- https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/BeyondTrust/sra/
+telemetry_validated: false
+required_fields:
+- event
+- who
+- who_ip
+- site
+- old_username
+- old_permissions:admin
+- new_permissions:admin
+- permissions:admin
+tags:
+- beyondtrust
+- remote-support
+- pra
+- bomgar
+- CVE-2026-102764
+query:
+  splunk: 'sourcetype=beyondtrust:sra (event=user_changed OR event=user_added)
+
+    | eval old_admin=''old_permissions:admin'', new_admin=''new_permissions:admin'', added_admin=''permissions:admin''
+
+    | where (event="user_changed" AND new_admin="1" AND coalesce(old_admin,"0")!="1") OR (event="user_added" AND (added_admin="1" OR new_admin="1"))
+
+    | eval target_user=coalesce(''new_username'',''old_username'',''username'')
+
+    | fillnull value="unknown" site who who_ip
+
+    | stats count min(_time) as firstTime max(_time) as lastTime values(event) as event values(target_user) as target_user by site, who, who_ip
+
+    '
