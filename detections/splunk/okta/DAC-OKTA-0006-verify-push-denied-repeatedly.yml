@@ -1,0 +1,50 @@
+id: DAC-OKTA-0006
+title: 'Okta: three or more Verify pushes denied for one user, with or without a later approval'
+description: Counts Okta System Log user.authentication.auth_via_mfa events with debugContext.debugData.factor=OKTA_VERIFY_PUSH per actor.alternateId and alerts when debugContext.debugData.pushOnlyResponseType=OV_RESPONSE_DENY appears three or more times in the search window (60 minutes). Repeated denied pushes mean someone holding the password is spamming the user (MFA fatigue). approved_after_denies=1 when an OV_RESPONSE_APPROVE follows the first deny, i.e. the user probably gave in. Built only from field paths and values in the Splunk attack_data samples okta_multiple_failed_mfa_pushes.log and okta_multiple_failed_mfa_requests.log.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- OktaIM2:log
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1621
+severity: high
+false_positives:
+- A user repeatedly denying pushes they triggered themselves on a second device by mistake. Low volume; confirm with the user.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/okta_mfa_exhaustion_hunt.yml
+- https://github.com/splunk/security_content/blob/develop/detections/application/okta_multiple_failed_mfa_requests_for_user.yml
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1621/okta_multiple_failed_mfa_pushes/okta_multiple_failed_mfa_pushes.log
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1621/okta_multiple_failed_mfa_requests/okta_multiple_failed_mfa_requests.log
+- https://developer.okta.com/docs/okta-event-types.csv
+- https://developer.okta.com/docs/reference/system-log-query/
+- https://splunk.github.io/splunk-add-on-for-okta-identity-cloud/Sourcetypes/
+- 'Attribution: splunk/security_content and splunk/attack_data (Apache-2.0), see THIRD_PARTY_NOTICES.md'
+telemetry_validated: false
+required_fields:
+- eventType
+- debugContext.debugData.factor
+- debugContext.debugData.pushOnlyResponseType
+- actor.alternateId
+- authenticationContext.externalSessionId
+- client.ipAddress
+- outcome.result
+tags:
+- okta
+- mfa
+- push
+- mfa-fatigue
+- okta-system-log
+- attack-data-payload
+query:
+  splunk: |
+    sourcetype="OktaIM2:log" eventType="user.authentication.auth_via_mfa" debugContext.debugData.factor="OKTA_VERIFY_PUSH" debugContext.debugData.pushOnlyResponseType IN ("OV_RESPONSE_DENY", "OV_RESPONSE_APPROVE")
+    | eval response='debugContext.debugData.pushOnlyResponseType'
+    | eval deny_time=if(response="OV_RESPONSE_DENY", _time, null()), approve_time=if(response="OV_RESPONSE_APPROVE", _time, null())
+    | stats min(_time) as firstTime max(_time) as lastTime count(deny_time) as denies count(approve_time) as approvals min(deny_time) as first_deny max(approve_time) as last_approve dc(authenticationContext.externalSessionId) as sessions values(client.ipAddress) as responder_ip by actor.alternateId
+    | where denies>=3
+    | eval approved_after_denies=if(isnotnull(last_approve) AND last_approve>first_deny, 1, 0)
