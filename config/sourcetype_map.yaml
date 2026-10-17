@@ -58,6 +58,12 @@ allowed_sourcetypes:
   - vmware:vclog
   - "vmware:vclog:*"             # SC4S / TA form e.g. vmware:vclog:vpxd
 
+  # --- BeyondTrust Remote Support / PRA (Bomgar) appliance syslog via SC4S ---
+  # SC4S parser app-syslog-beyondtrust_sra (PROGRAM "BG"), default index infraops.
+  # https://splunk.github.io/splunk-connect-for-syslog/main/sources/vendor/BeyondTrust/sra/
+  # https://github.com/splunk/splunk-connect-for-syslog/blob/main/package/shared/addons/beyondtrust/app-syslog-beyondtrust_sra.conf
+  - beyondtrust:sra
+
 # ---------------------------------------------------------------------------
 # Optional: source= patterns that pair with collapsed sourcetypes
 # (not CI-enforced as sourcetype strings; documented for rule authors)

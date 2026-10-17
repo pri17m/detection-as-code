@@ -1,0 +1,10 @@
+{
+  "label": "benign",
+  "source": "GoogleUpdate elevated via COM",
+  "expect_alert": false,
+  "result": "not run",
+  "InitiatingProcessFileName": "chrome.exe",
+  "InitiatingProcessFolderPath": "C:\\Program Files\\Google\\Chrome\\Application",
+  "AccountName": "system",
+  "FileName": "GoogleUpdate.exe"
+}

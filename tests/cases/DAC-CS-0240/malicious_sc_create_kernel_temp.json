@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "source": "detections.ai BYOVD + public BYOVD tradecraft",
+  "expect_alert": true,
+  "result": "not run",
+  "event_simpleName": "ProcessRollup2",
+  "event_platform": "Win",
+  "ImageFileName": "C:\\Windows\\System32\\sc.exe",
+  "CommandLine": "sc create BadDrv type= kernel binPath= C:\\Users\\Public\\Downloads\\evil.sys",
+  "ParentBaseFileName": "cmd.exe"
+}

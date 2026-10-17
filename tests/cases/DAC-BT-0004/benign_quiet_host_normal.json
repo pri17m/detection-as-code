@@ -1,0 +1,11 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "gap below 2x own p99",
+  "sourcetype": "beyondtrust:sra",
+  "host": "bt-lab-02",
+  "p99_gap_sec": 43200,
+  "gap_sec": 28800,
+  "expect_alert": false,
+  "result": "not run"
+}

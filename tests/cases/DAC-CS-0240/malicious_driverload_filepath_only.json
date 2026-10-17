@@ -1,0 +1,10 @@
+{
+  "label": "malicious",
+  "source": "LCC Enumerate Windows Driver Loads (FilePath/FileName on DriverLoad) + user path",
+  "expect_alert": true,
+  "result": "not run",
+  "event_simpleName": "DriverLoad",
+  "event_platform": "Win",
+  "FilePath": "\\Device\\HarddiskVolume3\\Windows\\Temp\\",
+  "FileName": "truesight.sys"
+}

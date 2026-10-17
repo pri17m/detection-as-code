@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "source": "Endor Labs Shai-Hulud credential endpoints",
+  "expect_alert": true,
+  "result": "not run",
+  "InitiatingProcessFileName": "node.exe",
+  "endpoints": [
+    "IMDS",
+    "Vault_local"
+  ]
+}
