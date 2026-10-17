@@ -1,0 +1,176 @@
+{
+  "label": "malicious",
+  "synthetic": false,
+  "source": "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1556/okta_idp/okta.log",
+  "source_commit_note": "attack_data master, downloaded 2026-10-17",
+  "source_lines": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "modifications": [
+    "trimmed to required_fields plus published/uuid/eventType/displayMessage",
+    "gmail.com / mail.com addresses pseudonymised to user<hash>@example.com"
+  ],
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": true,
+  "local_standin_match_rows": 1,
+  "local_standin_rows": [
+    {
+      "actor": "attacker@github.oktaidp",
+      "idp_id": "0oadup8giv0zAemm65d7",
+      "actions": [
+        "activate",
+        "create",
+        "deactivate",
+        "delete"
+      ],
+      "new_idp_enabled": 1
+    }
+  ],
+  "result": "not run by CI (no Splunk runner); local Python stand-in matched, see REVIEW.md",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "attacker@github.oktaidp"
+      },
+      "client": {
+        "ipAddress": "23.93.213.13"
+      },
+      "debugContext": {
+        "debugData": {
+          "protocol": "OIDC"
+        }
+      },
+      "displayMessage": "Delete an Identity Provider",
+      "eventType": "system.idp.lifecycle.delete",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2023-12-15T02:14:35.496Z",
+      "target": [
+        {
+          "alternateId": "google_idp",
+          "displayName": "attacker ADD Google IDP",
+          "id": "0oadup8giv0zAemm65d7",
+          "type": "IdentityProvider"
+        }
+      ],
+      "uuid": "b125a75e-9aef-11ee-9aaa-e50dcebb6450"
+    },
+    {
+      "actor": {
+        "alternateId": "attacker@github.oktaidp"
+      },
+      "client": {
+        "ipAddress": "23.93.213.13"
+      },
+      "debugContext": {
+        "debugData": {
+          "protocol": "OIDC"
+        }
+      },
+      "displayMessage": "Deactivate an Identity Provider",
+      "eventType": "system.idp.lifecycle.deactivate",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2023-12-15T02:13:58.161Z",
+      "target": [
+        {
+          "alternateId": "google_idp",
+          "displayName": "attacker ADD Google IDP",
+          "id": "0oadup8giv0zAemm65d7",
+          "type": "IdentityProvider"
+        }
+      ],
+      "uuid": "9ae4c85d-9aef-11ee-b874-69a6ed90ed0d"
+    },
+    {
+      "actor": {
+        "alternateId": "attacker@github.oktaidp"
+      },
+      "client": {
+        "ipAddress": "23.93.213.13"
+      },
+      "debugContext": {
+        "debugData": {
+          "protocol": "OIDC"
+        }
+      },
+      "displayMessage": "Activate an Identity Provider",
+      "eventType": "system.idp.lifecycle.activate",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2023-12-15T02:12:51.410Z",
+      "target": [
+        {
+          "alternateId": "google_idp",
+          "displayName": "attacker ADD Google IDP",
+          "id": "0oadup8giv0zAemm65d7",
+          "type": "IdentityProvider"
+        }
+      ],
+      "uuid": "731b6328-9aef-11ee-bf48-c3f26fe50e77"
+    },
+    {
+      "actor": {
+        "alternateId": "attacker@github.oktaidp"
+      },
+      "client": {
+        "ipAddress": "23.93.213.13"
+      },
+      "debugContext": {
+        "debugData": {
+          "protocol": "OIDC"
+        }
+      },
+      "displayMessage": "Deactivate an Identity Provider",
+      "eventType": "system.idp.lifecycle.deactivate",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2023-12-15T02:12:48.931Z",
+      "target": [
+        {
+          "alternateId": "google_idp",
+          "displayName": "attacker ADD Google IDP",
+          "id": "0oadup8giv0zAemm65d7",
+          "type": "IdentityProvider"
+        }
+      ],
+      "uuid": "71a11fc9-9aef-11ee-bbee-7193b800cfde"
+    },
+    {
+      "actor": {
+        "alternateId": "attacker@github.oktaidp"
+      },
+      "client": {
+        "ipAddress": "23.93.213.13"
+      },
+      "debugContext": {
+        "debugData": {
+          "protocol": "OIDC"
+        }
+      },
+      "displayMessage": "Create an Identity Provider",
+      "eventType": "system.idp.lifecycle.create",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2023-12-15T02:12:17.596Z",
+      "target": [
+        {
+          "alternateId": "google_idp",
+          "displayName": "attacker ADD Google IDP",
+          "id": "0oadup8giv0zAemm65d7",
+          "type": "IdentityProvider"
+        }
+      ],
+      "uuid": "5ef3c80d-9aef-11ee-b15d-a1bd0b15b20e"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1556/okta_idp/okta.log",
+  "modification": "payload event with eventType changed to an IdP event type not in scope (synthetic)",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "attacker@github.oktaidp"
+      },
+      "client": {
+        "ipAddress": "23.93.213.13"
+      },
+      "debugContext": {
+        "debugData": {
+          "protocol": "OIDC"
+        }
+      },
+      "displayMessage": "Delete an Identity Provider",
+      "eventType": "system.idp.lifecycle.update",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2023-12-15T02:14:35.496Z",
+      "target": [
+        {
+          "alternateId": "google_idp",
+          "displayName": "attacker ADD Google IDP",
+          "id": "0oadup8giv0zAemm65d7",
+          "type": "IdentityProvider"
+        }
+      ],
+      "uuid": "b125a75e-9aef-11ee-9aaa-e50dcebb6450"
+    }
+  ]
+}
