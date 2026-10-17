@@ -1,0 +1,108 @@
+{
+  "label": "malicious",
+  "synthetic": false,
+  "source": "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1539/okta_web_session_multiple_ip/okta_web_session_multiple_ip.log",
+  "source_commit_note": "attack_data master, downloaded 2026-10-17",
+  "source_lines": [
+    1,
+    2
+  ],
+  "modifications": [
+    "trimmed to required_fields plus published/uuid/eventType/displayMessage",
+    "gmail.com / mail.com addresses pseudonymised to user<hash>@example.com"
+  ],
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": true,
+  "local_standin_match_rows": 1,
+  "local_standin_rows": [
+    {
+      "session": "idxiiDSIWJxR--Gvc_e3e6IXQ",
+      "user": "user0315e2@example.com",
+      "ip_count": 2,
+      "src_ip": [
+        "18.185.207.118",
+        "23.93.1.1"
+      ],
+      "browser": [
+        "CHROME",
+        "Mozilla"
+      ],
+      "os": [
+        "Mac OS 12.1.0 (Ventura)",
+        "Mac OS 13.4.0 (Ventura)"
+      ],
+      "country_change": 1
+    }
+  ],
+  "result": "not run by CI (no Splunk runner); local Python stand-in matched, see REVIEW.md",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user0315e2@example.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxiiDSIWJxR--Gvc_e3e6IXQ"
+      },
+      "client": {
+        "geographicalContext": {
+          "country": "United States"
+        },
+        "ipAddress": "23.93.1.1",
+        "userAgent": {
+          "browser": "CHROME",
+          "os": "Mac OS 13.4.0 (Ventura)",
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "Evaluation of sign-on policy",
+      "eventType": "policy.evaluate_sign_on",
+      "outcome": {
+        "result": "ALLOW"
+      },
+      "published": "2024-03-18T16:23:02.715Z",
+      "target": [
+        {
+          "displayName": "OpenID Connect Client"
+        },
+        {
+          "displayName": "Catch-all Rule"
+        }
+      ],
+      "uuid": "cb0b5180-e543-11ee-b8e7-f9c990bca30b"
+    },
+    {
+      "actor": {
+        "alternateId": "user0315e2@example.com"
+      },
+      "authenticationContext": {
+        "externalSessionId": "idxiiDSIWJxR--Gvc_e3e6IXQ"
+      },
+      "client": {
+        "geographicalContext": {
+          "country": "Germany"
+        },
+        "ipAddress": "18.185.207.118",
+        "userAgent": {
+          "browser": "Mozilla",
+          "os": "Mac OS 12.1.0 (Ventura)",
+          "rawUserAgent": "python 3.11/attacker_user_agent"
+        }
+      },
+      "displayMessage": "Evaluation of sign-on policy",
+      "eventType": "policy.evaluate_sign_on",
+      "outcome": {
+        "result": "ALLOW"
+      },
+      "published": "2024-03-18T16:24:02.715Z",
+      "target": [
+        {
+          "displayName": "OpenID Connect Client"
+        },
+        {
+          "displayName": "Catch-all Rule"
+        }
+      ],
+      "uuid": "cb0b5180-e543-11ee-b8e7-f9c990bca30a"
+    }
+  ]
+}
