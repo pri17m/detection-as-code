@@ -1,0 +1,40 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1098.001/okta_new_api_token_created/okta_new_api_token_created.log",
+  "modification": "payload event with outcome.result=FAILURE",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com",
+        "id": "00ufb5gta21oowKfZ5d7"
+      },
+      "authenticationContext": {
+        "externalSessionId": "102e6VpbU8wQ4qe3OiejdSKjQ"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "Create API token",
+      "eventType": "system.api_token.create",
+      "outcome": {
+        "result": "FAILURE"
+      },
+      "published": "2024-03-06T20:08:34.848Z",
+      "target": [
+        {
+          "displayName": "testing",
+          "id": "00T1r1xfljWsN50A25d7",
+          "type": "Token"
+        }
+      ],
+      "uuid": "4fddf2e2-dbf5-11ee-ac35-038a21acef38"
+    }
+  ]
+}

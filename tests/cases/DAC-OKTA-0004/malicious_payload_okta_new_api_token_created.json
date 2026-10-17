@@ -1,0 +1,56 @@
+{
+  "label": "malicious",
+  "synthetic": false,
+  "source": "https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1098.001/okta_new_api_token_created/okta_new_api_token_created.log",
+  "source_commit_note": "attack_data master, downloaded 2026-10-17",
+  "source_lines": [
+    1
+  ],
+  "modifications": [
+    "trimmed to required_fields plus published/uuid/eventType/displayMessage",
+    "gmail.com / mail.com addresses pseudonymised to user<hash>@example.com"
+  ],
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": true,
+  "local_standin_match_rows": 1,
+  "local_standin_rows": [
+    {
+      "actor": "user15@splunkresearch.com",
+      "token_name": "testing",
+      "token_id": "00T1r1xfljWsN50A25d7",
+      "src_ip": "120.1.121.43"
+    }
+  ],
+  "result": "not run by CI (no Splunk runner); local Python stand-in matched, see REVIEW.md",
+  "events": [
+    {
+      "actor": {
+        "alternateId": "user15@splunkresearch.com",
+        "id": "00ufb5gta21oowKfZ5d7"
+      },
+      "authenticationContext": {
+        "externalSessionId": "102e6VpbU8wQ4qe3OiejdSKjQ"
+      },
+      "client": {
+        "ipAddress": "120.1.121.43",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
+      },
+      "displayMessage": "Create API token",
+      "eventType": "system.api_token.create",
+      "outcome": {
+        "result": "SUCCESS"
+      },
+      "published": "2024-03-06T20:08:34.848Z",
+      "target": [
+        {
+          "displayName": "testing",
+          "id": "00T1r1xfljWsN50A25d7",
+          "type": "Token"
+        }
+      ],
+      "uuid": "4fddf2e2-dbf5-11ee-ac35-038a21acef38"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+id: DAC-OKTA-0004
+title: 'Okta: new API token created'
+description: Detects successful Okta System Log system.api_token.create events. Okta documents this event as generating an unscoped API token that grants authenticated access to the org API, so a token minted by a compromised admin is durable access that survives password and MFA resets. Token name and id come from the target of type Token. Built only from field paths and values in the Splunk attack_data sample okta_new_api_token_created.log.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- OktaIM2:log
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1098.001
+severity: medium
+false_positives:
+- Admins creating tokens for a new integration. Confirm a change record and that the token name matches a known integration; expected volume is low.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/okta_new_api_token_created.yml
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1098.001/okta_new_api_token_created/okta_new_api_token_created.log
+- https://developer.okta.com/docs/okta-event-types.csv
+- https://developer.okta.com/docs/reference/system-log-query/
+- https://splunk.github.io/splunk-add-on-for-okta-identity-cloud/Sourcetypes/
+- 'Attribution: splunk/security_content and splunk/attack_data (Apache-2.0), see THIRD_PARTY_NOTICES.md'
+telemetry_validated: false
+required_fields:
+- eventType
+- outcome.result
+- actor.id
+- actor.alternateId
+- target{}.id
+- target{}.type
+- target{}.displayName
+- client.ipAddress
+- client.userAgent.rawUserAgent
+- authenticationContext.externalSessionId
+tags:
+- okta
+- api-token
+- okta-system-log
+- attack-data-payload
+query:
+  splunk: |
+    sourcetype="OktaIM2:log" eventType="system.api_token.create" outcome.result="SUCCESS"
+    | eval token_id=mvindex('target{}.id', mvfind('target{}.type', "^Token$")), token_name=mvindex('target{}.displayName', mvfind('target{}.type', "^Token$"))
+    | stats min(_time) as firstTime max(_time) as lastTime count values(token_name) as token_name values(token_id) as token_id values(client.ipAddress) as src_ip values(client.userAgent.rawUserAgent) as user_agent values(authenticationContext.externalSessionId) as session by actor.id actor.alternateId
