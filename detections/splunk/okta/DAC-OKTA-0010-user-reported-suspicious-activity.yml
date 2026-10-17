@@ -1,0 +1,47 @@
+id: DAC-OKTA-0010
+title: 'Okta: user reported suspicious activity on their account'
+description: Detects Okta System Log user.account.report_suspicious_activity_by_enduser events (the user clicked "report suspicious activity" in an Okta security notification). Surfaces the reported event from debugContext.debugData.suspiciousActivityEventType, its IP, location and transaction id so the analyst can pivot straight to the reported event. This is a passthrough of a user report, not behavioural logic, but the user saying "this was not me" is a high-signal input. Built only from field paths and values in the Splunk attack_data sample okta_suspicious_activity_reported_by_user.log.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- OktaIM2:log
+mitre:
+  tactics:
+  - initial-access
+  - persistence
+  - privilege-escalation
+  - stealth
+  techniques:
+  - T1078.004
+severity: high
+false_positives:
+- User reports a legitimate change made by the help desk (for example an MFA reset they forgot they asked for). Confirm with the actor of the reported transaction.
+references:
+- https://github.com/splunk/security_content/blob/develop/detections/application/okta_suspicious_activity_reported.yml
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1078/okta_suspicious_activity_reported_by_user/okta_suspicious_activity_reported_by_user.log
+- https://developer.okta.com/docs/okta-event-types.csv
+- https://developer.okta.com/docs/reference/system-log-query/
+- https://splunk.github.io/splunk-add-on-for-okta-identity-cloud/Sourcetypes/
+- 'Attribution: splunk/security_content and splunk/attack_data (Apache-2.0), see THIRD_PARTY_NOTICES.md'
+telemetry_validated: false
+required_fields:
+- eventType
+- actor.alternateId
+- client.ipAddress
+- debugContext.debugData.suspiciousActivityEventType
+- debugContext.debugData.suspiciousActivityEventIp
+- debugContext.debugData.suspiciousActivityEventCity
+- debugContext.debugData.suspiciousActivityEventCountry
+- debugContext.debugData.suspiciousActivityEventTransactionId
+- debugContext.debugData.suspiciousActivityTimestamp
+tags:
+- okta
+- user-report
+- okta-system-log
+- attack-data-payload
+query:
+  splunk: |
+    sourcetype="OktaIM2:log" eventType="user.account.report_suspicious_activity_by_enduser"
+    | stats min(_time) as firstTime max(_time) as lastTime count values(debugContext.debugData.suspiciousActivityEventType) as reported_event_type values(debugContext.debugData.suspiciousActivityEventIp) as reported_ip values(debugContext.debugData.suspiciousActivityEventCity) as reported_city values(debugContext.debugData.suspiciousActivityEventCountry) as reported_country values(debugContext.debugData.suspiciousActivityEventTransactionId) as reported_transaction values(debugContext.debugData.suspiciousActivityTimestamp) as reported_time values(client.ipAddress) as reporter_ip by actor.alternateId
