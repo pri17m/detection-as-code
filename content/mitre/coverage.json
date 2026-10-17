@@ -1,13 +1,13 @@
 {
   "summary": {
-    "detections_total": 882,
-    "detections_with_mitre": 882,
+    "detections_total": 883,
+    "detections_with_mitre": 883,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 213,
     "platform_counts": {
       "crowdstrike": 166,
       "defender": 78,
-      "splunk": 638
+      "splunk": 639
     }
   },
   "techniques": {
@@ -733,6 +733,7 @@
       "DAC-ENTRA-0033",
       "DAC-ENTRA-0034",
       "DAC-MDE-0053",
+      "DAC-OKTA-0007",
       "DAC-WIN-0010",
       "DAC-WIN-0109",
       "DAC-WIN-0132",
