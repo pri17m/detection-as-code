@@ -1,5 +1,6 @@
 {
   "label": "malicious",
+  "synthetic": true,
   "source": "appliance stopped sending",
   "sourcetype": "beyondtrust:sra",
   "host": "bt-appliance-01",

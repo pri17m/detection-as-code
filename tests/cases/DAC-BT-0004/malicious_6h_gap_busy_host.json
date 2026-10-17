@@ -1,5 +1,6 @@
 {
   "label": "malicious",
+  "synthetic": true,
   "source": "Mandiant: syslog gap = log tampering",
   "sourcetype": "beyondtrust:sra",
   "host": "bt-appliance-01",

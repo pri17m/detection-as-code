@@ -1,5 +1,6 @@
 {
   "label": "benign",
+  "synthetic": true,
   "source": "gap below 2x own p99",
   "sourcetype": "beyondtrust:sra",
   "host": "bt-lab-02",

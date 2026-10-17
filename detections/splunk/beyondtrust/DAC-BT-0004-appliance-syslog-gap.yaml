@@ -1,6 +1,6 @@
 id: DAC-BT-0004
 title: 'BeyondTrust RS/PRA: appliance syslog gap far above its own baseline'
-description: Detects a per-host gap in beyondtrust:sra events in the last 24h that is at least 4 hours and more than twice that host's 30-day 99th-percentile inter-event gap, including an appliance that has been silent until now. ARMORY CASTLE deleted appliance logs. Mandiant says a forwarding gap bounded by a single session is a strong sign of tampering. Uses only host and _time.
+description: Detects a per-host gap in beyondtrust:sra events in the last 24h that is at least 4 hours and more than twice that host's 30-day 99th-percentile inter-bucket gap (baseline excludes the last 24h; ≥20 baseline gaps required), including an appliance that has been silent until now. ARMORY CASTLE deleted appliance logs. Mandiant says a forwarding gap bounded by a single session is a strong sign of tampering. Uses only host and _time.
 author: DaC
 status: experimental
 platforms:
@@ -34,24 +34,22 @@ tags:
 - bomgar
 - log-gap
 query:
-  splunk: 'sourcetype=beyondtrust:sra earliest=-30d@d
+  splunk: '| tstats count where sourcetype=beyondtrust:sra earliest=-30d@d latest=now by host _time span=10m
 
-    | fields _time host
-
-    | append [| tstats max(_time) as lastSeen where sourcetype=beyondtrust:sra earliest=-30d@d by host | eval _time=now(), synthetic_now=1 | fields _time host synthetic_now]
+    | append [| tstats max(_time) as lastSeen where sourcetype=beyondtrust:sra earliest=-30d@d latest=now by host | eval _time=now(), synthetic_now=1 | fields _time host synthetic_now]
 
     | sort 0 host _time
 
     | streamstats current=f window=1 last(_time) as prevTime by host
 
-    | eval gap_sec=_time-prevTime
+    | eval gap_sec=_time-prevTime, baseline_gap=if(_time < relative_time(now(), "-24h"), gap_sec, null())
 
-    | eventstats perc99(gap_sec) as p99_gap by host
+    | eventstats perc99(baseline_gap) as p99_gap count(baseline_gap) as baseline_n by host
 
-    | where _time >= relative_time(now(), "-24h") AND gap_sec >= 14400 AND gap_sec > 2*p99_gap
+    | where _time >= relative_time(now(), "-24h") AND prevTime >= relative_time(now(), "-72h") AND baseline_n >= 20 AND gap_sec >= 14400 AND gap_sec > 2*p99_gap
 
-    | eval gap_start=strftime(prevTime, "%F %T"), gap_end=if(synthetic_now=1, "still silent", strftime(_time, "%F %T")), gap_hours=round(gap_sec/3600, 1)
+    | eval gap_start=strftime(prevTime, "%F %T"), gap_end=if(synthetic_now=1, "still silent", strftime(_time, "%F %T")), gap_hours=round(gap_sec/3600, 1), p99_gap_hours=round(p99_gap/3600, 1)
 
-    | table host gap_start gap_end gap_hours p99_gap
+    | table host gap_start gap_end gap_hours p99_gap_hours baseline_n
 
     '

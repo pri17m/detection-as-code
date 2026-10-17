@@ -1,5 +1,6 @@
 {
   "label": "near_miss",
+  "synthetic": true,
   "source": "below 4h floor",
   "sourcetype": "beyondtrust:sra",
   "host": "bt-appliance-01",
