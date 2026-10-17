@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "variant": "X509Store('Root','LocalMachine').Add()",
+  "source": ".NET X509Store docs",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "OriginalFileName": "PowerShell.EXE",
+  "CommandLine": "powershell -c \"$s=New-Object System.Security.Cryptography.X509Certificates.X509Store('Root','LocalMachine');$s.Open('ReadWrite');$s.Add($c)\"",
+  "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+}

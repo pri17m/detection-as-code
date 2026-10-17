@@ -1,0 +1,77 @@
+id: DAC-WIN-0362
+title: "Root CA added to the machine Root store with certutil -addstore or certmgr -add localMachine (Sysmon 1)"
+description: >-
+  Sysmon Event ID 1: a command line that adds a certificate to the machine-scope Root or AuthRoot store
+  with certutil-style (-addstore [-f] [-enterprise] root, not -user) or certmgr-style
+  (-add <file> [-c] [-s] -r localMachine root) arguments. Argument-based, and compares Sysmon
+  OriginalFileName to the Image name to flag renamed copies. severity high when renamed, outside
+  System32/SysWOW64 (certutil) or Windows Kits (certmgr), or launched by an unexpected parent.
+  Fixes the gap in DAC-WIN-0253, whose query has no -addstore/root filter. telemetry_validated false.
+  Hardened: also covers -importpfx root, PowerShell cert-provider writes (Import-Certificate,
+  Move-Item/Copy-Item to Cert:\LocalMachine\Root), X509Store('Root','LocalMachine').Add(), and reg add of a Root
+  Blob; normalises Unicode dashes, quotes and carets before matching. See REVIEW.md variant matrix.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+- "WinEventLog:Microsoft-Windows-Sysmon/Operational"
+- "sysmon"
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1553.004
+severity: medium
+false_positives:
+- "IT or helpdesk installing a corporate or proxy root CA by hand with certutil -addstore root from an admin shell (alerts at medium; allowlist by host group or ticketed change window after measuring - not measured)."
+- "Software installers and agents that ship their own certmgr.exe or certutil wrapper (Elastic's published rule allowlists ?:\\ProgramData\\Logishrd\\LogiOptionsPlus\\Plugins\\64\\certmgr.exe); these alert at high because the path is unexpected - allowlist by SHA256 plus path, never by name."
+- "Developer machines using Windows SDK certmgr.exe from Windows Kits for test certificates."
+references:
+- https://attack.mitre.org/techniques/T1553/004/
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certutil_certificate_installation.yml
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_certmgr_certificate_installation.yml
+- https://github.com/splunk/security_content/blob/develop/detections/endpoint/windows_certutil_root_certificate_addition.yml
+- https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certutil
+- https://learn.microsoft.com/en-us/windows/win32/seccrypto/certmgr-exe
+- https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1553.004/T1553.004.md
+- https://learn.microsoft.com/en-us/powershell/module/pki/import-certificate
+- https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509store
+telemetry_validated: false
+required_fields:
+- "_time"
+- "host"
+- "EventCode"
+- "User"
+- "Image"
+- "OriginalFileName"
+- "CommandLine"
+- "ParentImage"
+- "ParentCommandLine"
+- "Hashes"
+tags:
+- behavioural
+- root-ca
+- process-creation
+- windows_sysmon
+query:
+  splunk: |
+    (sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational" OR sourcetype=sysmon) (EventCode=1 OR EventID=1)
+    | eval EventCode=coalesce(EventCode, EventID)
+    | eval cmd=replace(replace(lower(CommandLine), "[‐‑‒–—―−]", "-"), "[\^\x22']", "")
+    | eval tool=case(
+        match(cmd, "[-/](addstore|importpfx)\b") AND NOT match(cmd, "\s[-/]user\b") AND match(cmd, "(^|\s)(auth)?root(\s|$)"), "certutil-style",
+        match(cmd, "[-/]add\b") AND match(cmd, "[-/]r\s+localmachine\b") AND match(cmd, "(^|\s)(auth)?root(\s|$)"), "certmgr-style",
+        match(cmd, "cert:\\\\localmachine\\\\(auth)?root\b") AND match(cmd, "(import-(pfx)?certificate|(^|[^a-z])(move|copy)-item|\bmove\b|\bmi\b|\bcopy\b|\bcpi\b|\.add\()"), "powershell-certprovider",
+        match(cmd, "x509store") AND match(cmd, "localmachine") AND match(cmd, "\b(auth)?root\b") AND match(cmd, "\.add\("), "powershell-x509store",
+        match(cmd, "\breg(\.exe)?\s+add\b") AND match(cmd, "(hklm|hkey_local_machine)\\\\software\\\\(policies\\\\)?microsoft\\\\(systemcertificates|enterprisecertificates)\\\\(auth)?root\\\\certificates"), "reg-add")
+    | where isnotnull(tool)
+    | eval img_name=lower(replace(Image, "^.*\\\\", "")), orig=lower(OriginalFileName)
+    | eval renamed=if(isnotnull(orig) AND orig IN ("certutil.exe","certmgr.exe","certmgt.exe","powershell.exe","pwsh.dll","reg.exe") AND img_name!=orig AND NOT (orig="certmgt.exe" AND img_name="certmgr.exe") AND NOT (orig="pwsh.dll" AND img_name="pwsh.exe"), 1, 0)
+    | eval expected_path=if(match(Image, "(?i)^[a-z]:\\\\windows\\\\(system32|syswow64)\\\\(certutil|reg)\.exe$") OR match(Image, "(?i)^[a-z]:\\\\windows\\\\(system32|syswow64)\\\\windowspowershell\\\\v1\.0\\\\powershell\.exe$") OR match(Image, "(?i)\\\\program files\\\\powershell\\\\[0-9]+\\\\pwsh\.exe$") OR match(Image, "(?i)\\\\Windows Kits\\\\.*\\\\certmgr\.exe$"), 1, 0)
+    | eval parent_name=lower(replace(ParentImage, "^.*\\\\", ""))
+    | eval unexpected_parent=if(parent_name IN ("cmd.exe","powershell.exe","pwsh.exe","msiexec.exe","ccmexec.exe","explorer.exe"), 0, 1)
+    | eval severity=if(renamed=1 OR expected_path=0 OR unexpected_parent=1, "high", "medium")
+    | table _time host User tool severity renamed expected_path unexpected_parent Image OriginalFileName CommandLine ParentImage ParentCommandLine Hashes
