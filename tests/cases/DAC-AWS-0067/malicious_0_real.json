@@ -1,0 +1,99 @@
+{
+  "label": "malicious",
+  "synthetic": false,
+  "source": "verbatim from https://docs.aws.amazon.com/IAM/latest/UserGuide/cloudtrail-track-privileged-tasks.html",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": true,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (index=dac, KV_MODE=json, 2026-10-20): 1 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.08",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AIDACKCEVSQ6C2EXAMPLE:JohnRole1",
+        "arn": "arn:aws:sts::111111111111:assumed-role/John/JohnRole1",
+        "accountId": "111111111111",
+        "accessKeyId": "ASIAIOSFODNN7EXAMPLE",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AIDACKCEVSQ6C2EXAMPLE",
+            "arn": "arn:aws:iam::111111111111:role/John",
+            "accountId": "111111111111",
+            "userName": "Admin2"
+          },
+          "webIdFederationData": {},
+          "attributes": {
+            "creationDate": "2024-10-25T20:45:28Z",
+            "mfaAuthenticated": "false"
+          },
+          "assumedRoot": "true"
+        }
+      },
+      "eventTime": "2024-10-25T20:52:11Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoot",
+      "awsRegion": "us-west-2",
+      "sourceIPAddress": "192.0.2.1",
+      "requestParameters": {
+        "targetPrincipal": "222222222222",
+        "taskPolicyArn": {
+          "arn": "arn:aws:iam::aws:policy/root-task/S3UnlockBucketPolicy"
+        }
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAIOSFODNN7EXAMPLE",
+          "sessionToken": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+          "expiration": "Oct 25, 2024, 9:07:11 PM"
+        }
+      }
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Root",
+        "principalId": "222222222222",
+        "arn": "arn:aws:iam::222222222222:root",
+        "accountId": "222222222222",
+        "accessKeyId": "ASIAIOSFODNN7EXAMPLE",
+        "sessionContext": {
+          "attributes": {
+            "creationDate": "2024-10-25T20:52:11Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2024-10-25T20:53:47Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "DeleteBucketPolicy",
+      "awsRegion": "us-west-2",
+      "sourceIPAddress": "192.0.2.1",
+      "requestParameters": {
+        "bucketName": "resource-policy-John",
+        "Host": "resource-policy-John.s3.amazonaws.com",
+        "policy": ""
+      },
+      "responseElements": null,
+      "requestID": "1234567890abcdef0",
+      "eventID": "a1b2c3d4-5678-90ab-cdef-EXAMPLE11111",
+      "readOnly": false,
+      "resources": [
+        {
+          "accountId": "222222222222",
+          "type": "AWS::S3::Bucket",
+          "ARN": "arn:aws:s3:::resource-policy-John"
+        }
+      ],
+      "eventType": "AwsApiCall",
+      "managementEvent": true,
+      "recipientAccountId": "222222222222",
+      "eventCategory": "Management",
+      "tlsDetails": {
+        "tlsVersion": "TLSv1.3",
+        "cipherSuite": "TLS_AES_128_GCM_SHA256",
+        "clientProvidedHostHeader": "resource-policy-John.s3.amazonaws.com"
+      }
+    }
+  ]
+}

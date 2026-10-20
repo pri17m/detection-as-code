@@ -1,0 +1,52 @@
+id: DAC-AWS-0063
+title: S3 object written or copied with SSE-C customer-provided key
+description: 'Behavior: PutObject/CopyObject/CreateMultipartUpload on S3 (or S3 on Outposts) carrying x-amz-server-side-encryption-customer-algorithm, i.e. the caller supplied the encryption key. Codefinger-style ransomware re-encrypts objects with a key the victim never had (T1486). Needs S3 data events. Not telemetry_validated. Behaviour idea from Elastic detection-rules (Elastic License 2.0), clean-room: own SPL, no Elastic query text.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1486
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- eventName
+- eventSource
+- recipientAccountId
+- requestParameters.Key
+- requestParameters.bucketName
+- requestParameters.x-amz-server-side-encryption-customer-algorithm
+- sourceIPAddress
+- userAgent
+- userIdentity.arn
+- userIdentity.principalId
+- errorCode
+telemetry_validated: false
+false_positives:
+- 'Applications that deliberately use SSE-C for their own data (AWS documents SSE-C as a supported option: https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerSideEncryptionCustomerKeys.html); baseline by bucket and principal'
+references:
+- https://docs.aws.amazon.com/AmazonS3/latest/s3-outposts/S3OutpostsCloudtrail.html
+- https://aws.amazon.com/blogs/security/preventing-unintended-encryption-of-amazon-s3-objects/
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerSideEncryptionCustomerKeys.html
+- https://attack.mitre.org/techniques/T1486/
+- https://github.com/elastic/detection-rules/blob/main/rules/integrations/aws/impact_s3_unusual_object_encryption_with_sse_c.toml
+- https://github.com/elastic/detection-rules/blob/main/rules/integrations/aws/impact_s3_excessive_object_encryption_with_sse_c.toml
+tags:
+- aws
+- cloudtrail
+- behavioural
+- clean-room
+- elastic-inspired
+- local-splunk-replay
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail eventSource IN ("s3.amazonaws.com","s3-outposts.amazonaws.com") eventName IN ("PutObject","CopyObject","CreateMultipartUpload")
+    | where isnull(errorCode) AND isnotnull('requestParameters.x-amz-server-side-encryption-customer-algorithm')
+    | eval actor=coalesce('userIdentity.arn','userIdentity.principalId',"unknown"), bucket='requestParameters.bucketName', object_key=coalesce('requestParameters.key','requestParameters.Key'), copy_source='requestParameters.x-amz-copy-source'
+    | stats count AS sse_c_writes dc(object_key) AS objects values(eventName) AS actions values(object_key) AS sample_keys values(copy_source) AS copy_sources values(sourceIPAddress) AS src_ip values(userAgent) AS user_agent min(_time) AS first_seen max(_time) AS last_seen BY actor bucket recipientAccountId
+    | eval sample_keys=mvindex(sample_keys,0,9)
+    | sort - objects

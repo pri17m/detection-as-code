@@ -1,0 +1,86 @@
+{
+  "label": "benign",
+  "synthetic": false,
+  "source": "verbatim from https://docs.aws.amazon.com/aws-backup/latest/devguide/logging-using-cloudtrail.html",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (index=dac, KV_MODE=json, 2026-10-20): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.05",
+      "userIdentity": {
+        "type": "Root",
+        "principalId": "123456789012",
+        "arn": "arn:aws:iam::123456789012:root",
+        "accountId": "123456789012",
+        "accessKeyId": "AKIAI44QH8DHBEXAMPLE",
+        "sessionContext": {
+          "attributes": {
+            "mfaAuthenticated": "false",
+            "creationDate": "2019-01-10T12:24:50Z"
+          }
+        }
+      },
+      "eventTime": "2019-01-10T13:45:24Z",
+      "eventSource": "backup.amazonaws.com",
+      "eventName": "StartBackupJob",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "12.34.567.89",
+      "userAgent": "aws-internal/3 aws-sdk-java/1.11.465 Linux/4.9.124-0.1.ac.198.73.329.metal1.x86_64 OpenJDK_64-Bit_Server_VM/25.192-b12 java/1.8.0_192",
+      "requestParameters": {
+        "backupVaultName": "Default",
+        "resourceArn": "arn:aws:ec2:us-east-1:123456789012:volume/vol-00a422a05b9c6asd3",
+        "iamRoleArn": "arn:aws:iam::123456789012:role/AWSBackup",
+        "startWindowMinutes": 60
+      },
+      "responseElements": {
+        "backupJobId": "8a3c2a87-b23e-4d56-b045-fa9e88ede4e6",
+        "creationDate": "Jan 10, 2019 1:45:24 PM"
+      },
+      "requestID": "98cf4d59-8c76-49f7-9201-790743931234",
+      "eventID": "fe8146a5-7812-4a95-90ad-074498be1234",
+      "eventType": "AwsApiCall",
+      "recipientAccountId": "account-id"
+    },
+    {
+      "eventVersion": "1.05",
+      "userIdentity": {
+        "type": "Root",
+        "principalId": "123456789012",
+        "arn": "arn:aws:iam::123456789012:root",
+        "accountId": "123456789012",
+        "accessKeyId": "AKIAI44QH8DHBEXAMPLE",
+        "sessionContext": {
+          "attributes": {
+            "mfaAuthenticated": "false",
+            "creationDate": "2019-01-10T12:24:50Z"
+          }
+        }
+      },
+      "eventTime": "2019-01-10T13:49:50Z",
+      "eventSource": "backup.amazonaws.com",
+      "eventName": "StartRestoreJob",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "12.34.567.89",
+      "userAgent": "aws-internal/3 aws-sdk-java/1.11.465 Linux/4.9.124-0.1.ac.198.73.329.metal1.x86_64 OpenJDK_64-Bit_Server_VM/25.192-b12 java/1.8.0_192",
+      "requestParameters": {
+        "recoveryPointArn": "arn:aws:ec2:us-east-1::snapshot/snap-00a129455bdbc9d99",
+        "metadata": {
+          "volumeType": "gp2",
+          "availabilityZone": "us-east-1b",
+          "volumeSize": "100"
+        },
+        "iamRoleArn": "arn:aws:iam::123456789012:role/AWSBackup",
+        "idempotencyToken": "a9c8b4fb-d369-4a58-944b-942e442a8fe3",
+        "resourceType": "EBS"
+      },
+      "responseElements": {
+        "restoreJobId": "9808E090-8C76-CCB8-4CEA-407CF6AC4C43"
+      },
+      "requestID": "783ddddc-6d7e-4539-8fab-376aa9668543",
+      "eventID": "ff35ddea-7577-4aec-a132-964b7e9dd423",
+      "eventType": "AwsApiCall",
+      "recipientAccountId": "account-id"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "derived from https://github.com/DataDog/stratus-red-team/blob/592c425f1707d11dfda8cf16fe7027f159dfa172/docs/detonation-logs/aws.persistence.rolesanywhere-create-trust-anchor.json",
+  "modification": "CreateTrustAnchor event renamed to ListTrustAnchors, request/response removed, readOnly=true",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (index=dac, KV_MODE=json, 2026-10-20): 0 row(s), PASS",
+  "events": [
+    {
+      "awsRegion": "cn-northsouth-3r",
+      "eventCategory": "Management",
+      "eventID": "66e5f252-e092-4ad0-9a33-a03595e05aca",
+      "eventName": "ListTrustAnchors",
+      "eventSource": "rolesanywhere.amazonaws.com",
+      "eventTime": "2024-08-01T13:56:39Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.10",
+      "managementEvent": true,
+      "readOnly": true,
+      "recipientAccountId": "791182566784",
+      "requestID": "4f8955b7-2a80-43c8-8f56-055883a07632",
+      "sourceIPAddress": "221.252.237.0",
+      "tlsDetails": {
+        "cipherSuite": "TLS_AES_128_GCM_SHA256",
+        "clientProvidedHostHeader": "rolesanywhere.cn-northsouth-3r.amazonaws.com",
+        "tlsVersion": "TLSv1.3"
+      },
+      "userAgent": "stratus-red-team_e2e652c1-ed4b-4402-b3b0-136ef4c9ace7",
+      "userIdentity": {
+        "accessKeyId": "AKIA3SBEM4QSKES6Z5F9",
+        "accountId": "791182566784",
+        "arn": "arn:aws:iam::791182566784:user/christophe",
+        "principalId": "AIDADMWJD73A3SNMRPEY",
+        "type": "IAMUser",
+        "userName": "christophe"
+      }
+    }
+  ]
+}
