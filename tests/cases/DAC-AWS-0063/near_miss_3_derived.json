@@ -1,0 +1,85 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "derived from https://docs.aws.amazon.com/AmazonS3/latest/s3-outposts/S3OutpostsCloudtrail.html",
+  "modification": "errorCode=AccessDenied added",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (index=dac, KV_MODE=json, 2026-10-20): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.08",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "111122223333",
+        "arn": "arn:aws:iam::111122223333:user/yourUserName",
+        "accountId": "222222222222",
+        "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "userName": "yourUserName"
+      },
+      "eventTime": "2020-11-30T15:44:33Z",
+      "eventSource": "s3-outposts.amazonaws.com",
+      "eventName": "PutObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "26.29.66.20",
+      "userAgent": "aws-cli/1.18.39 Python/3.4.10 Darwin/18.7.0 botocore/1.15.39",
+      "requestParameters": {
+        "expires": "Wed, 21 Oct 2020 07:28:00 GMT",
+        "Content-Language": "english",
+        "x-amz-server-side-encryption-customer-key-MD5": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        "ObjectCannedACL": "BucketOwnerFullControl",
+        "x-amz-server-side-encryption": "Aes256",
+        "Content-Encoding": "gzip",
+        "Content-Length": "10",
+        "Cache-Control": "no-cache",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Disposition": "attachment",
+        "Content-MD5": "je7MtGbClwBF/2Zp9Utk/h3yCo8nvbEXAMPLEKEY",
+        "x-amz-storage-class": "Outposts",
+        "x-amz-server-side-encryption-customer-algorithm": "Aes256",
+        "bucketName": "amzn-s3-demo-bucket1",
+        "Key": "path/upload.sh"
+      },
+      "responseElements": {
+        "x-amz-server-side-encryption-customer-key-MD5": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        "x-amz-server-side-encryption": "Aes256",
+        "x-amz-version-id": "001",
+        "x-amz-server-side-encryption-customer-algorithm": "Aes256",
+        "ETag": "d41d8cd98f00b204e9800998ecf8427f"
+      },
+      "additionalEventData": {
+        "CipherSuite": "ECDHE-RSA-AES128-SHA",
+        "bytesTransferredIn": 10,
+        "x-amz-id-2": "29xXQBV2O+xOHKItvzY1suLv1i6A52E0zOX159fpfsItYd58JhXwKxXAXI4IQkp6",
+        "SignatureVersion": "SigV4",
+        "bytesTransferredOut": 20,
+        "AuthenticationMethod": "AuthHeader"
+      },
+      "requestID": "8E96D972160306FA",
+      "eventID": "ee3b4e0c-ab12-459b-9998-0a5a6f2e4015",
+      "readOnly": false,
+      "resources": [
+        {
+          "accountId": "222222222222",
+          "type": "AWS::S3Outposts::Object",
+          "ARN": "arn:aws:s3-outposts:us-east-1:YYY:outpost/op-01ac5d28a6a232904/bucket/path/upload.sh"
+        },
+        {
+          "accountId": "222222222222",
+          "type": "AWS::S3Outposts::Bucket",
+          "ARN": "arn:aws:s3-outposts:us-east-1:YYY:outpost/op-01ac5d28a6a232904/bucket/"
+        }
+      ],
+      "eventType": "AwsApiCall",
+      "managementEvent": false,
+      "recipientAccountId": "444455556666",
+      "sharedEventID": "02759a4c-c040-4758-b84b-7cbaaf17747a",
+      "edgeDeviceDetails": {
+        "type": "outposts",
+        "deviceId": "op-01ac5d28a6a232904"
+      },
+      "eventCategory": "Data",
+      "errorCode": "AccessDenied"
+    }
+  ]
+}
