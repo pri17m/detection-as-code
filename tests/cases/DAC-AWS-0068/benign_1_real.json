@@ -1,0 +1,100 @@
+{
+  "label": "benign",
+  "synthetic": false,
+  "source": "verbatim from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1526/aws_security_scanner/aws_security_scanner.json",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (index=dac, KV_MODE=json, 2026-10-20): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.08",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAYTOGP2RLMDEPWZWMJ",
+        "arn": "arn:aws:iam::111111111111:user/cloudsploit",
+        "accountId": "111111111111",
+        "accessKeyId": "AKIAYTOGP2RLGBSBSMH2",
+        "userName": "cloudsploit"
+      },
+      "eventTime": "2021-04-13T11:35:11Z",
+      "eventSource": "ec2.amazonaws.com",
+      "eventName": "DescribeFlowLogs",
+      "awsRegion": "ap-southeast-2",
+      "sourceIPAddress": "95.90.195.80",
+      "userAgent": "aws-sdk-nodejs/2.885.0 linux/v14.16.1 callback",
+      "errorCode": "Client.UnauthorizedOperation",
+      "errorMessage": "You are not authorized to perform this operation.",
+      "requestParameters": {
+        "DescribeFlowLogsRequest": ""
+      },
+      "responseElements": null,
+      "requestID": "6e0eaeda-6408-409e-bb01-d8c8e0254fdb",
+      "eventID": "fd3220a5-2fc4-4563-b0f5-6717a32bd58c",
+      "readOnly": true,
+      "eventType": "AwsApiCall",
+      "managementEvent": true,
+      "eventCategory": "Management",
+      "recipientAccountId": "111111111111"
+    },
+    {
+      "eventVersion": "1.08",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAYTOGP2RLMDEPWZWMJ",
+        "arn": "arn:aws:iam::111111111111:user/cloudsploit",
+        "accountId": "111111111111",
+        "accessKeyId": "AKIAYTOGP2RLGBSBSMH2",
+        "userName": "cloudsploit"
+      },
+      "eventTime": "2021-04-13T11:35:10Z",
+      "eventSource": "ec2.amazonaws.com",
+      "eventName": "DescribeFlowLogs",
+      "awsRegion": "ap-south-1",
+      "sourceIPAddress": "95.90.195.80",
+      "userAgent": "aws-sdk-nodejs/2.885.0 linux/v14.16.1 callback",
+      "errorCode": "Client.UnauthorizedOperation",
+      "errorMessage": "You are not authorized to perform this operation.",
+      "requestParameters": {
+        "DescribeFlowLogsRequest": ""
+      },
+      "responseElements": null,
+      "requestID": "b43104aa-a285-434b-8ac5-aa19a381df29",
+      "eventID": "9289ca91-8429-4ff2-a0bf-95d04e889ce3",
+      "readOnly": true,
+      "eventType": "AwsApiCall",
+      "managementEvent": true,
+      "eventCategory": "Management",
+      "recipientAccountId": "111111111111"
+    },
+    {
+      "eventVersion": "1.08",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAYTOGP2RLMDEPWZWMJ",
+        "arn": "arn:aws:iam::111111111111:user/cloudsploit",
+        "accountId": "111111111111",
+        "accessKeyId": "AKIAYTOGP2RLGBSBSMH2",
+        "userName": "cloudsploit"
+      },
+      "eventTime": "2021-04-13T11:35:10Z",
+      "eventSource": "ec2.amazonaws.com",
+      "eventName": "DescribeFlowLogs",
+      "awsRegion": "sa-east-1",
+      "sourceIPAddress": "95.90.195.80",
+      "userAgent": "aws-sdk-nodejs/2.885.0 linux/v14.16.1 callback",
+      "errorCode": "Client.UnauthorizedOperation",
+      "errorMessage": "You are not authorized to perform this operation.",
+      "requestParameters": {
+        "DescribeFlowLogsRequest": ""
+      },
+      "responseElements": null,
+      "requestID": "89ec5a65-d434-4da8-b178-6343c4ca930b",
+      "eventID": "c9af2c4c-3f2f-4087-82b9-3bdc2c260cd6",
+      "readOnly": true,
+      "eventType": "AwsApiCall",
+      "managementEvent": true,
+      "eventCategory": "Management",
+      "recipientAccountId": "111111111111"
+    }
+  ]
+}

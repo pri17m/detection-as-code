@@ -1,0 +1,58 @@
+id: DAC-AWS-0065
+title: IAM Roles Anywhere trust anchor or profile created
+description: 'Behavior: CreateTrustAnchor and/or CreateProfile on rolesanywhere.amazonaws.com. A trust anchor backed by an attacker CA plus a profile mapping to a role lets the attacker mint AWS credentials from their own X.509 certificate, outliving key rotation (T1098, T1484.002). Rows with both calls by one actor sort first. Not telemetry_validated. Behaviour idea from Elastic detection-rules (Elastic License 2.0), clean-room: own SPL, no Elastic query text.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  - defense-impairment
+  techniques:
+  - T1098
+  - T1484.002
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- awsRegion
+- eventName
+- eventSource
+- recipientAccountId
+- requestParameters.name
+- requestParameters.roleArns{}
+- requestParameters.source.sourceType
+- sourceIPAddress
+- userAgent
+- userIdentity.arn
+- userIdentity.principalId
+- errorCode
+telemetry_validated: false
+false_positives:
+- On-premises workloads onboarded to Roles Anywhere by the platform team using the corporate private CA; allowlist the trust anchor source/CA
+references:
+- https://github.com/DataDog/stratus-red-team/blob/592c425f1707d11dfda8cf16fe7027f159dfa172/docs/detonation-logs/aws.persistence.rolesanywhere-create-trust-anchor.json
+- https://stratus-red-team.cloud/attack-techniques/AWS/aws.persistence.rolesanywhere-create-trust-anchor/
+- https://docs.aws.amazon.com/rolesanywhere/latest/userguide/introduction.html
+- https://attack.mitre.org/techniques/T1098/
+- https://attack.mitre.org/techniques/T1484/002/
+- https://github.com/elastic/detection-rules/blob/main/rules/integrations/aws/persistence_iam_roles_anywhere_trusted_anchor_created_with_external_ca.toml
+- https://github.com/elastic/detection-rules/blob/main/rules/integrations/aws/persistence_iam_roles_anywhere_profile_created.toml
+tags:
+- aws
+- cloudtrail
+- behavioural
+- clean-room
+- elastic-inspired
+- local-splunk-replay
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail eventSource="rolesanywhere.amazonaws.com" eventName IN ("CreateTrustAnchor","CreateProfile")
+    | where isnull(errorCode)
+    | eval actor=coalesce('userIdentity.arn','userIdentity.principalId',"unknown")
+    | eval trust_anchor=if(eventName="CreateTrustAnchor",'requestParameters.name',null()), anchor_source_type=if(eventName="CreateTrustAnchor",'requestParameters.source.sourceType',null()), profile=if(eventName="CreateProfile",'requestParameters.name',null()), profile_roles=if(eventName="CreateProfile",'requestParameters.roleArns{}',null())
+    | stats values(eventName) AS actions values(trust_anchor) AS trust_anchors values(anchor_source_type) AS anchor_source_types values(profile) AS profiles values(profile_roles) AS profile_roles values(sourceIPAddress) AS src_ip values(userAgent) AS user_agent min(_time) AS first_seen max(_time) AS last_seen BY actor recipientAccountId awsRegion
+    | eval anchor_and_profile=if(mvcount(actions)=2,1,0)
+    | sort - anchor_and_profile

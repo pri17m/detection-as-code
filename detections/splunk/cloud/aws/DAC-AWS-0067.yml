@@ -1,0 +1,52 @@
+id: DAC-AWS-0067
+title: STS AssumeRoot root session issued for a member account
+description: 'Behavior: sts AssumeRoot (centralized root access) issues short-lived root credentials for a member account; the root actions made with those credentials (userIdentity.type=Root, same ASIA access key) are joined onto the row. Abuse gives root on a member account (T1548.005). Not telemetry_validated. Behaviour idea from Elastic detection-rules (Elastic License 2.0), clean-room: own SPL, no Elastic query text.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - privilege-escalation
+  techniques:
+  - T1548.005
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- eventName
+- eventSource
+- requestParameters.targetPrincipal
+- requestParameters.taskPolicyArn.arn
+- responseElements.credentials.accessKeyId
+- sourceIPAddress
+- userIdentity.accessKeyId
+- userIdentity.arn
+- userIdentity.principalId
+- userIdentity.type
+- errorCode
+telemetry_validated: false
+false_positives:
+- Security team using centralized root access to unlock a misconfigured S3 bucket or SQS policy, or to delete root credentials (the documented task policies)
+references:
+- https://docs.aws.amazon.com/IAM/latest/UserGuide/cloudtrail-track-privileged-tasks.html
+- https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoot.html
+- https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user-privileged-task.html
+- https://attack.mitre.org/techniques/T1548/005/
+- https://github.com/elastic/detection-rules/blob/main/rules/integrations/aws/privilege_escalation_sts_assume_root_from_rare_user_and_member_account.toml
+tags:
+- aws
+- cloudtrail
+- behavioural
+- clean-room
+- elastic-inspired
+- local-splunk-replay
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail ((eventSource="sts.amazonaws.com" eventName="AssumeRoot") OR (userIdentity.type="Root" userIdentity.accessKeyId="ASIA*"))
+    | eval is_assume=if(eventName="AssumeRoot",1,0)
+    | eval session_key=coalesce(if(is_assume=1,'responseElements.credentials.accessKeyId','userIdentity.accessKeyId'),"nokey-".md5(_raw))
+    | eval caller=if(is_assume=1,coalesce('userIdentity.arn','userIdentity.principalId',"unknown"),null()), target_account=if(is_assume=1,'requestParameters.targetPrincipal',null()), task_policy=if(is_assume=1,'requestParameters.taskPolicyArn.arn',null()), assume_outcome=if(is_assume=1,coalesce(errorCode,"success"),null()), root_action=if(is_assume=0,eventSource.":".eventName,null())
+    | stats max(is_assume) AS has_assume values(caller) AS caller values(target_account) AS target_account values(task_policy) AS task_policy values(assume_outcome) AS assume_outcome values(root_action) AS root_actions values(sourceIPAddress) AS src_ip min(_time) AS first_seen max(_time) AS last_seen BY session_key
+    | where has_assume=1
+    | fields - has_assume
