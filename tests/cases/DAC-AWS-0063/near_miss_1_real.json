@@ -1,0 +1,129 @@
+{
+  "label": "near_miss",
+  "synthetic": false,
+  "source": "verbatim from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1486/s3_file_encryption/aws_cloudtrail_events.json",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (index=dac, KV_MODE=json, 2026-10-20): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.08",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAYTOGP2RLNALZHZ6KX",
+        "arn": "arn:aws:iam::111111111111:user/patrick_cli",
+        "accountId": "111111111111",
+        "accessKeyId": "AKIAYTOGP2RLJ2OYSF6E",
+        "userName": "patrick_cli"
+      },
+      "eventTime": "2021-01-11T12:40:47Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "CopyObject",
+      "awsRegion": "us-west-2",
+      "sourceIPAddress": "95.90.199.65",
+      "userAgent": "[aws-cli/2.0.45 Python/3.7.4 Darwin/20.2.0 exe/x86_64 command/s3.cp]",
+      "requestParameters": {
+        "bucketName": "patricktestbucketencrypt",
+        "x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-west-2:111111111111:key/f2a82583-a7d3-4c92-8787-fe2baab1cee1",
+        "Host": "patricktestbucketencrypt.s3.us-west-2.amazonaws.com",
+        "x-amz-server-side-encryption": "aws:kms",
+        "x-amz-copy-source": "patricktestbucketencrypt/kms_aws_events.json",
+        "key": "kms_aws_events_encrypted.json"
+      },
+      "responseElements": {
+        "x-amz-server-side-encryption": "aws:kms",
+        "x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-west-2:111111111111:key/f2a82583-a7d3-4c92-8787-fe2baab1cee1"
+      },
+      "additionalEventData": {
+        "SignatureVersion": "SigV4",
+        "CipherSuite": "ECDHE-RSA-AES128-GCM-SHA256",
+        "bytesTransferredIn": 0.0,
+        "SSEApplied": "SSE_KMS",
+        "AuthenticationMethod": "AuthHeader",
+        "x-amz-id-2": "fqzX1iZV6ImDtkFxbGvziOE6fUwryRa+PhnLckfVAkLNHdbCAHNq4l/yckUd1a2HNJPL6NAS01U=",
+        "bytesTransferredOut": 234.0
+      },
+      "requestID": "6A7359F7A9414B02",
+      "eventID": "b20d43de-175d-4443-acd7-f5f3e587ae00",
+      "readOnly": false,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::patricktestbucketencrypt/kms_aws_events_encrypted.json"
+        },
+        {
+          "accountId": "111111111111",
+          "type": "AWS::S3::Bucket",
+          "ARN": "arn:aws:s3:::patricktestbucketencrypt"
+        },
+        {
+          "accountId": "111111111111",
+          "type": "AWS::S3::Bucket",
+          "ARN": "arn:aws:s3:::patricktestbucketencrypt"
+        },
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::patricktestbucketencrypt/kms_aws_events.json"
+        }
+      ],
+      "eventType": "AwsApiCall",
+      "managementEvent": false,
+      "recipientAccountId": "111111111111",
+      "eventCategory": "Data"
+    },
+    {
+      "eventVersion": "1.08",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAYTOGP2RLNALZHZ6KX",
+        "arn": "arn:aws:iam::111111111111:user/patrick_cli",
+        "accountId": "111111111111",
+        "accessKeyId": "AKIAYTOGP2RLJ2OYSF6E",
+        "userName": "patrick_cli"
+      },
+      "eventTime": "2021-01-11T12:40:10Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "CopyObject",
+      "awsRegion": "us-west-2",
+      "sourceIPAddress": "95.90.199.65",
+      "userAgent": "[aws-cli/2.0.45 Python/3.7.4 Darwin/20.2.0 exe/x86_64 command/s3.cp]",
+      "errorCode": "KMS.KMSInvalidStateException",
+      "errorMessage": "arn:aws:kms:us-west-2:111111111111:key/f2a82583-a7d3-4c92-8787-fe2baab1cee1 is pending deletion.",
+      "requestParameters": {
+        "bucketName": "patricktestbucketencrypt",
+        "x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-west-2:111111111111:key/f2a82583-a7d3-4c92-8787-fe2baab1cee1",
+        "Host": "patricktestbucketencrypt.s3.us-west-2.amazonaws.com",
+        "x-amz-server-side-encryption": "aws:kms",
+        "x-amz-copy-source": "patricktestbucketencrypt/kms_aws_events.json",
+        "key": "kms_aws_events_encrypted.json"
+      },
+      "responseElements": null,
+      "additionalEventData": {
+        "SignatureVersion": "SigV4",
+        "CipherSuite": "ECDHE-RSA-AES128-GCM-SHA256",
+        "bytesTransferredIn": 0.0,
+        "AuthenticationMethod": "AuthHeader",
+        "x-amz-id-2": "bRRvzF4lnDehYypmQEC9tX+aWm6CWzDbzEYmAV09EU5qu78eE8QOI5cPIfk43mr1YJ2iYgPFk3E=",
+        "bytesTransferredOut": 303.0
+      },
+      "requestID": "AF623D437C7DEA13",
+      "eventID": "d535906d-25c3-4eaf-8c1b-4b8b24e04eb1",
+      "readOnly": false,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::patricktestbucketencrypt/kms_aws_events_encrypted.json"
+        },
+        {
+          "accountId": "111111111111",
+          "type": "AWS::S3::Bucket",
+          "ARN": "arn:aws:s3:::patricktestbucketencrypt"
+        }
+      ],
+      "eventType": "AwsApiCall",
+      "managementEvent": false,
+      "recipientAccountId": "111111111111",
+      "eventCategory": "Data"
+    }
+  ]
+}
