@@ -1,0 +1,33 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "derived from https://docs.aws.amazon.com/aws-backup/latest/devguide/logging-using-cloudtrail.html",
+  "modification": "userIdentity replaced with the service-invoked shape used by this same docs page (invokedBy=backup.amazonaws.com)",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (index=dac, KV_MODE=json, 2026-10-20): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.05",
+      "userIdentity": {
+        "accountId": "123456789012",
+        "invokedBy": "backup.amazonaws.com"
+      },
+      "eventTime": "2019-01-10T14:52:42Z",
+      "eventSource": "backup.amazonaws.com",
+      "eventName": "DeleteRecoveryPoint",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "backup.amazonaws.com",
+      "userAgent": "aws-internal/3 aws-sdk-java/1.11.465 Linux/4.9.124-0.1.ac.198.73.329.metal1.x86_64 OpenJDK_64-Bit_Server_VM/25.192-b12 java/1.8.0_192",
+      "requestParameters": {
+        "backupVaultName": "Default",
+        "recoveryPointArn": "arn:aws:ec2:us-east-1::snapshot/snap-05f426fd9daab3433"
+      },
+      "responseElements": null,
+      "requestID": "f1f1b33a-48da-436c-9a8f-7574f1ab5fd7",
+      "eventID": "2dd70080-5aba-4a79-9a0f-92647c9f0846",
+      "eventType": "AwsApiCall",
+      "recipientAccountId": "account-id"
+    }
+  ]
+}
