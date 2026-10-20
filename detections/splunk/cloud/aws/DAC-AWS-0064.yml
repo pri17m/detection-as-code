@@ -1,0 +1,58 @@
+id: DAC-AWS-0064
+title: EC2 AMI launch permission granted to another AWS account or to all
+description: 'Behavior: ModifyImageAttribute adds a launchPermission for a foreign 12-digit account or group "all" (public). An attacker shares an AMI built from a victim instance to their own account to copy disk contents (T1537). Not telemetry_validated. Behaviour idea from Elastic detection-rules (Elastic License 2.0), clean-room: own SPL, no Elastic query text.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - exfiltration
+  techniques:
+  - T1537
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- awsRegion
+- eventName
+- eventSource
+- recipientAccountId
+- requestParameters.imageId
+- requestParameters.launchPermission.add.items{}.group
+- requestParameters.launchPermission.add.items{}.userId
+- sourceIPAddress
+- userAgent
+- userIdentity.arn
+- userIdentity.principalId
+- errorCode
+telemetry_validated: false
+false_positives:
+- Golden-image pipelines that share AMIs with member accounts; allowlist the known account IDs
+- Marketplace or public AMI publishing
+references:
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1537/aws_ami_shared_public/aws_cloudtrail_events.json
+- https://github.com/DataDog/stratus-red-team/blob/592c425f1707d11dfda8cf16fe7027f159dfa172/docs/detonation-logs/aws.exfiltration.ec2-share-ami.json
+- https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_ModifyImageAttribute.html
+- https://stratus-red-team.cloud/attack-techniques/AWS/aws.exfiltration.ec2-share-ami/
+- https://attack.mitre.org/techniques/T1537/
+- https://github.com/elastic/detection-rules/blob/main/rules/integrations/aws/exfiltration_ec2_ami_shared_with_separate_account.toml
+tags:
+- aws
+- cloudtrail
+- behavioural
+- clean-room
+- elastic-inspired
+- local-splunk-replay
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail eventSource="ec2.amazonaws.com" eventName="ModifyImageAttribute"
+    | where isnull(errorCode)
+    | eval shared_to=mvappend('requestParameters.launchPermission.add.items{}.userId','requestParameters.launchPermission.add.items{}.group')
+    | where isnotnull(shared_to)
+    | eval own_account=recipientAccountId, public=if(isnotnull(mvfind(shared_to,"^all$")),1,0)
+    | eval foreign_accounts=mvmap(shared_to, if(match(shared_to,"^\d{12}$") AND shared_to!=own_account, shared_to, null()))
+    | where public=1 OR isnotnull(foreign_accounts)
+    | eval actor=coalesce('userIdentity.arn','userIdentity.principalId',"unknown"), image_id='requestParameters.imageId'
+    | table _time actor recipientAccountId awsRegion image_id public foreign_accounts sourceIPAddress userAgent
+    | sort - public
