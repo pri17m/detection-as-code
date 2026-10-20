@@ -1,0 +1,56 @@
+{
+  "label": "near_miss",
+  "synthetic": true,
+  "source": "derived from https://github.com/DataDog/stratus-red-team/blob/592c425f1707d11dfda8cf16fe7027f159dfa172/docs/detonation-logs/aws.lateral-movement.ec2-serial-console-send-ssh-public-key.json",
+  "modification": "errorCode added, responseElements removed",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (index=dac, KV_MODE=json, 2026-10-20): 0 row(s), PASS",
+  "events": [
+    {
+      "awsRegion": "cniso-east-3r",
+      "eventCategory": "Management",
+      "eventID": "37ba412b-f943-44f2-ae48-4527f6e789d9",
+      "eventName": "EnableSerialConsoleAccess",
+      "eventSource": "ec2.amazonaws.com",
+      "eventTime": "2024-11-26T15:35:22Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.10",
+      "managementEvent": true,
+      "readOnly": false,
+      "recipientAccountId": "844015365555",
+      "requestID": "e110338f-cc06-4284-bf16-6528a7df1561",
+      "requestParameters": {
+        "EnableSerialConsoleAccessRequest": ""
+      },
+      "sourceIPAddress": "201.252.42.03",
+      "tlsDetails": {
+        "cipherSuite": "TLS_AES_128_GCM_SHA256",
+        "clientProvidedHostHeader": "ec2.cniso-east-3r.amazonaws.com",
+        "tlsVersion": "TLSv1.3"
+      },
+      "userAgent": "stratus-red-team_b0fedc91-bd4a-4ba1-a776-80e707fef2a0",
+      "userIdentity": {
+        "accessKeyId": "ASIA2HJRQF0DHNYEE9N1",
+        "accountId": "844015365555",
+        "arn": "arn:aws:sts::844015365555:assumed-role/AWSReservedSSOrandoml3I7nL6f7BmB@gmail.com",
+        "principalId": "AROAEMHZD694LU95MUYOP:randomca0L529zwNAY@gmail.com",
+        "sessionContext": {
+          "attributes": {
+            "creationDate": "2024-11-26T15:14:58Z",
+            "mfaAuthenticated": "false"
+          },
+          "sessionIssuer": {
+            "accountId": "844015365555",
+            "arn": "arn:aws:iam::844015365555:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_account-admin_599c9e90e350d2ff",
+            "principalId": "AROAEMHZD694LU95MUYOP",
+            "type": "Role",
+            "userName": "AWSReservedSSO_account-admin_599c9e90e350d2ff"
+          }
+        },
+        "type": "AssumedRole"
+      },
+      "errorCode": "Client.UnauthorizedOperation"
+    }
+  ]
+}
