@@ -1,0 +1,57 @@
+id: DAC-AWS-0066
+title: Lambda function permission granted to any principal or a foreign account
+description: 'Behavior: lambda AddPermission (any API-version suffix) whose principal is "*" or another AWS account. A function invocable by anyone or by the attacker account is a backdoor that survives credential rotation (T1546). Service principals are not flagged. Not telemetry_validated. Behaviour idea from Elastic detection-rules (Elastic License 2.0), clean-room: own SPL, no Elastic query text.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - privilege-escalation
+  - persistence
+  techniques:
+  - T1546
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- awsRegion
+- eventName
+- eventSource
+- recipientAccountId
+- requestParameters.action
+- requestParameters.functionName
+- requestParameters.principal
+- requestParameters.statementId
+- sourceIPAddress
+- userAgent
+- userIdentity.arn
+- userIdentity.principalId
+- errorCode
+telemetry_validated: false
+false_positives:
+- 'Public function URLs that need principal "*" (AWS documents this for AuthType NONE: https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html)'
+- Cross-account invocation by a known partner or org account; allowlist account IDs
+references:
+- https://github.com/DataDog/stratus-red-team/blob/592c425f1707d11dfda8cf16fe7027f159dfa172/docs/detonation-logs/aws.persistence.lambda-backdoor-function.json
+- https://stratus-red-team.cloud/attack-techniques/AWS/aws.persistence.lambda-backdoor-function/
+- https://docs.aws.amazon.com/lambda/latest/api/API_AddPermission.html
+- https://attack.mitre.org/techniques/T1546/
+- https://github.com/elastic/detection-rules/blob/main/rules/integrations/aws/persistence_lambda_backdoor_invoke_function_for_any_principal.toml
+tags:
+- aws
+- cloudtrail
+- behavioural
+- clean-room
+- elastic-inspired
+- local-splunk-replay
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail eventSource="lambda.amazonaws.com" eventName IN ("AddPermission","AddPermission20150331","AddPermission20150331v2")
+    | where isnull(errorCode)
+    | eval principal='requestParameters.principal', own_account=recipientAccountId
+    | eval principal_account=if(match(principal,"^\d{12}$"), principal, if(match(principal,"^arn:aws[a-z-]*:iam::\d{12}:"), replace(principal,"^arn:aws[a-z-]*:iam::(\d{12}):.*$","\1"), null()))
+    | eval exposure=case(principal="*","any_principal", isnotnull(principal_account) AND principal_account!=own_account,"foreign_account")
+    | where isnotnull(exposure)
+    | eval actor=coalesce('userIdentity.arn','userIdentity.principalId',"unknown"), function='requestParameters.functionName', action='requestParameters.action', statement_id='requestParameters.statementId'
+    | table _time actor recipientAccountId awsRegion function exposure principal action statement_id sourceIPAddress userAgent
