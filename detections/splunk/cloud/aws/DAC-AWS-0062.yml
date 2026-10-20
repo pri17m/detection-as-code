@@ -1,0 +1,55 @@
+id: DAC-AWS-0062
+title: AWS Backup recovery point, backup vault or vault lock deleted
+description: 'Behavior: a principal deletes AWS Backup recovery points, a backup vault, a vault lock configuration or a backup plan (backup.amazonaws.com). Removing backups before encryption or deletion stops recovery (T1490). One row per actor with recovery-point count. Not telemetry_validated. Behaviour idea from Elastic detection-rules (Elastic License 2.0), clean-room: own SPL, no Elastic query text.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: critical
+mitre:
+  tactics:
+  - impact
+  techniques:
+  - T1490
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- awsRegion
+- eventName
+- eventSource
+- recipientAccountId
+- requestParameters.backupVaultName
+- requestParameters.recoveryPointArn
+- sourceIPAddress
+- userAgent
+- userIdentity.arn
+- userIdentity.principalId
+- errorCode
+- userIdentity.invokedBy
+telemetry_validated: false
+false_positives:
+- Planned retention clean-up of old recovery points by a backup administrator (AWS Backup lifecycle deletes are done by the service; https://docs.aws.amazon.com/aws-backup/latest/devguide/deleting-backups.html)
+- Decommissioning a test vault in a sandbox account
+references:
+- https://docs.aws.amazon.com/aws-backup/latest/devguide/logging-using-cloudtrail.html
+- https://docs.aws.amazon.com/aws-backup/latest/devguide/API_DeleteRecoveryPoint.html
+- https://docs.aws.amazon.com/aws-backup/latest/devguide/API_DeleteBackupVault.html
+- https://docs.aws.amazon.com/aws-backup/latest/devguide/API_DeleteBackupVaultLockConfiguration.html
+- https://attack.mitre.org/techniques/T1490/
+- https://github.com/elastic/detection-rules/blob/main/rules/integrations/aws/impact_backup_vault_deleted_or_lock_removed.toml
+- https://github.com/elastic/detection-rules/blob/main/rules/integrations/aws/impact_backup_recovery_point_deleted.toml
+tags:
+- aws
+- cloudtrail
+- behavioural
+- clean-room
+- elastic-inspired
+- local-splunk-replay
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail eventSource="backup.amazonaws.com" eventName IN ("DeleteRecoveryPoint","DeleteBackupVault","DeleteBackupVaultLockConfiguration","DeleteBackupPlan")
+    | where isnull(errorCode) AND isnull('userIdentity.invokedBy')
+    | eval actor=coalesce('userIdentity.arn','userIdentity.principalId',"unknown"), vault='requestParameters.backupVaultName', recovery_point='requestParameters.recoveryPointArn'
+    | stats count AS deletions dc(recovery_point) AS recovery_points values(eventName) AS actions values(vault) AS vaults values(recovery_point) AS recovery_point_arns values(sourceIPAddress) AS src_ip values(userAgent) AS user_agent min(_time) AS first_seen max(_time) AS last_seen BY actor recipientAccountId awsRegion
+    | eval vault_or_lock_removed=if(isnotnull(mvfind(actions,"^DeleteBackupVault")),1,0)
+    | sort - vault_or_lock_removed - recovery_points
