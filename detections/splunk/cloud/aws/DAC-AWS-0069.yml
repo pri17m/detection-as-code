@@ -1,0 +1,54 @@
+id: DAC-AWS-0069
+title: EC2 serial console access enabled for the account
+description: 'Behavior: EnableSerialConsoleAccess (account-level opt-in) on ec2.amazonaws.com; SendSerialConsoleSSHPublicKey calls by the same actor are joined to show follow-on instance access. Serial console bypasses security groups and network controls (T1578.005, T1021.008). Not telemetry_validated. Behaviour idea from Elastic detection-rules (Elastic License 2.0), clean-room: own SPL, no Elastic query text.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - defense-impairment
+  - lateral-movement
+  techniques:
+  - T1578.005
+  - T1021.008
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- awsRegion
+- eventName
+- eventSource
+- recipientAccountId
+- sourceIPAddress
+- userAgent
+- userIdentity.arn
+- userIdentity.principalId
+- errorCode
+telemetry_validated: false
+false_positives:
+- 'Operations team enabling the serial console to troubleshoot an unbootable instance (documented use: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-serial-console.html)'
+references:
+- https://github.com/DataDog/stratus-red-team/blob/592c425f1707d11dfda8cf16fe7027f159dfa172/docs/detonation-logs/aws.lateral-movement.ec2-serial-console-send-ssh-public-key.json
+- https://stratus-red-team.cloud/attack-techniques/AWS/aws.lateral-movement.ec2-serial-console-send-ssh-public-key/
+- https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_EnableSerialConsoleAccess.html
+- https://attack.mitre.org/techniques/T1578/005/
+- https://attack.mitre.org/techniques/T1021/008/
+- https://github.com/elastic/detection-rules/blob/main/rules/integrations/aws/defense_evasion_ec2_serial_console_access_enabled.toml
+tags:
+- aws
+- cloudtrail
+- behavioural
+- clean-room
+- elastic-inspired
+- local-splunk-replay
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail ((eventSource="ec2.amazonaws.com" eventName="EnableSerialConsoleAccess") OR (eventSource="ec2-instance-connect.amazonaws.com" eventName="SendSerialConsoleSSHPublicKey"))
+    | where isnull(errorCode)
+    | eval actor=coalesce('userIdentity.arn','userIdentity.principalId',"unknown"), enabled=if(eventName="EnableSerialConsoleAccess",1,0), instance=if(enabled=0,'requestParameters.instanceId',null())
+    | stats max(enabled) AS console_enabled dc(instance) AS instances_keyed values(instance) AS instance_ids values(sourceIPAddress) AS src_ip values(userAgent) AS user_agent min(_time) AS first_seen max(_time) AS last_seen BY actor recipientAccountId awsRegion
+    | where console_enabled=1
+    | eval key_pushed_after_enable=if(instances_keyed>0,1,0)
+    | fields - console_enabled
+    | sort - instances_keyed
