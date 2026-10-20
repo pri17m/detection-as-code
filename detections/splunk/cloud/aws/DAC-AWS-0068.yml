@@ -1,0 +1,50 @@
+id: DAC-AWS-0068
+title: VPC flow logs deleted
+description: 'Behavior: successful ec2 DeleteFlowLogs. Removing flow logs blinds network forensics before exfiltration or lateral movement (T1685.002). One row per actor with deleted flow log IDs. Not telemetry_validated. Behaviour idea from Elastic detection-rules (Elastic License 2.0), clean-room: own SPL, no Elastic query text.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1685.002
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- awsRegion
+- eventName
+- eventSource
+- recipientAccountId
+- requestParameters.DeleteFlowLogsRequest.FlowLogId.content
+- responseElements.DeleteFlowLogsResponse.unsuccessful
+- sourceIPAddress
+- userAgent
+- userIdentity.arn
+- userIdentity.principalId
+- errorCode
+telemetry_validated: false
+false_positives:
+- Infrastructure-as-code teardown of a VPC or replacement of a flow log destination
+references:
+- https://github.com/DataDog/stratus-red-team/blob/592c425f1707d11dfda8cf16fe7027f159dfa172/docs/detonation-logs/aws.defense-evasion.vpc-remove-flow-logs.json
+- https://stratus-red-team.cloud/attack-techniques/AWS/aws.defense-evasion.vpc-remove-flow-logs/
+- https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DeleteFlowLogs.html
+- https://attack.mitre.org/techniques/T1685/002/
+- https://github.com/elastic/detection-rules/blob/main/rules/integrations/aws/defense_evasion_ec2_flow_log_deletion.toml
+tags:
+- aws
+- cloudtrail
+- behavioural
+- clean-room
+- elastic-inspired
+- local-splunk-replay
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail eventSource="ec2.amazonaws.com" eventName="DeleteFlowLogs"
+    | where isnull(errorCode)
+    | eval actor=coalesce('userIdentity.arn','userIdentity.principalId',"unknown"), flow_log_ids=mvappend('requestParameters.DeleteFlowLogsRequest.FlowLogId.content','requestParameters.DeleteFlowLogsRequest.FlowLogId{}.content'), unsuccessful='responseElements.DeleteFlowLogsResponse.unsuccessful'
+    | stats count AS calls dc(flow_log_ids) AS flow_logs values(flow_log_ids) AS flow_log_ids values(unsuccessful) AS unsuccessful values(sourceIPAddress) AS src_ip values(userAgent) AS user_agent min(_time) AS first_seen max(_time) AS last_seen BY actor recipientAccountId awsRegion
+    | sort - flow_logs

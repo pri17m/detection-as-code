@@ -1,13 +1,13 @@
 {
   "summary": {
-    "detections_total": 883,
-    "detections_with_mitre": 883,
+    "detections_total": 884,
+    "detections_with_mitre": 884,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 213,
     "platform_counts": {
       "crowdstrike": 166,
       "defender": 78,
-      "splunk": 639
+      "splunk": 640
     }
   },
   "techniques": {
@@ -1561,6 +1561,7 @@
       "DAC-AWS-0027",
       "DAC-AWS-0028",
       "DAC-AWS-0061",
+      "DAC-AWS-0068",
       "DAC-AZ-0004",
       "DAC-AZ-0005",
       "DAC-AZ-0019",
