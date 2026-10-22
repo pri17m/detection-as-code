@@ -1,0 +1,12 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "derived from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1005/esxi_vm_download/esxi_vm_download.log",
+  "modification": "VM folder/disk renamed Test2 -> DC01 (matches default name pattern, not the lookup)",
+  "sourcetype": "vmw-syslog",
+  "expect_alert": true,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (2026-10-22): 1 row(s), PASS",
+  "events": [
+    "May  7 17:17:50 192.168.8.233 2025-05-07T17:17:49.375Z localhost.localdomain Hostd[263196]: [Originator@6876 sub=Vimsvc.ha-eventmgr] Event 848 : File download from path '[Test]DC01/DC01.vmdk' was initiated from 'govc/0.50.0@192.168.196.95' and completed with status ''"
+  ]
+}

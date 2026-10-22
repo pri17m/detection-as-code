@@ -1,0 +1,61 @@
+id: DAC-VMW-0038
+title: ESXi snapshot created or VMDK downloaded for a domain controller VM
+description: 'Behavior: ESXi hostd "Create Snapshot:" on a VM, or a datastore download of a .vmdk, where the VM is a domain controller. Offline dumping of NTDS.dit from a DC virtual disk bypasses in-guest EDR (Unit 42, CVE-2026-0257 intrusions). DC identification is configurable: lookup dac_domain_controller_vms (vm_name,is_dc) and a default name pattern in eval dc_name_pattern; edit both for your naming. Not telemetry_validated.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - credential-access
+  - stealth
+  - defense-impairment
+  techniques:
+  - T1003.003
+  - T1006
+  - T1578.001
+severity: high
+false_positives:
+- 'Backup products (snapshot-based image backup of DCs runs nightly; the KB example user is vpxuser, i.e. vCenter-driven: https://knowledge.broadcom.com/external/article/438753/quiesced-snapshot-creation-succeeds-but.html). Exclude your backup service account and schedule.'
+- Admin snapshot before patching a DC
+references:
+- https://unit42.paloaltonetworks.com/active-exploitation-of-pan-os-cve-2026-0257/
+- https://knowledge.broadcom.com/external/article/438753/quiesced-snapshot-creation-succeeds-but.html
+- https://knowledge.broadcom.com/external/article/318905/detected-an-invalid-snapshot-configurati.html
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1005/esxi_vm_download/esxi_vm_download.log
+- https://github.com/splunk/security_content/blob/develop/detections/application/esxi_vm_exported_via_remote_tool.yml
+- https://attack.mitre.org/techniques/T1003/003/
+- https://attack.mitre.org/techniques/T1006/
+- https://attack.mitre.org/techniques/T1578/001/
+telemetry_validated: false
+required_fields:
+- _raw
+- sub
+- user
+tags:
+- vmware
+- esxi
+- domain-controller
+- unit42
+- cve-2026-0257
+- configurable-lookup
+- local-splunk-replay
+query:
+  splunk: |
+    (sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) ("Create Snapshot:" OR ("File download from path" "was initiated from"))
+    | rex field=_raw "sub=Vmsvc\.vm:(?<vmx_path>\S+\.vmx)\s.*\]\sCreate Snapshot:\s(?<snapshot_name>[^,]*),"
+    | rex field=_raw "File download from path '\[(?<datastore>[^\]]+)\](?<file_path>[^']+)' was initiated from '(?<initiator>[^']*)'"
+    | rex field=_raw "\suser=(?<user>[^\]\s]*)"
+    | eval action=case(isnotnull(snapshot_name),"snapshot_create", isnotnull(file_path) AND match(file_path,"(?i)\.vmdk$"),"disk_download")
+    | where isnotnull(action)
+    | eval vm_name=if(action="snapshot_create", replace(vmx_path,"^.*/([^/]*)\.vmx$","\1"), replace(file_path,"^([^/]+)/.*$","\1"))
+    | lookup dac_domain_controller_vms vm_name OUTPUT is_dc AS dc_from_lookup
+    | eval dc_name_pattern="(?i)^(dc|addc|adds|dom-?ctrl)[-_]?\d*$|(?i)[-_](dc|addc)[-_]?\d+$"
+    | eval is_dc=if(dc_from_lookup="true" OR match(vm_name,dc_name_pattern),1,0)
+    | where is_dc=1
+    | eval dc_match=if(dc_from_lookup="true","lookup","name_pattern")
+    | stats count values(action) AS actions values(snapshot_name) AS snapshot_names values(file_path) AS disk_files values(initiator) AS initiators values(user) AS users min(_time) AS first_seen max(_time) AS last_seen BY host vm_name dc_match
+    | fields - dc_name_pattern
