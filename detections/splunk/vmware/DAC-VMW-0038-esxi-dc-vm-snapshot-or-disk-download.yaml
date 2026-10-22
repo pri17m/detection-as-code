@@ -1,6 +1,6 @@
 id: DAC-VMW-0038
 title: ESXi snapshot created or VMDK downloaded for a domain controller VM
-description: 'Behavior: ESXi hostd "Create Snapshot:" on a VM, or a datastore download of a .vmdk, where the VM is a domain controller. Offline dumping of NTDS.dit from a DC virtual disk bypasses in-guest EDR (Unit 42, CVE-2026-0257 intrusions). DC identification is configurable: lookup dac_domain_controller_vms (vm_name,is_dc) and a default name pattern in eval dc_name_pattern; edit both for your naming. Not telemetry_validated.'
+description: 'Behavior: ESXi hostd "Create Snapshot:" on a VM, or a datastore download of a .vmdk, where the VM is a domain controller. Offline dumping of NTDS.dit from a DC virtual disk bypasses in-guest EDR (Unit 42, CVE-2026-0257 intrusions). DC identification is configurable: lookup dac_domain_controller_vms (vm_name,is_dc) and a default name pattern in eval dc_name_pattern; edit both for your naming. Deploy the lookup from lookups/dac_domain_controller_vms.csv.example (see lookups/README.md); the search errors until it exists. Not telemetry_validated.'
 author: DaC
 status: experimental
 platforms:

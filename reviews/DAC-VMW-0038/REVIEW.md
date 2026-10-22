@@ -51,7 +51,7 @@ Ponytail pass (2026-10-22). Findings naming a fixture were replayed in local Spl
 
 ## Unverified ideas
 - Broadcom KB lines have placeholders (YYYY, #####) as published; timestamps parse to index time.
-- The lookup dac_domain_controller_vms is not shipped; the rule errors in Splunk until it is created (CSV vm_name,is_dc).
+- The lookup dac_domain_controller_vms ships only as a template: `lookups/dac_domain_controller_vms.csv.example` (fake EXAMPLE-* rows). Deploy: copy to `dac_domain_controller_vms.csv`, fill with your DC VM names, upload via Settings > Lookups > Lookup table files (or the app's `lookups/` dir) and share with the app. Steps in `lookups/README.md`. The rule errors in Splunk until it is deployed.
 - hostd user= field in real vCenter-driven snapshots is vpxuser:<domain user> per KB 438753; direct ESXi users not seen.
 - telemetry_validated stays false.
 
