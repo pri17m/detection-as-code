@@ -33,6 +33,7 @@ platforms:
 tags:
 - wave-c
 - P1
+- needs-review
 description: SendSSHPublicKey / serial-console
 sourcetypes:
 - aws:cloudtrail
