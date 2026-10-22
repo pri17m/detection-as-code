@@ -64,6 +64,14 @@ allowed_sourcetypes:
   # https://github.com/splunk/splunk-connect-for-syslog/blob/main/package/shared/addons/beyondtrust/app-syslog-beyondtrust_sra.conf
   - beyondtrust:sra
 
+  # --- AWS CloudTrail (Splunk Add-on for AWS) ---
+  # same sourcetype as splunk/security_content AWS tests (e.g. detections/cloud/aws_*.yml tests sourcetype: aws:cloudtrail)
+  - aws:cloudtrail
+
+  # --- Palo Alto Networks Strata Logging Service / Cortex Data Lake (HTTPS JSON) ---
+  # Splunk add-on sourcetype per PaloAltoNetworks/Splunk-Apps Splunk_TA_paloalto/default/props.conf [pan:firewall_cloud]
+  - pan:firewall_cloud
+
 # ---------------------------------------------------------------------------
 # Optional: source= patterns that pair with collapsed sourcetypes
 # (not CI-enforced as sourcetype strings; documented for rule authors)
