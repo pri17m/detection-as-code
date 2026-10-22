@@ -28,3 +28,45 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 - License: none shown on the individual rule pages (checked 2026-10-13). The site Terms of Service apply: https://detections.ai/terms/full (System Two Security Inc.). Those terms grant a limited right to access and use the Platform to view, share and generate detections; they prohibit modifying or creating derivative works of Platform elements and renting/distributing/selling rights to use the Platform. Copyright in community-posted rules rests with each contributor (or with System Two for Platform Materials). No open-source licence was displayed on the rule pages.
 - Attribution authors as shown on the rule pages at capture time: Fatima Suvaid (@arhaminafs), Adarsh Pandey (@Pandeyadarsh), Arnold Chan (@slaz); some pages showed Unknown.
 - Debarshi Ghosh (repo owner) explicitly directed that these rules be based on the detections.ai queries after being informed of the site terms. This notice records that choice and the missing per-rule licence.
+
+## Stratus Red Team (DataDog)
+
+- Upstream: https://github.com/DataDog/stratus-red-team
+- Used for: attack technique definitions that test fixtures and references in DAC-AWS-0062..0069 are based on (technique pages linked in each rule's `references`).
+- License: Apache-2.0, per the upstream LICENSE file (https://github.com/DataDog/stratus-red-team/blob/main/LICENSE, checked 2026-10-20).
+- Upstream NOTICE (https://github.com/DataDog/stratus-red-team/blob/main/NOTICE), reproduced as Apache-2.0 section 4(d) requires:
+
+  > Stratus Red Team
+  > Copyright 2021-Present Datadog, Inc.
+  >
+  > This product includes software developed at Datadog (https://www.datadoghq.com/).
+
+- Full licence text: https://www.apache.org/licenses/LICENSE-2.0
+
+## splunk/attack_data
+
+- Upstream: https://github.com/splunk/attack_data
+- Used for: sample log lines that test fixtures under `tests/cases/` are taken from or derived from (edited copies are marked `_derived` and documented in each REVIEW.md) for DAC-AWS-0062..0069, DAC-OKTA-0011, DAC-PAN-0001, DAC-VMW-0015, DAC-VMW-0038. Source dataset URLs are in each rule's `references` and REVIEW.md.
+- License: Apache-2.0, per the upstream LICENSE file (https://github.com/splunk/attack_data/blob/master/LICENSE, checked 2026-10-20). No NOTICE file upstream.
+- Modified files: fixtures named `*_derived.json` were changed from the upstream lines; the changes are listed per fixture in the rule's REVIEW.md.
+- Full licence text: https://www.apache.org/licenses/LICENSE-2.0
+
+## Palo Alto Networks Splunk-Apps
+
+- Upstream: https://github.com/PaloAltoNetworks/Splunk-Apps (sample files pinned at commit ae653b335e633895c1dcc796139d0c21c4c34696)
+- Used for: sample log lines and sourcetype/field definitions behind DAC-PAN-0001 test fixtures; cited in the REVIEW.md of DAC-VMW-0015 and DAC-VMW-0038.
+- License: ISC, per the upstream LICENSE file (https://github.com/PaloAltoNetworks/Splunk-Apps/blob/develop/LICENSE, checked 2026-10-20).
+
+### ISC License (copyright line as stated upstream)
+
+Copyright (c) 2013-2020, Palo Alto Networks Inc.
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+## Broadcom knowledge base (VMware ESXi)
+
+- Upstream: https://knowledge.broadcom.com/external/article/318905, /320681, /438753 (and other KB articles linked in DAC-VMW-0027..0038 `references`).
+- Used for: short ESXi log-line formats cited as references for DAC-VMW rules.
+- License: none claimed. These are cited as references only; no licence beyond citation is asserted, and Broadcom's site terms apply to the articles themselves.
