@@ -1,13 +1,13 @@
 {
   "summary": {
-    "detections_total": 892,
-    "detections_with_mitre": 892,
+    "detections_total": 893,
+    "detections_with_mitre": 893,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 217,
     "platform_counts": {
       "crowdstrike": 166,
       "defender": 78,
-      "splunk": 648
+      "splunk": 649
     }
   },
   "techniques": {
