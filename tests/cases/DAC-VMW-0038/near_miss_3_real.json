@@ -1,0 +1,13 @@
+{
+  "label": "near_miss",
+  "synthetic": false,
+  "source": "verbatim from https://knowledge.broadcom.com/external/article/318905/detected-an-invalid-snapshot-configurati.html",
+  "sourcetype": "vmw-syslog",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (2026-10-22): 0 row(s), PASS",
+  "events": [
+    "YYYY-MM-DDTHH:MM:SSZ verbose hostd[2##1##6] [Originator@6876 sub=Vmsvc.vm:/vmfs/volumes///.vmx opID=esxui-8##a-6##f user=] Create Snapshot: Test, memory=false, quiescent=false state=5",
+    "YYYY-MM-DDTHH:MM:SSZ verbose hostd[2##1##6] [Originator@6876 sub=Vigor.Vmsvc.vm:/vmfs/volumes///.vmx opID=esxui-4##8-5##4] Create Snapshot translated error to vim.fault.InvalidSnapshotFormat",
+    "YYYY-MM-DDTHH:MM:SSZ verbose hostd[2##1##6] [Originator@6876 sub=Vigor.Vmsvc.vm:/vmfs/volumes///.vmx opID=esxui-4##8-5##4] Create Snapshot message: An error occurred while saving the snapshot: A required file was not found."
+  ]
+}

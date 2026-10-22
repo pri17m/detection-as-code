@@ -1,0 +1,11 @@
+{
+  "label": "malicious",
+  "synthetic": false,
+  "source": "verbatim from https://knowledge.broadcom.com/external/article/438753/quiesced-snapshot-creation-succeeds-but.html",
+  "sourcetype": "vmw-syslog",
+  "expect_alert": true,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (2026-10-22): 1 row(s), PASS",
+  "events": [
+    "T Db(167) Hostd[2099692]: [Originator@6876 sub=Vmsvc.vm:/vmfs/volumes/#####-####-####-####-#######/VM_Name/VM_Name.vmx opID=#####-####-####-####-####### sid=###### user=vpxuser:Domain\\User] Create Snapshot: VM Snapshot YYYY-MM-DD, Time, memory=false, quiescent=true"
+  ]
+}
