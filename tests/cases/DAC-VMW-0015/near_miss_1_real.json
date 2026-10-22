@@ -1,0 +1,13 @@
+{
+  "label": "near_miss",
+  "synthetic": false,
+  "source": "verbatim from https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1562/esxi_encryption_modified/esxi_encryption_modified.log",
+  "sourcetype": "vmw-syslog",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay (2026-10-22): 0 row(s), PASS",
+  "events": [
+    "Jul  7 18:54:48 192.168.8.233 2025-07-07T18:53:37.663Z localhost.localdomain shell[1798020]: [root]: esxcli system settings encryption set --require-exec-installed-only=1",
+    "Jul  7 18:53:45 192.168.8.233 2025-07-07T18:52:34.673Z localhost.localdomain shell[1798020]: [root]: esxcli system settings encryption set -e 1",
+    "Jul  7 18:53:11 192.168.8.233 2025-07-07T18:52:00.262Z localhost.localdomain shell[1798020]: [root]: esxcli system settings encryption set --require-exec-installed-only=1"
+  ]
+}

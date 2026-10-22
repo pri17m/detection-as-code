@@ -1,6 +1,6 @@
 id: DAC-VMW-0015
 title: ESXi encryption or execInstalledOnly enforcement changed
-description: Detects esxcli system settings encryption set touching secure boot or execInstalledOnly, excluding shell-echo lines. Disabling those checks lets unsigned code run on the host.
+description: Detects esxcli system settings encryption set that DISABLES secure boot or execInstalledOnly enforcement (value 0/F/false, including mis-typed --require-exec* flags), excluding shell-echo lines. Enabling the controls no longer alerts. Disabling those checks lets unsigned code run on the host (abused in CVE-2026-0257 intrusions per Unit 42).
 author: DaC
 status: experimental
 platforms:
@@ -18,12 +18,21 @@ false_positives:
 - Planned maintenance or host rebuilds. Confirm the actor and change window.
 references:
 - https://github.com/splunk/security_content/blob/develop/detections/application/esxi_encryption_settings_modified.yml
+- https://unit42.paloaltonetworks.com/active-exploitation-of-pan-os-cve-2026-0257/
+- https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1562/esxi_encryption_modified/esxi_encryption_modified.log
+- https://knowledge.broadcom.com/external/article/320681/the-spherelet-service-is-failing-to-star.html
 telemetry_validated: false
 required_fields:
 - Message
+- _raw
 tags:
 - vmware
 - esxi
 - escu
 query:
-  splunk: "(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message=\"*system settings encryption set*\" NOT Message=\"*shell.*\"\n    Message IN (\"* -e *\",\"* -s *\",\"*--require-secure-boot*\",\"*execInstalledOnly*\",\"*require-exec-installed-only*\")\n| rex field=_raw \"Z (?<dest>[\\w\\.]+)\\s.*\\]: \\[(?<user>\\w+)\\]:(?<command>.+)\"\n| stats count min(_time) as firstTime max(_time) as lastTime values(command) as command by dest user\n"
+  splunk: |
+    (sourcetype=vmw-syslog OR sourcetype=vmware:esxlog*) Message="*system settings encryption set*" NOT Message="*shell.*"
+        Message IN ("* -e *","* -s *","*--require-secure-boot*","*execInstalledOnly*","*require-exec*")
+    | rex field=_raw "Z (?<dest>[\w\.]+)\s.*\]: \[(?<user>\w+)\]:(?<command>.+)"
+    | where match(command,"(?i)(--require-(exec\S*|secure-boot)=(0|f|false)\b)|(\s-(e|s)\s+(0|f|false)\b)")
+    | stats count min(_time) as firstTime max(_time) as lastTime values(command) as command by dest user
