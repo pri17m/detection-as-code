@@ -1,0 +1,4 @@
+vm_name,is_dc
+EXAMPLE-DC-01,true
+EXAMPLE-DC-02,true
+EXAMPLE-APP-01,false
