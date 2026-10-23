@@ -1,0 +1,19 @@
+{
+  "label": "benign",
+  "variant": "php-fpm -> convert (ImageMagick, not shell)",
+  "source": "SigmaHQ FP note",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "ParentBaseFileName": "php-fpm",
+      "ImageFileName": "/usr/bin/convert",
+      "CommandLine": "convert in.jpg out.png",
+      "UserName": "www-data",
+      "ComputerName": "web1",
+      "aid": "a1"
+    }
+  ]
+}
