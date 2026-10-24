@@ -1,0 +1,19 @@
+{
+  "label": "near_miss",
+  "variant": "single class",
+  "source": "synthetic",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "ParentBaseFileName": "php-cgi",
+      "ImageFileName": "/bin/sh",
+      "CommandLine": "/bin/sh -c hostname",
+      "UserName": "apache",
+      "ComputerName": "web3",
+      "aid": "a3"
+    }
+  ]
+}

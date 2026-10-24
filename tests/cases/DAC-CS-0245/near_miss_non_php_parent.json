@@ -1,0 +1,19 @@
+{
+  "label": "near_miss",
+  "variant": "cron parent",
+  "source": "synthetic",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "ParentBaseFileName": "cron",
+      "ImageFileName": "/bin/bash",
+      "CommandLine": "bash -c whoami; curl http://127.0.0.1/x -o /tmp/x",
+      "UserName": "root",
+      "ComputerName": "web4",
+      "aid": "a4"
+    }
+  ]
+}
