@@ -1,0 +1,17 @@
+{
+  "label": "near_miss",
+  "variant": "single class recon only",
+  "source": "synthetic",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "events": [
+    {
+      "InitiatingProcessFileName": "php-fpm8.2",
+      "FileName": "sh",
+      "ProcessCommandLine": "/bin/sh -c id",
+      "AccountName": "www-data",
+      "DeviceName": "web3"
+    }
+  ]
+}

