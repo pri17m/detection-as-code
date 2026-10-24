@@ -1,0 +1,14 @@
+{
+  "label": "benign",
+  "variant": "php.exe -> composer (not cmd/powershell shell match in stacking path if Image is composer)",
+  "source": "synthetic",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 1,
+  "ParentImage": "C:\\\\PHP\\\\php.exe",
+  "Image": "C:\\\\tools\\\\composer.bat",
+  "CommandLine": "composer install",
+  "User": "deploy",
+  "host": "iis1"
+}

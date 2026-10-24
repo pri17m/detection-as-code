@@ -1,0 +1,25 @@
+{
+  "label": "near_miss",
+  "variant": "explorer -> cmd recon+download",
+  "source": "synthetic",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 1,
+  "events": [
+    {
+      "ParentImage": "C:\\\\Windows\\\\explorer.exe",
+      "Image": "C:\\\\Windows\\\\System32\\\\cmd.exe",
+      "CommandLine": "cmd.exe /c whoami",
+      "User": "user1",
+      "host": "ws1"
+    },
+    {
+      "ParentImage": "C:\\\\Windows\\\\explorer.exe",
+      "Image": "C:\\\\Windows\\\\System32\\\\cmd.exe",
+      "CommandLine": "cmd.exe /c curl http://127.0.0.1/a -o C:\\\\Windows\\\\Temp\\\\a",
+      "User": "user1",
+      "host": "ws1"
+    }
+  ]
+}

