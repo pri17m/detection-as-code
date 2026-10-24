@@ -1,0 +1,17 @@
+{
+  "label": "benign",
+  "variant": "php mail() -> sendmail (not a shell class)",
+  "source": "SigmaHQ FP note 818f7b24",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "events": [
+    {
+      "InitiatingProcessFileName": "php-fpm8.2",
+      "FileName": "sendmail",
+      "ProcessCommandLine": "sendmail -t -i",
+      "AccountName": "www-data",
+      "DeviceName": "web1"
+    }
+  ]
+}

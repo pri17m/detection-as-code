@@ -1,0 +1,24 @@
+{
+  "label": "near_miss",
+  "variant": "sshd parent with recon+download",
+  "source": "synthetic",
+  "expect_alert": false,
+  "result": "not run",
+  "synthetic": true,
+  "events": [
+    {
+      "InitiatingProcessFileName": "sshd",
+      "FileName": "bash",
+      "ProcessCommandLine": "bash -c whoami",
+      "AccountName": "ops",
+      "DeviceName": "web4"
+    },
+    {
+      "InitiatingProcessFileName": "sshd",
+      "FileName": "bash",
+      "ProcessCommandLine": "bash -c curl http://127.0.0.1/a -o /tmp/a",
+      "AccountName": "ops",
+      "DeviceName": "web4"
+    }
+  ]
+}

