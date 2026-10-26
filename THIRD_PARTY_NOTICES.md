@@ -70,3 +70,13 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 - Upstream: https://knowledge.broadcom.com/external/article/318905, /320681, /438753 (and other KB articles linked in DAC-VMW-0027..0038 `references`).
 - Used for: short ESXi log-line formats cited as references for DAC-VMW rules.
 - License: none claimed. These are cited as references only; no licence beyond citation is asserted, and Broadcom's site terms apply to the articles themselves.
+
+## 0x4D31/honeypot-data (PHP2Shell confirmed-RCE evidence)
+
+- Upstream: https://github.com/0x4D31/honeypot-data (repository owner 0x4D31; content used at commit 0b6a57491134c10f7cc5055999f1cb8b38c67546)
+- Report: https://github.com/0x4D31/honeypot-data/blob/main/reports/php2shell/2026-10-24-confirmed-rce.md
+- Evidence dataset: https://github.com/0x4D31/honeypot-data/tree/main/reports/php2shell/2026-10-24-rce-evidence
+- Used for: Tetragon `process_exec` records from the 35 published cases (A01-A03, B01-B32), field-mapped into test fixtures named `*honeypot*_derived.json` under `tests/cases/` for DAC-CS-0245, DAC-MDE-0096 and DAC-WIN-0365, and the per-case command analysis in those rules' REVIEW.md files. Each of those rules links the report and dataset in `references`.
+- License: Creative Commons Attribution 4.0 International (CC-BY-4.0), per the upstream LICENSE file (https://github.com/0x4D31/honeypot-data/blob/main/LICENSE, checked 2026-10-26).
+- Changes made here: records were reshaped into each platform's field names (mapping stated in every fixture's `field_mapping`), the `UserName`/`AccountName` value `www-data` was derived from uid 33, and kprobe socket records were left out. Command lines, timestamps, node names, exec IDs and source IPs are as published. Upstream already replaced honeypot addresses with TEST-NET aliases (see the dataset README). These fixtures are not native EDR or SIEM telemetry and have not been run.
+- Full licence text: https://creativecommons.org/licenses/by/4.0/legalcode
