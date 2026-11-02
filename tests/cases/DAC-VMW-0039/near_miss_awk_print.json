@@ -1,0 +1,15 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "synthetic, written for this rule",
+  "sourcetype": "vmware:esxlog:shell",
+  "expect_alert": false,
+  "result": "not run (no Splunk runner; regex logic checked locally in Python only)",
+  "events": [
+    {
+      "host": "esx01.example.test",
+      "Message": "esxcli storage filesystem list | awk '{print $3}'",
+      "_raw": "2026-08-07T10:00:00Z esx01.example.test shell[2100123]: [root]: esxcli storage filesystem list | awk '{print $3}'"
+    }
+  ]
+}

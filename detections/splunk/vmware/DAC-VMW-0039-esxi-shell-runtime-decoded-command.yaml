@@ -1,0 +1,34 @@
+id: DAC-VMW-0039
+title: ESXi shell command decoded at runtime (awk decode or escape-sequence substitution)
+description: 'Detects ESXi shell commands that build the real command at runtime instead of typing it: awk output piped to sh, awk system(), awk bitwise xor/and/or or %c character generation, or a run of 3+ hex/octal escapes inside $(printf ...), backticks or $''...''. ESXi shell.log records the command before expansion, so keyword rules for esxcli miss these.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - stealth
+  - execution
+  techniques:
+  - T1027
+  - T1140
+  - T1059.004
+severity: high
+false_positives:
+- Admin one-liners that pipe awk output to sh (e.g. generating and running a batch of vim-cmd calls). Review the decoded command; do not suppress by host.
+references:
+- https://www.crowdstrike.com/en-us/blog/crowdstrike-hunts-for-shell-command-obfuscation-vmware-esx/
+- https://docs.splunk.com/Documentation/AddOns/released/VMWesxilogs/SourceTypes
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- shell
+- clean-room
+query:
+  splunk: "(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog:shell)\n| eval cmd=coalesce(Message, _raw)\n| eval matched_pattern=case(\n    match(cmd, \"\\bawk\\b.*\\|\\s*(?:/bin/)?(?:busybox\\s+)?(?:ba)?sh(?:\\s|$|;|\\))\"), \"awk_to_shell\",\n    match(cmd, \"\\bawk\\b.*\\bsystem\\s*\\(\"), \"awk_system\",\n    match(cmd, \"\\bawk\\b.*\\b(?:xor|and|or|lshift|rshift|compl)\\s*\\(\"), \"awk_bitwise\",\n    match(cmd, \"\\bawk\\b.*%c.*\\b\\d{2,3}\\b\"), \"awk_charcode\",\n    match(cmd, \"(?:\\$\\(|`)\\s*printf\\s+[\\x22\\x27]?(?:\\x5c(?:x[0-9A-Fa-f]{2}|[0-7]{3})){3,}\"), \"printf_escape_subst\",\n    match(cmd, \"\\$\\x27(?:\\x5c(?:x[0-9A-Fa-f]{2}|[0-7]{3})){3,}\"), \"ansi_c_escape\",\n    true(), null())\n| where isnotnull(matched_pattern)\n| stats count min(_time) as firstTime max(_time) as lastTime values(cmd) as command values(matched_pattern) as matched_pattern by host\n"
