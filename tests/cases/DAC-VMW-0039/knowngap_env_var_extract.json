@@ -1,0 +1,16 @@
+{
+  "label": "known-gap",
+  "synthetic": true,
+  "source": "CrowdStrike blog Aug 2026 (verbatim sample, flattened to one line): https://www.crowdstrike.com/en-us/blog/crowdstrike-hunts-for-shell-command-obfuscation-vmware-esx/",
+  "sourcetype": "vmware:esxlog:shell",
+  "expect_alert": true,
+  "result": "not run (no Splunk runner; regex logic checked locally in Python only)",
+  "events": [
+    {
+      "host": "esx01.example.test",
+      "Message": "$(echo $TERM | cut -c 3)$(echo $SHELL | cut -c 6)$(echo $TERM | cut -c 1) system syslog config set --reset=loghost",
+      "_raw": "2026-08-07T10:00:00Z esx01.example.test shell[2100123]: [root]: $(echo $TERM | cut -c 3)$(echo $SHELL | cut -c 6)$(echo $TERM | cut -c 1) system syslog config set --reset=loghost"
+    }
+  ],
+  "note": "expected to be MISSED by this rule; see REVIEW.md"
+}

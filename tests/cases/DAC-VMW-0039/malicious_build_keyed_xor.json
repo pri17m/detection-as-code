@@ -1,0 +1,15 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "CrowdStrike blog Aug 2026 (verbatim sample, flattened to one line): https://www.crowdstrike.com/en-us/blog/crowdstrike-hunts-for-shell-command-obfuscation-vmware-esx/",
+  "sourcetype": "vmware:esxlog:shell",
+  "expect_alert": true,
+  "result": "not run (no Splunk runner; regex logic checked locally in Python only)",
+  "events": [
+    {
+      "host": "esx01.example.test",
+      "Message": "K=$(esxcli system version get | grep Build | awk '{print $3}' | head -c 2); K=${K:-9}; echo \"108 122 113 106 101 96 41 127 100 41 121 123 102 106 108 122 122 41 101 96 122 125\" | awk -v key=$K '{for(i=1;i<=NF;i++)printf(\"%c\",xor($i,key))}' | sh",
+      "_raw": "2026-08-07T10:00:00Z esx01.example.test shell[2100123]: [root]: K=$(esxcli system version get | grep Build | awk '{print $3}' | head -c 2); K=${K:-9}; echo \"108 122 113 106 101 96 41 127 100 41 121 123 102 106 108 122 122 41 101 96 122 125\" | awk -v key=$K '{for(i=1;i<=NF;i++)printf(\"%c\",xor($i,key))}' | sh"
+    }
+  ]
+}

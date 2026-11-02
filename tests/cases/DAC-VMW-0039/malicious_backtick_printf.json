@@ -1,0 +1,15 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "synthetic, written for this rule (backtick form of blog hex printf)",
+  "sourcetype": "vmware:esxlog:shell",
+  "expect_alert": true,
+  "result": "not run (no Splunk runner; regex logic checked locally in Python only)",
+  "events": [
+    {
+      "host": "esx01.example.test",
+      "Message": "`printf \"\\x65\\x73\\x78\\x63\\x6c\\x69\"` vm process list",
+      "_raw": "2026-08-07T10:00:00Z esx01.example.test shell[2100123]: [root]: `printf \"\\x65\\x73\\x78\\x63\\x6c\\x69\"` vm process list"
+    }
+  ]
+}

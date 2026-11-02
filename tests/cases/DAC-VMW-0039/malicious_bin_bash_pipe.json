@@ -1,0 +1,15 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "synthetic, written for this rule",
+  "sourcetype": "vmware:esxlog:shell",
+  "expect_alert": true,
+  "result": "not run (no Splunk runner; regex logic checked locally in Python only)",
+  "events": [
+    {
+      "host": "esx01.example.test",
+      "Message": "echo 101 115 120 | awk '{for(i=1;i<=NF;i++)printf(\"%c\",$i)}' | /bin/sh",
+      "_raw": "2026-08-07T10:00:00Z esx01.example.test shell[2100123]: [root]: echo 101 115 120 | awk '{for(i=1;i<=NF;i++)printf(\"%c\",$i)}' | /bin/sh"
+    }
+  ]
+}
