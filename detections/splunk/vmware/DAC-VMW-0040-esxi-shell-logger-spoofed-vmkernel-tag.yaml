@@ -1,0 +1,33 @@
+id: DAC-VMW-0040
+title: ESXi shell runs logger with a spoofed vmkernel tag
+description: Detects a shell command on ESXi that writes a syslog message tagged vmkernel with logger. vmkernel messages come from the kernel, not from logger, so this is log injection to hide activity behind routine-looking entries.
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- vmw-syslog
+- vmware:esxlog*
+mitre:
+  tactics:
+  - stealth
+  - execution
+  techniques:
+  - T1036
+  - T1059.004
+severity: high
+false_positives:
+- A vendor or in-house script that misuses the vmkernel tag for its own messages. None is known; record any found here.
+references:
+- https://www.crowdstrike.com/en-us/blog/crowdstrike-hunts-for-shell-command-obfuscation-vmware-esx/
+- https://docs.splunk.com/Documentation/AddOns/released/VMWesxilogs/SourceTypes
+telemetry_validated: false
+required_fields:
+- Message
+tags:
+- vmware
+- esxi
+- shell
+- clean-room
+query:
+  splunk: "(sourcetype=vmw-syslog OR sourcetype=vmware:esxlog:shell)\n| eval cmd=coalesce(Message, _raw)\n| eval matched_pattern=case(\n    match(cmd, \"\\blogger\\b.*(?:\\s-[a-z]*t\\s*|\\s--tag[=\\s]+)[\\x22\\x27]?vmkernel\\b\"), \"logger_vmkernel_tag\",\n    true(), null())\n| where isnotnull(matched_pattern)\n| stats count min(_time) as firstTime max(_time) as lastTime values(cmd) as command values(matched_pattern) as matched_pattern by host\n"
