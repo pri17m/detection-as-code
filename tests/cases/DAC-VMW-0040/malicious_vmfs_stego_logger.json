@@ -1,0 +1,15 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "CrowdStrike blog Aug 2026 (verbatim sample, flattened to one line): https://www.crowdstrike.com/en-us/blog/crowdstrike-hunts-for-shell-command-obfuscation-vmware-esx/ (octal payload shortened)",
+  "sourcetype": "vmware:esxlog:shell",
+  "expect_alert": true,
+  "result": "not run (no Splunk runner; regex logic checked locally in Python only)",
+  "events": [
+    {
+      "host": "esx01.example.test",
+      "Message": "F=/vmfs/volumes/$(esxcli storage filesystem list | grep VMFS | head -1 | awk '{print $2}')/.sys$(date +%N); logger -t \"vmkernel\" \"Storage check: $F\"; printf \"\\145\\163\\170\" > $F; sh $F; rm -f $F; logger -t \"vmkernel\" \"Storage check complete\"",
+      "_raw": "2026-08-07T10:00:00Z esx01.example.test shell[2100123]: [root]: F=/vmfs/volumes/$(esxcli storage filesystem list | grep VMFS | head -1 | awk '{print $2}')/.sys$(date +%N); logger -t \"vmkernel\" \"Storage check: $F\"; printf \"\\145\\163\\170\" > $F; sh $F; rm -f $F; logger -t \"vmkernel\" \"Storage check complete\""
+    }
+  ]
+}
