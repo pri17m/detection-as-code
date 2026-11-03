@@ -1,0 +1,60 @@
+id: DAC-OKTA-0013
+title: 'Okta: sign-in for a nonexistent username then a privileged username from the same IP'
+description: 'Detects an Okta sign-in attempt (user.session.start) for a username Okta does not know (actor.id="unknown"), followed within 60 seconds from the same client.ipAddress by a sign-in attempt for a common privileged username (admin, administrator, root, superadmin, sysadmin, okta-admin, compared on the part before "@"). Unit 42 reports an agentic attack tool (ARTEX) that logs in "as a randomly generated, nonexistent user to baseline the error response, followed one second later by a login as admin". The second attempt alerts whether it fails or succeeds; priv_success=1 marks rows where it succeeded. The 60-second window and the username list are tunable and not validated on real telemetry. Run every 15 minutes over the last 20 minutes and throttle on src_ip.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+sourcetypes:
+- OktaIM2:log
+mitre:
+  tactics:
+  - credential-access
+  techniques:
+  - T1110
+severity: medium
+false_positives:
+- 'A person mistypes their username (Okta logs actor.id="unknown") and within a minute signs in to a shared or break-glass account named admin from the same office NAT IP. Check whether the privileged account is a real named shared account and whether the unknown username is a near-typo of a real user.'
+- 'Many users behind one NAT or proxy egress IP: an unrelated typo and an admin sign-in can fall inside the same 60 seconds. Review request.ipChain and securityContext.isProxy, and allowlist known egress IPs after review.'
+- 'Authorised penetration tests, red-team exercises and SSO or IdP configuration tests that use throwaway usernames. Suppress by test window and source IP.'
+- 'Alert volume is not measured: no real benign Okta data was available.'
+references:
+- https://developer.okta.com/docs/reference/api/event-types/
+- https://developer.okta.com/docs/okta-event-types.csv
+- https://support.okta.com/help/s/article/okta-system-log-displays-verification-error-due-to-incorrect-username
+- https://support.okta.com/help/s/article/common-okta-login-failures
+- https://developer.okta.com/docs/reference/system-log-query/
+- https://splunk.github.io/splunk-add-on-for-okta-identity-cloud/Sourcetypes/
+- https://github.com/PaloAltoNetworks/Unit42-timely-threat-intel/blob/main/2026-10-30-activity-using-ARTEX-agentic-AI.txt
+- https://attack.mitre.org/techniques/T1110/
+telemetry_validated: false
+required_fields:
+- eventType
+- actor.id
+- actor.alternateId
+- outcome.result
+- outcome.reason
+- client.ipAddress
+- client.userAgent.rawUserAgent
+- securityContext.isProxy
+tags:
+- okta
+- okta-system-log
+- username-enumeration
+- ai-agent
+- artex
+query:
+  splunk: |
+    sourcetype="OktaIM2:log" eventType="user.session.start"
+    | eval src_ip='client.ipAddress', user=lower('actor.alternateId'), ua='client.userAgent.rawUserAgent'
+    | eval local_part=replace(user, "@.*$", "")
+    | eval is_priv=if(match(local_part, "^(admin|administrator|root|superadmin|sysadmin|okta-admin)$"), 1, 0)
+    | eval is_probe=if('actor.id'="unknown" AND is_priv=0, 1, 0)
+    | where (is_probe=1 OR is_priv=1) AND isnotnull(src_ip)
+    | sort 0 _time
+    | eval probe_time=if(is_probe=1, _time, null()), probe_user=if(is_probe=1, user, null())
+    | streamstats last(probe_time) as last_probe_time last(probe_user) as last_probe_user by src_ip
+    | where is_priv=1 AND isnotnull(last_probe_time) AND (_time - last_probe_time) <= 60
+    | eval gap_seconds=round(_time - last_probe_time, 3), priv_success=if('outcome.result'="SUCCESS", 1, 0)
+    | stats min(_time) as firstTime max(_time) as lastTime values(last_probe_user) as probed_usernames values(user) as privileged_usernames min(gap_seconds) as min_gap_seconds max(priv_success) as priv_success values(outcome.reason) as outcome_reason values(ua) as user_agent values(securityContext.isProxy) as is_proxy by src_ip
+    | sort 0 - priv_success min_gap_seconds

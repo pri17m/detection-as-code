@@ -1,13 +1,13 @@
 {
   "summary": {
-    "detections_total": 896,
-    "detections_with_mitre": 896,
+    "detections_total": 897,
+    "detections_with_mitre": 897,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 217,
     "platform_counts": {
       "crowdstrike": 167,
       "defender": 79,
-      "splunk": 650
+      "splunk": 651
     }
   },
   "techniques": {
@@ -745,6 +745,7 @@
     "T1110": [
       "DAC-CS-0097",
       "DAC-CS-0098",
+      "DAC-OKTA-0013",
       "DAC-VMW-0003",
       "DAC-VMW-0027",
       "DAC-WIN-0161",
