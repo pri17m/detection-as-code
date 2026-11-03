@@ -1,0 +1,32 @@
+{
+  "label": "benign",
+  "synthetic": true,
+  "source": "synthetic, hand-written from Okta LogEvent field paths (no real or employer data); IPs from RFC 5737 documentation ranges",
+  "modification": "admin signs in with no preceding unknown-user attempt",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 0 rows",
+  "events": [
+    {
+      "published": "2026-11-01T10:00:00.000Z",
+      "eventType": "user.session.start",
+      "actor": {
+        "id": "00uSYNTH0002",
+        "alternateId": "admin@example.com"
+      },
+      "outcome": {
+        "result": "SUCCESS",
+        "reason": null
+      },
+      "client": {
+        "ipAddress": "203.0.113.10",
+        "userAgent": {
+          "rawUserAgent": "Mozilla/5.0"
+        }
+      },
+      "securityContext": {
+        "isProxy": false
+      }
+    }
+  ]
+}

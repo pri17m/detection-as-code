@@ -1,0 +1,53 @@
+{
+  "label": "malicious",
+  "synthetic": true,
+  "source": "synthetic, hand-written from Okta LogEvent field paths (no real or employer data); IPs from RFC 5737 documentation ranges",
+  "modification": "nonexistent user then a real 'administrator' account succeeds 5s later",
+  "sourcetype": "OktaIM2:log",
+  "expect_alert": true,
+  "result": "not run by CI (no Splunk runner); local Python stand-in: 1 rows",
+  "events": [
+    {
+      "published": "2026-11-01T10:00:00.000Z",
+      "eventType": "user.session.start",
+      "actor": {
+        "id": "unknown",
+        "alternateId": "precheck.not-a-user@example.invalid"
+      },
+      "outcome": {
+        "result": "FAILURE",
+        "reason": "VERIFICATION_ERROR"
+      },
+      "client": {
+        "ipAddress": "203.0.113.10",
+        "userAgent": {
+          "rawUserAgent": "python-requests/2.31"
+        }
+      },
+      "securityContext": {
+        "isProxy": false
+      }
+    },
+    {
+      "published": "2026-11-01T10:00:05.000Z",
+      "eventType": "user.session.start",
+      "actor": {
+        "id": "00uSYNTH0001",
+        "alternateId": "administrator@example.com"
+      },
+      "outcome": {
+        "result": "SUCCESS",
+        "reason": null
+      },
+      "client": {
+        "ipAddress": "203.0.113.10",
+        "userAgent": {
+          "rawUserAgent": "python-requests/2.31"
+        }
+      },
+      "securityContext": {
+        "isProxy": false
+      }
+    }
+  ]
+}
