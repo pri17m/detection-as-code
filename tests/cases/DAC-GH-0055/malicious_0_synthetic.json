@@ -1,0 +1,53 @@
+{
+  "label": "malicious",
+  "variant": "Run triggered from a chore/ branch push and deleted by the same token 70 seconds later",
+  "synthetic": true,
+  "source": "synthetic; field names from GitHub 'Audit log events for your organization' (workflows category), behaviour from https://www.aikido.dev/blog/compromised-github-accounts-push-ci-secret-stealer-to-tens-of-thousands-of-repositories",
+  "sourcetype": "github:audit",
+  "expect_alert": true,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 1 row(s), PASS",
+  "events": [
+    {
+      "@timestamp": 1794316200000,
+      "_document_id": "syn-880001rkflow_run",
+      "action": "workflows.created_workflow_run",
+      "actor": "dev-alex",
+      "actor_id": 1008,
+      "actor_is_bot": false,
+      "org": "example-org",
+      "repo": "example-org/webapp",
+      "workflow_run_id": 880001,
+      "workflow_id": 5550001,
+      "run_number": 412,
+      "head_branch": "chore/k3j9x2qa",
+      "head_sha": "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678",
+      "name": "build-audit",
+      "event": "push",
+      "public_repo": false,
+      "operation_type": "create",
+      "hashed_token": "c3ludGhldGljLWhhc2hlZC10b2tlbi0wMDE=",
+      "programmatic_access_type": "Personal access token (classic)"
+    },
+    {
+      "@timestamp": 1794316270000,
+      "_document_id": "syn-880001rkflow_run",
+      "action": "workflows.delete_workflow_run",
+      "actor": "dev-alex",
+      "actor_id": 1008,
+      "actor_is_bot": false,
+      "org": "example-org",
+      "repo": "example-org/webapp",
+      "workflow_run_id": 880001,
+      "workflow_id": 5550001,
+      "run_number": 412,
+      "head_branch": "chore/k3j9x2qa",
+      "head_sha": "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678",
+      "name": "build-audit",
+      "event": "push",
+      "public_repo": false,
+      "operation_type": "remove",
+      "hashed_token": "c3ludGhldGljLWhhc2hlZC10b2tlbi0wMDE=",
+      "programmatic_access_type": "Personal access token (classic)"
+    }
+  ]
+}

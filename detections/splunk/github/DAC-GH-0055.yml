@@ -1,0 +1,59 @@
+id: DAC-GH-0055
+title: 'GitHub: Actions workflow run deleted within 15 minutes of being created'
+description: 'Behavior: the org audit log shows workflows.created_workflow_run and then workflows.delete_workflow_run for the same run (repo + workflow_id + run_number, falling back to workflow_run_id) within 15 minutes. Aikido reports the wfx CI stealer reverts its commit within a minute and deletes the workflow run with its logs, leaving a missing run number as often the only trace. Output shows head_branch, head_sha, who triggered and who deleted, and the token type. created_workflow_run is only available through the REST API, audit log streaming or exports, not the web UI. The 15-minute window is unmeasured. Not telemetry_validated.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - stealth
+  - execution
+  techniques:
+  - T1070
+  - T1677
+sourcetypes:
+- github:audit
+- github:cloud:audit
+required_fields:
+- action
+- actor
+- repo
+- org
+- workflow_run_id
+- workflow_id
+- run_number
+- head_branch
+- head_sha
+- name
+- event
+- hashed_token
+- programmatic_access_type
+telemetry_validated: false
+false_positives:
+- Maintainers cancelling and deleting a run they started by mistake, usually on their own branch. Volume not measured.
+- Cleanup scripts that delete runs right after they finish (for example to save storage on high-volume repos). Allowlist those actors or tokens.
+references:
+- https://www.aikido.dev/blog/compromised-github-accounts-push-ci-secret-stealer-to-tens-of-thousands-of-repositories
+- https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/audit-log-events-for-your-organization
+- https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/identifying-audit-log-events-performed-by-an-access-token
+- https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/deleting-a-workflow-run
+- https://attack.mitre.org/techniques/T1070/
+- https://attack.mitre.org/techniques/T1677/
+tags:
+- github
+- audit-log
+- behavioural
+- aikido-wfx
+- ci-cd
+query:
+  splunk: |
+    (sourcetype=github:audit OR sourcetype=github:cloud:audit) action IN ("workflows.created_workflow_run","workflows.delete_workflow_run")
+    | eval run_key=coalesce(repo.":".tostring(workflow_id).":".tostring(run_number), repo.":run:".tostring(workflow_run_id))
+    | eval created_t=if(action="workflows.created_workflow_run",_time,null()), deleted_t=if(action="workflows.delete_workflow_run",_time,null()), created_by=if(action="workflows.created_workflow_run",actor,null()), deleted_by=if(action="workflows.delete_workflow_run",actor,null())
+    | stats min(created_t) AS created_time max(deleted_t) AS deleted_time values(created_by) AS triggered_by values(deleted_by) AS deleted_by values(repo) AS repo values(org) AS org values(name) AS workflow_name values(head_branch) AS head_branch values(head_sha) AS head_sha values(event) AS trigger_event values(run_number) AS run_number values(hashed_token) AS hashed_token values(programmatic_access_type) AS access_type BY run_key
+    | where isnotnull(created_time) AND isnotnull(deleted_time) AND deleted_time>=created_time AND deleted_time-created_time<=900
+    | eval minutes_to_delete=round((deleted_time-created_time)/60,1), same_actor=if(isnotnull(mvfind(deleted_by,"^\Q".mvindex(triggered_by,0)."\E$")),1,0)
+    | convert ctime(created_time) ctime(deleted_time)
+    | table created_time deleted_time minutes_to_delete org repo workflow_name head_branch head_sha trigger_event run_number triggered_by deleted_by same_actor access_type hashed_token

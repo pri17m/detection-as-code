@@ -1,0 +1,49 @@
+{
+  "label": "near_miss",
+  "variant": "Run deleted 16 minutes after creation (just outside the 15-minute window)",
+  "synthetic": true,
+  "source": "synthetic; field names from GitHub 'Audit log events for your organization' (workflows category), behaviour from https://www.aikido.dev/blog/compromised-github-accounts-push-ci-secret-stealer-to-tens-of-thousands-of-repositories",
+  "sourcetype": "github:audit",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 0 row(s), PASS",
+  "events": [
+    {
+      "@timestamp": 1794322800000,
+      "_document_id": "syn-880900rkflow_run",
+      "action": "workflows.created_workflow_run",
+      "actor": "dev-alex",
+      "actor_id": 1008,
+      "actor_is_bot": false,
+      "org": "example-org",
+      "repo": "example-org/webapp",
+      "workflow_run_id": 880900,
+      "workflow_id": 5550001,
+      "run_number": 420,
+      "head_branch": "chore/zz81mnq0",
+      "head_sha": "3333333333333333333333333333333333333333",
+      "name": "CI",
+      "event": "push",
+      "public_repo": false,
+      "operation_type": "create"
+    },
+    {
+      "@timestamp": 1794323760000,
+      "_document_id": "syn-880900rkflow_run",
+      "action": "workflows.delete_workflow_run",
+      "actor": "dev-alex",
+      "actor_id": 1008,
+      "actor_is_bot": false,
+      "org": "example-org",
+      "repo": "example-org/webapp",
+      "workflow_run_id": 880900,
+      "workflow_id": 5550001,
+      "run_number": 420,
+      "head_branch": "chore/zz81mnq0",
+      "head_sha": "3333333333333333333333333333333333333333",
+      "name": "CI",
+      "event": "push",
+      "public_repo": false,
+      "operation_type": "remove"
+    }
+  ]
+}
