@@ -1,0 +1,34 @@
+{
+  "label": "malicious",
+  "variant": "Payload process whose whole command line is a kernel-thread-style name, including one with a slash",
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:10:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "0",
+      "GrandParentBaseFileName": "sh",
+      "ParentBaseFileName": "bash",
+      "ImageFileName": "/usr/bin/defunct",
+      "CommandLine": "[kaluad]"
+    },
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:11:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "33",
+      "GrandParentBaseFileName": "cron",
+      "ParentBaseFileName": "bash",
+      "ImageFileName": "/dev/shm/.gs-0/gs-netcat",
+      "CommandLine": "[kworker/0:2]"
+    }
+  ]
+}
