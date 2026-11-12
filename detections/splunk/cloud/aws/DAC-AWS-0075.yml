@@ -1,0 +1,74 @@
+id: DAC-AWS-0075
+title: Long-lived IAM access key created by a GitHub OIDC or CI role session, with the new key's first use
+description: 'Behavior: iam CreateAccessKey succeeds and returns an AKIA key while the caller is a GitHub Actions OIDC session (webIdFederationData or identityProvider token.actions.githubusercontent.com), a role session one AssumeRole hop away from such a session (joined on the issued ASIA key), or a role whose name looks like CI (github, gha, ci, jenkins, gitlab, pipeline, deploy, build as a separate name part). Aikido reports the wfx CI stealer chains into IAM roles found in the repo and calls iam:CreateAccessKey to create long-lived credentials. The rule also reports the first later call made with the new AKIA key inside the search window. OIDC signals are critical, the name heuristic is high. Run over a window of at least 24h; thresholds and the name pattern are unmeasured. Not telemetry_validated.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: critical
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1098.001
+  - T1078.004
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- eventSource
+- eventName
+- errorCode
+- userIdentity.type
+- userIdentity.arn
+- userIdentity.principalId
+- userIdentity.accessKeyId
+- userIdentity.identityProvider
+- userIdentity.sessionContext.sessionIssuer.userName
+- userIdentity.sessionContext.webIdFederationData.federatedProvider
+- requestParameters.userName
+- responseElements.accessKey.accessKeyId
+- responseElements.accessKey.userName
+- responseElements.credentials.accessKeyId
+- sourceIPAddress
+- userAgent
+telemetry_validated: false
+false_positives:
+- IaC pipelines that deliberately manage IAM user keys from GitHub Actions. These should be few and named; allowlist by role and target user. Volume not measured.
+- The CI role-name heuristic will match human roles named like deploy-admins or build-team; it is high, not critical, for that reason.
+- Key rotation jobs running as a CI role create a key and use it soon after; that looks the same as the attack. Check the target user and the first-use source.
+references:
+- https://www.aikido.dev/blog/compromised-github-accounts-push-ci-secret-stealer-to-tens-of-thousands-of-repositories
+- https://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateAccessKey.html
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
+- https://docs.aws.amazon.com/IAM/latest/UserGuide/cloudtrail-integration.html
+- https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect
+- https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html
+- https://attack.mitre.org/techniques/T1098/001/
+- https://attack.mitre.org/techniques/T1078/004/
+tags:
+- aws
+- cloudtrail
+- behavioural
+- aikido-wfx
+- ci-cd
+- github-oidc
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail ((eventSource="sts.amazonaws.com" eventName IN ("AssumeRoleWithWebIdentity","AssumeRole")) OR (eventSource="iam.amazonaws.com" eventName="CreateAccessKey") OR userIdentity.accessKeyId="AKIA*")
+    | eval caller_key=coalesce('userIdentity.accessKeyId',""), issued_key=coalesce('responseElements.credentials.accessKeyId',""), new_key=coalesce('responseElements.accessKey.accessKeyId',""), issuer_role=coalesce('userIdentity.sessionContext.sessionIssuer.userName',"")
+    | eval caller_oidc=if(like(coalesce('userIdentity.sessionContext.webIdFederationData.federatedProvider',""),"%token.actions.githubusercontent.com%") OR like(coalesce('userIdentity.identityProvider',""),"%token.actions.githubusercontent.com%"),1,0)
+    | eval oidc_issue=if(isnull(errorCode) AND eventSource="sts.amazonaws.com" AND issued_key!="" AND caller_oidc=1,1,0)
+    | eval link_key=case(oidc_issue=1, issued_key, eventName="CreateAccessKey" AND caller_key!="", caller_key, true(), null())
+    | eventstats max(oidc_issue) AS chained_from_oidc BY link_key
+    | eval is_create=if(eventName="CreateAccessKey" AND isnull(errorCode) AND match(new_key,"^AKIA"),1,0)
+    | eval is_use=if(eventName!="CreateAccessKey" AND match(caller_key,"^AKIA"),1,0)
+    | eval key_ref=case(is_create=1, new_key, is_use=1, caller_key, true(), null())
+    | eval use_time=if(is_use=1,_time,null()), use_desc=if(is_use=1, strftime(_time,"%Y-%m-%dT%H:%M:%S%z")." ".eventSource." ".eventName." from ".sourceIPAddress." ua=".userAgent, null())
+    | eventstats min(use_time) AS first_use_time count(use_time) AS key_use_calls values(use_desc) AS key_use_sample BY key_ref
+    | where is_create=1
+    | eval ci_role_name=if(match(issuer_role,"(?i)(^|[-_.])(github|gha|actions|ci|cicd|jenkins|gitlab|pipeline|deploy|build)([-_.]|$)"),1,0)
+    | eval ci_signal=case(caller_oidc=1, "github_oidc_direct", chained_from_oidc=1, "github_oidc_chained", ci_role_name=1, "ci_role_name", true(), null())
+    | where isnotnull(ci_signal)
+    | eval actor=coalesce('userIdentity.arn','userIdentity.principalId',"unknown"), target_user=coalesce('requestParameters.userName','responseElements.accessKey.userName',"caller"), severity=if(ci_signal="ci_role_name","high","critical"), first_use=if(isnotnull(first_use_time), strftime(first_use_time,"%Y-%m-%dT%H:%M:%S%z"), "not seen in search window")
+    | table _time actor issuer_role caller_key ci_signal target_user new_key first_use key_use_calls key_use_sample severity sourceIPAddress userAgent
