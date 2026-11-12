@@ -1,41 +1,59 @@
 query:
-  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
-
-    | search action IN ("workflows.completed_workflow_run","oidc.*") OR operation_type="oidc"
-
-    | # Correlate separately to cloud AssumeRoleWithWebIdentity via sub claim
-
-    | table _time, actor, action, org, repo, actor_ip, user_agent
-
-    '
+  splunk: |
+    sourcetype=aws:cloudtrail eventSource="sts.amazonaws.com" eventName="AssumeRoleWithWebIdentity"
+    | where like(coalesce('userIdentity.identityProvider','responseElements.provider',""),"%token.actions.githubusercontent.com%")
+    | eventstats max(_time) AS last_event
+    | eval sub=coalesce('responseElements.subjectFromWebIdentityToken','userIdentity.userName',"unknown"), role_arn=coalesce('requestParameters.roleArn',"unknown")
+    | rex field=sub "^repo:(?<gh_repo>[^:]+):(?<gh_context>.+)$"
+    | eval gh_repo=coalesce(gh_repo,"unparsed:".sub), ok=if(isnull(errorCode),1,0)
+    | stats min(_time) AS first_seen max(_time) AS last_seen count AS calls sum(ok) AS successes values(gh_context) AS contexts values(errorCode) AS errorCodes values(sourceIPAddress) AS src_ip values(userAgent) AS user_agent max(last_event) AS last_event BY role_arn gh_repo
+    | eventstats dc(gh_repo) AS repos_seen_for_role BY role_arn
+    | where first_seen>=last_event-3600 AND repos_seen_for_role>=2
+    | eval severity=if(successes>0,"high","medium")
+    | convert ctime(first_seen) ctime(last_seen) ctime(last_event)
 id: DAC-GH-0046
 title: 'GitHub: OIDC cloud role assumption from Actions for unexpected repo'
 false_positives:
-- Tune after baselining; experimental sketch may be noisy.
+- A new repository legitimately added to a shared deploy role. Expected once per new repo; volume not measured.
+- Repos renamed or transferred change the sub claim and look new.
 severity: high
 sourcetypes:
-- github:audit
-- github:cloud:audit
+- aws:cloudtrail
 platforms:
 - splunk
 tags:
 - wave-b
 - P0
 - phase2-top5
+- aikido-wfx
+- fixed-2026-11-12
 telemetry_validated: false
 required_fields:
-- actor
-- action
-- org
-- repo
-- actor_ip
+- eventSource
+- eventName
+- errorCode
+- userIdentity.identityProvider
+- userIdentity.userName
+- responseElements.subjectFromWebIdentityToken
+- responseElements.provider
+- requestParameters.roleArn
+- sourceIPAddress
+- userAgent
 references:
+- https://www.aikido.dev/blog/compromised-github-accounts-push-ci-secret-stealer-to-tens-of-thousands-of-repositories
+- https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
+- https://docs.aws.amazon.com/IAM/latest/UserGuide/cloudtrail-integration.html
+- https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/audit-log-events-for-your-organization
 - https://attack.mitre.org/techniques/T1550/001/
+- https://attack.mitre.org/techniques/T1078/004/
 mitre:
   tactics:
   - lateral-movement
+  - initial-access
   techniques:
   - T1550.001
+  - T1078.004
 author: Detection Engineer
 status: experimental
-description: correlate cloud AssumeRoleWithWebIdentity sub claim
+description: 'Behavior: an AWS role is assumed through GitHub Actions OIDC (sts AssumeRoleWithWebIdentity, identity provider token.actions.githubusercontent.com) by a repository that first appears for that role in the last hour of the search window, while the role already has at least one other repo on record. The repo comes from the OIDC sub claim (repo:ORG/REPO:...). The GitHub org audit log has no OIDC token or role-assumption event, so this rule reads CloudTrail. Aikido reports the wfx CI stealer mints GitHub OIDC tokens for AWS audiences and exchanges them for cloud sessions. Schedule hourly over a 30-day window so the baseline exists; the window and the 1-hour cut are unmeasured. Not telemetry_validated. Fixed 2026-11-12: the earlier query searched GitHub audit actions oidc.* that GitHub does not document and did not parse in Splunk.'
