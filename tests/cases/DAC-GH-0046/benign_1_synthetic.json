@@ -1,0 +1,374 @@
+{
+  "label": "benign",
+  "variant": "Same two repos keep assuming the role, including from a new branch of a known repo",
+  "synthetic": true,
+  "source": "synthetic; event shape from the AWS IAM CloudTrail AssumeRoleWithWebIdentity sample, sub format from GitHub's OIDC docs, behaviour from https://www.aikido.dev/blog/compromised-github-accounts-push-ci-secret-stealer-to-tens-of-thousands-of-repositories",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "WebIdentityUser",
+        "principalId": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com:sts.amazonaws.com:repo:example-org/infra:ref:refs/heads/main",
+        "userName": "repo:example-org/infra:ref:refs/heads/main",
+        "identityProvider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "eventTime": "2026-10-12T10:00:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoleWithWebIdentity",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-sdk-js/3.600.0",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/gha-deploy",
+        "roleSessionName": "GitHubActions"
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAEXAMPLEOIDC08633",
+          "expiration": "synthetic"
+        },
+        "subjectFromWebIdentityToken": "repo:example-org/infra:ref:refs/heads/main",
+        "provider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com",
+        "audience": "sts.amazonaws.com"
+      },
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "6513270e-269e-4d37-b2a7-4de452e6b438",
+      "readOnly": true
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "WebIdentityUser",
+        "principalId": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com:sts.amazonaws.com:repo:example-org/infra:ref:refs/heads/main",
+        "userName": "repo:example-org/infra:ref:refs/heads/main",
+        "identityProvider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "eventTime": "2026-10-15T10:00:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoleWithWebIdentity",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-sdk-js/3.600.0",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/gha-deploy",
+        "roleSessionName": "GitHubActions"
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAEXAMPLEOIDC06610",
+          "expiration": "synthetic"
+        },
+        "subjectFromWebIdentityToken": "repo:example-org/infra:ref:refs/heads/main",
+        "provider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com",
+        "audience": "sts.amazonaws.com"
+      },
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "d23f0824-128b-4f33-8c5c-7fd0a6a3a450",
+      "readOnly": true
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "WebIdentityUser",
+        "principalId": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com:sts.amazonaws.com:repo:example-org/infra:ref:refs/heads/main",
+        "userName": "repo:example-org/infra:ref:refs/heads/main",
+        "identityProvider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "eventTime": "2026-10-18T10:00:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoleWithWebIdentity",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-sdk-js/3.600.0",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/gha-deploy",
+        "roleSessionName": "GitHubActions"
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAEXAMPLEOIDC08148",
+          "expiration": "synthetic"
+        },
+        "subjectFromWebIdentityToken": "repo:example-org/infra:ref:refs/heads/main",
+        "provider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com",
+        "audience": "sts.amazonaws.com"
+      },
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "9531985d-5d9d-49f8-9818-e811892f902b",
+      "readOnly": true
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "WebIdentityUser",
+        "principalId": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com:sts.amazonaws.com:repo:example-org/infra:ref:refs/heads/main",
+        "userName": "repo:example-org/infra:ref:refs/heads/main",
+        "identityProvider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "eventTime": "2026-10-21T10:00:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoleWithWebIdentity",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-sdk-js/3.600.0",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/gha-deploy",
+        "roleSessionName": "GitHubActions"
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAEXAMPLEOIDC03404",
+          "expiration": "synthetic"
+        },
+        "subjectFromWebIdentityToken": "repo:example-org/infra:ref:refs/heads/main",
+        "provider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com",
+        "audience": "sts.amazonaws.com"
+      },
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "36f675cc-81e7-4ef5-a8e2-5d940ed90475",
+      "readOnly": true
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "WebIdentityUser",
+        "principalId": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com:sts.amazonaws.com:repo:example-org/infra:ref:refs/heads/main",
+        "userName": "repo:example-org/infra:ref:refs/heads/main",
+        "identityProvider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "eventTime": "2026-10-24T10:00:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoleWithWebIdentity",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-sdk-js/3.600.0",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/gha-deploy",
+        "roleSessionName": "GitHubActions"
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAEXAMPLEOIDC01937",
+          "expiration": "synthetic"
+        },
+        "subjectFromWebIdentityToken": "repo:example-org/infra:ref:refs/heads/main",
+        "provider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com",
+        "audience": "sts.amazonaws.com"
+      },
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "6b0d549b-6f03-475a-9600-a35a099950d8",
+      "readOnly": true
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "WebIdentityUser",
+        "principalId": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com:sts.amazonaws.com:repo:example-org/infra:ref:refs/heads/main",
+        "userName": "repo:example-org/infra:ref:refs/heads/main",
+        "identityProvider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "eventTime": "2026-10-27T10:00:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoleWithWebIdentity",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-sdk-js/3.600.0",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/gha-deploy",
+        "roleSessionName": "GitHubActions"
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAEXAMPLEOIDC04948",
+          "expiration": "synthetic"
+        },
+        "subjectFromWebIdentityToken": "repo:example-org/infra:ref:refs/heads/main",
+        "provider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com",
+        "audience": "sts.amazonaws.com"
+      },
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "8d116ece-1738-47d9-bd9c-172411e20b8f",
+      "readOnly": true
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "WebIdentityUser",
+        "principalId": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com:sts.amazonaws.com:repo:example-org/infra:ref:refs/heads/main",
+        "userName": "repo:example-org/infra:ref:refs/heads/main",
+        "identityProvider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "eventTime": "2026-10-30T10:00:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoleWithWebIdentity",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-sdk-js/3.600.0",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/gha-deploy",
+        "roleSessionName": "GitHubActions"
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAEXAMPLEOIDC09105",
+          "expiration": "synthetic"
+        },
+        "subjectFromWebIdentityToken": "repo:example-org/infra:ref:refs/heads/main",
+        "provider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com",
+        "audience": "sts.amazonaws.com"
+      },
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "90c192cf-d3ac-44af-8f21-ddb66cad4a26",
+      "readOnly": true
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "WebIdentityUser",
+        "principalId": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com:sts.amazonaws.com:repo:example-org/infra-modules:ref:refs/heads/main",
+        "userName": "repo:example-org/infra-modules:ref:refs/heads/main",
+        "identityProvider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "eventTime": "2026-10-14T11:00:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoleWithWebIdentity",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-sdk-js/3.600.0",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/gha-deploy",
+        "roleSessionName": "GitHubActions"
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAEXAMPLEOIDC00596",
+          "expiration": "synthetic"
+        },
+        "subjectFromWebIdentityToken": "repo:example-org/infra-modules:ref:refs/heads/main",
+        "provider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com",
+        "audience": "sts.amazonaws.com"
+      },
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "a170b338-3926-4059-b28c-105d1fb17c23",
+      "readOnly": true
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "WebIdentityUser",
+        "principalId": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com:sts.amazonaws.com:repo:example-org/infra-modules:ref:refs/heads/main",
+        "userName": "repo:example-org/infra-modules:ref:refs/heads/main",
+        "identityProvider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "eventTime": "2026-10-25T11:00:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoleWithWebIdentity",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-sdk-js/3.600.0",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/gha-deploy",
+        "roleSessionName": "GitHubActions"
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAEXAMPLEOIDC04496",
+          "expiration": "synthetic"
+        },
+        "subjectFromWebIdentityToken": "repo:example-org/infra-modules:ref:refs/heads/main",
+        "provider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com",
+        "audience": "sts.amazonaws.com"
+      },
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "0fd630f1-f29d-4da9-953f-48f1a09f76b5",
+      "readOnly": true
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "WebIdentityUser",
+        "principalId": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com:sts.amazonaws.com:repo:example-org/infra:ref:refs/heads/main",
+        "userName": "repo:example-org/infra:ref:refs/heads/main",
+        "identityProvider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "eventTime": "2026-11-10T12:00:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoleWithWebIdentity",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-sdk-js/3.600.0",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/gha-deploy",
+        "roleSessionName": "GitHubActions"
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAEXAMPLEOIDC07933",
+          "expiration": "synthetic"
+        },
+        "subjectFromWebIdentityToken": "repo:example-org/infra:ref:refs/heads/main",
+        "provider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com",
+        "audience": "sts.amazonaws.com"
+      },
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "6b4cb242-4a23-4596-a217-beaddbc496cb",
+      "readOnly": true
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "WebIdentityUser",
+        "principalId": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com:sts.amazonaws.com:repo:example-org/infra:pull_request",
+        "userName": "repo:example-org/infra:pull_request",
+        "identityProvider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "eventTime": "2026-11-10T13:05:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRoleWithWebIdentity",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-sdk-js/3.600.0",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/gha-deploy",
+        "roleSessionName": "GitHubActions"
+      },
+      "responseElements": {
+        "credentials": {
+          "accessKeyId": "ASIAEXAMPLEOIDC09634",
+          "expiration": "synthetic"
+        },
+        "subjectFromWebIdentityToken": "repo:example-org/infra:pull_request",
+        "provider": "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com",
+        "audience": "sts.amazonaws.com"
+      },
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "92276658-1e27-41c0-8a6a-63ec24ede6a4",
+      "readOnly": true
+    }
+  ]
+}
