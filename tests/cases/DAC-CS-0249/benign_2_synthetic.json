@@ -1,0 +1,23 @@
+{
+  "label": "benign",
+  "variant": "Normal binary in /usr/local/bin",
+  "synthetic": true,
+  "source": "synthetic; synthetic",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": false,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: no alert, matches expectation",
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:10:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "999",
+      "GrandParentBaseFileName": "",
+      "ParentBaseFileName": "systemd",
+      "ImageFileName": "/usr/local/bin/node_exporter",
+      "CommandLine": "/usr/local/bin/node_exporter"
+    }
+  ]
+}

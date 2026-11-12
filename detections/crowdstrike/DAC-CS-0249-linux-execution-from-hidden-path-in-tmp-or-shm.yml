@@ -1,0 +1,48 @@
+id: DAC-CS-0249
+title: "Linux execution of a dot-hidden file or folder under /dev/shm, /tmp, /var/tmp or /run/user"
+description: >-
+  Falcon ProcessRollup2 on Linux where the executed image path is under /dev/shm, /tmp, /var/tmp or
+  /run/user/<uid> and the file or any folder below that root starts with a dot. AppImage mounts (/tmp/.mount_*)
+  are excluded. The Microsoft gsocket report shows the client staged in /dev/shm/.gs-0 and a hidden file at
+  /tmp/.gsn_ora. Tool-agnostic. telemetry_validated false. Companion rule: DAC-MDE-0100.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- "falcon:process"
+mitre:
+  tactics:
+  - stealth
+  techniques:
+  - T1564.001
+severity: medium
+false_positives:
+- "AppImage is excluded. Other self-extracting installers or language toolchains may unpack into dot folders in /tmp; allowlist by path prefix after measuring (not measured)."
+references:
+- "https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/"
+- "https://attack.mitre.org/techniques/T1564/001/"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table"
+- "https://github.com/CrowdStrike/logscale-community-content"
+telemetry_validated: false
+required_fields:
+- "#event_simpleName"
+- "event_platform"
+- "aid"
+- "UID"
+- "ParentBaseFileName"
+- "GrandParentBaseFileName"
+- "ImageFileName"
+- "CommandLine"
+tags:
+- behavioural
+- linux
+- gsocket
+- hidden-files
+- needs-review
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Lin
+    | ImageFileName=/^\/(dev\/shm|tmp|var\/tmp|run\/user\/[0-9]+)\/([^\/]+\/)*\.[^\/]+/i
+    | ImageFileName!=/\/\.mount_/i
+    | table([@timestamp, aid, UID, GrandParentBaseFileName, ParentBaseFileName, ImageFileName, CommandLine])

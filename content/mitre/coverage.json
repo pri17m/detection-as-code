@@ -1,11 +1,11 @@
 {
   "summary": {
-    "detections_total": 901,
-    "detections_with_mitre": 901,
+    "detections_total": 902,
+    "detections_with_mitre": 902,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 218,
     "platform_counts": {
-      "crowdstrike": 167,
+      "crowdstrike": 168,
       "defender": 79,
       "splunk": 655
     }
@@ -1375,6 +1375,7 @@
     ],
     "T1564.001": [
       "DAC-CS-0227",
+      "DAC-CS-0249",
       "DAC-WIN-0066"
     ],
     "T1564.003": [
