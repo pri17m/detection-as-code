@@ -1,0 +1,48 @@
+{
+  "label": "benign",
+  "variant": "Authenticated IAM user reads a key named zzz_nonexistent_abc.txt (not anonymous)",
+  "synthetic": true,
+  "source": "synthetic; event shapes from AWS CloudTrail docs, behaviour from https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEPRINCIPAL1",
+        "arn": "arn:aws:iam::111122223333:user/qa-bot",
+        "accountId": "111122223333",
+        "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "userName": "qa-bot"
+      },
+      "eventTime": "2026-10-20T08:00:00Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "aws-cli/2.15.0",
+      "requestParameters": {
+        "bucketName": "acme-qa",
+        "Host": "acme-qa.s3.amazonaws.com",
+        "key": "zzz_nonexistent_abc.txt"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-398079613154",
+      "errorCode": "NoSuchKey",
+      "errorMessage": "The specified key does not exist.",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-qa/zzz_nonexistent_abc.txt"
+        }
+      ]
+    }
+  ]
+}

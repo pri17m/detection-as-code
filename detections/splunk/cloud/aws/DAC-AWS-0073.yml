@@ -1,0 +1,56 @@
+id: DAC-AWS-0073
+title: Anonymous S3 reads with placeholder object keys or an anonymous read burst
+description: 'Behavior: unauthenticated S3 data-event reads (userIdentity.accountId=anonymous) of GetObject, ListObjects, ListObjectsV2, HeadObject or HeadBucket. Alerts when a key looks like a not-found probe (nonexist, notexist, zzz_ / zzz-) or when one bucket takes 20+ anonymous reads in a 30-minute bin. Datadog Security Labs saw every ARTEX session open with anonymous S3 reads and saw probes for keys such as zzz_nonexistent_abc.txt and Notexist-xyz right before a burst of guesses. Requires S3 data events (off by default, billed separately). Thresholds are unmeasured starting points. Not telemetry_validated. Clean-room: own SPL.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - collection
+  - discovery
+  techniques:
+  - T1530
+  - T1619
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- eventName
+- eventSource
+- userIdentity.accountId
+- userIdentity.type
+- requestParameters.bucketName
+- requestParameters.key
+- sourceIPAddress
+- userAgent
+- errorCode
+telemetry_validated: false
+false_positives:
+- 'Public website buckets and CloudFront origins without Origin Access Control receive normal anonymous GetObject traffic, so the 20-read burst branch will fire there. Exclude known public buckets or rely on the placeholder branch (placeholder_hits>0). Volume not measured.'
+- 'Uptime checkers and CDNs that probe a deliberately missing object to test 404 handling use the same trick.'
+- 'The 20-read and 30-minute values are unmeasured starting points.'
+references:
+- https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/
+- https://attack.mitre.org/techniques/T1530/
+- https://attack.mitre.org/techniques/T1619/
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-request-identification.html
+tags:
+- aws
+- cloudtrail
+- s3-data-events
+- behavioural
+- clean-room
+- artex
+- datadog-inspired
+- agentic-attack
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail eventSource="s3.amazonaws.com" eventName IN ("GetObject","ListObjects","ListObjectsV2","HeadObject","HeadBucket") userIdentity.accountId="anonymous"
+    | eval obj=coalesce('requestParameters.key','requestParameters.prefix',""), bucket=coalesce('requestParameters.bucketName',"unknown"), placeholder=if(match(obj,"(?i)(nonexist|notexist|zzz[_-])"),1,0)
+    | bin _time span=30m
+    | stats count sum(placeholder) AS placeholder_hits dc(obj) AS distinct_keys values(eventName) AS eventNames values(obj) AS sample_keys values(errorCode) AS errorCodes values(sourceIPAddress) AS src_ip values(userAgent) AS user_agent BY _time bucket
+    | where placeholder_hits>0 OR count>=20
+    | eval sample_keys=mvindex(sample_keys,0,19)
+    | sort - placeholder_hits

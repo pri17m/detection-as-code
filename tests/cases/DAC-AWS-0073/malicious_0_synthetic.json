@@ -1,0 +1,212 @@
+{
+  "label": "malicious",
+  "variant": "Anonymous placeholder probes (zzz_nonexistent_abc.txt, Notexist-xyz) then config guesses on an app bucket",
+  "synthetic": true,
+  "source": "synthetic; event shapes from AWS CloudTrail docs, behaviour from https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": true,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 1 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AWSAccount",
+        "principalId": "",
+        "accountId": "anonymous"
+      },
+      "eventTime": "2026-10-20T08:00:01Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "python-requests/2.31.0",
+      "requestParameters": {
+        "bucketName": "acme-app-frontend",
+        "Host": "acme-app-frontend.s3.amazonaws.com",
+        "key": "zzz_nonexistent_abc.txt"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-195569710413",
+      "errorCode": "NoSuchKey",
+      "errorMessage": "The specified key does not exist.",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-app-frontend/zzz_nonexistent_abc.txt"
+        }
+      ]
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AWSAccount",
+        "principalId": "",
+        "accountId": "anonymous"
+      },
+      "eventTime": "2026-10-20T08:00:04Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "python-requests/2.31.0",
+      "requestParameters": {
+        "bucketName": "acme-app-frontend",
+        "Host": "acme-app-frontend.s3.amazonaws.com",
+        "key": "Notexist-xyz"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-006854655573",
+      "errorCode": "NoSuchKey",
+      "errorMessage": "The specified key does not exist.",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-app-frontend/Notexist-xyz"
+        }
+      ]
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AWSAccount",
+        "principalId": "",
+        "accountId": "anonymous"
+      },
+      "eventTime": "2026-10-20T08:00:09Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "python-requests/2.31.0",
+      "requestParameters": {
+        "bucketName": "acme-app-frontend",
+        "Host": "acme-app-frontend.s3.amazonaws.com",
+        "key": "asset-manifest.json"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-646465916802",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-app-frontend/asset-manifest.json"
+        }
+      ]
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AWSAccount",
+        "principalId": "",
+        "accountId": "anonymous"
+      },
+      "eventTime": "2026-10-20T08:00:12Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "python-requests/2.31.0",
+      "requestParameters": {
+        "bucketName": "acme-app-frontend",
+        "Host": "acme-app-frontend.s3.amazonaws.com",
+        "key": "config.json"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-409359554902",
+      "errorCode": "NoSuchKey",
+      "errorMessage": "The specified key does not exist.",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-app-frontend/config.json"
+        }
+      ]
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AWSAccount",
+        "principalId": "",
+        "accountId": "anonymous"
+      },
+      "eventTime": "2026-10-20T08:00:15Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "python-requests/2.31.0",
+      "requestParameters": {
+        "bucketName": "acme-app-frontend",
+        "Host": "acme-app-frontend.s3.amazonaws.com",
+        "key": "env.js"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-032950410170",
+      "errorCode": "NoSuchKey",
+      "errorMessage": "The specified key does not exist.",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-app-frontend/env.js"
+        }
+      ]
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AWSAccount",
+        "principalId": "",
+        "accountId": "anonymous"
+      },
+      "eventTime": "2026-10-20T08:00:20Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "ListObjects",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "python-requests/2.31.0",
+      "requestParameters": {
+        "bucketName": "acme-app-frontend",
+        "Host": "acme-app-frontend.s3.amazonaws.com"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-004565768193",
+      "errorCode": "AccessDenied",
+      "errorMessage": "The specified key does not exist.",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-app-frontend/"
+        }
+      ]
+    }
+  ]
+}

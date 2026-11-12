@@ -1,0 +1,171 @@
+{
+  "label": "near_miss",
+  "variant": "Five anonymous reads of real website assets (normal public bucket traffic)",
+  "synthetic": true,
+  "source": "synthetic; event shapes from AWS CloudTrail docs, behaviour from https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AWSAccount",
+        "principalId": "",
+        "accountId": "anonymous"
+      },
+      "eventTime": "2026-10-20T08:00:00Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "bucketName": "acme-www",
+        "Host": "acme-www.s3.amazonaws.com",
+        "key": "index.html"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-261660049001",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-www/index.html"
+        }
+      ]
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AWSAccount",
+        "principalId": "",
+        "accountId": "anonymous"
+      },
+      "eventTime": "2026-10-20T08:00:05Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "bucketName": "acme-www",
+        "Host": "acme-www.s3.amazonaws.com",
+        "key": "styles.css"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-500900458601",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-www/styles.css"
+        }
+      ]
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AWSAccount",
+        "principalId": "",
+        "accountId": "anonymous"
+      },
+      "eventTime": "2026-10-20T08:00:10Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "bucketName": "acme-www",
+        "Host": "acme-www.s3.amazonaws.com",
+        "key": "app.js"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-882787496945",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-www/app.js"
+        }
+      ]
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AWSAccount",
+        "principalId": "",
+        "accountId": "anonymous"
+      },
+      "eventTime": "2026-10-20T08:00:15Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "bucketName": "acme-www",
+        "Host": "acme-www.s3.amazonaws.com",
+        "key": "logo.png"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-386260930260",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-www/logo.png"
+        }
+      ]
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AWSAccount",
+        "principalId": "",
+        "accountId": "anonymous"
+      },
+      "eventTime": "2026-10-20T08:00:20Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetObject",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "192.0.2.50",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "bucketName": "acme-www",
+        "Host": "acme-www.s3.amazonaws.com",
+        "key": "favicon.ico"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Data",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-660631271424",
+      "managementEvent": false,
+      "readOnly": true,
+      "resources": [
+        {
+          "type": "AWS::S3::Object",
+          "ARN": "arn:aws:s3:::acme-www/favicon.ico"
+        }
+      ]
+    }
+  ]
+}
