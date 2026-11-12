@@ -1,0 +1,23 @@
+{
+  "label": "benign",
+  "variant": "Web app touches a maintenance flag",
+  "synthetic": true,
+  "source": "synthetic; synthetic",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": false,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: no alert, matches expectation",
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:10:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "33",
+      "GrandParentBaseFileName": "php-fpm8.1",
+      "ParentBaseFileName": "php-fpm8.1",
+      "ImageFileName": "/usr/bin/touch",
+      "CommandLine": "touch /var/www/html/maintenance.flag"
+    }
+  ]
+}

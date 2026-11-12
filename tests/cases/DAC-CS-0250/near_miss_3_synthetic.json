@@ -1,0 +1,34 @@
+{
+  "label": "near_miss",
+  "variant": "Reference timestamp on a temp marker; plain touch on a unit file",
+  "synthetic": true,
+  "source": "synthetic; synthetic",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": false,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: no alert, matches expectation",
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:10:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "1000",
+      "GrandParentBaseFileName": "sshd",
+      "ParentBaseFileName": "bash",
+      "ImageFileName": "/usr/bin/touch",
+      "CommandLine": "touch -r /etc/hosts /tmp/marker"
+    },
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:11:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "0",
+      "GrandParentBaseFileName": "sshd",
+      "ParentBaseFileName": "bash",
+      "ImageFileName": "/usr/bin/touch",
+      "CommandLine": "touch /etc/systemd/system/app.service"
+    }
+  ]
+}
