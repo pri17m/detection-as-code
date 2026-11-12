@@ -1,0 +1,36 @@
+{
+  "label": "near_miss",
+  "variant": "AppImage mount under /tmp/.mount_ and a non-hidden installer in /tmp",
+  "synthetic": true,
+  "source": "synthetic; synthetic",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": false,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-10T13:10:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "admin1",
+      "FileName": "obsidian",
+      "FolderPath": "/tmp/.mount_ObsidiX1/obsidian",
+      "ProcessCommandLine": "/tmp/.mount_ObsidiX1/obsidian",
+      "InitiatingProcessFileName": "bash",
+      "InitiatingProcessCommandLine": "bash",
+      "InitiatingProcessParentFileName": "gnome-shell"
+    },
+    {
+      "Timestamp": "2026-11-10T13:11:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "root",
+      "FileName": "setup",
+      "FolderPath": "/tmp/installer/setup",
+      "ProcessCommandLine": "/tmp/installer/setup --quiet",
+      "InitiatingProcessFileName": "bash",
+      "InitiatingProcessCommandLine": "bash",
+      "InitiatingProcessParentFileName": "sshd"
+    }
+  ]
+}
