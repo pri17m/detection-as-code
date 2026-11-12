@@ -1,0 +1,53 @@
+id: DAC-AWS-0071
+title: One principal denied across four or more AWS services in 15 minutes
+description: 'Behavior: one actor (ARN, then principalId, then access key) gets AccessDenied, AccessDeniedException or UnauthorizedOperation from 4+ distinct eventSources and 8+ calls inside one 15-minute bin. Datadog Security Labs saw ARTEX, holding Cognito-vended credentials, try nearly every read-only discovery call (S3, Secrets Manager, SSM, SNS, Logs, API Gateway, ECR, Lambda) and fail on all of them. The rule does not depend on a fixed API list, so a different model choosing different calls still fires. Thresholds are unmeasured starting points. Not telemetry_validated. Clean-room: own SPL.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: medium
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1526
+  - T1580
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- eventName
+- eventSource
+- errorCode
+- userIdentity.arn
+- userIdentity.principalId
+- userIdentity.accessKeyId
+- userIdentity.type
+- sourceIPAddress
+- userAgent
+telemetry_validated: false
+false_positives:
+- 'New IAM users, broken automation, Terraform plans, AWS Config and security scanners produce AccessDenied bursts. Exclude known provisioner and auditor roles after baselining; volume not measured.'
+- 'Thresholds (4 services, 8 denials, 15-minute bins) are unmeasured starting points, not tuned on tenant data.'
+- 'Datadog ships a baselined version of this idea (A user received an anomalous number of AccessDenied errors); this static rule has no baseline.'
+references:
+- https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/
+- https://attack.mitre.org/techniques/T1526/
+- https://attack.mitre.org/techniques/T1580/
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
+tags:
+- aws
+- cloudtrail
+- behavioural
+- clean-room
+- artex
+- datadog-inspired
+- agentic-attack
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail errorCode IN ("AccessDenied","AccessDeniedException","Client.UnauthorizedOperation","UnauthorizedOperation")
+    | eval actor=coalesce('userIdentity.arn','userIdentity.principalId','userIdentity.accessKeyId',"unknown"), id_type=coalesce('userIdentity.type',"unknown")
+    | bin _time span=15m
+    | stats count dc(eventSource) AS services dc(eventName) AS apis values(eventSource) AS eventSources values(eventName) AS eventNames values(errorCode) AS errorCodes values(sourceIPAddress) AS src_ip values(userAgent) AS user_agent BY _time actor id_type
+    | where services>=4 AND count>=8
+    | sort - services
