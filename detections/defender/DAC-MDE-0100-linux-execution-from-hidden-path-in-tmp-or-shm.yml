@@ -1,0 +1,52 @@
+id: DAC-MDE-0100
+title: "Linux execution of a dot-hidden file or folder under /dev/shm, /tmp, /var/tmp or /run/user"
+description: >-
+  DeviceProcessEvents on Linux where the executed image path is under /dev/shm, /tmp, /var/tmp or
+  /run/user/<uid> and the file or any folder below that root starts with a dot. AppImage mounts (/tmp/.mount_*)
+  are excluded. The Microsoft gsocket report shows the client staged in /dev/shm/.gs-0 and a hidden file at
+  /tmp/.gsn_ora. Tool-agnostic. telemetry_validated false. Companion rule: DAC-CS-0249.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - stealth
+  techniques:
+  - T1564.001
+severity: medium
+false_positives:
+- "AppImage is excluded. Other self-extracting installers or language toolchains may unpack into dot folders in /tmp; allowlist by path prefix after measuring (not measured)."
+references:
+- "https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/"
+- "https://attack.mitre.org/techniques/T1564/001/"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table"
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "AccountName"
+- "FileName"
+- "FolderPath"
+- "ProcessCommandLine"
+- "InitiatingProcessFileName"
+- "InitiatingProcessCommandLine"
+- "InitiatingProcessParentFileName"
+tags:
+- behavioural
+- linux
+- gsocket
+- hidden-files
+- needs-review
+query:
+  defender: |
+    let Lookback = 1d;
+    DeviceProcessEvents
+    | where Timestamp > ago(Lookback)
+    | where FolderPath matches regex @"(?i)^/(dev/shm|tmp|var/tmp|run/user/[0-9]+)/([^/]+/)*\.[^/]+"
+    | where not(FolderPath matches regex @"(?i)/\.mount_")
+    | project Timestamp, DeviceId, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine,
+        InitiatingProcessFileName, InitiatingProcessCommandLine, InitiatingProcessParentFileName
