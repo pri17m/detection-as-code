@@ -1,17 +1,19 @@
 query:
-  splunk: '(sourcetype=github:audit OR sourcetype=github:cloud:audit)
-
-    | search action="*"
-
-    | # Experimental stub: GitHub: Human-owned PAT used for bursty API automation
-
-    | table _time, actor, action, org, repo, actor_ip, user_agent
-
-    '
+  splunk: |
+    (sourcetype=github:audit OR sourcetype=github:cloud:audit) hashed_token=*
+    | where match(coalesce(programmatic_access_type,""),"(?i)personal access token") AND NOT (lower(tostring(actor_is_bot))="true" OR match(coalesce(actor,""),"\[bot\]$"))
+    | sort 0 _time
+    | streamstats time_window=10m count AS events_10m dc(repo) AS repos_10m BY hashed_token
+    | eval hit=if(events_10m>=50 OR repos_10m>=10,1,0), hit_time=if(hit=1,_time,null())
+    | eventstats max(hit) AS token_hit BY hashed_token
+    | where token_hit=1
+    | stats min(hit_time) AS first_hit max(hit_time) AS last_hit max(events_10m) AS max_events_10m max(repos_10m) AS max_repos_10m count AS events_total dc(repo) AS repos_total values(actor) AS actors values(action) AS actions values(programmatic_access_type) AS access_types values(token_scopes) AS token_scopes values(user_agent) AS user_agents BY hashed_token
+    | convert ctime(first_hit) ctime(last_hit)
 id: DAC-GH-0012
 title: 'GitHub: Human-owned PAT used for bursty API automation'
 false_positives:
-- Tune after baselining; experimental sketch may be noisy.
+- Release or migration scripts run with a human PAT. Move them to a GitHub App or allowlist the token hash; volume not measured.
+- programmatic_access_type values are not listed in GitHub's docs; if your feed uses other strings for PATs the rule misses them.
 severity: high
 sourcetypes:
 - github:audit
@@ -22,14 +24,22 @@ tags:
 - wave-b
 - P0
 - phase2-top5
+- aikido-wfx
+- fixed-2026-11-12
 telemetry_validated: false
 required_fields:
-- actor
 - action
-- org
+- actor
+- actor_is_bot
 - repo
-- actor_ip
+- hashed_token
+- programmatic_access_type
+- token_scopes
+- user_agent
 references:
+- https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/identifying-audit-log-events-performed-by-an-access-token
+- https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/audit-log-events-for-your-organization
+- https://www.aikido.dev/blog/compromised-github-accounts-push-ci-secret-stealer-to-tens-of-thousands-of-repositories
 - https://attack.mitre.org/techniques/T1550/001/
 mitre:
   tactics:
@@ -38,4 +48,4 @@ mitre:
   - T1550.001
 author: Detection Engineer
 status: experimental
-description: high rate API with PAT actor type user
+description: 'Behavior: one personal access token (hashed_token, programmatic_access_type containing ''personal access token'') used by a non-bot actor produces 50 or more audited org events, or events in 10 or more repos, inside a sliding 10-minute window. hashed_token and programmatic_access_type are documented common audit-log fields. Aikido reports stolen GitHub tokens used to open probe PRs, push payloads and delete workflow runs across many repos. The audit log only records audited actions, not every API read, so this sees write-type bursts. Thresholds are unmeasured. Not telemetry_validated. Fixed 2026-11-12: the earlier query was a stub (action=* plus a ''| #'' line that Splunk rejects).'
