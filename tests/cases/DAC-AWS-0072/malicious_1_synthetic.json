@@ -1,0 +1,126 @@
+{
+  "label": "malicious",
+  "variant": "Stolen long-term key runs 5 discovery calls across 4 services, all succeed",
+  "synthetic": true,
+  "source": "synthetic; event shapes from AWS CloudTrail docs, behaviour from https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": true,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 1 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEPRINCIPAL1",
+        "arn": "arn:aws:iam::111122223333:user/ci-reader",
+        "accountId": "111122223333",
+        "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "userName": "ci-reader"
+      },
+      "eventTime": "2026-10-20T09:30:00Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "ListBuckets",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-928778308747"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEPRINCIPAL1",
+        "arn": "arn:aws:iam::111122223333:user/ci-reader",
+        "accountId": "111122223333",
+        "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "userName": "ci-reader"
+      },
+      "eventTime": "2026-10-20T09:30:17Z",
+      "eventSource": "secretsmanager.amazonaws.com",
+      "eventName": "ListSecrets",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-102679578669"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEPRINCIPAL1",
+        "arn": "arn:aws:iam::111122223333:user/ci-reader",
+        "accountId": "111122223333",
+        "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "userName": "ci-reader"
+      },
+      "eventTime": "2026-10-20T09:30:34Z",
+      "eventSource": "ssm.amazonaws.com",
+      "eventName": "DescribeParameters",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-890097522430"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEPRINCIPAL1",
+        "arn": "arn:aws:iam::111122223333:user/ci-reader",
+        "accountId": "111122223333",
+        "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "userName": "ci-reader"
+      },
+      "eventTime": "2026-10-20T09:31:51Z",
+      "eventSource": "logs.amazonaws.com",
+      "eventName": "DescribeLogGroups",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-077340209910"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEPRINCIPAL1",
+        "arn": "arn:aws:iam::111122223333:user/ci-reader",
+        "accountId": "111122223333",
+        "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "userName": "ci-reader"
+      },
+      "eventTime": "2026-10-20T09:31:08Z",
+      "eventSource": "lambda.amazonaws.com",
+      "eventName": "ListFunctions20150331",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-008645669810"
+    }
+  ]
+}

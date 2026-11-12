@@ -1,0 +1,54 @@
+id: DAC-AWS-0072
+title: Read-only discovery across three or more AWS services from one principal in 15 minutes
+description: 'Behavior: one actor calls the read-only discovery APIs Datadog Security Labs listed for ARTEX (ListBuckets, GetBucket*, ListSecrets, DescribeParameters, ListTopics, DescribeLogGroups, GetRestApis, DescribeRepositories, ListFunctions*) across 3+ services and 4+ APIs inside one 15-minute bin, whether the calls succeed or fail. Rows are ranked by denial ratio; a high ratio plus a DAC-AWS-0071 hit for the same actor is the strongest triage signal. Datadog notes the playbook varies by model, so the rule needs no fixed sequence. Thresholds are unmeasured starting points. Not telemetry_validated. Clean-room: own SPL.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: low
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1526
+  - T1580
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- eventName
+- eventSource
+- errorCode
+- userIdentity.arn
+- userIdentity.principalId
+- userIdentity.accessKeyId
+- userIdentity.type
+- sourceIPAddress
+- userAgent
+telemetry_validated: false
+false_positives:
+- 'CSPM, inventory, backup and FinOps tools call these APIs constantly. Their principals are stable and their calls rarely fail; allowlist them after baselining. Volume not measured.'
+- 'Thresholds (3 services, 4 APIs, 15-minute bins) are unmeasured starting points.'
+- 'Overlaps DAC-AWS-0042 (ListBuckets recon) and DAC-AWS-0019/0020 (ListSecrets volume); this rule is the cross-service view, not a replacement.'
+references:
+- https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/
+- https://attack.mitre.org/techniques/T1526/
+- https://attack.mitre.org/techniques/T1580/
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html
+- https://docs.aws.amazon.com/lambda/latest/dg/logging-using-cloudtrail.html
+tags:
+- aws
+- cloudtrail
+- behavioural
+- clean-room
+- artex
+- datadog-inspired
+- agentic-attack
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail eventName IN ("ListBuckets","GetBucket*","ListSecrets","DescribeParameters","ListTopics","DescribeLogGroups","GetRestApis","DescribeRepositories","ListFunctions","ListFunctions20150331","ListFunctions20150331v2")
+    | eval actor=coalesce('userIdentity.arn','userIdentity.principalId','userIdentity.accessKeyId',"unknown"), id_type=coalesce('userIdentity.type',"unknown"), session_name=mvindex(split(coalesce('userIdentity.arn',""),"/"),-1), denied=if(isnotnull(errorCode),1,0)
+    | bin _time span=15m
+    | stats count sum(denied) AS denied dc(eventSource) AS services dc(eventName) AS apis values(eventSource) AS eventSources values(eventName) AS eventNames values(errorCode) AS errorCodes values(session_name) AS session_names values(sourceIPAddress) AS src_ip values(userAgent) AS user_agent BY _time actor id_type
+    | where services>=3 AND apis>=4
+    | eval deny_ratio=round(denied/count,2)
+    | sort 0 - deny_ratio
