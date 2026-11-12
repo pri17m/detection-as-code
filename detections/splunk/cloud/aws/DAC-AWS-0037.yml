@@ -1,39 +1,79 @@
-false_positives:
-- Tune after baselining; experimental sketch may be noisy.
+id: DAC-AWS-0037
+title: 'AWS: IAM UpdateAssumeRolePolicy broaden trust'
+description: 'Behavior: a successful UpdateAssumeRolePolicy whose new trust policy has an Allow statement that lets any AWS principal assume the role (Principal "*" or Principal.AWS "*" without an aws:PrincipalOrgID, PrincipalOrgPaths, PrincipalAccount, PrincipalArn or SourceAccount condition), or that names an AWS account other than the role''s own account. Aikido saw the wfx CI stealer set a chained role''s trust to {"AWS": "*"} so the role stays usable after credential rotation. CloudTrail does not log the previous policy, so ''broaden'' means the new policy is open, not a diff. Wildcard or GitHub OIDC caller is critical, foreign account is high. Not telemetry_validated. Fixed 2026-11-12: the earlier query searched sts AssumeRole into *admin* roles and never looked at UpdateAssumeRolePolicy.'
+author: Detection Engineer
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  - defense-impairment
+  techniques:
+  - T1098.003
+  - T1484.002
+sourcetypes:
+- aws:cloudtrail
 required_fields:
 - eventSource
 - eventName
+- errorCode
+- requestParameters.roleName
+- requestParameters.policyDocument
+- recipientAccountId
 - userIdentity.arn
+- userIdentity.principalId
+- userIdentity.type
+- userIdentity.accountId
+- userIdentity.sessionContext.webIdFederationData.federatedProvider
 - sourceIPAddress
-- awsRegion
+- userAgent
 telemetry_validated: false
-author: Detection Engineer
-mitre:
-  tactics:
-  - privilege-escalation
-  techniques:
-  - T1098.003
-id: DAC-AWS-0037
-status: experimental
-title: 'AWS: IAM UpdateAssumeRolePolicy broaden trust'
-query:
-  splunk: '(sourcetype=aws:cloudtrail OR sourcetype=aws:cloudtrail:json OR sourcetype=aws:cloudtrail:event)
-
-    | search eventSource="sts.amazonaws.com" eventName="AssumeRole"
-
-    | search requestParameters.roleArn="*admin*" OR requestParameters.roleArn="*Admin*" OR resources{}.ARN="*admin*"
-
-    | table _time, eventName, userIdentity.arn, sourceIPAddress, awsRegion, errorCode, requestParameters
-
-    '
-severity: high
+false_positives:
+- Legitimate cross-account trust (partner, vendor or another account in the org) fires as foreign_account. Keep a lookup of approved account IDs per role; volume not measured.
+- Org-wide roles that use Principal AWS * with aws:PrincipalOrgID are excluded; ones scoped only by sts:ExternalId or other keys still alert by design.
+- Terraform or CloudFormation pipelines that rewrite trust policies on every apply will alert each time the policy contains a foreign account.
 references:
+- https://www.aikido.dev/blog/compromised-github-accounts-push-ci-secret-stealer-to-tens-of-thousands-of-repositories
+- https://docs.aws.amazon.com/IAM/latest/APIReference/API_UpdateAssumeRolePolicy.html
+- https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html
+- https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
 - https://attack.mitre.org/techniques/T1098/003/
-platforms:
-- splunk
+- https://attack.mitre.org/techniques/T1484/002/
 tags:
 - wave-c
 - P0
-description: UpdateAssumeRolePolicy Principal=*
-sourcetypes:
-- aws:cloudtrail
+- aws
+- cloudtrail
+- behavioural
+- aikido-wfx
+- fixed-2026-11-12
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail eventSource="iam.amazonaws.com" eventName="UpdateAssumeRolePolicy"
+    | where isnull(errorCode)
+    | eval actor=coalesce('userIdentity.arn','userIdentity.principalId',"unknown"), id_type=coalesce('userIdentity.type',"unknown"), role_name=coalesce('requestParameters.roleName',"unknown"), own_account=coalesce(recipientAccountId,'userIdentity.accountId',""), policy=coalesce('requestParameters.policyDocument',"")
+    | eval oidc_session=if(like(coalesce('userIdentity.sessionContext.webIdFederationData.federatedProvider',""),"%token.actions.githubusercontent.com%"),1,0)
+    | spath input=policy path=Statement{} output=stmt_list
+    | spath input=policy path=Statement output=stmt_one
+    | eval stmt=if(isnotnull(stmt_list), stmt_list, stmt_one)
+    | mvexpand stmt
+    | spath input=stmt path=Effect output=effect
+    | spath input=stmt path=Principal output=principal_raw
+    | spath input=stmt path=Principal.AWS output=p_aws_one
+    | spath input=stmt path=Principal.AWS{} output=p_aws_list
+    | spath input=stmt path=Condition output=cond
+    | eval aws_principals=if(isnotnull(p_aws_list), p_aws_list, p_aws_one)
+    | where effect="Allow" AND (isnotnull(aws_principals) OR principal_raw="*")
+    | eval wildcard=if(principal_raw="*" OR isnotnull(mvfind(aws_principals,"^\*$")),1,0)
+    | eval principal_accounts=mvmap(aws_principals, replace(aws_principals,"^(?:arn:aws[a-z-]*:iam::)?(\d{12})(?::.*)?$","\1"))
+    | eval foreign_accounts=mvmap(principal_accounts, if(match(principal_accounts,"^\d{12}$") AND principal_accounts!=own_account, principal_accounts, null()))
+    | eval scoped_condition=if(match(coalesce(cond,""),"(?i)aws:(PrincipalOrgID|PrincipalOrgPaths|PrincipalAccount|PrincipalArn|SourceAccount)"),1,0)
+    | eval reason=case(wildcard=1 AND scoped_condition=0, "any_aws_principal", isnotnull(foreign_accounts), "foreign_account", true(), null())
+    | where isnotnull(reason)
+    | stats values(reason) AS reasons values(foreign_accounts) AS foreign_accounts values(aws_principals) AS principals values(cond) AS conditions max(oidc_session) AS github_oidc_session min(_time) AS first_seen max(_time) AS last_seen values(sourceIPAddress) AS src_ip values(userAgent) AS user_agent BY actor id_type role_name own_account
+    | eval severity=if(isnotnull(mvfind(reasons,"any_aws_principal")) OR github_oidc_session=1, "critical", "high")
+    | convert ctime(first_seen) ctime(last_seen)
