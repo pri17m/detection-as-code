@@ -1,0 +1,60 @@
+id: DAC-CS-0247
+title: "gsocket secret passed on the command line (GS_ARGS, deploy notify vars, or gs-* tool with -s/-k)"
+description: >-
+  Falcon ProcessRollup2 on Linux where the command line sets GS_ARGS or GSOCKET_ARGS, sets the deploy
+  notification variables (GS_TG_TOKEN, GS_TG_CHATID, GS_DISCORD_KEY, GS_WEBHOOK, GS_WEBHOOK_KEY), or runs gs-
+  netcat, gs-sftp, gs-mount or gs-full-pipe with -s or -k. This is how the gsocket deploy script starts its
+  hidden copy from cron, rc.local, shell profiles and systemd. A gsocket.io host in the same command line is
+  reported as a supporting field only, never as the trigger. telemetry_validated false. Companion rule: DAC-
+  MDE-0098.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- "falcon:process"
+mitre:
+  tactics:
+  - command-and-control
+  techniques:
+  - T1219
+  - T1090.002
+severity: high
+false_positives:
+- "Admins who use gsocket on purpose. Allowlist by host and account after you confirm it is approved (not measured)."
+- "Other software with a variable named exactly GS_ARGS (none known)."
+references:
+- "https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/"
+- "https://github.com/hackerschoice/gsocket/blob/master/deploy/deploy.sh"
+- "https://github.com/hackerschoice/gsocket/blob/master/README.md"
+- "https://attack.mitre.org/techniques/T1219/"
+- "https://attack.mitre.org/techniques/T1090/002/"
+- "https://github.com/CrowdStrike/logscale-community-content"
+telemetry_validated: false
+required_fields:
+- "#event_simpleName"
+- "event_platform"
+- "aid"
+- "UID"
+- "ParentBaseFileName"
+- "GrandParentBaseFileName"
+- "ImageFileName"
+- "CommandLine"
+tags:
+- behavioural
+- linux
+- gsocket
+- c2
+- needs-review
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Lin
+    | case {
+        CommandLine=/\b(GS_ARGS|GSOCKET_ARGS)=/ | sig := "gsocket_args_env";
+        CommandLine=/\b(GS_TG_TOKEN|GS_TG_CHATID|GS_DISCORD_KEY|GS_WEBHOOK_KEY|GS_WEBHOOK)=/ | sig := "deploy_secret_notify_env";
+        CommandLine=/(^|[\s\/])(gs-netcat|gs-sftp|gs-mount|gs-full-pipe)(\s.*)?\s-(s|k)\s+\S/i | sig := "gs_tool_secret_arg";
+        * | sig := "none";
+      }
+    | sig != "none"
+    | case { CommandLine=/gsocket\.io/i | supporting_gsocket_host := "yes"; * | supporting_gsocket_host := "no"; }
+    | table([@timestamp, aid, UID, GrandParentBaseFileName, ParentBaseFileName, ImageFileName, CommandLine, sig, supporting_gsocket_host])

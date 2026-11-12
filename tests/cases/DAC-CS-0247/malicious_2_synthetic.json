@@ -1,0 +1,23 @@
+{
+  "label": "malicious",
+  "variant": "gs-netcat started with a secret on the command line (README usage)",
+  "synthetic": true,
+  "source": "synthetic; https://github.com/hackerschoice/gsocket/blob/master/README.md",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:10:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "0",
+      "GrandParentBaseFileName": "sshd",
+      "ParentBaseFileName": "bash",
+      "ImageFileName": "/usr/local/bin/gs-netcat",
+      "CommandLine": "gs-netcat -s ExampleSecret0 -l -i"
+    }
+  ]
+}
