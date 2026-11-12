@@ -1,0 +1,60 @@
+id: DAC-MDE-0097
+title: "Linux process presents a kernel-thread-style name (exec -a or bracketed argv0)"
+description: >-
+  DeviceProcessEvents on Linux where the command line is only a bracketed name such as [kaluad] or
+  [kworker/0:2], or where a shell runs exec -a with a bracketed name. Kernel threads are not created through
+  execve, so a process-start event that looks like one is a user-space process hiding behind a kernel-thread
+  name. The Microsoft gsocket report shows bash exec -a [kaluad] /usr/bin/defunct, and the gsocket deploy script
+  picks the name from a list of kernel-thread names. Tool-agnostic: any malware that disguises argv0 this way is
+  in scope. telemetry_validated false. Companion rule: DAC-CS-0246.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - stealth
+  techniques:
+  - T1036
+  - T1036.004
+severity: high
+false_positives:
+- "Wrapper scripts that use exec -a with an ordinary name are excluded because the name must be in square brackets."
+- "Some daemons rewrite their own argv after start; the sensor records the command line at process start, so this should not fire for them (not measured)."
+references:
+- "https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/"
+- "https://github.com/hackerschoice/gsocket/blob/master/deploy/deploy.sh"
+- "https://attack.mitre.org/techniques/T1036/004/"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table"
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "AccountName"
+- "FileName"
+- "FolderPath"
+- "ProcessCommandLine"
+- "InitiatingProcessFileName"
+- "InitiatingProcessCommandLine"
+- "InitiatingProcessParentFileName"
+tags:
+- behavioural
+- linux
+- gsocket
+- masquerade
+- needs-review
+query:
+  defender: |
+    let Lookback = 1d;
+    DeviceProcessEvents
+    | where Timestamp > ago(Lookback)
+    | extend sig = case(
+        ProcessCommandLine matches regex @"^\s*\[[^\]]{1,40}\]\s*$", "argv0_kernel_thread_name",
+        ProcessCommandLine matches regex @"(?i)\bexec\s+-a\s+['""]?\[[^\]]{1,32}\]", "exec_a_bracket_name",
+        "")
+    | where isnotempty(sig)
+    | project Timestamp, DeviceId, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine,
+        InitiatingProcessFileName, InitiatingProcessCommandLine, InitiatingProcessParentFileName, sig

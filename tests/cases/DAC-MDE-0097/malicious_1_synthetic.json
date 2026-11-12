@@ -1,0 +1,36 @@
+{
+  "label": "malicious",
+  "variant": "Payload process whose whole command line is a kernel-thread-style name, including one with a slash",
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-10T13:10:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "root",
+      "FileName": "defunct",
+      "FolderPath": "/usr/bin/defunct",
+      "ProcessCommandLine": "[kaluad]",
+      "InitiatingProcessFileName": "bash",
+      "InitiatingProcessCommandLine": "bash",
+      "InitiatingProcessParentFileName": "sh"
+    },
+    {
+      "Timestamp": "2026-11-10T13:11:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "www-data",
+      "FileName": "gs-netcat",
+      "FolderPath": "/dev/shm/.gs-0/gs-netcat",
+      "ProcessCommandLine": "[kworker/0:2]",
+      "InitiatingProcessFileName": "bash",
+      "InitiatingProcessCommandLine": "bash",
+      "InitiatingProcessParentFileName": "cron"
+    }
+  ]
+}
