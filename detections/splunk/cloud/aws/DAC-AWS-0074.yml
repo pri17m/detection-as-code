@@ -1,0 +1,60 @@
+id: DAC-AWS-0074
+title: Cognito user pool self sign-up followed by AWS discovery from the same source within 60 minutes
+description: 'Behavior: SignUp (API, Hosted UI Signup_POST or managed login signup_POST) on a Cognito user pool, then at least one read-only discovery call (ListBuckets, ListSecrets, DescribeParameters, ListTopics, DescribeLogGroups, GetRestApis, DescribeRepositories, ListFunctions*) from the same sourceIPAddress within 60 minutes after the most recent sign-up. Datadog Security Labs saw ARTEX register on a public pool after several PreSignUp failures, walk InitiateAuth, RespondToAuthChallenge, GetUser and GetTokensFromRefreshToken, then sweep discovery APIs under a CognitoIdentityCredentials session. sourceIPAddress is only the join key between the two stages; no IP indicator is matched. Correlation assumptions are unverified (see REVIEW.md). The 60-minute window is an unmeasured starting point; schedule with a lookback of at least 60 minutes. Not telemetry_validated. Clean-room: own SPL.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - initial-access
+  - discovery
+  techniques:
+  - T1136.003
+  - T1078.004
+  - T1526
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- eventName
+- eventSource
+- errorCode
+- sourceIPAddress
+- userIdentity.arn
+- userIdentity.type
+- userAgent
+telemetry_validated: false
+false_positives:
+- 'A real user signs up on a mobile or web app and the app then calls AWS APIs through a NAT or corporate egress shared with other workloads. Shared egress joins unrelated events; volume not measured.'
+- 'Load tests or QA against public user pools that also run AWS CLI checks from the same runner.'
+- 'A single successful SignUp alone never alerts; a discovery call from the same source is required. The 60-minute window is an unmeasured starting point.'
+references:
+- https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/
+- https://attack.mitre.org/techniques/T1136/003/
+- https://attack.mitre.org/techniques/T1078/004/
+- https://attack.mitre.org/techniques/T1526/
+- https://docs.aws.amazon.com/cognito/latest/developerguide/logging-using-cloudtrail.html
+- https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_SignUp.html
+tags:
+- aws
+- cloudtrail
+- cognito
+- correlation
+- behavioural
+- clean-room
+- artex
+- datadog-inspired
+- agentic-attack
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail ((eventSource="cognito-idp.amazonaws.com" eventName IN ("SignUp","Signup_POST","signup_POST","InitiateAuth","RespondToAuthChallenge","GetUser","GetTokensFromRefreshToken","ResendConfirmationCode")) OR eventName IN ("ListBuckets","ListSecrets","DescribeParameters","ListTopics","DescribeLogGroups","GetRestApis","DescribeRepositories","ListFunctions","ListFunctions20150331"))
+    | eval is_signup=if(eventSource="cognito-idp.amazonaws.com" AND in(eventName,"SignUp","Signup_POST","signup_POST"),1,0), is_signup_fail=if(is_signup=1 AND isnotnull(errorCode),1,0), is_auth=if(in(eventName,"InitiateAuth","RespondToAuthChallenge","GetUser","GetTokensFromRefreshToken"),1,0), is_discover=if(eventSource!="cognito-idp.amazonaws.com",1,0), cognito_session=if(match(coalesce('userIdentity.arn',""),"CognitoIdentityCredentials"),1,0), signup_time=if(is_signup=1,_time,null())
+    | sort 0 _time
+    | streamstats last(signup_time) AS last_signup_time BY sourceIPAddress
+    | eval discover_after_signup=if(is_discover=1 AND isnotnull(last_signup_time) AND _time-last_signup_time<=3600,1,0)
+    | stats sum(is_signup) AS signups sum(is_signup_fail) AS signup_fails sum(is_auth) AS auth_calls sum(discover_after_signup) AS discovers_after_signup max(cognito_session) AS cognito_session values(eventName) AS eventNames values(errorCode) AS errorCodes values(userIdentity.arn) AS arns values(userAgent) AS user_agent min(_time) AS first_seen max(_time) AS last_seen BY sourceIPAddress
+    | where signups>=1 AND discovers_after_signup>=1
+    | convert ctime(first_seen) ctime(last_seen)
+    | sort - discovers_after_signup
