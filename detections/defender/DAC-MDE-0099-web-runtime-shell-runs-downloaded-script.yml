@@ -1,0 +1,72 @@
+id: DAC-MDE-0099
+title: "Web or app runtime spawns a shell that runs downloaded or decoded script content"
+description: >-
+  DeviceProcessEvents on Linux where the parent is a web server or app runtime (apache2, httpd, nginx, php, php-
+  fpm, php-cgi, lsphp, java, node, uwsgi, gunicorn) and the child shell runs curl or wget output straight into a
+  shell (pipe or $( ) substitution) or pipes base64-decoded text into a shell. The Microsoft gsocket report says
+  access starts with web app RCE followed by curl download-and-execute and encoded commands. One event is
+  enough; this closes the gap where the PHP stacking rules need two behaviour classes. telemetry_validated
+  false. Companion rule: DAC-CS-0248.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - initial-access
+  - execution
+  - command-and-control
+  - persistence
+  techniques:
+  - T1190
+  - T1059.004
+  - T1105
+  - T1505.003
+severity: high
+false_positives:
+- "Apps that self-update by piping an installer to sh from the web process (rare; allowlist by parent and command line after review)."
+- "CI runners on node or java that run install scripts. Exclude the runner host group if it is in scope (not measured)."
+references:
+- "https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/"
+- "https://github.com/hackerschoice/gsocket/blob/master/deploy/deploy.sh"
+- "https://attack.mitre.org/techniques/T1190/"
+- "https://attack.mitre.org/techniques/T1059/004/"
+- "https://attack.mitre.org/techniques/T1105/"
+- "https://attack.mitre.org/techniques/T1505/003/"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table"
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "AccountName"
+- "FileName"
+- "FolderPath"
+- "ProcessCommandLine"
+- "InitiatingProcessFileName"
+- "InitiatingProcessCommandLine"
+- "InitiatingProcessParentFileName"
+tags:
+- behavioural
+- linux
+- gsocket
+- webshell
+- needs-review
+query:
+  defender: |
+    let Lookback = 1d;
+    DeviceProcessEvents
+    | where Timestamp > ago(Lookback)
+    | where InitiatingProcessFileName matches regex @"(?i)^(apache2|httpd|nginx|lsphp.*|php-fpm.*|php[0-9.]*|php-cgi.*|java|node|uwsgi|gunicorn)$"
+    | where FileName in~ ("sh", "bash", "dash", "ash", "zsh", "busybox")
+    | extend how = case(
+        ProcessCommandLine matches regex @"(?i)\b(curl|wget)\b[^|;&]*\|\s*(sudo\s+)?(ba|da|z)?sh\b", "fetch_pipe_to_shell",
+        ProcessCommandLine matches regex @"(?i)(\$\(|`)\s*(curl|wget)\b", "fetch_in_substitution",
+        ProcessCommandLine matches regex @"(?i)base64\s+(-d|--decode)[^|]*\|\s*(ba|da|z)?sh\b", "decoded_pipe_to_shell",
+        "")
+    | where isnotempty(how)
+    | extend supporting_gsocket_host = ProcessCommandLine has "gsocket.io"
+    | project Timestamp, DeviceId, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine,
+        InitiatingProcessFileName, InitiatingProcessCommandLine, InitiatingProcessParentFileName, how, supporting_gsocket_host
