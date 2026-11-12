@@ -1,0 +1,23 @@
+{
+  "label": "malicious",
+  "variant": "Payload binary timestamp copied from /etc/ld.so.conf (deploy.sh _ts_fix fallback; blog: touch on /usr/bin/defunct)",
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/ ; https://github.com/hackerschoice/gsocket/blob/master/deploy/deploy.sh",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:10:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "0",
+      "GrandParentBaseFileName": "sh",
+      "ParentBaseFileName": "bash",
+      "ImageFileName": "/usr/bin/touch",
+      "CommandLine": "touch -r /etc/ld.so.conf /usr/bin/defunct"
+    }
+  ]
+}

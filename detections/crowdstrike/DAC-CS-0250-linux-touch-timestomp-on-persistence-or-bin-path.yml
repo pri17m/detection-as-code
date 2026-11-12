@@ -1,0 +1,51 @@
+id: DAC-CS-0250
+title: "touch copies or sets a timestamp on a systemd, cron, rc.local, shell profile or bin path"
+description: >-
+  Falcon ProcessRollup2 on Linux where touch runs with -r/--reference, -t or -d/--date (including combined flags
+  such as -h -t or -hr) and the command line names a systemd unit path, rc.local, cron spool or cron.d, a shell
+  profile file, or /usr/bin, /usr/sbin, /usr/local/bin. The Microsoft gsocket report shows touch giving older
+  times to /usr/bin/defunct and defunct.service, and the deploy script copies times from a reference file,
+  falling back to /etc/ld.so.conf. telemetry_validated false. Companion rule: DAC-MDE-0101.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- "falcon:process"
+mitre:
+  tactics:
+  - stealth
+  techniques:
+  - T1070.006
+severity: medium
+false_positives:
+- "Package and config management scripts that keep timestamps when they install files. Allowlist by parent (dpkg, rpm, ansible) after measuring (not measured)."
+- "Backup or restore jobs that set times on restored files."
+references:
+- "https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/"
+- "https://github.com/hackerschoice/gsocket/blob/master/deploy/deploy.sh"
+- "https://attack.mitre.org/techniques/T1070/006/"
+- "https://github.com/CrowdStrike/logscale-community-content"
+telemetry_validated: false
+required_fields:
+- "#event_simpleName"
+- "event_platform"
+- "aid"
+- "UID"
+- "ParentBaseFileName"
+- "GrandParentBaseFileName"
+- "ImageFileName"
+- "CommandLine"
+tags:
+- behavioural
+- linux
+- gsocket
+- timestomp
+- needs-review
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Lin
+    | ImageFileName=/\/touch$/i
+    | CommandLine=/\s(-[a-z]*[rtd]\b|--reference|--date)/i
+    | CommandLine=/(\/etc\/systemd\/|\/(usr\/)?lib\/systemd\/|\/etc\/rc\.local|\/var\/spool\/cron|\/etc\/cron|\/etc\/crontab|\/\.(bashrc|bash_profile|bash_login|profile)\b|\/usr\/(local\/)?s?bin\/)/i
+    | table([@timestamp, aid, UID, GrandParentBaseFileName, ParentBaseFileName, ImageFileName, CommandLine])

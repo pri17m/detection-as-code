@@ -1,0 +1,23 @@
+{
+  "label": "malicious",
+  "variant": "systemd wants-link timestamp set with -h -t (deploy.sh symlink case; blog: defunct.service)",
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/ ; https://github.com/hackerschoice/gsocket/blob/master/deploy/deploy.sh",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:10:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "0",
+      "GrandParentBaseFileName": "sh",
+      "ParentBaseFileName": "bash",
+      "ImageFileName": "/usr/bin/touch",
+      "CommandLine": "touch -h -t 202301150930 /etc/systemd/system/multi-user.target.wants/defunct.service"
+    }
+  ]
+}
