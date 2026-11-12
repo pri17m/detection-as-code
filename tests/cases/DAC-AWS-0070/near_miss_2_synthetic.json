@@ -1,0 +1,95 @@
+{
+  "label": "near_miss",
+  "variant": "Three limit=1000 searches from an AKIA key for ordinary error strings (weak branch only)",
+  "synthetic": true,
+  "source": "synthetic; event shapes from AWS CloudTrail docs, behaviour from https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEPRINCIPAL1",
+        "arn": "arn:aws:iam::111122223333:user/ci-reader",
+        "accountId": "111122223333",
+        "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "userName": "ci-reader"
+      },
+      "eventTime": "2026-10-20T09:01:00Z",
+      "eventSource": "logs.amazonaws.com",
+      "eventName": "FilterLogEvents",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": {
+        "logGroupName": "/app/payments/api",
+        "filterPattern": "?Error ?Exception",
+        "limit": 1000,
+        "startTime": 1760918400000
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-869221454128"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEPRINCIPAL1",
+        "arn": "arn:aws:iam::111122223333:user/ci-reader",
+        "accountId": "111122223333",
+        "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "userName": "ci-reader"
+      },
+      "eventTime": "2026-10-20T09:02:00Z",
+      "eventSource": "logs.amazonaws.com",
+      "eventName": "FilterLogEvents",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": {
+        "logGroupName": "/app/payments/api",
+        "filterPattern": "?timeout",
+        "limit": 1000,
+        "startTime": 1760918400000
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-847100357231"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEPRINCIPAL1",
+        "arn": "arn:aws:iam::111122223333:user/ci-reader",
+        "accountId": "111122223333",
+        "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "userName": "ci-reader"
+      },
+      "eventTime": "2026-10-20T09:03:00Z",
+      "eventSource": "logs.amazonaws.com",
+      "eventName": "FilterLogEvents",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": {
+        "logGroupName": "/app/payments/api",
+        "filterPattern": "?Error",
+        "limit": 1000,
+        "startTime": 1760918400000
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-128811538425"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+id: DAC-AWS-0070
+title: CloudWatch Logs FilterLogEvents searched for credentials or storage links
+description: 'Behavior: a principal calls FilterLogEvents on logs.amazonaws.com with a filterPattern that hunts for credentials or data locations (AKIA, password, presigned, s3://, .csv, .xlsx). Datadog Security Labs saw ARTEX make this its most frequent call once it held a long-term AKIA key, always with limit=1000, moving from financial terms to s3://, presigned, password and AKIA. Alerts on any AKIA or password search, or on 3+ searches by one actor where at least one is secret-like. limit=1000 with an AKIA key is kept as context and never alerts alone. Thresholds are unmeasured starting points. Not telemetry_validated. Clean-room: behaviour from the Datadog write-up, own SPL (Datadog published no query text).'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - credential-access
+  - discovery
+  techniques:
+  - T1552
+  - T1526
+sourcetypes:
+- aws:cloudtrail
+required_fields:
+- eventName
+- eventSource
+- requestParameters.filterPattern
+- requestParameters.limit
+- requestParameters.logGroupName
+- requestParameters.logGroupIdentifier
+- userIdentity.arn
+- userIdentity.principalId
+- userIdentity.accessKeyId
+- userIdentity.type
+- sourceIPAddress
+- userAgent
+- errorCode
+telemetry_validated: false
+false_positives:
+- 'Incident responders, on-call engineers and log-analytics tooling search CloudWatch Logs for password or AKIA when hunting leaked secrets. Baseline those principals; volume not measured.'
+- 'limit=1000 is a legal client choice (API default and maximum are 10,000: https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_FilterLogEvents.html). It never alerts on its own here.'
+- 'Thresholds (3 searches, the term list) are unmeasured starting points taken from one Datadog case, not from tenant data.'
+references:
+- https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/
+- https://attack.mitre.org/techniques/T1552/
+- https://attack.mitre.org/techniques/T1526/
+- https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_FilterLogEvents.html
+- https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/logging_cw_api_calls_cwl.html
+- https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html
+tags:
+- aws
+- cloudtrail
+- behavioural
+- clean-room
+- artex
+- datadog-inspired
+- agentic-attack
+query:
+  splunk: |
+    sourcetype=aws:cloudtrail eventSource="logs.amazonaws.com" eventName="FilterLogEvents"
+    | eval filter_pat=coalesce('requestParameters.filterPattern',""), flt_limit=tonumber('requestParameters.limit'), key_id=coalesce('userIdentity.accessKeyId',""), id_type=coalesce('userIdentity.type',"unknown"), log_group=coalesce('requestParameters.logGroupName','requestParameters.logGroupIdentifier',"unknown"), actor=coalesce('userIdentity.arn','userIdentity.principalId','userIdentity.accessKeyId',"unknown")
+    | eval secret_like=if(match(filter_pat,"(?i)(AKIA|password|presigned|s3://|\.xlsx|\.csv)"),1,0), cred_search=if(match(filter_pat,"(?i)(AKIA|password)"),1,0), long_term_key=if(match(key_id,"^AKIA"),1,0), akia_limit_1000=if(flt_limit=1000 AND match(key_id,"^AKIA"),1,0)
+    | where secret_like=1 OR akia_limit_1000=1
+    | stats count sum(secret_like) AS secret_searches max(cred_search) AS cred_search sum(akia_limit_1000) AS akia_limit_1000_calls max(long_term_key) AS long_term_key dc(log_group) AS log_groups values(log_group) AS log_group_names values(filter_pat) AS filters values(errorCode) AS errorCodes values(sourceIPAddress) AS src_ip values(userAgent) AS user_agent min(_time) AS first_seen max(_time) AS last_seen BY actor key_id id_type
+    | where cred_search=1 OR (count>=3 AND secret_searches>=1)
+    | convert ctime(first_seen) ctime(last_seen)
+    | sort - secret_searches
