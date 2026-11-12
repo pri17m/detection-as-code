@@ -1,0 +1,24 @@
+{
+  "label": "near_miss",
+  "variant": "Admin over SSH pipes a vendor installer to sh (not a web parent)",
+  "synthetic": true,
+  "source": "synthetic; synthetic admin pattern",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": false,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-10T13:10:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "admin1",
+      "FileName": "bash",
+      "FolderPath": "/usr/bin/bash",
+      "ProcessCommandLine": "bash -c curl -fsSL https://get.example.invalid/install.sh | sh",
+      "InitiatingProcessFileName": "sshd",
+      "InitiatingProcessCommandLine": "sshd",
+      "InitiatingProcessParentFileName": "sshd"
+    }
+  ]
+}

