@@ -1,0 +1,68 @@
+id: DAC-CS-0248
+title: "Web or app runtime spawns a shell that runs downloaded or decoded script content"
+description: >-
+  Falcon ProcessRollup2 on Linux where the parent is a web server or app runtime (apache2, httpd, nginx, php,
+  php-fpm, php-cgi, lsphp, java, node, uwsgi, gunicorn) and the child shell runs curl or wget output straight
+  into a shell (pipe or $( ) substitution) or pipes base64-decoded text into a shell. The Microsoft gsocket
+  report says access starts with web app RCE followed by curl download-and-execute and encoded commands. One
+  event is enough; this closes the gap where the PHP stacking rules need two behaviour classes.
+  telemetry_validated false. Companion rule: DAC-MDE-0099.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- "falcon:process"
+mitre:
+  tactics:
+  - initial-access
+  - execution
+  - command-and-control
+  - persistence
+  techniques:
+  - T1190
+  - T1059.004
+  - T1105
+  - T1505.003
+severity: high
+false_positives:
+- "Apps that self-update by piping an installer to sh from the web process (rare; allowlist by parent and command line after review)."
+- "CI runners on node or java that run install scripts. Exclude the runner host group if it is in scope (not measured)."
+references:
+- "https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/"
+- "https://github.com/hackerschoice/gsocket/blob/master/deploy/deploy.sh"
+- "https://attack.mitre.org/techniques/T1190/"
+- "https://attack.mitre.org/techniques/T1059/004/"
+- "https://attack.mitre.org/techniques/T1105/"
+- "https://attack.mitre.org/techniques/T1505/003/"
+- "https://github.com/CrowdStrike/logscale-community-content"
+telemetry_validated: false
+required_fields:
+- "#event_simpleName"
+- "event_platform"
+- "aid"
+- "UID"
+- "ParentBaseFileName"
+- "GrandParentBaseFileName"
+- "ImageFileName"
+- "CommandLine"
+tags:
+- behavioural
+- linux
+- gsocket
+- webshell
+- needs-review
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Lin
+    | ParentBaseFileName=/^(apache2|httpd|nginx|lsphp.*|php-fpm.*|php[0-9.]*|php-cgi.*|java|node|uwsgi|gunicorn)$/i
+    | ImageFileName=/\/(sh|bash|dash|ash|zsh|busybox)$/i
+    | case {
+        CommandLine=/\b(curl|wget)\b[^|;&]*\|\s*(sudo\s+)?(ba|da|z)?sh\b/i | how := "fetch_pipe_to_shell";
+        CommandLine=/(\$\(|`)\s*(curl|wget)\b/i | how := "fetch_in_substitution";
+        CommandLine=/base64\s+(-d|--decode)[^|]*\|\s*(ba|da|z)?sh\b/i | how := "decoded_pipe_to_shell";
+        * | how := "none";
+      }
+    | how != "none"
+    | case { CommandLine=/gsocket\.io/i | supporting_gsocket_host := "yes"; * | supporting_gsocket_host := "no"; }
+    | table([@timestamp, aid, UID, GrandParentBaseFileName, ParentBaseFileName, ImageFileName, CommandLine, how, supporting_gsocket_host])
