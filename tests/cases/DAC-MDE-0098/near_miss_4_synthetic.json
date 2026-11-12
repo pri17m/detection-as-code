@@ -1,0 +1,24 @@
+{
+  "label": "near_miss",
+  "variant": "Admin reads gsocket docs mentioning GSOCKET_ARGS (no assignment)",
+  "synthetic": true,
+  "source": "synthetic; synthetic admin pattern",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": false,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-10T13:10:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "admin1",
+      "FileName": "grep",
+      "FolderPath": "/usr/bin/grep",
+      "ProcessCommandLine": "grep -n GSOCKET_ARGS /usr/share/doc/gsocket/README.md",
+      "InitiatingProcessFileName": "bash",
+      "InitiatingProcessCommandLine": "bash",
+      "InitiatingProcessParentFileName": "sshd"
+    }
+  ]
+}

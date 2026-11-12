@@ -1,0 +1,24 @@
+{
+  "label": "benign",
+  "variant": "Ghostscript with GS_OPTIONS env var and its own -s option",
+  "synthetic": true,
+  "source": "synthetic; synthetic; Ghostscript GS_OPTIONS",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": false,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-10T13:10:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "www-data",
+      "FileName": "sh",
+      "FolderPath": "/bin/sh",
+      "ProcessCommandLine": "sh -c GS_OPTIONS=-dSAFER gs -sDEVICE=pdfwrite -o /tmp/out.pdf /tmp/in.ps",
+      "InitiatingProcessFileName": "bash",
+      "InitiatingProcessCommandLine": "bash",
+      "InitiatingProcessParentFileName": "php-fpm8.1"
+    }
+  ]
+}
