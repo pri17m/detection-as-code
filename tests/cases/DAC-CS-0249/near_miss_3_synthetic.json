@@ -1,0 +1,34 @@
+{
+  "label": "near_miss",
+  "variant": "AppImage mount under /tmp/.mount_ and a non-hidden installer in /tmp",
+  "synthetic": true,
+  "source": "synthetic; synthetic",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": false,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: no alert, matches expectation",
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:10:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "1000",
+      "GrandParentBaseFileName": "gnome-shell",
+      "ParentBaseFileName": "bash",
+      "ImageFileName": "/tmp/.mount_ObsidiX1/obsidian",
+      "CommandLine": "/tmp/.mount_ObsidiX1/obsidian"
+    },
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:11:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "0",
+      "GrandParentBaseFileName": "sshd",
+      "ParentBaseFileName": "bash",
+      "ImageFileName": "/tmp/installer/setup",
+      "CommandLine": "/tmp/installer/setup --quiet"
+    }
+  ]
+}
