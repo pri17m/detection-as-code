@@ -1,6 +1,6 @@
 id: DAC-GH-0006
 title: "GitHub: Actions workflow modified"
-description: "Detects modifications to GitHub Actions workflows which can be used to execute malicious code in CI/CD (supply chain risk)."
+description: "Detects modifications to GitHub Actions workflows which can be used to execute malicious code in CI/CD (supply chain risk). NEEDS REVIEW (2026-11-12): the query uses action names that are not in GitHub's 'Audit log events for your organization' list (workflows.workflow_file_modified, repo.actions_workflow_update, repo.create_workflow, repo.update_workflow), so it cannot match real audit-log data. The audit log does not record which files a push changed, so a change to a .github/workflows file cannot be expressed with audit-log data alone; it needs push webhook or repository content data. Query left as-is pending a decision; see reviews/DAC-GH-0006/REVIEW.md."
 author: "DaC"
 status: experimental
 platforms: [splunk]
@@ -14,6 +14,7 @@ false_positives:
 references:
   - "https://docs.github.com/en/actions"
 telemetry_validated: false
+tags: ["needs-review"]
 required_fields: ["action", "actor", "repo", "created_at"]
 query:
   splunk: |
