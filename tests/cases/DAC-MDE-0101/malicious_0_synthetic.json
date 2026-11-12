@@ -1,0 +1,24 @@
+{
+  "label": "malicious",
+  "variant": "Payload binary timestamp copied from /etc/ld.so.conf (deploy.sh _ts_fix fallback; blog: touch on /usr/bin/defunct)",
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/ ; https://github.com/hackerschoice/gsocket/blob/master/deploy/deploy.sh",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-10T13:10:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "root",
+      "FileName": "touch",
+      "FolderPath": "/usr/bin/touch",
+      "ProcessCommandLine": "touch -r /etc/ld.so.conf /usr/bin/defunct",
+      "InitiatingProcessFileName": "bash",
+      "InitiatingProcessCommandLine": "bash",
+      "InitiatingProcessParentFileName": "sh"
+    }
+  ]
+}

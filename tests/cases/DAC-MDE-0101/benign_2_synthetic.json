@@ -1,0 +1,24 @@
+{
+  "label": "benign",
+  "variant": "Web app touches a maintenance flag",
+  "synthetic": true,
+  "source": "synthetic; synthetic",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": false,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-10T13:10:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "web1.example.invalid",
+      "AccountName": "www-data",
+      "FileName": "touch",
+      "FolderPath": "/usr/bin/touch",
+      "ProcessCommandLine": "touch /var/www/html/maintenance.flag",
+      "InitiatingProcessFileName": "php-fpm8.1",
+      "InitiatingProcessCommandLine": "php-fpm8.1",
+      "InitiatingProcessParentFileName": "php-fpm8.1"
+    }
+  ]
+}
