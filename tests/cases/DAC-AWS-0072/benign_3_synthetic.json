@@ -1,0 +1,81 @@
+{
+  "label": "benign",
+  "variant": "Deploy role reads one Lambda and one log group listing (2 services, 2 APIs)",
+  "synthetic": true,
+  "source": "synthetic; event shapes from AWS CloudTrail docs, behaviour from https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:gh-actions",
+        "arn": "arn:aws:sts::111122223333:assumed-role/DeployRole/gh-actions",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/DeployRole",
+            "accountId": "111122223333",
+            "userName": "DeployRole"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:20:00Z",
+      "eventSource": "lambda.amazonaws.com",
+      "eventName": "ListFunctions20150331",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-627216411150"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:gh-actions",
+        "arn": "arn:aws:sts::111122223333:assumed-role/DeployRole/gh-actions",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/DeployRole",
+            "accountId": "111122223333",
+            "userName": "DeployRole"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:20:17Z",
+      "eventSource": "logs.amazonaws.com",
+      "eventName": "DescribeLogGroups",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-484968312599"
+    }
+  ]
+}
