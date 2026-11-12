@@ -1,0 +1,518 @@
+{
+  "label": "malicious",
+  "variant": "Sign-up chain from 10:50Z, discovery sweep at 11:05Z: 15 minutes apart, on either side of the 11:00Z 60-minute bin edge",
+  "synthetic": true,
+  "source": "synthetic; event shapes from AWS CloudTrail docs, behaviour from https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": true,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 1 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Unknown",
+        "principalId": "Anonymous"
+      },
+      "eventTime": "2026-10-20T10:50:02Z",
+      "eventSource": "cognito-idp.amazonaws.com",
+      "eventName": "SignUp",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "clientId": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-530804184456",
+      "errorCode": "UserLambdaValidationException",
+      "errorMessage": "PreSignUp failed with error Invalid tenant domain (synthetic)"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Unknown",
+        "principalId": "Anonymous"
+      },
+      "eventTime": "2026-10-20T10:50:30Z",
+      "eventSource": "cognito-idp.amazonaws.com",
+      "eventName": "SignUp",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "clientId": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-320231872227",
+      "errorCode": "UserLambdaValidationException",
+      "errorMessage": "PreSignUp failed with error tenantId does not match tenant domain (synthetic)"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Unknown",
+        "principalId": "Anonymous"
+      },
+      "eventTime": "2026-10-20T10:51:05Z",
+      "eventSource": "cognito-idp.amazonaws.com",
+      "eventName": "SignUp",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "clientId": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-898309344912",
+      "errorCode": "InvalidParameterException",
+      "errorMessage": "Attributes did not conform to the schema (synthetic)"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Unknown",
+        "principalId": "Anonymous"
+      },
+      "eventTime": "2026-10-20T10:52:00Z",
+      "eventSource": "cognito-idp.amazonaws.com",
+      "eventName": "SignUp",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "curl/8.5.0",
+      "requestParameters": {
+        "clientId": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-342506408256"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Unknown",
+        "principalId": "Anonymous"
+      },
+      "eventTime": "2026-10-20T10:53:00Z",
+      "eventSource": "cognito-idp.amazonaws.com",
+      "eventName": "InitiateAuth",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "clientId": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-952539101233"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Unknown",
+        "principalId": "Anonymous"
+      },
+      "eventTime": "2026-10-20T10:53:20Z",
+      "eventSource": "cognito-idp.amazonaws.com",
+      "eventName": "RespondToAuthChallenge",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "clientId": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-006675535854"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Unknown",
+        "principalId": "Anonymous"
+      },
+      "eventTime": "2026-10-20T10:54:00Z",
+      "eventSource": "cognito-idp.amazonaws.com",
+      "eventName": "GetUser",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "clientId": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-693161638103"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Unknown",
+        "principalId": "Anonymous"
+      },
+      "eventTime": "2026-10-20T10:55:00Z",
+      "eventSource": "cognito-idp.amazonaws.com",
+      "eventName": "GetTokensFromRefreshToken",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "clientId": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-664329416686"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:CognitoIdentityCredentials",
+        "arn": "arn:aws:sts::111122223333:assumed-role/Cognito_PublicPoolAuth_Role/CognitoIdentityCredentials",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/Cognito_PublicPoolAuth_Role",
+            "accountId": "111122223333",
+            "userName": "Cognito_PublicPoolAuth_Role"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:05:00Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "ListBuckets",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-274194958747",
+      "errorCode": "AccessDenied",
+      "errorMessage": "User is not authorized to perform this action (synthetic)"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:CognitoIdentityCredentials",
+        "arn": "arn:aws:sts::111122223333:assumed-role/Cognito_PublicPoolAuth_Role/CognitoIdentityCredentials",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/Cognito_PublicPoolAuth_Role",
+            "accountId": "111122223333",
+            "userName": "Cognito_PublicPoolAuth_Role"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:05:17Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetBucketPolicy",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-934596976728",
+      "errorCode": "AccessDenied",
+      "errorMessage": "User is not authorized to perform this action (synthetic)"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:CognitoIdentityCredentials",
+        "arn": "arn:aws:sts::111122223333:assumed-role/Cognito_PublicPoolAuth_Role/CognitoIdentityCredentials",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/Cognito_PublicPoolAuth_Role",
+            "accountId": "111122223333",
+            "userName": "Cognito_PublicPoolAuth_Role"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:05:34Z",
+      "eventSource": "secretsmanager.amazonaws.com",
+      "eventName": "ListSecrets",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-003663251217",
+      "errorCode": "AccessDeniedException",
+      "errorMessage": "User is not authorized to perform this action (synthetic)"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:CognitoIdentityCredentials",
+        "arn": "arn:aws:sts::111122223333:assumed-role/Cognito_PublicPoolAuth_Role/CognitoIdentityCredentials",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/Cognito_PublicPoolAuth_Role",
+            "accountId": "111122223333",
+            "userName": "Cognito_PublicPoolAuth_Role"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:06:51Z",
+      "eventSource": "ssm.amazonaws.com",
+      "eventName": "DescribeParameters",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-815078231067",
+      "errorCode": "AccessDeniedException",
+      "errorMessage": "User is not authorized to perform this action (synthetic)"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:CognitoIdentityCredentials",
+        "arn": "arn:aws:sts::111122223333:assumed-role/Cognito_PublicPoolAuth_Role/CognitoIdentityCredentials",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/Cognito_PublicPoolAuth_Role",
+            "accountId": "111122223333",
+            "userName": "Cognito_PublicPoolAuth_Role"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:06:08Z",
+      "eventSource": "sns.amazonaws.com",
+      "eventName": "ListTopics",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-028108988074",
+      "errorCode": "AccessDenied",
+      "errorMessage": "User is not authorized to perform this action (synthetic)"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:CognitoIdentityCredentials",
+        "arn": "arn:aws:sts::111122223333:assumed-role/Cognito_PublicPoolAuth_Role/CognitoIdentityCredentials",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/Cognito_PublicPoolAuth_Role",
+            "accountId": "111122223333",
+            "userName": "Cognito_PublicPoolAuth_Role"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:06:25Z",
+      "eventSource": "logs.amazonaws.com",
+      "eventName": "DescribeLogGroups",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-603750040106",
+      "errorCode": "AccessDeniedException",
+      "errorMessage": "User is not authorized to perform this action (synthetic)"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:CognitoIdentityCredentials",
+        "arn": "arn:aws:sts::111122223333:assumed-role/Cognito_PublicPoolAuth_Role/CognitoIdentityCredentials",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/Cognito_PublicPoolAuth_Role",
+            "accountId": "111122223333",
+            "userName": "Cognito_PublicPoolAuth_Role"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:07:42Z",
+      "eventSource": "apigateway.amazonaws.com",
+      "eventName": "GetRestApis",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-897026578509",
+      "errorCode": "AccessDeniedException",
+      "errorMessage": "User is not authorized to perform this action (synthetic)"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:CognitoIdentityCredentials",
+        "arn": "arn:aws:sts::111122223333:assumed-role/Cognito_PublicPoolAuth_Role/CognitoIdentityCredentials",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/Cognito_PublicPoolAuth_Role",
+            "accountId": "111122223333",
+            "userName": "Cognito_PublicPoolAuth_Role"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:07:59Z",
+      "eventSource": "ecr.amazonaws.com",
+      "eventName": "DescribeRepositories",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-493267333218",
+      "errorCode": "AccessDeniedException",
+      "errorMessage": "User is not authorized to perform this action (synthetic)"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:CognitoIdentityCredentials",
+        "arn": "arn:aws:sts::111122223333:assumed-role/Cognito_PublicPoolAuth_Role/CognitoIdentityCredentials",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/Cognito_PublicPoolAuth_Role",
+            "accountId": "111122223333",
+            "userName": "Cognito_PublicPoolAuth_Role"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:07:16Z",
+      "eventSource": "lambda.amazonaws.com",
+      "eventName": "ListFunctions20150331",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.78",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-885738894537",
+      "errorCode": "AccessDeniedException",
+      "errorMessage": "User is not authorized to perform this action (synthetic)"
+    }
+  ]
+}

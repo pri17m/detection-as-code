@@ -1,0 +1,74 @@
+{
+  "label": "benign",
+  "variant": "A real user signs up and authenticates; no AWS discovery calls follow",
+  "synthetic": true,
+  "source": "synthetic; event shapes from AWS CloudTrail docs, behaviour from https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Unknown",
+        "principalId": "Anonymous"
+      },
+      "eventTime": "2026-10-20T10:00:00Z",
+      "eventSource": "cognito-idp.amazonaws.com",
+      "eventName": "SignUp",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "203.0.113.44",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "clientId": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-335624601522"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Unknown",
+        "principalId": "Anonymous"
+      },
+      "eventTime": "2026-10-20T10:02:00Z",
+      "eventSource": "cognito-idp.amazonaws.com",
+      "eventName": "InitiateAuth",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "203.0.113.44",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "clientId": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-205453829176"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "Unknown",
+        "principalId": "Anonymous"
+      },
+      "eventTime": "2026-10-20T10:03:00Z",
+      "eventSource": "cognito-idp.amazonaws.com",
+      "eventName": "GetUser",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "203.0.113.44",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": {
+        "clientId": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      },
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-569052719523"
+    }
+  ]
+}
