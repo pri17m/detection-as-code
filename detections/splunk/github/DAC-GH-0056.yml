@@ -1,0 +1,57 @@
+id: DAC-GH-0056
+title: 'GitHub: one actor pushes or opens pull requests in 5+ repos within 60 minutes, 2+ not owned by them'
+description: 'Behavior: a non-bot actor''s git.push and pull_request.create events reach 5 or more distinct repos inside a sliding 60-minute window, and at least 2 of those repos are owned by someone else (an org or another user). Aikido reports 4,837 compromised accounts opening the same ''docs: dependency audit notes'' probe PR in 61,764 repos, 10,431 of them reached through collaborator or org access, followed by payload pushes. Severity is critical when 5+ PRs in the window share one title. git.* events are only available through the REST API (7-day retention on Enterprise Cloud), streaming or exports. An org audit log only sees that org''s repos, so cross-org fan-out is undercounted. Thresholds are unmeasured. Not telemetry_validated.'
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - initial-access
+  - persistence
+  - execution
+  techniques:
+  - T1078
+  - T1677
+sourcetypes:
+- github:audit
+- github:cloud:audit
+required_fields:
+- action
+- actor
+- actor_is_bot
+- repo
+- pull_request_title
+- hashed_token
+- programmatic_access_type
+- user_agent
+telemetry_validated: false
+false_positives:
+- Dependency or docs sweeps run under a human account (Renovate-style scripts using a personal token). Bots flagged actor_is_bot or named [bot] are excluded; humans running scripts are not.
+- Platform engineers making the same change across many org repos. Baseline per actor over 30 days; volume not measured.
+references:
+- https://www.aikido.dev/blog/compromised-github-accounts-push-ci-secret-stealer-to-tens-of-thousands-of-repositories
+- https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/audit-log-events-for-your-organization
+- https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/identifying-audit-log-events-performed-by-an-access-token
+- https://attack.mitre.org/techniques/T1078/
+- https://attack.mitre.org/techniques/T1677/
+tags:
+- github
+- audit-log
+- behavioural
+- aikido-wfx
+- ci-cd
+query:
+  splunk: |
+    (sourcetype=github:audit OR sourcetype=github:cloud:audit) action IN ("pull_request.create","git.push")
+    | where isnotnull(repo) AND isnotnull(actor) AND NOT (lower(tostring(actor_is_bot))="true" OR match(actor,"\[bot\]$"))
+    | eval repo_owner=mvindex(split(repo,"/"),0), not_owned_repo=if(lower(repo_owner)!=lower(actor), repo, null()), pr_title=if(action="pull_request.create", pull_request_title, null())
+    | sort 0 _time
+    | streamstats time_window=60m dc(repo) AS repos_60m dc(not_owned_repo) AS not_owned_60m dc(pr_title) AS pr_titles_60m count(pr_title) AS prs_60m BY actor
+    | eval hit=if(repos_60m>=5 AND not_owned_60m>=2,1,0), same_title=if(hit=1 AND prs_60m>=5 AND pr_titles_60m=1,1,0), hit_time=if(hit=1,_time,null())
+    | eventstats max(hit) AS actor_hit BY actor
+    | where actor_hit=1
+    | stats min(hit_time) AS first_hit max(hit_time) AS last_hit max(repos_60m) AS max_repos_60m max(not_owned_60m) AS max_not_owned_60m max(same_title) AS same_title_fanout dc(repo) AS repos_total values(repo) AS repos values(action) AS actions values(pr_title) AS pr_titles values(hashed_token) AS hashed_tokens values(programmatic_access_type) AS access_types values(user_agent) AS user_agents BY actor
+    | eval severity=if(same_title_fanout=1,"critical","high")
+    | convert ctime(first_hit) ctime(last_hit)
