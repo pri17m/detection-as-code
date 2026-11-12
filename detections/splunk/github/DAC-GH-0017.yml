@@ -22,6 +22,7 @@ tags:
 - wave-b
 - P0
 - phase2-top5
+- needs-review
 telemetry_validated: false
 required_fields:
 - actor
@@ -38,4 +39,4 @@ mitre:
   - T1677
 author: Detection Engineer
 status: experimental
-description: workflows.update .github/workflows on prod
+description: 'workflows.update .github/workflows on prod NEEDS REVIEW (2026-11-12): the query uses action names that are not in GitHub''s ''Audit log events for your organization'' list (workflows.update, workflows.created, repo.update), so it cannot match real audit-log data. The audit log does not record which files a push changed, so a workflow file change on a production repo cannot be expressed with audit-log data alone; it needs push webhook or repository content data. Query left as-is pending a decision; see reviews/DAC-GH-0017/REVIEW.md.'
