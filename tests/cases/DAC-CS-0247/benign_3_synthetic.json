@@ -1,0 +1,23 @@
+{
+  "label": "benign",
+  "variant": "Ghostscript with GS_OPTIONS env var and its own -s option",
+  "synthetic": true,
+  "source": "synthetic; synthetic; Ghostscript GS_OPTIONS",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": false,
+  "result": "not run (no LogScale or Advanced Hunting runner). Regex-level Python check of the rule's patterns: no alert, matches expectation",
+  "events": [
+    {
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Lin",
+      "@timestamp": "2026-11-10T13:10:00Z",
+      "aid": "0000000000000000000000000000syn1",
+      "UID": "33",
+      "GrandParentBaseFileName": "php-fpm8.1",
+      "ParentBaseFileName": "bash",
+      "ImageFileName": "/bin/sh",
+      "CommandLine": "sh -c GS_OPTIONS=-dSAFER gs -sDEVICE=pdfwrite -o /tmp/out.pdf /tmp/in.ps"
+    }
+  ]
+}
