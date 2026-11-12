@@ -1,0 +1,326 @@
+{
+  "label": "benign",
+  "variant": "Same 9 discovery calls from an inventory role, all succeeded (no errorCode)",
+  "synthetic": true,
+  "source": "synthetic; event shapes from AWS CloudTrail docs, behaviour from https://securitylabs.datadoghq.com/articles/artex-agentic-attacks-aws-environments/",
+  "sourcetype": "aws:cloudtrail",
+  "expect_alert": false,
+  "result": "not run by CI (no Splunk runner). Local Splunk 9.4.1 replay of these synthetic events (index=dac, KV_MODE=json, 2026-11-12): 0 row(s), PASS",
+  "events": [
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:inventory-run",
+        "arn": "arn:aws:sts::111122223333:assumed-role/InventoryCollector/inventory-run",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/InventoryCollector",
+            "accountId": "111122223333",
+            "userName": "InventoryCollector"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:20:00Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "ListBuckets",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-877830462591"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:inventory-run",
+        "arn": "arn:aws:sts::111122223333:assumed-role/InventoryCollector/inventory-run",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/InventoryCollector",
+            "accountId": "111122223333",
+            "userName": "InventoryCollector"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:20:17Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "GetBucketPolicy",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-818823133939"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:inventory-run",
+        "arn": "arn:aws:sts::111122223333:assumed-role/InventoryCollector/inventory-run",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/InventoryCollector",
+            "accountId": "111122223333",
+            "userName": "InventoryCollector"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:20:34Z",
+      "eventSource": "secretsmanager.amazonaws.com",
+      "eventName": "ListSecrets",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-461297686274"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:inventory-run",
+        "arn": "arn:aws:sts::111122223333:assumed-role/InventoryCollector/inventory-run",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/InventoryCollector",
+            "accountId": "111122223333",
+            "userName": "InventoryCollector"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:21:51Z",
+      "eventSource": "ssm.amazonaws.com",
+      "eventName": "DescribeParameters",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-134113588851"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:inventory-run",
+        "arn": "arn:aws:sts::111122223333:assumed-role/InventoryCollector/inventory-run",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/InventoryCollector",
+            "accountId": "111122223333",
+            "userName": "InventoryCollector"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:21:08Z",
+      "eventSource": "sns.amazonaws.com",
+      "eventName": "ListTopics",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-255843361727"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:inventory-run",
+        "arn": "arn:aws:sts::111122223333:assumed-role/InventoryCollector/inventory-run",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/InventoryCollector",
+            "accountId": "111122223333",
+            "userName": "InventoryCollector"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:21:25Z",
+      "eventSource": "logs.amazonaws.com",
+      "eventName": "DescribeLogGroups",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-278435523580"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:inventory-run",
+        "arn": "arn:aws:sts::111122223333:assumed-role/InventoryCollector/inventory-run",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/InventoryCollector",
+            "accountId": "111122223333",
+            "userName": "InventoryCollector"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:22:42Z",
+      "eventSource": "apigateway.amazonaws.com",
+      "eventName": "GetRestApis",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-321641242458"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:inventory-run",
+        "arn": "arn:aws:sts::111122223333:assumed-role/InventoryCollector/inventory-run",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/InventoryCollector",
+            "accountId": "111122223333",
+            "userName": "InventoryCollector"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:22:59Z",
+      "eventSource": "ecr.amazonaws.com",
+      "eventName": "DescribeRepositories",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-172697760612"
+    },
+    {
+      "eventVersion": "1.10",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAEXAMPLEROLEID01:inventory-run",
+        "arn": "arn:aws:sts::111122223333:assumed-role/InventoryCollector/inventory-run",
+        "accountId": "111122223333",
+        "accessKeyId": "ASIAEXAMPLETEMPKEY01",
+        "sessionContext": {
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAEXAMPLEROLEID01",
+            "arn": "arn:aws:iam::111122223333:role/InventoryCollector",
+            "accountId": "111122223333",
+            "userName": "InventoryCollector"
+          },
+          "attributes": {
+            "creationDate": "2026-10-20T10:00:00Z",
+            "mfaAuthenticated": "false"
+          }
+        }
+      },
+      "eventTime": "2026-10-20T11:22:16Z",
+      "eventSource": "lambda.amazonaws.com",
+      "eventName": "ListFunctions20150331",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "Boto3/1.34.0",
+      "requestParameters": null,
+      "responseElements": null,
+      "eventType": "AwsApiCall",
+      "eventCategory": "Management",
+      "recipientAccountId": "111122223333",
+      "eventID": "00000000-0000-4000-8000-850550695487"
+    }
+  ]
+}
