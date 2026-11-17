@@ -1,0 +1,78 @@
+id: DAC-MDE-0105
+title: "cmd.exe started by a binary in System32 or SysWOW64 that is not Microsoft-signed"
+description: >-
+  DeviceProcessEvents where cmd.exe is started by a parent whose image sits under C:\Windows\System32\ or
+  C:\Windows\SysWOW64\ and the parent is not a trusted Microsoft-rooted file in DeviceFileCertificateInfo. GraphDoor's
+  shell command runs "cmd.exe /C <command_string>" from the side-load host, and Part 1 shows those hosts placed
+  straight into System32 (start.exe, and dtsapo4service.exe under System32\dts\pc\apo4x). Signer status is taken from
+  DeviceFileCertificateInfo joined on the parent's SHA1. When there is no certificate row the signer is unknown, not
+  unsigned; in that case the rule only alerts if the parent's version-info company is not Microsoft. When a row
+  exists and is not Microsoft-rooted and trusted, it alerts whatever the company name says, so a forged "Microsoft"
+  company name does not hide the parent. telemetry_validated false.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - execution
+  - stealth
+  techniques:
+  - T1059.003
+  - T1036.005
+severity: medium
+false_positives:
+- "OEM, printer and GPU utilities installed into System32 (including DriverStore) that shell out to cmd.exe. Allowlist by Signer plus InitiatingProcessSHA1 after one baseline run (not measured)."
+- "Microsoft binaries with no certificate row yet and an empty company field would match through the unknown branch until a row arrives."
+references:
+- "https://securelist.com/operation-shadowcloud-graphdoor/122005/"
+- "https://securelist.com/operation-shadowcloud-gitdoor/122004/"
+- "https://attack.mitre.org/techniques/T1059/003/"
+- "https://attack.mitre.org/techniques/T1036/005/"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicefilecertificateinfo-table"
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "FileName"
+- "ProcessCommandLine"
+- "InitiatingProcessFileName"
+- "InitiatingProcessFolderPath"
+- "InitiatingProcessSHA1"
+- "InitiatingProcessVersionInfoCompanyName"
+- "DeviceFileCertificateInfo.SHA1"
+- "DeviceFileCertificateInfo.IsTrusted"
+- "DeviceFileCertificateInfo.IsRootSignerMicrosoft"
+- "DeviceFileCertificateInfo.Signer"
+tags:
+- behavioural
+- sideload
+- shadowcloud
+- graphdoor
+- needs-review
+query:
+  defender: |
+    let Lookback = 1d;
+    let CertLookback = 30d;
+    let Certs = DeviceFileCertificateInfo
+        | where Timestamp > ago(CertLookback)
+        | summarize arg_max(Timestamp, IsSigned, IsTrusted, IsRootSignerMicrosoft, Signer, SignatureType) by CertSHA1 = SHA1;
+    DeviceProcessEvents
+    | where Timestamp > ago(Lookback)
+    | where FileName =~ "cmd.exe"
+    | where InitiatingProcessFolderPath startswith @"C:\Windows\System32\" or InitiatingProcessFolderPath startswith @"C:\Windows\SysWOW64\"
+    | join kind=leftouter Certs on $left.InitiatingProcessSHA1 == $right.CertSHA1
+    // no certificate row means the signer is unknown, not unsigned
+    | extend ParentSigner = case(
+        isempty(CertSHA1), "unknown_no_cert_row",
+        IsRootSignerMicrosoft == true and IsTrusted == true, "microsoft",
+        "non_microsoft")
+    | where ParentSigner == "non_microsoft"
+        or (ParentSigner == "unknown_no_cert_row" and not(InitiatingProcessVersionInfoCompanyName has "Microsoft"))
+    | summarize Execs = count(), Cmds = make_set(ProcessCommandLine, 10), FirstSeen = min(Timestamp), LastSeen = max(Timestamp)
+        by DeviceId, DeviceName, InitiatingProcessFileName, InitiatingProcessFolderPath, InitiatingProcessSHA1,
+           InitiatingProcessVersionInfoCompanyName, ParentSigner, Signer
