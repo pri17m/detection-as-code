@@ -1,0 +1,17 @@
+rule dac_gcp_0034 {
+  meta:
+    author = "Detection Engineer"
+    description = "GCP: Logging exclusion created hiding Admin Activity - CreateExclusion Admin Activity"
+    severity = "High"
+    rule_id = "DAC-GCP-0034"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685.002"
+
+  events:
+    $e.metadata.log_type = "GCP_CLOUDAUDIT"
+    ($e.metadata.product_event_type = "google.logging.v2.ConfigServiceV2.CreateExclusion" nocase or $e.metadata.product_event_type = /CreateExclusion/ nocase)
+
+  condition:
+    $e
+}

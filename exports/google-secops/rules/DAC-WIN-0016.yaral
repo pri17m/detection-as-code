@@ -1,0 +1,27 @@
+rule dac_win_0016 {
+  meta:
+    author = "DaC"
+    description = "Password reset attempts spike (4724) by actor - Detects spikes in password reset attempts which can indicate account takeover or helpdesk abuse."
+    severity = "High"
+    rule_id = "DAC-WIN-0016"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1098"
+
+  events:
+    $e.metadata.log_type = "WINEVTLOG"
+    $e.metadata.product_event_type = "4724"
+    $user = $e.principal.user.userid
+    $name = $e.principal.hostname
+
+  match:
+    $user, $name over 1h
+
+  outcome:
+    $resets = count($e.metadata.id)
+    $users = count_distinct($e.target.user.userid)
+    $user_list = array_distinct($e.target.user.userid)
+
+  condition:
+    $e and $resets >= 5 and $users >= 5
+}

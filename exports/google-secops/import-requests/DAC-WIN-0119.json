@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_win_0119 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"Network share Admin$ access - Behavior: Network share Admin$ access. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Security 5140/5145 ShareName Admin$\"\n    severity = \"Medium\"\n    rule_id = \"DAC-WIN-0119\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1021.002\"\n\n  events:\n    $e.metadata.log_type = \"WINEVTLOG\"\n    $e.metadata.product_event_type = \"5140\"\n    $e.target.resource.name = /(?:ADMIN\\$|C\\$|IPC\\$)/ nocase\n    $name = $e.principal.hostname\n    $user = $e.target.user.userid\n\n  match:\n    $name, $user over 1h\n\n  outcome:\n    $shares = count_distinct($e.target.resource.name)\n    $srcs = count_distinct($e.principal.ip)\n\n  condition:\n    $e and ($shares >= 3 or $srcs >= 5)\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_win_0119 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"Network share Admin$ access - Behavior: Network share Admin$ access. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Security 5140/5145 ShareName Admin$\"\n    severity = \"Medium\"\n    rule_id = \"DAC-WIN-0119\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1021.002\"\n\n  events:\n    $e.metadata.log_type = \"WINEVTLOG\"\n    $e.metadata.product_event_type = \"5140\"\n    $e.target.resource.name = /(?:ADMIN\\$|C\\$|IPC\\$)/ nocase\n    $name = $e.principal.hostname\n    $user = $e.target.user.userid\n\n  match:\n    $name, $user over 1h\n\n  outcome:\n    $shares = count_distinct($e.target.resource.name)\n    $srcs = count_distinct($e.principal.ip)\n\n  condition:\n    $e and ($shares >= 3 or $srcs >= 5)\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

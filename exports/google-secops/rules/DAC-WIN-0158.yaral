@@ -1,0 +1,20 @@
+rule dac_win_0158 {
+  meta:
+    author = "Detection Engineer"
+    description = "Nltest / domain trust discovery - Behavior: Nltest / domain trust discovery. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1 nltest /dclist /domain_trusts"
+    severity = "Medium"
+    rule_id = "DAC-WIN-0158"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1018"
+    mitre_attack_technique = "T1482"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    ($e.target.process.file.full_path = /\\nltest\.exe$/ nocase or $e.target.process.command_line = /nltest/ nocase)
+    ($e.target.process.command_line = /\/domain_trusts/ nocase or $e.target.process.command_line = /\/dclist/ nocase or $e.target.process.command_line = /\/dsgetdc/ nocase)
+
+  condition:
+    $e
+}

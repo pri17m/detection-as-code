@@ -1,0 +1,17 @@
+rule dac_entra_0005 {
+  meta:
+    author = "Detection Engineer"
+    description = "Entra: Service principal credentials added (key password or cert) - Add service principal credentials"
+    severity = "High"
+    rule_id = "DAC-ENTRA-0005"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1098.001"
+
+  events:
+    $e.metadata.log_type = "AZURE_AD_AUDIT"
+    $e.metadata.product_event_type = "Add service principal credentials" nocase
+
+  condition:
+    $e
+}

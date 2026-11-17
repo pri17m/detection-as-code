@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_gh_0002 {\n  meta:\n    author = \"DaC\"\n    description = \"GitHub: SSH key added to account - Detects SSH key additions which can indicate persistence on a compromised GitHub account.\"\n    severity = \"Medium\"\n    rule_id = \"DAC-GH-0002\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1098\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    $e.metadata.product_event_type = \"user.ssh_key.add\" nocase\n    $action = $e.metadata.product_event_type\n\n  match:\n    $action over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $actors = array_distinct($e.principal.user.userid)\n    $users = array_distinct($e.principal.user.userid)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_gh_0002 {\n  meta:\n    author = \"DaC\"\n    description = \"GitHub: SSH key added to account - Detects SSH key additions which can indicate persistence on a compromised GitHub account.\"\n    severity = \"Medium\"\n    rule_id = \"DAC-GH-0002\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1098\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    $e.metadata.product_event_type = \"user.ssh_key.add\" nocase\n    $action = $e.metadata.product_event_type\n\n  match:\n    $action over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $actors = array_distinct($e.principal.user.userid)\n    $users = array_distinct($e.principal.user.userid)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

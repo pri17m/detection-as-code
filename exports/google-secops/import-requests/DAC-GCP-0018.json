@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_gcp_0018 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GCP: Secret Manager AccessSecretVersion burst - AccessSecretVersion high volume\"\n    severity = \"High\"\n    rule_id = \"DAC-GCP-0018\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1555.006\"\n\n  events:\n    $e.metadata.log_type = \"GCP_CLOUDAUDIT\"\n    $e.metadata.product_event_type = /AccessSecretVersion$/ nocase\n    $email = $e.principal.user.userid\n\n  match:\n    $email over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n\n  condition:\n    $e and $count > 20\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_gcp_0018 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GCP: Secret Manager AccessSecretVersion burst - AccessSecretVersion high volume\"\n    severity = \"High\"\n    rule_id = \"DAC-GCP-0018\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1555.006\"\n\n  events:\n    $e.metadata.log_type = \"GCP_CLOUDAUDIT\"\n    $e.metadata.product_event_type = /AccessSecretVersion$/ nocase\n    $email = $e.principal.user.userid\n\n  match:\n    $email over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n\n  condition:\n    $e and $count > 20\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

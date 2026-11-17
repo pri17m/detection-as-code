@@ -1,0 +1,17 @@
+rule dac_gh_0031 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Repository transferred out of organization - repo.transfer outside org"
+    severity = "High"
+    rule_id = "DAC-GH-0031"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1213.003"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "repo.transfer" nocase or $e.metadata.product_event_type = "repo.transfer_start" nocase)
+
+  condition:
+    $e
+}

@@ -1,0 +1,17 @@
+rule dac_gh_0034 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Release asset replaced after publish - release.update asset replace"
+    severity = "Medium"
+    rule_id = "DAC-GH-0034"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1195.002"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "release.update" nocase or $e.metadata.product_event_type = "release.editasset" nocase or $e.metadata.product_event_type = "release.uploadasset" nocase)
+
+  condition:
+    $e
+}

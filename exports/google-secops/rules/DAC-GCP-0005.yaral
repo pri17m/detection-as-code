@@ -1,0 +1,17 @@
+rule dac_gcp_0005 {
+  meta:
+    author = "Detection Engineer"
+    description = "GCP: IAM service account create outside pipeline - CreateServiceAccount"
+    severity = "Medium"
+    rule_id = "DAC-GCP-0005"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1136.003"
+
+  events:
+    $e.metadata.log_type = "GCP_CLOUDAUDIT"
+    $e.metadata.product_event_type = /CreateServiceAccount$/ nocase
+
+  condition:
+    $e
+}

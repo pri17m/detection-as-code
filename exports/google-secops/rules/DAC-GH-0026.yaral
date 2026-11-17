@@ -1,0 +1,17 @@
+rule dac_gh_0026 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: SSH key added to privileged org member account - public_key.create for admin members"
+    severity = "High"
+    rule_id = "DAC-GH-0026"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1098"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "public_key.create" nocase or $e.metadata.product_event_type = "user.add_public_key" nocase)
+
+  condition:
+    $e
+}

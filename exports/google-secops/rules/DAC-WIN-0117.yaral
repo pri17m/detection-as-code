@@ -1,0 +1,18 @@
+rule dac_win_0117 {
+  meta:
+    author = "Detection Engineer"
+    description = "Special privileges assigned to new logon (Tier-0) - Behavior: Special privileges assigned to new logon (Tier-0). Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Security 4672 with 4624"
+    severity = "Medium"
+    rule_id = "DAC-WIN-0117"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1078.002"
+
+  events:
+    $e.metadata.log_type = "WINEVTLOG"
+    $e.metadata.product_event_type = "4672"
+    ($e.target.user.userid = /admin/ nocase or $e.principal.user.userid = /admin/ nocase or $e.target.user.userid = /domain admin/ nocase or $e.principal.user.userid = /domain admin/ nocase or $e.target.user.userid = "krbtgt" nocase or $e.principal.user.userid = "krbtgt" nocase or $e.target.user.attribute.permissions.name = /SeDebugPrivilege/ nocase)
+
+  condition:
+    $e
+}

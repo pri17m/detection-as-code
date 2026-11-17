@@ -1,0 +1,17 @@
+rule dac_az_0025 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: Resource lock deleted before destructive change - locks delete → delete resource"
+    severity = "High"
+    rule_id = "DAC-AZ-0025"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685.002"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    $e.metadata.product_event_type = "Microsoft.Authorization/locks/delete" nocase
+
+  condition:
+    $e
+}

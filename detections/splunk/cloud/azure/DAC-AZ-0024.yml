@@ -23,14 +23,49 @@ query:
     | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
 
     '
+  google_secops: |-
+    rule dac_az_0024 {
+      meta:
+        author = "Detection Engineer"
+        description = "Azure: Backup vault soft-delete disabled or backup item delete - backup softDelete / protectedItems delete"
+        severity = "High"
+        rule_id = "DAC-AZ-0024"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1490"
+
+      events:
+        $e.metadata.log_type = "AZURE_ACTIVITY"
+        ($e.metadata.product_event_type = "Microsoft.RecoveryServices/vaults/backupconfig/write" nocase or $e.metadata.product_event_type = "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems/delete" nocase)
+
+      condition:
+        $e
+    }
 severity: high
 references:
 - https://attack.mitre.org/techniques/T1490/
 platforms:
 - splunk
+- google_secops
 tags:
 - wave-c
 - P0
 description: backup softDelete / protectedItems delete
 sourcetypes:
 - azure:monitor:activity
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: exact
+    score: 1.0
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: azure.activity
+    review: approved in detection-engineering review 2026-11-17
+    caveats: []
+    converted_on: '2026-11-17'

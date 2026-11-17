@@ -1,0 +1,24 @@
+rule dac_gh_0030 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Mass private repository clone or archive download - repo.download_zip / git.clone burst private"
+    severity = "High"
+    rule_id = "DAC-GH-0030"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1213.003"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "repo.download_zip" nocase or $e.metadata.product_event_type = "git.clone" nocase or $e.metadata.product_event_type = "repo.access" nocase)
+    $name = $e.principal.user.userid
+
+  match:
+    $name over 1h
+
+  outcome:
+    $count = count($e.metadata.id)
+
+  condition:
+    $e and $count > 20
+}

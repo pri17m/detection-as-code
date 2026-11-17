@@ -6,6 +6,24 @@ query:
     | table _time, actor, action, org, repo, actor_ip, user_agent
 
     '
+  google_secops: |-
+    rule dac_gh_0021 {
+      meta:
+        author = "Detection Engineer"
+        description = "GitHub: Org MFA requirement disabled or relaxed - org.disable_two_factor_requirement"
+        severity = "High"
+        rule_id = "DAC-GH-0021"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1556.006"
+
+      events:
+        $e.metadata.log_type = "GITHUB"
+        ($e.metadata.product_event_type = "org.disable_two_factor_requirement" nocase or $e.metadata.product_event_type = "business.disable_two_factor_requirement" nocase)
+
+      condition:
+        $e
+    }
 id: DAC-GH-0021
 title: 'GitHub: Org MFA requirement disabled or relaxed'
 false_positives:
@@ -16,6 +34,7 @@ sourcetypes:
 - github:cloud:audit
 platforms:
 - splunk
+- google_secops
 tags:
 - wave-b
 - P0
@@ -37,3 +56,19 @@ mitre:
 author: Detection Engineer
 status: experimental
 description: org.disable_two_factor_requirement
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: exact
+    score: 1.0
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: github.audit
+    review: approved in detection-engineering review 2026-11-17
+    caveats: []
+    converted_on: '2026-11-17'

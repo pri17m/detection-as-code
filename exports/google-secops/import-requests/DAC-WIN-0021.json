@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_win_0021 {\n  meta:\n    author = \"DaC\"\n    description = \"Scheduled task modified (4702) for persistence - Detects modifications to scheduled tasks that may indicate persistence through task hijacking.\"\n    severity = \"Medium\"\n    rule_id = \"DAC-WIN-0021\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1053.005\"\n\n  events:\n    $e.metadata.log_type = \"WINEVTLOG\"\n    $e.metadata.product_event_type = \"4702\"\n    $name = $e.principal.hostname\n    $user = $e.principal.user.userid\n\n  match:\n    $name, $user over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $tasks = array_distinct($e.target.resource.name)\n\n  condition:\n    $e and $count >= 3\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_win_0021 {\n  meta:\n    author = \"DaC\"\n    description = \"Scheduled task modified (4702) for persistence - Detects modifications to scheduled tasks that may indicate persistence through task hijacking.\"\n    severity = \"Medium\"\n    rule_id = \"DAC-WIN-0021\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1053.005\"\n\n  events:\n    $e.metadata.log_type = \"WINEVTLOG\"\n    $e.metadata.product_event_type = \"4702\"\n    $name = $e.principal.hostname\n    $user = $e.principal.user.userid\n\n  match:\n    $name, $user over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $tasks = array_distinct($e.target.resource.name)\n\n  condition:\n    $e and $count >= 3\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

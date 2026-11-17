@@ -1,0 +1,19 @@
+rule dac_win_0133 {
+  meta:
+    author = "Detection Engineer"
+    description = "WinRM host process spawning script interpreter - Behavior: WinRM host process spawning script interpreter. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1 Parent wsmprovhost to powershell/cmd"
+    severity = "High"
+    rule_id = "DAC-WIN-0133"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1021.006"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    ($e.principal.process.file.full_path = /\\wsmprovhost\.exe$/ nocase or $e.principal.process.file.full_path = /\\winrshost\.exe$/ nocase)
+    ($e.target.process.file.full_path = /\\cmd\.exe$/ nocase or $e.target.process.file.full_path = /\\powershell\.exe$/ nocase or $e.target.process.file.full_path = /\\whoami\.exe$/ nocase)
+
+  condition:
+    $e
+}

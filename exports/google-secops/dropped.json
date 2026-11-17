@@ -1,0 +1,1283 @@
+[
+ {
+  "id": "DAC-CS-0013",
+  "title": "Falcon: LSASS process access by non-EDR",
+  "tier": "exact",
+  "reason": "source-mapping-unverified",
+  "why": "CQL source: ImageFileName/ParentBaseFileName are medium confidence in the pack, Falcon uses \\Device\\HarddiskVolumeN paths, and the Google CrowdStrike EDR parser page in our doc set was a 404, so the UDM landing field is not doc-verified."
+ },
+ {
+  "id": "DAC-CS-0079",
+  "title": "Falcon: JAR files executed from %AppData%",
+  "tier": "exact",
+  "reason": "source-mapping-unverified",
+  "why": "CQL source: ImageFileName/ParentBaseFileName are medium confidence in the pack, Falcon uses \\Device\\HarddiskVolumeN paths, and the Google CrowdStrike EDR parser page in our doc set was a 404, so the UDM landing field is not doc-verified."
+ },
+ {
+  "id": "DAC-CS-0085",
+  "title": "Falcon: Remote Port Forwarding via Plink - Unauthorized RDP Tunneling Detection",
+  "tier": "exact",
+  "reason": "source-mapping-unverified",
+  "why": "CQL source: ImageFileName/ParentBaseFileName are medium confidence in the pack, Falcon uses \\Device\\HarddiskVolumeN paths, and the Google CrowdStrike EDR parser page in our doc set was a 404, so the UDM landing field is not doc-verified."
+ },
+ {
+  "id": "DAC-CS-0086",
+  "title": "Falcon: Rust Build Toolchain Spawning Interpreter or Downloader",
+  "tier": "exact",
+  "reason": "source-mapping-unverified",
+  "why": "CQL source: ImageFileName/ParentBaseFileName are medium confidence in the pack, Falcon uses \\Device\\HarddiskVolumeN paths, and the Google CrowdStrike EDR parser page in our doc set was a 404, so the UDM landing field is not doc-verified."
+ },
+ {
+  "id": "DAC-MDE-0002",
+  "title": "Office spawning shell or script interpreter",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0010",
+  "title": "Suspicious outbound connections from scripting engines",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0032",
+  "title": "MDE: Office child process PowerShell/cmd/mshta",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0039",
+  "title": "MDE: WinRM host unusual children",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0056",
+  "title": "MDE: outbound network from Office/script engines rare dest",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-MDE-0067",
+  "title": "odbcconf REGSVR, response file, or driver install",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0068",
+  "title": "hh.exe opening a remote URL",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0069",
+  "title": "esentutl copy of NTDS or registry hive",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0070",
+  "title": "desktopimgdownldr lockscreen URL outside Microsoft",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0071",
+  "title": "UAC bypass registry hijack of ms-settings or mscfile",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0073",
+  "title": "fsutil usn deletejournal",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0075",
+  "title": "wsl.exe running curl, wget, or a /dev/tcp redirect",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0076",
+  "title": "msdt invoked via the ms-msdt protocol",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0077",
+  "title": "explorer.exe launched with a search-ms URI",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0079",
+  "title": "Add-MpPreference exclusion",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0080",
+  "title": "auto-elevate binary spawning a shell or script host",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-MDE-0081",
+  "title": "accessibility binary spawning a shell",
+  "tier": "exact",
+  "reason": "source-mapping-medium",
+  "why": "KQL source: the RuleBridge pack rates FolderPath/InitiatingProcessFolderPath as medium confidence, but the grade came out exact. Google's MDE parser builds principal/target full_path as FolderPath + '/' + FileName when FolderPath lacks the file name, so the `\\\\name.exe$` regexes could miss. Converter grading bug; fix and re-run before import."
+ },
+ {
+  "id": "DAC-AZ-0003",
+  "title": "Azure: Role assignment to unfamiliar principal then privileged action",
+  "tier": "exact",
+  "reason": "source-logic-gap",
+  "why": "Title describes a sequence, burst or correlation that the source query does not implement; as a single-event rule it would alert on routine activity"
+ },
+ {
+  "id": "DAC-AZ-0009",
+  "title": "Azure: Public IP associate to sensitive NIC or load balancer",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-AZ-0014",
+  "title": "Azure: Key Vault secret list/get burst by unusual principal",
+  "tier": "exact",
+  "reason": "source-logic-gap",
+  "why": "Title describes a sequence, burst or correlation that the source query does not implement; as a single-event rule it would alert on routine activity"
+ },
+ {
+  "id": "DAC-AZ-0015",
+  "title": "Azure: Automation account runbook create/publish then start",
+  "tier": "exact",
+  "reason": "source-logic-gap",
+  "why": "Title describes a sequence, burst or correlation that the source query does not implement; as a single-event rule it would alert on routine activity"
+ },
+ {
+  "id": "DAC-AZ-0016",
+  "title": "Azure: Logic App or Function app deploy from rare actor",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-AZ-0022",
+  "title": "Azure: AKS trustedAccess or apiServerAuthorizedIPRanges emptied",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-AZ-0032",
+  "title": "Azure: Site Recovery or vault replication to external region/tenant",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-AZ-0039",
+  "title": "Azure: Key Vault purge protection disabled then purge",
+  "tier": "exact",
+  "reason": "source-logic-gap",
+  "why": "Title describes a sequence, burst or correlation that the source query does not implement; as a single-event rule it would alert on routine activity"
+ },
+ {
+  "id": "DAC-AZ-0040",
+  "title": "Azure: Activity from disabled or atypical userAgent automation",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-GCP-0004",
+  "title": "GCP: serviceAccounts.keys.create then auth from new IP",
+  "tier": "exact",
+  "reason": "source-logic-gap",
+  "why": "Title describes a sequence, burst or correlation that the source query does not implement; as a single-event rule it would alert on routine activity"
+ },
+ {
+  "id": "DAC-GCP-0007",
+  "title": "GCP: Disable audit log config for DATA_READ/WRITE or ADMIN",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-GCP-0010",
+  "title": "GCP: organization.policy disable domain restricted sharing",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-GCP-0014",
+  "title": "GCP: compute.disks.createSnapshot then IAM share",
+  "tier": "exact",
+  "reason": "source-logic-gap",
+  "why": "Title describes a sequence, burst or correlation that the source query does not implement; as a single-event rule it would alert on routine activity"
+ },
+ {
+  "id": "DAC-GCP-0017",
+  "title": "GCP: cloudfunctions or run services deploy from rare actor",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-GCP-0019",
+  "title": "GCP: Secret Manager ListSecrets anomalous",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-GCP-0023",
+  "title": "GCP: Security Command Center source or finding mute anomalous",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-GCP-0026",
+  "title": "GCP: Project IAM policy set with deleted-then-recreated member",
+  "tier": "exact",
+  "reason": "source-logic-gap",
+  "why": "Title describes a sequence, burst or correlation that the source query does not implement; as a single-event rule it would alert on routine activity"
+ },
+ {
+  "id": "DAC-GCP-0033",
+  "title": "GCP: Cloud Asset or Resource Manager org policy revert",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-GCP-0036",
+  "title": "GCP: Compute image create and share publicly",
+  "tier": "exact",
+  "reason": "source-logic-gap",
+  "why": "Title describes a sequence, burst or correlation that the source query does not implement; as a single-event rule it would alert on routine activity"
+ },
+ {
+  "id": "DAC-GCP-0039",
+  "title": "GCP: API key create with no application restriction",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-GH-0038",
+  "title": "GitHub: Privileged org member activity from new geo or device",
+  "tier": "approx-lowrisk",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-GH-0044",
+  "title": "GitHub: Codespaces or org runner created with elevated network egress",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-GH-0045",
+  "title": "GitHub: Self-hosted runner registered on privileged org or repo",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-WIN-0106",
+  "title": "Admin share write + new service (PsExec-class)",
+  "tier": "exact",
+  "reason": "source-logic-gap",
+  "why": "Title describes a sequence, burst or correlation that the source query does not implement; as a single-event rule it would alert on routine activity"
+ },
+ {
+  "id": "DAC-WIN-0112",
+  "title": "Tier-0 account first-seen host / odd LogonType",
+  "tier": "exact",
+  "reason": "not-production-in-source",
+  "why": "Source SPL says it needs a Tier-0 allowlist / first-seen baseline join before enabling"
+ },
+ {
+  "id": "DAC-WIN-0114",
+  "title": "Security tooling / Sysmon / audit tamper",
+  "tier": "exact",
+  "reason": "converter-flattened-logic",
+  "why": "RuleBridge flattened per-channel (event ID AND log channel) pairs into two independent OR lists and still called it exact; 7036/7040 service-state events from any channel would match. Logged as a converter bug."
+ },
+ {
+  "id": "DAC-WIN-0118",
+  "title": "Explicit credentials (4648) to remote host",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-WIN-0126",
+  "title": "Scheduled task updated (4702) suspicious content",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-WIN-0154",
+  "title": "Remote scheduled task creation (schtasks /s)",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-WIN-0156",
+  "title": "PowerShell AD enumeration burst",
+  "tier": "exact",
+  "reason": "source-logic-gap",
+  "why": "Title describes a sequence, burst or correlation that the source query does not implement; as a single-event rule it would alert on routine activity"
+ },
+ {
+  "id": "DAC-WIN-0159",
+  "title": "SMB sweep many destinations from one host",
+  "tier": "approx-lowrisk",
+  "reason": "duplicate",
+  "why": "Same logic as another approved rule (DAC-WIN-0119)"
+ },
+ {
+  "id": "DAC-WIN-0166",
+  "title": "Password reset on privileged account",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-WIN-0167",
+  "title": "Computer account created unexpectedly",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-WIN-0177",
+  "title": "PowerShell classic engine suspicious start",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-WIN-0183",
+  "title": "Scheduled task deleted suspiciously (4699)",
+  "tier": "exact",
+  "reason": "noisy-or-mismatched",
+  "why": "Source query matches routine, high-volume activity (or does not implement what the title says), so importing it would be noisy"
+ },
+ {
+  "id": "DAC-WIN-0022",
+  "title": "Local or domain user account created (4720)",
+  "tier": "approx-lowrisk",
+  "reason": "duplicate",
+  "why": "Same logic as another approved rule (DAC-WIN-0125)"
+ },
+ {
+  "id": "DAC-WIN-0023",
+  "title": "User account enabled (4722) shortly after creation",
+  "tier": "approx-lowrisk",
+  "reason": "source-logic-gap",
+  "why": "Title describes a sequence, burst or correlation that the source query does not implement; as a single-event rule it would alert on routine activity"
+ },
+ {
+  "id": "DAC-WIN-0201",
+  "title": "Powerview Add-DomainObjectAcl DCSync AD Extend Right",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0202",
+  "title": "Active Directory Replication from Non Machine Account - DcSync Indicator",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0203",
+  "title": "ADCS Certificate Template Configuration Vulnerability",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0204",
+  "title": "ADCS Certificate Template Configuration Vulnerability with Risky EKU",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0205",
+  "title": "Persistence and Execution at Scale via GPO Scheduled Task",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0206",
+  "title": "Impacket PsExec Execution",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0209",
+  "title": "LSASS Access From Non System Account",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0211",
+  "title": "PowerShell Scripts Installed as Services - Security",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0212",
+  "title": "Active Directory Certificate Services Denied Certificate Enrollment Request",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0213",
+  "title": "Potential Credential Dumping Attempt Via PowerShell Remote Thread",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0214",
+  "title": "Remote Thread Creation Via PowerShell In Uncommon Target",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0215",
+  "title": "Password Dumper Remote Thread in LSASS",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0216",
+  "title": "Exchange PowerShell Cmdlet History Deleted",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0217",
+  "title": "PowerShell Console History Logs Deleted",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0218",
+  "title": "LSASS Process Memory Dump Files",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0219",
+  "title": "LSASS Process Dump Artefact In CrashDumps Folder",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0220",
+  "title": "Suspicious Renamed Comsvcs DLL Loaded By Rundll32",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0221",
+  "title": "Unsigned Image Loaded Into LSASS Process",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0222",
+  "title": "PowerShell Core DLL Loaded Via Office Application",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0223",
+  "title": "Potential Remote PowerShell Session Initiated",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0224",
+  "title": "Nslookup PowerShell Download Cradle",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0225",
+  "title": "Delete Volume Shadow Copies Via WMI With PowerShell",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0226",
+  "title": "PowerShell Downgrade Attack - PowerShell",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0227",
+  "title": "PowerShell Download Via Net.WebClient - PowerShell Classic",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0228",
+  "title": "PowerShell Called from an Executable Version Mismatch",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0229",
+  "title": "Netcat The Powershell Version",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0230",
+  "title": "Remote PowerShell Session (PS Classic)",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0231",
+  "title": "Potential RemoteFXvGPUDisablement.EXE Abuse",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0232",
+  "title": "Renamed Powershell Under Powershell Channel",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0233",
+  "title": "Use Get-NetTCPConnection",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0234",
+  "title": "Zip A Folder With PowerShell For Staging In Temp - PowerShell",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0235",
+  "title": "Tamper Windows Defender - PSClassic",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0236",
+  "title": "Suspicious Non PowerShell WSMAN COM Provider",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0237",
+  "title": "Potential Active Directory Enumeration Using AD Module - PsModule",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0238",
+  "title": "Alternate PowerShell Hosts - PowerShell Module",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0239",
+  "title": "Bad Opsec Powershell Code Artifacts",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0240",
+  "title": "Clear PowerShell History - PowerShell Module",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0241",
+  "title": "PowerShell Decompress Commands",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0242",
+  "title": "HackTool - HandleKatz Duplicating LSASS Handle",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0243",
+  "title": "Lsass Memory Dump via Comsvcs DLL",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0244",
+  "title": "LSASS Memory Access by Tool With Dump Keyword In Name",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0245",
+  "title": "Potential Credential Dumping Activity Via LSASS",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0246",
+  "title": "Credential Dumping Activity By Python Based Tool",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0247",
+  "title": "Remote LSASS Process Access Through Windows Remote Management",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0248",
+  "title": "Suspicious LSASS Access Via MalSecLogon",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0249",
+  "title": "Potentially Suspicious GrantedAccess Flags On LSASS",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0250",
+  "title": "Credential Dumping Attempt Via WerFault",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0251",
+  "title": "LSASS Access From Potentially White-Listed Processes",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0252",
+  "title": "Suspicious Process Access to LSASS with Dbgcore/Dbghelp DLLs",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0253",
+  "title": "New Root Certificate Installed Via Certutil.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0254",
+  "title": "Powershell Executed From Headless ConHost Process",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0255",
+  "title": "PowerShell Web Access Feature Enabled Via DISM",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0256",
+  "title": "LSASS Process Reconnaissance Via Findstr.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0257",
+  "title": "HackTool - ADCSPwn Execution",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0258",
+  "title": "HackTool - CrackMapExec PowerShell Obfuscation",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0259",
+  "title": "HackTool - Empire PowerShell Launch Parameters",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0260",
+  "title": "HackTool - Empire PowerShell UAC Bypass",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0261",
+  "title": "HackTool - Default PowerSploit/Empire Scheduled Task Creation",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0262",
+  "title": "HackTool - Wmiexec Default Powershell Command",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0263",
+  "title": "Removal Of Index Value to Hide Schedule Task - Registry",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0264",
+  "title": "Removal Of SD Value to Hide Schedule Task - Registry",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0265",
+  "title": "Potential Credential Dumping Via LSASS SilentProcessExit Technique",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0266",
+  "title": "DLL Load via LSASS",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0267",
+  "title": "Admin User Remote Logon",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0268",
+  "title": "RDP Login from Localhost",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0269",
+  "title": "External Remote RDP Logon from Public IP",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0270",
+  "title": "Potential Privilege Escalation via Local Kerberos Relay over LDAP",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0271",
+  "title": "Successful Account Login Via WMI",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0272",
+  "title": "Windows Default Domain GPO Modification",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0273",
+  "title": "Windows Event Auditing Disabled",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0274",
+  "title": "Important Windows Event Auditing Disabled",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0275",
+  "title": "Hidden Local User Creation",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0276",
+  "title": "Possible Impacket SecretDump Remote Activity",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0277",
+  "title": "Invoke-Obfuscation Via Use MSHTA - Security",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0278",
+  "title": "Invoke-Obfuscation Via Use Rundll32 - Security",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0279",
+  "title": "Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0280",
+  "title": "Denied Access To Remote Desktop",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0281",
+  "title": "RDP over Reverse SSH Tunnel WFP",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0282",
+  "title": "Important Windows Eventlog Cleared",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0283",
+  "title": "Certificate Use With No Strong Mapping",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0284",
+  "title": "No Suitable Encryption Key Found For Generating Kerberos Ticket",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0285",
+  "title": "Invoke-Obfuscation Via Use MSHTA - System",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0286",
+  "title": "Invoke-Obfuscation Via Use Rundll32 - System",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0287",
+  "title": "Access To Potentially Sensitive Sysvol Files By Uncommon Applications",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0288",
+  "title": "HackTool - Impacket File Indicators",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0289",
+  "title": "Amsi.DLL Loaded Via LOLBIN Process",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0290",
+  "title": "Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0291",
+  "title": "Remote DLL Load Via Rundll32.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0292",
+  "title": "WMI ActiveScriptEventConsumers Activity Via Scrcons.EXE DLL Load",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0293",
+  "title": "Potential DLL Sideloading Of DBGHELP.DLL",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0294",
+  "title": "Uncommon Network Connection Initiated By Certutil.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0295",
+  "title": "Outbound RDP Connections Over Non-Standard Tools",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0296",
+  "title": "RDP Over Reverse SSH Tunnel",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0297",
+  "title": "RDP to HTTP or HTTPS Target Ports",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0298",
+  "title": "Network Connection Initiated By Regsvr32.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0299",
+  "title": "Rundll32 Internet Connection",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0300",
+  "title": "Uncommon Outbound Kerberos Connection",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0301",
+  "title": "Suspicious Autorun Registry Modified via WMI",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0302",
+  "title": "Suspicious Download From File-Sharing Website Via Bitsadmin",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0303",
+  "title": "Monitoring For Persistence Via BITS",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0304",
+  "title": "Suspicious File Downloaded From Direct IP Via Certutil.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0305",
+  "title": "Suspicious File Downloaded From File-Sharing Website Via Certutil.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0306",
+  "title": "File Encoded To Base64 Via Certutil.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0307",
+  "title": "Suspicious File Encoded To Base64 Via Certutil.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0308",
+  "title": "File In Suspicious Location Encoded To Base64 Via Certutil.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0309",
+  "title": "Certificate Exported Via Certutil.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0310",
+  "title": "Potential NTLM Coercion Via Certutil.EXE",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0311",
+  "title": "Forfiles.EXE Child Process Masquerading",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0312",
+  "title": "HackTool - F-Secure C3 Load by Rundll32",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0313",
+  "title": "CobaltStrike Load by Rundll32",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0314",
+  "title": "HackTool - WinRM Access Via Evil-WinRM",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0315",
+  "title": "HackTool - Potential Impacket Lateral Movement Activity",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0316",
+  "title": "HackTool - Impacket Tools Execution",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0317",
+  "title": "Potential Fake Instance Of Hxtsr.EXE Executed",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0318",
+  "title": "Attempts of Kerberos Coercion Via DNS SPN Spoofing",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0319",
+  "title": "Suspicious Eventlog Clearing or Configuration Change Activity",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0320",
+  "title": "System File Execution Location Anomaly",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0321",
+  "title": "Removal Of AMSI Provider Registry Keys",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0322",
+  "title": "Allow RDP Remote Assistance Feature",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0323",
+  "title": "Potential AMSI COM Server Hijacking",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0324",
+  "title": "AMSI Disabled via Registry Modification",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0325",
+  "title": "Classes Autorun Keys Modification",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0326",
+  "title": "Common Autorun Keys Modification",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0327",
+  "title": "CurrentControlSet Autorun Keys Modification",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ },
+ {
+  "id": "DAC-WIN-0328",
+  "title": "CurrentVersion Autorun Keys Modification",
+  "tier": "exact",
+  "reason": "sigma-wave1-stub",
+  "why": "Source is a Sigma-wave1 template: the SPL only filters on the event code and the Sigma selection logic was never ported, so the converted rule would fire on every event of that type"
+ }
+]

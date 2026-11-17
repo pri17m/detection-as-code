@@ -1,0 +1,17 @@
+rule dac_az_0011 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: Disk or snapshot export/grant to external tenant - snapshots/beginGetAccess / diskAccess"
+    severity = "High"
+    rule_id = "DAC-AZ-0011"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1537"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    ($e.metadata.product_event_type = "Microsoft.Compute/snapshots/beginGetAccess/action" nocase or $e.metadata.product_event_type = "Microsoft.Compute/disks/beginGetAccess/action" nocase or $e.metadata.product_event_type = "Microsoft.Compute/snapshots/write" nocase)
+
+  condition:
+    $e
+}

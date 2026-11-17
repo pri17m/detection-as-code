@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_gh_0013 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GitHub: Org audit log streaming disabled or removed - audit_log_streaming.destroy / update disable\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0013\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1685.002\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    (($e.metadata.product_event_type = \"audit_log_streaming.destroy\" nocase or $e.metadata.product_event_type = \"audit_log_streaming.update\" nocase) or $e.metadata.product_event_type = /^business\\.audit_log_streaming\\./ nocase)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_gh_0013 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GitHub: Org audit log streaming disabled or removed - audit_log_streaming.destroy / update disable\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0013\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1685.002\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    (($e.metadata.product_event_type = \"audit_log_streaming.destroy\" nocase or $e.metadata.product_event_type = \"audit_log_streaming.update\" nocase) or $e.metadata.product_event_type = /^business\\.audit_log_streaming\\./ nocase)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

@@ -1,0 +1,26 @@
+rule dac_win_0135 {
+  meta:
+    author = "Detection Engineer"
+    description = "Password spray distinct users single source (4625) - Behavior: Password spray distinct users single source (4625). Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. 4625 dc(TargetUserName) by IpAddress"
+    severity = "High"
+    rule_id = "DAC-WIN-0135"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1110.003"
+
+  events:
+    $e.metadata.log_type = "WINEVTLOG"
+    $e.metadata.product_event_type = "4625"
+    $ip = $e.principal.ip
+    $name = $e.principal.hostname
+
+  match:
+    $ip, $name over 1h
+
+  outcome:
+    $users = count_distinct($e.target.user.userid)
+    $count = count($e.metadata.id)
+
+  condition:
+    $e and $users >= 8
+}

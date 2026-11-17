@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_win_0077 {\n  meta:\n    author = \"DaC\"\n    description = \"Sysmon: LOLBins initiating outbound network connections - Detects Sysmon network connections initiated by common LOLBins often used for tool transfer or staging.\"\n    severity = \"Medium\"\n    rule_id = \"DAC-WIN-0077\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1105\"\n\n  events:\n    $e.metadata.event_type = \"NETWORK_CONNECTION\"\n    $e.metadata.log_type = \"WINDOWS_SYSMON\"\n    $e.principal.process.file.full_path = /(powershell|pwsh|mshta|rundll32|regsvr32|bitsadmin|certutil)\\.exe/ nocase\n    $name = $e.principal.hostname\n    $name_ = $e.principal.user.userid\n    $path = $e.principal.process.file.full_path\n\n  match:\n    $name, $name_, $path over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $dest_ips = count_distinct($e.target.ip)\n    $ports = array_distinct($e.target.port)\n\n  condition:\n    $e and $count >= 10 and $dest_ips >= 5\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_win_0077 {\n  meta:\n    author = \"DaC\"\n    description = \"Sysmon: LOLBins initiating outbound network connections - Detects Sysmon network connections initiated by common LOLBins often used for tool transfer or staging.\"\n    severity = \"Medium\"\n    rule_id = \"DAC-WIN-0077\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1105\"\n\n  events:\n    $e.metadata.event_type = \"NETWORK_CONNECTION\"\n    $e.metadata.log_type = \"WINDOWS_SYSMON\"\n    $e.principal.process.file.full_path = /(powershell|pwsh|mshta|rundll32|regsvr32|bitsadmin|certutil)\\.exe/ nocase\n    $name = $e.principal.hostname\n    $name_ = $e.principal.user.userid\n    $path = $e.principal.process.file.full_path\n\n  match:\n    $name, $name_, $path over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $dest_ips = count_distinct($e.target.ip)\n    $ports = array_distinct($e.target.port)\n\n  condition:\n    $e and $count >= 10 and $dest_ips >= 5\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

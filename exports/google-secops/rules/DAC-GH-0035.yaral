@@ -1,0 +1,17 @@
+rule dac_gh_0035 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Package published from unexpected actor or fork - packages.publish anomalous actor"
+    severity = "Medium"
+    rule_id = "DAC-GH-0035"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1195.002"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "packages.publish" nocase or $e.metadata.product_event_type = "package.create" nocase or $e.metadata.product_event_type = "package.version.publish" nocase)
+
+  condition:
+    $e
+}

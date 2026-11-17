@@ -1,0 +1,17 @@
+rule dac_az_0006 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: RunCommand or RunCommandPreview on VM fleets - Microsoft.Compute/virtualMachines/runCommand"
+    severity = "High"
+    rule_id = "DAC-AZ-0006"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1651"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    ($e.metadata.product_event_type = "Microsoft.Compute/virtualMachines/runCommand/action" nocase or $e.metadata.product_event_type = "Microsoft.Compute/virtualMachines/runCommands/write" nocase)
+
+  condition:
+    $e
+}

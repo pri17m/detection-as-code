@@ -1,0 +1,19 @@
+rule dac_win_0157 {
+  meta:
+    author = "Detection Engineer"
+    description = "Net.exe domain group enumeration - Behavior: Net.exe domain group enumeration. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1 net group/user /domain"
+    severity = "Low"
+    rule_id = "DAC-WIN-0157"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1087.002"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    ($e.target.process.file.full_path = /\\net\.exe$/ nocase or $e.target.process.file.full_path = /\\net1\.exe$/ nocase)
+    ($e.target.process.command_line = /group/ nocase or $e.target.process.command_line = /\/domain/ nocase or $e.target.process.command_line = /user \/domain/ nocase)
+
+  condition:
+    $e
+}

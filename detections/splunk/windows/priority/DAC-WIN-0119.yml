@@ -6,6 +6,7 @@ author: Detection Engineer
 status: experimental
 platforms:
 - splunk
+- google_secops
 severity: medium
 mitre:
   tactics:
@@ -56,3 +57,49 @@ query:
     | where shares>=3 OR srcs>=5
 
     '
+  google_secops: |-
+    rule dac_win_0119 {
+      meta:
+        author = "Detection Engineer"
+        description = "Network share Admin$ access - Behavior: Network share Admin$ access. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Security 5140/5145 ShareName Admin$"
+        severity = "Medium"
+        rule_id = "DAC-WIN-0119"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1021.002"
+
+      events:
+        $e.metadata.log_type = "WINEVTLOG"
+        $e.metadata.product_event_type = "5140"
+        $e.target.resource.name = /(?:ADMIN\$|C\$|IPC\$)/ nocase
+        $name = $e.principal.hostname
+        $user = $e.target.user.userid
+
+      match:
+        $name, $user over 1h
+
+      outcome:
+        $shares = count_distinct($e.target.resource.name)
+        $srcs = count_distinct($e.principal.ip)
+
+      condition:
+        $e and ($shares >= 3 or $srcs >= 5)
+    }
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: approximate
+    score: 0.9
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: win.security
+    review: approved in detection-engineering review 2026-11-17
+    caveats:
+    - group-by `Account` is a coalesce of ['TargetUserName', 'Account_Name', 'SubjectUserName']; first field used per target.
+    - Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule.
+    converted_on: '2026-11-17'

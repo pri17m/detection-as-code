@@ -7,6 +7,7 @@ author: Detection Engineer
 status: experimental
 platforms:
 - splunk
+- google_secops
 severity: medium
 mitre:
   tactics:
@@ -60,3 +61,40 @@ query:
     | table _time host Image TargetObject Details User
 
     '
+  google_secops: |-
+    rule dac_win_0111 {
+      meta:
+        author = "Detection Engineer"
+        description = "Registry Run key persistence (user-writable path) - Sysmon 13 Run/RunOnce; Details Temp/Users"
+        severity = "Medium"
+        rule_id = "DAC-WIN-0111"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1547.001"
+
+      events:
+        ($e.metadata.event_type = "REGISTRY_MODIFICATION" or $e.metadata.event_type = "REGISTRY_CREATION")
+        $e.metadata.log_type = "WINDOWS_SYSMON"
+        $e.metadata.product_event_type = "13"
+        ($e.target.registry.registry_key = /\\CurrentVersion\\Run/ nocase or $e.target.registry.registry_key = /\\CurrentVersion\\RunOnce/ nocase or $e.target.registry.registry_key = /\\Winlogon\\Shell/ nocase or $e.target.registry.registry_key = /\\Winlogon\\Userinit/ nocase)
+        ($e.target.registry.registry_value_data = /\\Temp\\/ nocase or $e.target.registry.registry_value_data = /\\Users\\/ nocase or $e.target.registry.registry_value_data = /\\AppData\\/ nocase or $e.target.registry.registry_value_data = /\\Downloads\\/ nocase or $e.target.registry.registry_value_data = /\\Public\\/ nocase)
+
+      condition:
+        $e
+    }
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: exact
+    score: 1.0
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: win.registry
+    review: approved in detection-engineering review 2026-11-17
+    caveats: []
+    converted_on: '2026-11-17'

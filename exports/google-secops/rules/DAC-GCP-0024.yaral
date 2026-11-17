@@ -1,0 +1,17 @@
+rule dac_gcp_0024 {
+  meta:
+    author = "Detection Engineer"
+    description = "GCP: KMS CryptoKeyVersion destroy or disable - DestroyCryptoKeyVersion"
+    severity = "High"
+    rule_id = "DAC-GCP-0024"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1485"
+
+  events:
+    $e.metadata.log_type = "GCP_CLOUDAUDIT"
+    (($e.metadata.product_event_type = "DestroyCryptoKeyVersion" nocase or $e.metadata.product_event_type = "DisableCryptoKeyVersion" nocase) or $e.metadata.product_event_type = /DestroyCryptoKey/ nocase)
+
+  condition:
+    $e
+}

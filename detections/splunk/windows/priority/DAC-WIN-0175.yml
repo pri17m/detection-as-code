@@ -6,6 +6,7 @@ author: Detection Engineer
 status: experimental
 platforms:
 - splunk
+- google_secops
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 - WinEventLog:Microsoft-Windows-Sysmon/Operational
@@ -47,8 +48,42 @@ query:
     | table _time host User Image ProcessTamperingType
 
     '
+  google_secops: |-
+    rule dac_win_0175 {
+      meta:
+        author = "Detection Engineer"
+        description = "Process tampering indicators (Sysmon 25 if present) - Behavior: Process tampering indicators (Sysmon 25 if present). Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 25 ProcessTampering"
+        severity = "High"
+        rule_id = "DAC-WIN-0175"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1055.012"
+
+      events:
+        $e.metadata.log_type = "WINDOWS_SYSMON"
+        $e.metadata.product_event_type = "25"
+
+      condition:
+        $e
+    }
 tags:
 - phase1
 - windows
 - P2
 - defense-evasion
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: exact
+    score: 1.0
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: win.sysmon_other
+    review: approved in detection-engineering review 2026-11-17
+    caveats: []
+    converted_on: '2026-11-17'

@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_win_0339 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"Indirect command execution via forfiles or pcalua - Behavior: forfiles /c or pcalua.exe -a launches a child command, a common indirect execution path (T1202). Anchor is Image+CommandLine after classic/XML coalesce. Not telemetry_validated.\"\n    severity = \"Medium\"\n    rule_id = \"DAC-WIN-0339\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1202\"\n\n  events:\n    $e.metadata.event_type = \"PROCESS_LAUNCH\"\n    $e.metadata.log_type = \"WINDOWS_SYSMON\"\n    ($e.target.process.file.full_path = /\\\\forfiles\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\pcalua\\.exe$/ nocase)\n    $e.target.process.command_line = /\\/c | -a |cmd.exe|powershell/ nocase\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_win_0339 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"Indirect command execution via forfiles or pcalua - Behavior: forfiles /c or pcalua.exe -a launches a child command, a common indirect execution path (T1202). Anchor is Image+CommandLine after classic/XML coalesce. Not telemetry_validated.\"\n    severity = \"Medium\"\n    rule_id = \"DAC-WIN-0339\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1202\"\n\n  events:\n    $e.metadata.event_type = \"PROCESS_LAUNCH\"\n    $e.metadata.log_type = \"WINDOWS_SYSMON\"\n    ($e.target.process.file.full_path = /\\\\forfiles\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\pcalua\\.exe$/ nocase)\n    $e.target.process.command_line = /\\/c | -a |cmd.exe|powershell/ nocase\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

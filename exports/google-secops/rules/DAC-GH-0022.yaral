@@ -1,0 +1,17 @@
+rule dac_gh_0022 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Org SAML SSO enforcement disabled - org.disable_saml / sso_policy weaken"
+    severity = "High"
+    rule_id = "DAC-GH-0022"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1556.006"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    (($e.metadata.product_event_type = "org.disable_saml" nocase or $e.metadata.product_event_type = "org.update_saml_provider_settings" nocase) or $e.metadata.product_event_type = /^business\.sso_/ nocase)
+
+  condition:
+    $e
+}

@@ -6,6 +6,7 @@ author: DaC
 status: experimental
 platforms:
 - splunk
+- google_secops
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 mitre:
@@ -39,3 +40,50 @@ query:
     | where count >= 10 AND dest_ips >= 5
 
     '
+  google_secops: |-
+    rule dac_win_0077 {
+      meta:
+        author = "DaC"
+        description = "Sysmon: LOLBins initiating outbound network connections - Detects Sysmon network connections initiated by common LOLBins often used for tool transfer or staging."
+        severity = "Medium"
+        rule_id = "DAC-WIN-0077"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1105"
+
+      events:
+        $e.metadata.event_type = "NETWORK_CONNECTION"
+        $e.metadata.log_type = "WINDOWS_SYSMON"
+        $e.principal.process.file.full_path = /(powershell|pwsh|mshta|rundll32|regsvr32|bitsadmin|certutil)\.exe/ nocase
+        $name = $e.principal.hostname
+        $name_ = $e.principal.user.userid
+        $path = $e.principal.process.file.full_path
+
+      match:
+        $name, $name_, $path over 1h
+
+      outcome:
+        $count = count($e.metadata.id)
+        $dest_ips = count_distinct($e.target.ip)
+        $ports = array_distinct($e.target.port)
+
+      condition:
+        $e and $count >= 10 and $dest_ips >= 5
+    }
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: approximate
+    score: 0.95
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: win.network_connect
+    review: approved in detection-engineering review 2026-11-17
+    caveats:
+    - Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule.
+    converted_on: '2026-11-17'

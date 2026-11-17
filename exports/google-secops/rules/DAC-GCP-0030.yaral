@@ -1,0 +1,17 @@
+rule dac_gcp_0030 {
+  meta:
+    author = "Detection Engineer"
+    description = "GCP: GKE UpdateCluster remove authorized networks - UpdateCluster masterAuthorizedNetworks empty"
+    severity = "Medium"
+    rule_id = "DAC-GCP-0030"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685"
+
+  events:
+    $e.metadata.log_type = "GCP_CLOUDAUDIT"
+    ($e.metadata.product_event_type = /UpdateCluster/ nocase or $e.metadata.product_event_type = "google.container.v1.ClusterManager.UpdateCluster" nocase)
+
+  condition:
+    $e
+}

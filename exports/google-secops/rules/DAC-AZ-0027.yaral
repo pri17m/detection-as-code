@@ -1,0 +1,17 @@
+rule dac_az_0027 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: Network Watcher or flow log disabled - networkWatchers / flowLogs delete"
+    severity = "High"
+    rule_id = "DAC-AZ-0027"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685.002"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    ($e.metadata.product_event_type = "Microsoft.Network/networkWatchers/delete" nocase or $e.metadata.product_event_type = "Microsoft.Network/networkWatchers/flowLogs/delete" nocase or $e.metadata.product_event_type = "Microsoft.Network/networkWatchers/flowLogs/write" nocase)
+
+  condition:
+    $e
+}

@@ -1,0 +1,27 @@
+rule dac_win_0119 {
+  meta:
+    author = "Detection Engineer"
+    description = "Network share Admin$ access - Behavior: Network share Admin$ access. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Security 5140/5145 ShareName Admin$"
+    severity = "Medium"
+    rule_id = "DAC-WIN-0119"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1021.002"
+
+  events:
+    $e.metadata.log_type = "WINEVTLOG"
+    $e.metadata.product_event_type = "5140"
+    $e.target.resource.name = /(?:ADMIN\$|C\$|IPC\$)/ nocase
+    $name = $e.principal.hostname
+    $user = $e.target.user.userid
+
+  match:
+    $name, $user over 1h
+
+  outcome:
+    $shares = count_distinct($e.target.resource.name)
+    $srcs = count_distinct($e.principal.ip)
+
+  condition:
+    $e and ($shares >= 3 or $srcs >= 5)
+}

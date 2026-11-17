@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_win_0080 {\n  meta:\n    author = \"DaC\"\n    description = \"Sysmon: File created in Startup folder (persistence) - Detects creation of executable/script content in Startup folders which is a common persistence technique.\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0080\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1547.001\"\n\n  events:\n    ($e.metadata.event_type = \"FILE_CREATION\" or $e.metadata.event_type = \"FILE_MODIFICATION\")\n    $e.metadata.log_type = \"WINDOWS_SYSMON\"\n    $e.metadata.product_event_type = \"11\"\n    $e.target.file.full_path = /\\\\(programdata|users)\\\\.*\\\\start menu\\\\programs\\\\startup\\\\/ nocase\n    $e.target.file.full_path = /\\.(exe|dll|ps1|vbs|js|lnk|bat|cmd)$/ nocase\n    $name = $e.principal.hostname\n    $name_ = $e.principal.user.userid\n\n  match:\n    $name, $name_ over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $files = array_distinct($e.target.file.full_path)\n    $images = array_distinct($e.principal.process.file.full_path)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_win_0080 {\n  meta:\n    author = \"DaC\"\n    description = \"Sysmon: File created in Startup folder (persistence) - Detects creation of executable/script content in Startup folders which is a common persistence technique.\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0080\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1547.001\"\n\n  events:\n    ($e.metadata.event_type = \"FILE_CREATION\" or $e.metadata.event_type = \"FILE_MODIFICATION\")\n    $e.metadata.log_type = \"WINDOWS_SYSMON\"\n    $e.metadata.product_event_type = \"11\"\n    $e.target.file.full_path = /\\\\(programdata|users)\\\\.*\\\\start menu\\\\programs\\\\startup\\\\/ nocase\n    $e.target.file.full_path = /\\.(exe|dll|ps1|vbs|js|lnk|bat|cmd)$/ nocase\n    $name = $e.principal.hostname\n    $name_ = $e.principal.user.userid\n\n  match:\n    $name, $name_ over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $files = array_distinct($e.target.file.full_path)\n    $images = array_distinct($e.principal.process.file.full_path)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

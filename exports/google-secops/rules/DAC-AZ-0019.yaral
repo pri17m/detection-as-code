@@ -1,0 +1,17 @@
+rule dac_az_0019 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: Policy assignment deleted or exemption created broadly - policyAssignments delete / exemptions write"
+    severity = "High"
+    rule_id = "DAC-AZ-0019"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685.002"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    ($e.metadata.product_event_type = "Microsoft.Authorization/policyAssignments/delete" nocase or $e.metadata.product_event_type = "Microsoft.Authorization/policyExemptions/write" nocase)
+
+  condition:
+    $e
+}

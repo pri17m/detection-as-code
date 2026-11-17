@@ -6,6 +6,7 @@ author: Detection Engineer
 status: experimental
 platforms:
 - splunk
+- google_secops
 severity: high
 mitre:
   tactics:
@@ -60,3 +61,39 @@ query:
     | table _time host User Image ParentImage CommandLine
 
     '
+  google_secops: |-
+    rule dac_win_0153 {
+      meta:
+        author = "Detection Engineer"
+        description = "Disable Windows Defender via process - Behavior: Disable Windows Defender via process. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1 Set-MpPreference disable patterns"
+        severity = "High"
+        rule_id = "DAC-WIN-0153"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1685"
+
+      events:
+        $e.metadata.event_type = "PROCESS_LAUNCH"
+        $e.metadata.log_type = "WINDOWS_SYSMON"
+        ($e.target.process.file.full_path = /\\sc\.exe$/ nocase or $e.target.process.file.full_path = /\\net\.exe$/ nocase or $e.target.process.file.full_path = /\\powershell\.exe$/ nocase)
+        ($e.target.process.command_line = /WinDefend/ nocase or $e.target.process.command_line = /Sense/ nocase or $e.target.process.command_line = /Set-MpPreference/ nocase or $e.target.process.command_line = /DisableRealtimeMonitoring/ nocase)
+
+      condition:
+        $e
+    }
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: exact
+    score: 1.0
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: win.process_start
+    review: approved in detection-engineering review 2026-11-17
+    caveats: []
+    converted_on: '2026-11-17'

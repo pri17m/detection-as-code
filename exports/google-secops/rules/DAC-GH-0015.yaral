@@ -1,0 +1,17 @@
+rule dac_gh_0015 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Branch protection or ruleset weakened on default branch - protected_branch / repository_ruleset destroy or weaken"
+    severity = "High"
+    rule_id = "DAC-GH-0015"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685.002"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "protected_branch.destroy" nocase or $e.metadata.product_event_type = "protected_branch.update_allow_force_pushes" nocase or $e.metadata.product_event_type = "repository_ruleset.destroy" nocase or $e.metadata.product_event_type = "repository_ruleset.update" nocase)
+
+  condition:
+    $e
+}

@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_entra_0005 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"Entra: Service principal credentials added (key password or cert) - Add service principal credentials\"\n    severity = \"High\"\n    rule_id = \"DAC-ENTRA-0005\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1098.001\"\n\n  events:\n    $e.metadata.log_type = \"AZURE_AD_AUDIT\"\n    $e.metadata.product_event_type = \"Add service principal credentials\" nocase\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_entra_0005 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"Entra: Service principal credentials added (key password or cert) - Add service principal credentials\"\n    severity = \"High\"\n    rule_id = \"DAC-ENTRA-0005\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1098.001\"\n\n  events:\n    $e.metadata.log_type = \"AZURE_AD_AUDIT\"\n    $e.metadata.product_event_type = \"Add service principal credentials\" nocase\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

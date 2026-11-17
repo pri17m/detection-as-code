@@ -1,0 +1,17 @@
+rule dac_az_0024 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: Backup vault soft-delete disabled or backup item delete - backup softDelete / protectedItems delete"
+    severity = "High"
+    rule_id = "DAC-AZ-0024"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1490"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    ($e.metadata.product_event_type = "Microsoft.RecoveryServices/vaults/backupconfig/write" nocase or $e.metadata.product_event_type = "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems/delete" nocase)
+
+  condition:
+    $e
+}

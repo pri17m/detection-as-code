@@ -1,0 +1,17 @@
+rule dac_az_0035 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: Subscription transfer or billing ownership change - subscriptions transfer"
+    severity = "Medium"
+    rule_id = "DAC-AZ-0035"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1484"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    ($e.metadata.product_event_type = "Microsoft.Subscription/subscriptions/write" nocase or $e.metadata.product_event_type = /^Microsoft\.Billing\// nocase)
+
+  condition:
+    $e
+}

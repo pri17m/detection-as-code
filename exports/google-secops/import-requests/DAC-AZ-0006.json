@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_az_0006 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"Azure: RunCommand or RunCommandPreview on VM fleets - Microsoft.Compute/virtualMachines/runCommand\"\n    severity = \"High\"\n    rule_id = \"DAC-AZ-0006\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1651\"\n\n  events:\n    $e.metadata.log_type = \"AZURE_ACTIVITY\"\n    ($e.metadata.product_event_type = \"Microsoft.Compute/virtualMachines/runCommand/action\" nocase or $e.metadata.product_event_type = \"Microsoft.Compute/virtualMachines/runCommands/write\" nocase)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_az_0006 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"Azure: RunCommand or RunCommandPreview on VM fleets - Microsoft.Compute/virtualMachines/runCommand\"\n    severity = \"High\"\n    rule_id = \"DAC-AZ-0006\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1651\"\n\n  events:\n    $e.metadata.log_type = \"AZURE_ACTIVITY\"\n    ($e.metadata.product_event_type = \"Microsoft.Compute/virtualMachines/runCommand/action\" nocase or $e.metadata.product_event_type = \"Microsoft.Compute/virtualMachines/runCommands/write\" nocase)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

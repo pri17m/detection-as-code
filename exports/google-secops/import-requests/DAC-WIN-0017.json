@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_win_0017 {\n  meta:\n    author = \"DaC\"\n    description = \"Privileged service called with SeDebugPrivilege (4673) - Detects use of SeDebugPrivilege via privileged service calls, which can be associated with credential dumping and process injection workflows.\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0017\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1068\"\n\n  events:\n    $e.metadata.log_type = \"WINEVTLOG\"\n    $e.metadata.product_event_type = \"4673\"\n    $e.target.user.attribute.permissions.name = /sedebugprivilege/ nocase\n    $name = $e.principal.hostname\n    $user = $e.principal.user.userid\n\n  match:\n    $name, $user over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $processes = array_distinct($e.target.process.file.full_path)\n    $privileges = array_distinct($e.target.user.attribute.permissions.name)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_win_0017 {\n  meta:\n    author = \"DaC\"\n    description = \"Privileged service called with SeDebugPrivilege (4673) - Detects use of SeDebugPrivilege via privileged service calls, which can be associated with credential dumping and process injection workflows.\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0017\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1068\"\n\n  events:\n    $e.metadata.log_type = \"WINEVTLOG\"\n    $e.metadata.product_event_type = \"4673\"\n    $e.target.user.attribute.permissions.name = /sedebugprivilege/ nocase\n    $name = $e.principal.hostname\n    $user = $e.principal.user.userid\n\n  match:\n    $name, $user over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $processes = array_distinct($e.target.process.file.full_path)\n    $privileges = array_distinct($e.target.user.attribute.permissions.name)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

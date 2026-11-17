@@ -1,0 +1,17 @@
+rule dac_az_0030 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: PIM Azure resource role activation anomalous - PIM resource role activate"
+    severity = "High"
+    rule_id = "DAC-AZ-0030"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1548.005"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    ($e.metadata.product_event_type = /(?:roleAssignmentSchedule|PIM)/ nocase or $e.metadata.product_event_type = "Microsoft.Authorization/roleAssignmentScheduleRequests/write" nocase)
+
+  condition:
+    $e
+}

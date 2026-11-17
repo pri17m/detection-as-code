@@ -1,0 +1,17 @@
+rule dac_gcp_0031 {
+  meta:
+    author = "Detection Engineer"
+    description = "GCP: Workload Identity pool / provider created for external IdP - CreateWorkloadIdentityPoolProvider"
+    severity = "High"
+    rule_id = "DAC-GCP-0031"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1098.001"
+
+  events:
+    $e.metadata.log_type = "GCP_CLOUDAUDIT"
+    $e.metadata.product_event_type = /(?:CreateWorkloadIdentityPool|CreateWorkloadIdentityPoolProvider)/ nocase
+
+  condition:
+    $e
+}

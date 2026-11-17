@@ -1,0 +1,17 @@
+rule dac_gcp_0003 {
+  meta:
+    author = "Detection Engineer"
+    description = "GCP: serviceAccounts.keys.create for privileged SA - google.iam.admin.v*.CreateServiceAccountKey"
+    severity = "High"
+    rule_id = "DAC-GCP-0003"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1098.001"
+
+  events:
+    $e.metadata.log_type = "GCP_CLOUDAUDIT"
+    ($e.metadata.product_event_type = "google.iam.admin.v1.CreateServiceAccountKey" nocase or $e.metadata.product_event_type = /CreateServiceAccountKey/ nocase)
+
+  condition:
+    $e
+}

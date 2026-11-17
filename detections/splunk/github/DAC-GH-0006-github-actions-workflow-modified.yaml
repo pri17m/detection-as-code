@@ -3,7 +3,7 @@ title: "GitHub: Actions workflow modified"
 description: "Detects modifications to GitHub Actions workflows which can be used to execute malicious code in CI/CD (supply chain risk)."
 author: "DaC"
 status: experimental
-platforms: [splunk]
+platforms: [splunk, google_secops]
 sourcetypes: ["github:audit"]
 mitre:
   tactics: ["execution", "persistence"]
@@ -19,4 +19,47 @@ query:
   splunk: |
     sourcetype=github:audit (action="workflows.workflow_file_modified" OR action="repo.actions_workflow_update" OR action="repo.create_workflow" OR action="repo.update_workflow")
     | stats count values(actor) as actors values(repo) as repos by action
+  google_secops: |-
+    rule dac_gh_0006 {
+      meta:
+        author = "DaC"
+        description = "GitHub: Actions workflow modified - Detects modifications to GitHub Actions workflows which can be used to execute malicious code in CI/CD (supply chain risk)."
+        severity = "High"
+        rule_id = "DAC-GH-0006"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1195"
 
+      events:
+        $e.metadata.log_type = "GITHUB"
+        ($e.metadata.product_event_type = "workflows.workflow_file_modified" nocase or $e.metadata.product_event_type = "repo.actions_workflow_update" nocase or $e.metadata.product_event_type = "repo.create_workflow" nocase or $e.metadata.product_event_type = "repo.update_workflow" nocase)
+        $action = $e.metadata.product_event_type
+
+      match:
+        $action over 1h
+
+      outcome:
+        $count = count($e.metadata.id)
+        $actors = array_distinct($e.principal.user.userid)
+        $repos = array_distinct($e.target.resource.name)
+
+      condition:
+        $e
+    }
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: approximate
+    score: 0.95
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: github.audit
+    review: approved in detection-engineering review 2026-11-17
+    caveats:
+    - Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule.
+    converted_on: '2026-11-17'

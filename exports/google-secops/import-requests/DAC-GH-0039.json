@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_gh_0039 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GitHub: Org IP allow list disabled or emptied - org.update_ip_allow_list disable\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0039\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1685\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    ($e.metadata.product_event_type = \"org.update_ip_allow_list_enabled\" nocase or $e.metadata.product_event_type = \"org.disable_ip_allow_list\" nocase or $e.metadata.product_event_type = \"business.update_ip_allow_list\" nocase)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_gh_0039 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GitHub: Org IP allow list disabled or emptied - org.update_ip_allow_list disable\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0039\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1685\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    ($e.metadata.product_event_type = \"org.update_ip_allow_list_enabled\" nocase or $e.metadata.product_event_type = \"org.disable_ip_allow_list\" nocase or $e.metadata.product_event_type = \"business.update_ip_allow_list\" nocase)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

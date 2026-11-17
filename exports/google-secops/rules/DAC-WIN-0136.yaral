@@ -1,0 +1,26 @@
+rule dac_win_0136 {
+  meta:
+    author = "Detection Engineer"
+    description = "Kerberos pre-auth failures spray (4771) - Behavior: Kerberos pre-auth failures spray (4771). Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. 4771 many users one IpAddress"
+    severity = "High"
+    rule_id = "DAC-WIN-0136"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1110.003"
+
+  events:
+    $e.metadata.log_type = "WINEVTLOG"
+    $e.metadata.product_event_type = "4771"
+    $ip = $e.principal.ip
+    $name = $e.principal.hostname
+
+  match:
+    $ip, $name over 1h
+
+  outcome:
+    $count = count($e.metadata.id)
+    $accounts = array_distinct($e.target.user.userid)
+
+  condition:
+    $e and $count >= 8
+}

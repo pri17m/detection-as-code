@@ -6,6 +6,7 @@ author: DaC
 status: experimental
 platforms:
 - splunk
+- google_secops
 sourcetypes:
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
 mitre:
@@ -38,3 +39,51 @@ query:
     | stats count values(file) as files values(img) as images by host, User
 
     '
+  google_secops: |-
+    rule dac_win_0080 {
+      meta:
+        author = "DaC"
+        description = "Sysmon: File created in Startup folder (persistence) - Detects creation of executable/script content in Startup folders which is a common persistence technique."
+        severity = "High"
+        rule_id = "DAC-WIN-0080"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1547.001"
+
+      events:
+        ($e.metadata.event_type = "FILE_CREATION" or $e.metadata.event_type = "FILE_MODIFICATION")
+        $e.metadata.log_type = "WINDOWS_SYSMON"
+        $e.metadata.product_event_type = "11"
+        $e.target.file.full_path = /\\(programdata|users)\\.*\\start menu\\programs\\startup\\/ nocase
+        $e.target.file.full_path = /\.(exe|dll|ps1|vbs|js|lnk|bat|cmd)$/ nocase
+        $name = $e.principal.hostname
+        $name_ = $e.principal.user.userid
+
+      match:
+        $name, $name_ over 1h
+
+      outcome:
+        $count = count($e.metadata.id)
+        $files = array_distinct($e.target.file.full_path)
+        $images = array_distinct($e.principal.process.file.full_path)
+
+      condition:
+        $e
+    }
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: approximate
+    score: 0.95
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: win.file_event
+    review: approved in detection-engineering review 2026-11-17
+    caveats:
+    - Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule.
+    converted_on: '2026-11-17'

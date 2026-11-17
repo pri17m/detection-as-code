@@ -1,0 +1,17 @@
+rule dac_gh_0039 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Org IP allow list disabled or emptied - org.update_ip_allow_list disable"
+    severity = "High"
+    rule_id = "DAC-GH-0039"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "org.update_ip_allow_list_enabled" nocase or $e.metadata.product_event_type = "org.disable_ip_allow_list" nocase or $e.metadata.product_event_type = "business.update_ip_allow_list" nocase)
+
+  condition:
+    $e
+}
