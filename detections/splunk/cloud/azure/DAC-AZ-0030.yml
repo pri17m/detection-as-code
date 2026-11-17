@@ -24,11 +24,30 @@ query:
     | table _time, operationName, caller, callerIpAddress, resourceId, status, activityStatusValue
 
     '
+  google_secops: |-
+    rule dac_az_0030 {
+      meta:
+        author = "Detection Engineer"
+        description = "Azure: PIM Azure resource role activation anomalous - PIM resource role activate"
+        severity = "High"
+        rule_id = "DAC-AZ-0030"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1548.005"
+
+      events:
+        $e.metadata.log_type = "AZURE_ACTIVITY"
+        ($e.metadata.product_event_type = /(?:roleAssignmentSchedule|PIM)/ nocase or $e.metadata.product_event_type = "Microsoft.Authorization/roleAssignmentScheduleRequests/write" nocase)
+
+      condition:
+        $e
+    }
 severity: high
 references:
 - https://attack.mitre.org/techniques/T1548/005/
 platforms:
 - splunk
+- google_secops
 tags:
 - wave-c
 - P0
@@ -36,3 +55,19 @@ tags:
 description: PIM resource role activate
 sourcetypes:
 - azure:monitor:activity
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: exact
+    score: 1.0
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: azure.activity
+    review: approved in detection-engineering review 2026-11-17
+    caveats: []
+    converted_on: '2026-11-17'

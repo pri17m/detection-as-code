@@ -1,0 +1,20 @@
+rule dac_win_0150 {
+  meta:
+    author = "Detection Engineer"
+    description = "Bitsadmin download - Behavior: Bitsadmin download. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1 bitsadmin /transfer"
+    severity = "Medium"
+    rule_id = "DAC-WIN-0150"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1197"
+    mitre_attack_technique = "T1105"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    $e.target.process.file.full_path = /\\bitsadmin\.exe$/ nocase
+    ($e.target.process.command_line = /\/transfer/ nocase or $e.target.process.command_line = /\/addfile/ nocase or $e.target.process.command_line = /\/download/ nocase)
+
+  condition:
+    $e
+}

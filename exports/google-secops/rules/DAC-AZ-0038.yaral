@@ -1,0 +1,17 @@
+rule dac_az_0038 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: Private endpoint removed exposing PaaS publicly - privateEndpoints delete"
+    severity = "Medium"
+    rule_id = "DAC-AZ-0038"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1578"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    $e.metadata.product_event_type = "Microsoft.Network/privateEndpoints/delete" nocase
+
+  condition:
+    $e
+}

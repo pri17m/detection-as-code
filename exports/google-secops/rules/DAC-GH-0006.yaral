@@ -1,0 +1,26 @@
+rule dac_gh_0006 {
+  meta:
+    author = "DaC"
+    description = "GitHub: Actions workflow modified - Detects modifications to GitHub Actions workflows which can be used to execute malicious code in CI/CD (supply chain risk)."
+    severity = "High"
+    rule_id = "DAC-GH-0006"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1195"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "workflows.workflow_file_modified" nocase or $e.metadata.product_event_type = "repo.actions_workflow_update" nocase or $e.metadata.product_event_type = "repo.create_workflow" nocase or $e.metadata.product_event_type = "repo.update_workflow" nocase)
+    $action = $e.metadata.product_event_type
+
+  match:
+    $action over 1h
+
+  outcome:
+    $count = count($e.metadata.id)
+    $actors = array_distinct($e.principal.user.userid)
+    $repos = array_distinct($e.target.resource.name)
+
+  condition:
+    $e
+}

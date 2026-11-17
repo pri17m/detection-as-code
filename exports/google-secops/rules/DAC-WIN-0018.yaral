@@ -1,0 +1,25 @@
+rule dac_win_0018 {
+  meta:
+    author = "DaC"
+    description = "Security audit log cleared (1102) - Detects Event ID 1102 indicating the Security log was cleared, commonly used for defense evasion."
+    severity = "High"
+    rule_id = "DAC-WIN-0018"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685.005"
+
+  events:
+    $e.metadata.log_type = "WINEVTLOG"
+    $e.metadata.product_event_type = "1102"
+    $name = $e.principal.hostname
+
+  match:
+    $name over 1h
+
+  outcome:
+    $count = count($e.metadata.id)
+    $users = array_distinct($e.principal.user.userid)
+
+  condition:
+    $e
+}

@@ -1,0 +1,24 @@
+rule dac_gcp_0018 {
+  meta:
+    author = "Detection Engineer"
+    description = "GCP: Secret Manager AccessSecretVersion burst - AccessSecretVersion high volume"
+    severity = "High"
+    rule_id = "DAC-GCP-0018"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1555.006"
+
+  events:
+    $e.metadata.log_type = "GCP_CLOUDAUDIT"
+    $e.metadata.product_event_type = /AccessSecretVersion$/ nocase
+    $email = $e.principal.user.userid
+
+  match:
+    $email over 1h
+
+  outcome:
+    $count = count($e.metadata.id)
+
+  condition:
+    $e and $count > 20
+}

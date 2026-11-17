@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_gh_0014 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GitHub: Org audit log export or webhook sink weakened - hook.destroy org audit-related\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0014\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1685.002\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    ($e.metadata.product_event_type = \"hook.destroy\" nocase or $e.metadata.product_event_type = \"org.hook.destroy\" nocase or $e.metadata.product_event_type = \"repo.hook.destroy\" nocase)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_gh_0014 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GitHub: Org audit log export or webhook sink weakened - hook.destroy org audit-related\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0014\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1685.002\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    ($e.metadata.product_event_type = \"hook.destroy\" nocase or $e.metadata.product_event_type = \"org.hook.destroy\" nocase or $e.metadata.product_event_type = \"repo.hook.destroy\" nocase)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

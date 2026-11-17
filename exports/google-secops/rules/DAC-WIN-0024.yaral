@@ -1,0 +1,26 @@
+rule dac_win_0024 {
+  meta:
+    author = "DaC"
+    description = "User account deleted (4726) - Detects deletion of a user account which can be used to hide traces or sabotage access."
+    severity = "High"
+    rule_id = "DAC-WIN-0024"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1531"
+
+  events:
+    $e.metadata.log_type = "WINEVTLOG"
+    $e.metadata.product_event_type = "4726"
+    $user = $e.principal.user.userid
+    $name = $e.principal.hostname
+
+  match:
+    $user, $name over 1h
+
+  outcome:
+    $count = count($e.metadata.id)
+    $deleted_users = array_distinct($e.target.user.userid)
+
+  condition:
+    $e
+}

@@ -1,0 +1,19 @@
+rule dac_win_0189 {
+  meta:
+    author = "Detection Engineer"
+    description = "CMSTP / InstallUtil / Regasm LOLBin execution - Behavior: CMSTP / InstallUtil / Regasm LOLBin execution. Anchor after classic/XML coalesce. Not telemetry_validated."
+    severity = "Medium"
+    rule_id = "DAC-WIN-0189"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1218.003"
+    mitre_attack_technique = "T1218.004"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    ($e.target.process.file.full_path = /\\cmstp\.exe$/ nocase or $e.target.process.file.full_path = /\\installutil\.exe$/ nocase or $e.target.process.file.full_path = /\\regasm\.exe$/ nocase or $e.target.process.file.full_path = /\\regsvcs\.exe$/ nocase)
+
+  condition:
+    $e
+}

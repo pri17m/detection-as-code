@@ -6,6 +6,7 @@ author: DaC
 status: experimental
 platforms:
 - splunk
+- google_secops
 sourcetypes:
 - WinEventLog:Security
 mitre:
@@ -36,3 +37,49 @@ query:
     SubjectUserName
 
     '
+  google_secops: |-
+    rule dac_win_0017 {
+      meta:
+        author = "DaC"
+        description = "Privileged service called with SeDebugPrivilege (4673) - Detects use of SeDebugPrivilege via privileged service calls, which can be associated with credential dumping and process injection workflows."
+        severity = "High"
+        rule_id = "DAC-WIN-0017"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1068"
+
+      events:
+        $e.metadata.log_type = "WINEVTLOG"
+        $e.metadata.product_event_type = "4673"
+        $e.target.user.attribute.permissions.name = /sedebugprivilege/ nocase
+        $name = $e.principal.hostname
+        $user = $e.principal.user.userid
+
+      match:
+        $name, $user over 1h
+
+      outcome:
+        $count = count($e.metadata.id)
+        $processes = array_distinct($e.target.process.file.full_path)
+        $privileges = array_distinct($e.target.user.attribute.permissions.name)
+
+      condition:
+        $e
+    }
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: approximate
+    score: 0.95
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: win.security
+    review: approved in detection-engineering review 2026-11-17
+    caveats:
+    - Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule.
+    converted_on: '2026-11-17'

@@ -62,6 +62,7 @@ def render(root: Path) -> str:
     pc = s["platform_counts"]
     total = s["detections_total"]
     splunk, cs, mde = pc.get("splunk", 0), pc.get("crowdstrike", 0), pc.get("defender", 0)
+    gso = pc.get("google_secops", 0)
     packs = " • ".join(
         f"{PACK_LABELS.get(k, k)} {v}" for k, v in sorted(extra["packs"].items(), key=lambda kv: (-kv[1], kv[0]))
     )
@@ -70,7 +71,7 @@ def render(root: Path) -> str:
     lines: List[str] = [
         BEGIN,
         f"- **Total detections**: {total}",
-        f"- **Rules per platform**: Splunk {splunk} • CrowdStrike {cs} • Defender {mde}",
+        f"- **Rules per platform**: Splunk {splunk} • CrowdStrike {cs} • Defender {mde} • Google SecOps {gso}",
         f"- **Splunk pack breakdown**: {packs}",
         f"- **ATT&CK coverage**: {s['unique_techniques']} unique techniques • tactics normalized from `mitre.tactics` "
         "(ATT&CK v19 remap: revoked T1562/T1070.001 folded into T1685/T1686)",
@@ -81,6 +82,7 @@ def render(root: Path) -> str:
         f"| Splunk | {splunk} | SPL (`query.splunk`) |",
         f"| CrowdStrike Falcon | {cs} | CQL / Falcon IOA-style patterns (`query.crowdstrike`) |",
         f"| Microsoft Defender for Endpoint | {mde} | KQL Advanced Hunting (`query.defender`) |",
+        f"| Google SecOps | {gso} | YARA-L 2.0 (`query.google_secops`), converted from SPL by RuleBridge; see `docs/platforms/google-secops.md` |",
         f"| Sigma sources | {extra['sigma_files']} Sigma YAMLs under `detections/` | {extra['sigma_meta']} detections carry "
         "`sigma.path` metadata (Sigma→Splunk conversions) |",
         END,

@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_gh_0010 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GitHub: Fine-grained PAT created for privileged org resources - fine_grained_personal_access_token.create\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0010\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1528\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    ($e.metadata.product_event_type = \"fine_grained_personal_access_token.create\" nocase or $e.metadata.product_event_type = \"personal_access_token.access_granted\" nocase)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_gh_0010 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GitHub: Fine-grained PAT created for privileged org resources - fine_grained_personal_access_token.create\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0010\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1528\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    ($e.metadata.product_event_type = \"fine_grained_personal_access_token.create\" nocase or $e.metadata.product_event_type = \"personal_access_token.access_granted\" nocase)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

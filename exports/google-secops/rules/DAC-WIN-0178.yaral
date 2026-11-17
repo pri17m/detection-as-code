@@ -1,0 +1,19 @@
+rule dac_win_0178 {
+  meta:
+    author = "Detection Engineer"
+    description = "WMI process call via powershell - Behavior: WMI process call via powershell. Anchor after classic/XML coalesce. Not telemetry_validated."
+    severity = "Medium"
+    rule_id = "DAC-WIN-0178"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1047"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    $e.target.process.file.full_path = /\\powershell\.exe$/ nocase
+    ($e.target.process.command_line = /Invoke-WmiMethod/ nocase or $e.target.process.command_line = /Get-WmiObject/ nocase or $e.target.process.command_line = /Invoke-CimMethod/ nocase or $e.target.process.command_line = /wmic / nocase)
+
+  condition:
+    $e
+}

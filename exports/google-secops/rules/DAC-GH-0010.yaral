@@ -1,0 +1,17 @@
+rule dac_gh_0010 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Fine-grained PAT created for privileged org resources - fine_grained_personal_access_token.create"
+    severity = "High"
+    rule_id = "DAC-GH-0010"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1528"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "fine_grained_personal_access_token.create" nocase or $e.metadata.product_event_type = "personal_access_token.access_granted" nocase)
+
+  condition:
+    $e
+}

@@ -6,6 +6,7 @@ author: Threat Detection Engineering
 status: experimental
 platforms:
 - splunk
+- google_secops
 sourcetypes:
 - windows_sysmon
 - XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
@@ -32,3 +33,51 @@ query:
     \ match(key,\"\\\\\\\\software\\\\\\\\microsoft\\\\\\\\windows\\\\\\\\currentversion\\\\\\\\policies\\\
     \\\\\\explorer\\\\\\\\run\\\\\\\\\")\n| stats count values(Image) as images values(Details) as value_data\
     \ by host, User, TargetObject\n"
+  google_secops: |-
+    rule dac_win_0012 {
+      meta:
+        author = "Threat Detection Engineering"
+        description = "Registry Run key persistence (Sysmon 13) - Detects registry value sets in common Run/RunOnce persistence keys via Sysmon Event ID 13. Tune allowlists for known software updaters and enterprise tooling."
+        severity = "Medium"
+        rule_id = "DAC-WIN-0012"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1547.001"
+
+      events:
+        ($e.metadata.event_type = "REGISTRY_MODIFICATION" or $e.metadata.event_type = "REGISTRY_CREATION")
+        $e.metadata.log_type = "WINDOWS_SYSMON"
+        $e.metadata.product_event_type = "13"
+        ($e.target.registry.registry_key = /\\software\\microsoft\\windows\\currentversion\\run(once)?\\/ nocase or $e.target.registry.registry_key = /\\software\\microsoft\\windows\\currentversion\\policies\\explorer\\run\\/ nocase)
+        $name = $e.principal.hostname
+        $name_ = $e.principal.user.userid
+        $key = $e.target.registry.registry_key
+
+      match:
+        $name, $name_, $key over 1h
+
+      outcome:
+        $count = count($e.metadata.id)
+        $images = array_distinct($e.principal.process.file.full_path)
+        $value_data = array_distinct($e.target.registry.registry_value_data)
+
+      condition:
+        $e
+    }
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: approximate
+    score: 0.95
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: win.registry
+    review: approved in detection-engineering review 2026-11-17
+    caveats:
+    - Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule.
+    converted_on: '2026-11-17'

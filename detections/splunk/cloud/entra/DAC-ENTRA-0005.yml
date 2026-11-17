@@ -8,6 +8,24 @@ query:
     userPrincipalName
 
     '
+  google_secops: |-
+    rule dac_entra_0005 {
+      meta:
+        author = "Detection Engineer"
+        description = "Entra: Service principal credentials added (key password or cert) - Add service principal credentials"
+        severity = "High"
+        rule_id = "DAC-ENTRA-0005"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1098.001"
+
+      events:
+        $e.metadata.log_type = "AZURE_AD_AUDIT"
+        $e.metadata.product_event_type = "Add service principal credentials" nocase
+
+      condition:
+        $e
+    }
 id: DAC-ENTRA-0005
 title: 'Entra: Service principal credentials added (key password or cert)'
 false_positives:
@@ -17,6 +35,7 @@ sourcetypes:
 - azure:monitor:aad
 platforms:
 - splunk
+- google_secops
 tags:
 - wave-b
 - P0
@@ -37,3 +56,19 @@ mitre:
 author: Detection Engineer
 status: experimental
 description: Add service principal credentials
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: exact
+    score: 1.0
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: azure.entra
+    review: approved in detection-engineering review 2026-11-17
+    caveats: []
+    converted_on: '2026-11-17'

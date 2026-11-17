@@ -10,6 +10,31 @@ query:
     | table _time, actor, action, org, repo, actor_ip, user_agent
 
     '
+  google_secops: |-
+    rule dac_gh_0030 {
+      meta:
+        author = "Detection Engineer"
+        description = "GitHub: Mass private repository clone or archive download - repo.download_zip / git.clone burst private"
+        severity = "High"
+        rule_id = "DAC-GH-0030"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1213.003"
+
+      events:
+        $e.metadata.log_type = "GITHUB"
+        ($e.metadata.product_event_type = "repo.download_zip" nocase or $e.metadata.product_event_type = "git.clone" nocase or $e.metadata.product_event_type = "repo.access" nocase)
+        $name = $e.principal.user.userid
+
+      match:
+        $name over 1h
+
+      outcome:
+        $count = count($e.metadata.id)
+
+      condition:
+        $e and $count > 20
+    }
 id: DAC-GH-0030
 title: 'GitHub: Mass private repository clone or archive download'
 false_positives:
@@ -20,6 +45,7 @@ sourcetypes:
 - github:cloud:audit
 platforms:
 - splunk
+- google_secops
 tags:
 - wave-b
 - P0
@@ -41,3 +67,20 @@ mitre:
 author: Detection Engineer
 status: experimental
 description: repo.download_zip / git.clone burst private
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: approximate
+    score: 0.95
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: github.audit
+    review: approved in detection-engineering review 2026-11-17
+    caveats:
+    - Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule.
+    converted_on: '2026-11-17'

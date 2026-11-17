@@ -1,0 +1,972 @@
+{
+ "generated_on": "2026-11-17",
+ "converter": "rulebridge 0.1.0 (2ad2aaa)",
+ "target": "Google SecOps YARA-L 2.0",
+ "count": 83,
+ "rules": [
+  {
+   "id": "DAC-AZ-0006",
+   "title": "Azure: RunCommand or RunCommandPreview on VM fleets",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0006.yml",
+   "rule_file": "rules/DAC-AZ-0006.yaral",
+   "import_request": "import-requests/DAC-AZ-0006.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0011",
+   "title": "Azure: Disk or snapshot export/grant to external tenant",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0011.yml",
+   "rule_file": "rules/DAC-AZ-0011.yaral",
+   "import_request": "import-requests/DAC-AZ-0011.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0019",
+   "title": "Azure: Policy assignment deleted or exemption created broadly",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0019.yml",
+   "rule_file": "rules/DAC-AZ-0019.yaral",
+   "import_request": "import-requests/DAC-AZ-0019.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0021",
+   "title": "Azure: AKS cluster admin credential list or kubeconfig pull",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0021.yml",
+   "rule_file": "rules/DAC-AZ-0021.yaral",
+   "import_request": "import-requests/DAC-AZ-0021.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0024",
+   "title": "Azure: Backup vault soft-delete disabled or backup item delete",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0024.yml",
+   "rule_file": "rules/DAC-AZ-0024.yaral",
+   "import_request": "import-requests/DAC-AZ-0024.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0025",
+   "title": "Azure: Resource lock deleted before destructive change",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0025.yml",
+   "rule_file": "rules/DAC-AZ-0025.yaral",
+   "import_request": "import-requests/DAC-AZ-0025.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0027",
+   "title": "Azure: Network Watcher or flow log disabled",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0027.yml",
+   "rule_file": "rules/DAC-AZ-0027.yaral",
+   "import_request": "import-requests/DAC-AZ-0027.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0030",
+   "title": "Azure: PIM Azure resource role activation anomalous",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0030.yml",
+   "rule_file": "rules/DAC-AZ-0030.yaral",
+   "import_request": "import-requests/DAC-AZ-0030.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0031",
+   "title": "Azure: Image gallery or shared image version published externally",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0031.yml",
+   "rule_file": "rules/DAC-AZ-0031.yaral",
+   "import_request": "import-requests/DAC-AZ-0031.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0033",
+   "title": "Azure: Bastion or JIT access policy weakened",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0033.yml",
+   "rule_file": "rules/DAC-AZ-0033.yaral",
+   "import_request": "import-requests/DAC-AZ-0033.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0035",
+   "title": "Azure: Subscription transfer or billing ownership change",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0035.yml",
+   "rule_file": "rules/DAC-AZ-0035.yaral",
+   "import_request": "import-requests/DAC-AZ-0035.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0036",
+   "title": "Azure: Create new subscription or move management group",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0036.yml",
+   "rule_file": "rules/DAC-AZ-0036.yaral",
+   "import_request": "import-requests/DAC-AZ-0036.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-AZ-0038",
+   "title": "Azure: Private endpoint removed exposing PaaS publicly",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/azure/DAC-AZ-0038.yml",
+   "rule_file": "rules/DAC-AZ-0038.yaral",
+   "import_request": "import-requests/DAC-AZ-0038.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-ENTRA-0005",
+   "title": "Entra: Service principal credentials added (key password or cert)",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/entra/DAC-ENTRA-0005.yml",
+   "rule_file": "rules/DAC-ENTRA-0005.yaral",
+   "import_request": "import-requests/DAC-ENTRA-0005.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0003",
+   "title": "GCP: serviceAccounts.keys.create for privileged SA",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0003.yml",
+   "rule_file": "rules/DAC-GCP-0003.yaral",
+   "import_request": "import-requests/DAC-GCP-0003.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0005",
+   "title": "GCP: IAM service account create outside pipeline",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0005.yml",
+   "rule_file": "rules/DAC-GCP-0005.yaral",
+   "import_request": "import-requests/DAC-GCP-0005.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0006",
+   "title": "GCP: logging sinks delete or update weaken export",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0006.yml",
+   "rule_file": "rules/DAC-GCP-0006.yaral",
+   "import_request": "import-requests/DAC-GCP-0006.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0008",
+   "title": "GCP: Cloud Monitoring notification channel or alert policy delete",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0008.yml",
+   "rule_file": "rules/DAC-GCP-0008.yaral",
+   "import_request": "import-requests/DAC-GCP-0008.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0009",
+   "title": "GCP: GenerateAccessToken or SignJwt for SA impersonation",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0009.yml",
+   "rule_file": "rules/DAC-GCP-0009.yaral",
+   "import_request": "import-requests/DAC-GCP-0009.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0013",
+   "title": "GCP: storage.objects.copy or rewrite cross-project",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0013.yml",
+   "rule_file": "rules/DAC-GCP-0013.yaral",
+   "import_request": "import-requests/DAC-GCP-0013.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0018",
+   "title": "GCP: Secret Manager AccessSecretVersion burst",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0018.yml",
+   "rule_file": "rules/DAC-GCP-0018.yaral",
+   "import_request": "import-requests/DAC-GCP-0018.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-GCP-0021",
+   "title": "GCP: compute.instances.getSerialPortOutput sensitive",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0021.yml",
+   "rule_file": "rules/DAC-GCP-0021.yaral",
+   "import_request": "import-requests/DAC-GCP-0021.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0024",
+   "title": "GCP: KMS CryptoKeyVersion destroy or disable",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0024.yml",
+   "rule_file": "rules/DAC-GCP-0024.yaral",
+   "import_request": "import-requests/DAC-GCP-0024.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0030",
+   "title": "GCP: GKE UpdateCluster remove authorized networks",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0030.yml",
+   "rule_file": "rules/DAC-GCP-0030.yaral",
+   "import_request": "import-requests/DAC-GCP-0030.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0031",
+   "title": "GCP: Workload Identity pool / provider created for external IdP",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0031.yml",
+   "rule_file": "rules/DAC-GCP-0031.yaral",
+   "import_request": "import-requests/DAC-GCP-0031.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0032",
+   "title": "GCP: Service account key upload (user-managed)",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0032.yml",
+   "rule_file": "rules/DAC-GCP-0032.yaral",
+   "import_request": "import-requests/DAC-GCP-0032.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0034",
+   "title": "GCP: Logging exclusion created hiding Admin Activity",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0034.yml",
+   "rule_file": "rules/DAC-GCP-0034.yaral",
+   "import_request": "import-requests/DAC-GCP-0034.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GCP-0037",
+   "title": "GCP: VPC Service Controls perimeter soften or dry-run only",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/cloud/gcp/DAC-GCP-0037.yml",
+   "rule_file": "rules/DAC-GCP-0037.yaral",
+   "import_request": "import-requests/DAC-GCP-0037.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0002",
+   "title": "GitHub: SSH key added to account",
+   "severity": "medium",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/github/DAC-GH-0002-github-ssh-key-added.yaml",
+   "rule_file": "rules/DAC-GH-0002.yaral",
+   "import_request": "import-requests/DAC-GH-0002.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-GH-0006",
+   "title": "GitHub: Actions workflow modified",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/github/DAC-GH-0006-github-actions-workflow-modified.yaml",
+   "rule_file": "rules/DAC-GH-0006.yaral",
+   "import_request": "import-requests/DAC-GH-0006.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-GH-0010",
+   "title": "GitHub: Fine-grained PAT created for privileged org resources",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0010.yml",
+   "rule_file": "rules/DAC-GH-0010.yaral",
+   "import_request": "import-requests/DAC-GH-0010.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0013",
+   "title": "GitHub: Org audit log streaming disabled or removed",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0013.yml",
+   "rule_file": "rules/DAC-GH-0013.yaral",
+   "import_request": "import-requests/DAC-GH-0013.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0014",
+   "title": "GitHub: Org audit log export or webhook sink weakened",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0014.yml",
+   "rule_file": "rules/DAC-GH-0014.yaral",
+   "import_request": "import-requests/DAC-GH-0014.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0015",
+   "title": "GitHub: Branch protection or ruleset weakened on default branch",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0015.yml",
+   "rule_file": "rules/DAC-GH-0015.yaral",
+   "import_request": "import-requests/DAC-GH-0015.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0016",
+   "title": "GitHub: Required status checks removed from protected branch",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0016.yml",
+   "rule_file": "rules/DAC-GH-0016.yaral",
+   "import_request": "import-requests/DAC-GH-0016.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0020",
+   "title": "GitHub: Org Actions permissions set to all repositories or write GITHUB_TOKEN",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0020.yml",
+   "rule_file": "rules/DAC-GH-0020.yaral",
+   "import_request": "import-requests/DAC-GH-0020.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0021",
+   "title": "GitHub: Org MFA requirement disabled or relaxed",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0021.yml",
+   "rule_file": "rules/DAC-GH-0021.yaral",
+   "import_request": "import-requests/DAC-GH-0021.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0022",
+   "title": "GitHub: Org SAML SSO enforcement disabled",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0022.yml",
+   "rule_file": "rules/DAC-GH-0022.yaral",
+   "import_request": "import-requests/DAC-GH-0022.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0026",
+   "title": "GitHub: SSH key added to privileged org member account",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0026.yml",
+   "rule_file": "rules/DAC-GH-0026.yaral",
+   "import_request": "import-requests/DAC-GH-0026.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0028",
+   "title": "GitHub: Push protection bypassed or disabled for org/repo",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0028.yml",
+   "rule_file": "rules/DAC-GH-0028.yaral",
+   "import_request": "import-requests/DAC-GH-0028.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0029",
+   "title": "GitHub: Repository secret or environment secret created outside CI bot",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0029.yml",
+   "rule_file": "rules/DAC-GH-0029.yaral",
+   "import_request": "import-requests/DAC-GH-0029.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0030",
+   "title": "GitHub: Mass private repository clone or archive download",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/github/DAC-GH-0030.yml",
+   "rule_file": "rules/DAC-GH-0030.yaral",
+   "import_request": "import-requests/DAC-GH-0030.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-GH-0031",
+   "title": "GitHub: Repository transferred out of organization",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0031.yml",
+   "rule_file": "rules/DAC-GH-0031.yaral",
+   "import_request": "import-requests/DAC-GH-0031.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0034",
+   "title": "GitHub: Release asset replaced after publish",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0034.yml",
+   "rule_file": "rules/DAC-GH-0034.yaral",
+   "import_request": "import-requests/DAC-GH-0034.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0035",
+   "title": "GitHub: Package published from unexpected actor or fork",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0035.yml",
+   "rule_file": "rules/DAC-GH-0035.yaral",
+   "import_request": "import-requests/DAC-GH-0035.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-GH-0039",
+   "title": "GitHub: Org IP allow list disabled or emptied",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/github/DAC-GH-0039.yml",
+   "rule_file": "rules/DAC-GH-0039.yaral",
+   "import_request": "import-requests/DAC-GH-0039.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0111",
+   "title": "Registry Run key persistence (user-writable path)",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0111.yml",
+   "rule_file": "rules/DAC-WIN-0111.yaral",
+   "import_request": "import-requests/DAC-WIN-0111.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0113",
+   "title": "WmiPrvSE / wsmprovhost unusual children",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0113.yml",
+   "rule_file": "rules/DAC-WIN-0113.yaral",
+   "import_request": "import-requests/DAC-WIN-0113.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0115",
+   "title": "LSASS access via comsvcs MiniDump pattern",
+   "severity": "critical",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0115.yml",
+   "rule_file": "rules/DAC-WIN-0115.yaral",
+   "import_request": "import-requests/DAC-WIN-0115.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0117",
+   "title": "Special privileges assigned to new logon (Tier-0)",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0117.yml",
+   "rule_file": "rules/DAC-WIN-0117.yaral",
+   "import_request": "import-requests/DAC-WIN-0117.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0119",
+   "title": "Network share Admin$ access",
+   "severity": "medium",
+   "fidelity": "approximate",
+   "score": 0.9,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0119.yml",
+   "rule_file": "rules/DAC-WIN-0119.yaral",
+   "import_request": "import-requests/DAC-WIN-0119.json",
+   "caveats": [
+    "group-by `Account` is a coalesce of ['TargetUserName', 'Account_Name', 'SubjectUserName']; first field used per target.",
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0121",
+   "title": "PowerShell encoded command line (Sysmon)",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0121.yml",
+   "rule_file": "rules/DAC-WIN-0121.yaral",
+   "import_request": "import-requests/DAC-WIN-0121.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0122",
+   "title": "Office spawning PowerShell",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0122.yml",
+   "rule_file": "rules/DAC-WIN-0122.yaral",
+   "import_request": "import-requests/DAC-WIN-0122.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0125",
+   "title": "Local user account created",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0125.yml",
+   "rule_file": "rules/DAC-WIN-0125.yaral",
+   "import_request": "import-requests/DAC-WIN-0125.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0133",
+   "title": "WinRM host process spawning script interpreter",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0133.yml",
+   "rule_file": "rules/DAC-WIN-0133.yaral",
+   "import_request": "import-requests/DAC-WIN-0133.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0135",
+   "title": "Password spray distinct users single source (4625)",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.9,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0135.yml",
+   "rule_file": "rules/DAC-WIN-0135.yaral",
+   "import_request": "import-requests/DAC-WIN-0135.json",
+   "caveats": [
+    "group-by `Ip` is a coalesce of ['IpAddress', 'Source_Network_Address', 'WorkstationName']; first field used per target.",
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0136",
+   "title": "Kerberos pre-auth failures spray (4771)",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.9,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0136.yml",
+   "rule_file": "rules/DAC-WIN-0136.yaral",
+   "import_request": "import-requests/DAC-WIN-0136.json",
+   "caveats": [
+    "group-by `Ip` is a coalesce of ['IpAddress', 'Source_Network_Address', 'WorkstationName']; first field used per target.",
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0143",
+   "title": "Audit policy changed (4719)",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0143.yml",
+   "rule_file": "rules/DAC-WIN-0143.yaral",
+   "import_request": "import-requests/DAC-WIN-0143.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0150",
+   "title": "Bitsadmin download",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0150.yml",
+   "rule_file": "rules/DAC-WIN-0150.yaral",
+   "import_request": "import-requests/DAC-WIN-0150.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0153",
+   "title": "Disable Windows Defender via process",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0153.yml",
+   "rule_file": "rules/DAC-WIN-0153.yaral",
+   "import_request": "import-requests/DAC-WIN-0153.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0157",
+   "title": "Net.exe domain group enumeration",
+   "severity": "low",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0157.yml",
+   "rule_file": "rules/DAC-WIN-0157.yaral",
+   "import_request": "import-requests/DAC-WIN-0157.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0158",
+   "title": "Nltest / domain trust discovery",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0158.yml",
+   "rule_file": "rules/DAC-WIN-0158.yaral",
+   "import_request": "import-requests/DAC-WIN-0158.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0174",
+   "title": "Suspicious parent-child of system tools",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0174.yml",
+   "rule_file": "rules/DAC-WIN-0174.yaral",
+   "import_request": "import-requests/DAC-WIN-0174.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0175",
+   "title": "Process tampering indicators (Sysmon 25 if present)",
+   "severity": "high",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0175.yml",
+   "rule_file": "rules/DAC-WIN-0175.yaral",
+   "import_request": "import-requests/DAC-WIN-0175.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0176",
+   "title": "DNS query to tunneling / suspicious patterns",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0176.yml",
+   "rule_file": "rules/DAC-WIN-0176.yaral",
+   "import_request": "import-requests/DAC-WIN-0176.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0178",
+   "title": "WMI process call via powershell",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0178.yml",
+   "rule_file": "rules/DAC-WIN-0178.yaral",
+   "import_request": "import-requests/DAC-WIN-0178.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0180",
+   "title": "Account locked out burst (4740)",
+   "severity": "medium",
+   "fidelity": "approximate",
+   "score": 0.9,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0180.yml",
+   "rule_file": "rules/DAC-WIN-0180.yaral",
+   "import_request": "import-requests/DAC-WIN-0180.json",
+   "caveats": [
+    "group-by `Ip` is a coalesce of ['IpAddress', 'Source_Network_Address', 'WorkstationName']; first field used per target.",
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0187",
+   "title": "Clear PowerShell history via process",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0187.yml",
+   "rule_file": "rules/DAC-WIN-0187.yaral",
+   "import_request": "import-requests/DAC-WIN-0187.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0189",
+   "title": "CMSTP / InstallUtil / Regasm LOLBin execution",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0189.yml",
+   "rule_file": "rules/DAC-WIN-0189.yaral",
+   "import_request": "import-requests/DAC-WIN-0189.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0339",
+   "title": "Indirect command execution via forfiles or pcalua",
+   "severity": "medium",
+   "fidelity": "exact",
+   "score": 1.0,
+   "source_path": "detections/splunk/windows/priority/DAC-WIN-0339.yml",
+   "rule_file": "rules/DAC-WIN-0339.yaral",
+   "import_request": "import-requests/DAC-WIN-0339.json",
+   "caveats": []
+  },
+  {
+   "id": "DAC-WIN-0012",
+   "title": "Registry Run key persistence (Sysmon 13)",
+   "severity": "medium",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/windows/security/DAC-WIN-0012-kerberos-tgs-requests-using-rc4-encryption-4769.yaml",
+   "rule_file": "rules/DAC-WIN-0012.yaral",
+   "import_request": "import-requests/DAC-WIN-0012.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0016",
+   "title": "Password reset attempts spike (4724) by actor",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.9,
+   "source_path": "detections/splunk/windows/security/DAC-WIN-0016-password-reset-attempts-spike-4724-by-actor.yaml",
+   "rule_file": "rules/DAC-WIN-0016.yaral",
+   "import_request": "import-requests/DAC-WIN-0016.json",
+   "caveats": [
+    "group-by `actor` is a coalesce of ['SubjectUserName', 'src_user']; first field used per target.",
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0017",
+   "title": "Privileged service called with SeDebugPrivilege (4673)",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/windows/security/DAC-WIN-0017-privileged-service-called-with-sedebugprivilege-4673.yaml",
+   "rule_file": "rules/DAC-WIN-0017.yaral",
+   "import_request": "import-requests/DAC-WIN-0017.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0018",
+   "title": "Security audit log cleared (1102)",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/windows/security/DAC-WIN-0018-security-audit-log-cleared-1102.yaml",
+   "rule_file": "rules/DAC-WIN-0018.yaral",
+   "import_request": "import-requests/DAC-WIN-0018.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0021",
+   "title": "Scheduled task modified (4702) for persistence",
+   "severity": "medium",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/windows/security/DAC-WIN-0021-scheduled-task-modified-4702-for-persistence.yaml",
+   "rule_file": "rules/DAC-WIN-0021.yaral",
+   "import_request": "import-requests/DAC-WIN-0021.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0024",
+   "title": "User account deleted (4726)",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.9,
+   "source_path": "detections/splunk/windows/security/DAC-WIN-0024-user-account-deleted-4726.yaml",
+   "rule_file": "rules/DAC-WIN-0024.yaral",
+   "import_request": "import-requests/DAC-WIN-0024.json",
+   "caveats": [
+    "group-by `actor` is a coalesce of ['SubjectUserName', 'src_user']; first field used per target.",
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0025",
+   "title": "User added to security group (EventCode 4728)",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.9,
+   "source_path": "detections/splunk/windows/security/DAC-WIN-0025-user-added-to-security-group-eventcode-4728.yaml",
+   "rule_file": "rules/DAC-WIN-0025.yaral",
+   "import_request": "import-requests/DAC-WIN-0025.json",
+   "caveats": [
+    "group-by `actor` is a coalesce of ['SubjectUserName', 'Subject_User_Name', 'src_user']; first field used per target.",
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0026",
+   "title": "User added to security group (EventCode 4732)",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.9,
+   "source_path": "detections/splunk/windows/security/DAC-WIN-0026-user-added-to-security-group-eventcode-4732.yaml",
+   "rule_file": "rules/DAC-WIN-0026.yaral",
+   "import_request": "import-requests/DAC-WIN-0026.json",
+   "caveats": [
+    "group-by `actor` is a coalesce of ['SubjectUserName', 'Subject_User_Name', 'src_user']; first field used per target.",
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0027",
+   "title": "User added to security group (EventCode 4756)",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.9,
+   "source_path": "detections/splunk/windows/security/DAC-WIN-0027-user-added-to-security-group-eventcode-4756.yaml",
+   "rule_file": "rules/DAC-WIN-0027.yaral",
+   "import_request": "import-requests/DAC-WIN-0027.json",
+   "caveats": [
+    "group-by `actor` is a coalesce of ['SubjectUserName', 'Subject_User_Name', 'src_user']; first field used per target.",
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0077",
+   "title": "Sysmon: LOLBins initiating outbound network connections",
+   "severity": "medium",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/windows/sysmon/DAC-WIN-0077-sysmon-lolbins-initiating-outbound-network-connections.yaml",
+   "rule_file": "rules/DAC-WIN-0077.yaral",
+   "import_request": "import-requests/DAC-WIN-0077.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0080",
+   "title": "Sysmon: File created in Startup folder (persistence)",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/windows/sysmon/DAC-WIN-0080-sysmon-file-created-in-startup-folder-persistence.yaml",
+   "rule_file": "rules/DAC-WIN-0080.yaral",
+   "import_request": "import-requests/DAC-WIN-0080.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0081",
+   "title": "Sysmon: Registry Run key persistence (CurrentVersion\\\\Run)",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/windows/sysmon/DAC-WIN-0081-sysmon-registry-run-key-persistence-currentversion-run.yaml",
+   "rule_file": "rules/DAC-WIN-0081.yaral",
+   "import_request": "import-requests/DAC-WIN-0081.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  },
+  {
+   "id": "DAC-WIN-0082",
+   "title": "Sysmon: Defender policy registry modifications",
+   "severity": "high",
+   "fidelity": "approximate",
+   "score": 0.95,
+   "source_path": "detections/splunk/windows/sysmon/DAC-WIN-0082-sysmon-defender-policy-registry-modifications.yaml",
+   "rule_file": "rules/DAC-WIN-0082.yaral",
+   "import_request": "import-requests/DAC-WIN-0082.json",
+   "caveats": [
+    "Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule."
+   ]
+  }
+ ]
+}

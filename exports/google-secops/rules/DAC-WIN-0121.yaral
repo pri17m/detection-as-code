@@ -1,0 +1,19 @@
+rule dac_win_0121 {
+  meta:
+    author = "Detection Engineer"
+    description = "PowerShell encoded command line (Sysmon) - Behavior: PowerShell encoded command line (Sysmon). Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1 powershell -EncodedCommand/-enc"
+    severity = "Medium"
+    rule_id = "DAC-WIN-0121"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1059.001"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    $e.target.process.file.full_path = /\\powershell\.exe$/ nocase
+    ($e.target.process.command_line = /-enc/ nocase or $e.target.process.command_line = /-encodedcommand/ nocase)
+
+  condition:
+    $e
+}

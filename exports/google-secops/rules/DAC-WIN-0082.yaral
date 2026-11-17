@@ -1,0 +1,29 @@
+rule dac_win_0082 {
+  meta:
+    author = "DaC"
+    description = "Sysmon: Defender policy registry modifications - Detects registry modifications under Windows Defender policy keys that can indicate attempts to impair defenses."
+    severity = "High"
+    rule_id = "DAC-WIN-0082"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685"
+
+  events:
+    ($e.metadata.event_type = "REGISTRY_MODIFICATION" or $e.metadata.event_type = "REGISTRY_CREATION")
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    $e.metadata.product_event_type = "13"
+    ($e.target.registry.registry_key = /\\software\\policies\\microsoft\\windows defender\\/ nocase or $e.target.registry.registry_key = /\\software\\microsoft\\windows defender\\/ nocase)
+    $name = $e.principal.hostname
+    $name_ = $e.principal.user.userid
+
+  match:
+    $name, $name_ over 1h
+
+  outcome:
+    $count = count($e.metadata.id)
+    $registry_paths = array_distinct($e.target.registry.registry_key)
+    $images = array_distinct($e.principal.process.file.full_path)
+
+  condition:
+    $e
+}

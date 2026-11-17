@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_win_0025 {\n  meta:\n    author = \"DaC\"\n    description = \"User added to security group (EventCode 4728) - Detects group membership additions (EventCode 4728). On this event TargetUserName is the GROUP and MemberName/MemberSid identify the member added; SubjectUserName is the actor.\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0025\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1098\"\n\n  events:\n    $e.metadata.log_type = \"WINEVTLOG\"\n    $e.metadata.product_event_type = \"4728\"\n    ($e.target.user.user_display_name != \"\" or $e.target.user.windows_sid != \"\")\n    $user = $e.principal.user.userid\n    $name = $e.principal.hostname\n\n  match:\n    $user, $name over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $members = array_distinct($e.target.user.user_display_name)\n    $member_sids = array_distinct($e.target.user.windows_sid)\n    $groups = array_distinct($e.target.user.userid)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_win_0025 {\n  meta:\n    author = \"DaC\"\n    description = \"User added to security group (EventCode 4728) - Detects group membership additions (EventCode 4728). On this event TargetUserName is the GROUP and MemberName/MemberSid identify the member added; SubjectUserName is the actor.\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0025\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1098\"\n\n  events:\n    $e.metadata.log_type = \"WINEVTLOG\"\n    $e.metadata.product_event_type = \"4728\"\n    ($e.target.user.user_display_name != \"\" or $e.target.user.windows_sid != \"\")\n    $user = $e.principal.user.userid\n    $name = $e.principal.hostname\n\n  match:\n    $user, $name over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $members = array_distinct($e.target.user.user_display_name)\n    $member_sids = array_distinct($e.target.user.windows_sid)\n    $groups = array_distinct($e.target.user.userid)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

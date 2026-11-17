@@ -1,0 +1,26 @@
+rule dac_win_0180 {
+  meta:
+    author = "Detection Engineer"
+    description = "Account locked out burst (4740) - Behavior: Account locked out burst (4740). Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. 4740 many users one caller"
+    severity = "Medium"
+    rule_id = "DAC-WIN-0180"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1110"
+
+  events:
+    $e.metadata.log_type = "WINEVTLOG"
+    $e.metadata.product_event_type = "4740"
+    $ip = $e.principal.ip
+    $name = $e.principal.hostname
+
+  match:
+    $ip, $name over 1h
+
+  outcome:
+    $count = count($e.metadata.id)
+    $accounts = array_distinct($e.target.user.userid)
+
+  condition:
+    $e and $count >= 5
+}

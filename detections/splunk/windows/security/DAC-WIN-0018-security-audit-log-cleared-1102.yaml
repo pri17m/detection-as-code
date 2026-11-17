@@ -6,6 +6,7 @@ author: DaC
 status: experimental
 platforms:
 - splunk
+- google_secops
 sourcetypes:
 - WinEventLog:Security
 mitre:
@@ -32,5 +33,48 @@ query:
     | stats count values(user) as users by host
 
     '
+  google_secops: |-
+    rule dac_win_0018 {
+      meta:
+        author = "DaC"
+        description = "Security audit log cleared (1102) - Detects Event ID 1102 indicating the Security log was cleared, commonly used for defense evasion."
+        severity = "High"
+        rule_id = "DAC-WIN-0018"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1685.005"
+
+      events:
+        $e.metadata.log_type = "WINEVTLOG"
+        $e.metadata.product_event_type = "1102"
+        $name = $e.principal.hostname
+
+      match:
+        $name over 1h
+
+      outcome:
+        $count = count($e.metadata.id)
+        $users = array_distinct($e.principal.user.userid)
+
+      condition:
+        $e
+    }
 tags:
 - attack-v19-remap
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: approximate
+    score: 0.95
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: win.security
+    review: approved in detection-engineering review 2026-11-17
+    caveats:
+    - Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule.
+    converted_on: '2026-11-17'

@@ -1,0 +1,17 @@
+rule dac_gh_0029 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Repository secret or environment secret created outside CI bot - repository_secret.create by human admin"
+    severity = "Medium"
+    rule_id = "DAC-GH-0029"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1552.001"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "repository_secret.create" nocase or $e.metadata.product_event_type = "environment_secret.create" nocase or $e.metadata.product_event_type = "org_secret.create" nocase)
+
+  condition:
+    $e
+}

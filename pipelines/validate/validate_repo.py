@@ -186,6 +186,13 @@ def _validate_platform_query_match(det: Dict[str, Any], *, path: Path) -> List[s
             _require_query("defender", "defender")
         if "crowdstrike" in platforms:
             _require_query("crowdstrike", "crowdstrike")
+        if "google_secops" in platforms:
+            _require_query("google_secops", "google_secops")
+            if not isinstance(det.get("conversions"), dict) or "google_secops" not in det.get("conversions", {}):
+                # A converted query must say where it came from and how faithful it is.
+                qv = query_obj.get("google_secops", "")
+                if isinstance(qv, str) and "converted_by = \"rulebridge\"" in qv:
+                    errors.append(f"{path}: query.google_secops was produced by rulebridge but conversions.google_secops is missing")
 
     return errors
 

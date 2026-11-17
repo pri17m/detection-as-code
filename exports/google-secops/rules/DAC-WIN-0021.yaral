@@ -1,0 +1,26 @@
+rule dac_win_0021 {
+  meta:
+    author = "DaC"
+    description = "Scheduled task modified (4702) for persistence - Detects modifications to scheduled tasks that may indicate persistence through task hijacking."
+    severity = "Medium"
+    rule_id = "DAC-WIN-0021"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1053.005"
+
+  events:
+    $e.metadata.log_type = "WINEVTLOG"
+    $e.metadata.product_event_type = "4702"
+    $name = $e.principal.hostname
+    $user = $e.principal.user.userid
+
+  match:
+    $name, $user over 1h
+
+  outcome:
+    $count = count($e.metadata.id)
+    $tasks = array_distinct($e.target.resource.name)
+
+  condition:
+    $e and $count >= 3
+}

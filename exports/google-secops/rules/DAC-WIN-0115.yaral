@@ -1,0 +1,19 @@
+rule dac_win_0115 {
+  meta:
+    author = "Detection Engineer"
+    description = "LSASS access via comsvcs MiniDump pattern - Behavior: LSASS access via comsvcs MiniDump pattern. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1 rundll32/comsvcs MiniDump OR Sysmon 10"
+    severity = "Critical"
+    rule_id = "DAC-WIN-0115"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1003.001"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    ($e.target.process.file.full_path = /\\rundll32\.exe$/ nocase or $e.target.process.command_line = /comsvcs/ nocase)
+    $e.target.process.command_line = /MiniDump/ nocase
+
+  condition:
+    $e
+}

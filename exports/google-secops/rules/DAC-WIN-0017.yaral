@@ -1,0 +1,28 @@
+rule dac_win_0017 {
+  meta:
+    author = "DaC"
+    description = "Privileged service called with SeDebugPrivilege (4673) - Detects use of SeDebugPrivilege via privileged service calls, which can be associated with credential dumping and process injection workflows."
+    severity = "High"
+    rule_id = "DAC-WIN-0017"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1068"
+
+  events:
+    $e.metadata.log_type = "WINEVTLOG"
+    $e.metadata.product_event_type = "4673"
+    $e.target.user.attribute.permissions.name = /sedebugprivilege/ nocase
+    $name = $e.principal.hostname
+    $user = $e.principal.user.userid
+
+  match:
+    $name, $user over 1h
+
+  outcome:
+    $count = count($e.metadata.id)
+    $processes = array_distinct($e.target.process.file.full_path)
+    $privileges = array_distinct($e.target.user.attribute.permissions.name)
+
+  condition:
+    $e
+}

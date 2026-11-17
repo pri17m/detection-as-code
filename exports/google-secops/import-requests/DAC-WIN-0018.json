@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_win_0018 {\n  meta:\n    author = \"DaC\"\n    description = \"Security audit log cleared (1102) - Detects Event ID 1102 indicating the Security log was cleared, commonly used for defense evasion.\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0018\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1685.005\"\n\n  events:\n    $e.metadata.log_type = \"WINEVTLOG\"\n    $e.metadata.product_event_type = \"1102\"\n    $name = $e.principal.hostname\n\n  match:\n    $name over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $users = array_distinct($e.principal.user.userid)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_win_0018 {\n  meta:\n    author = \"DaC\"\n    description = \"Security audit log cleared (1102) - Detects Event ID 1102 indicating the Security log was cleared, commonly used for defense evasion.\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0018\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1685.005\"\n\n  events:\n    $e.metadata.log_type = \"WINEVTLOG\"\n    $e.metadata.product_event_type = \"1102\"\n    $name = $e.principal.hostname\n\n  match:\n    $name over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $users = array_distinct($e.principal.user.userid)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

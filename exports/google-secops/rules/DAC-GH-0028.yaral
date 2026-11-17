@@ -1,0 +1,17 @@
+rule dac_gh_0028 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Push protection bypassed or disabled for org/repo - secret_scanning_push_protection disabled / bypass"
+    severity = "High"
+    rule_id = "DAC-GH-0028"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1552.001"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "secret_scanning_push_protection.bypass" nocase or $e.metadata.product_event_type = "repository_secret_scanning.disable" nocase or $e.metadata.product_event_type = "org.disable_secret_scanning" nocase)
+
+  condition:
+    $e
+}

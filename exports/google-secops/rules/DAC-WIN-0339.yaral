@@ -1,0 +1,19 @@
+rule dac_win_0339 {
+  meta:
+    author = "Detection Engineer"
+    description = "Indirect command execution via forfiles or pcalua - Behavior: forfiles /c or pcalua.exe -a launches a child command, a common indirect execution path (T1202). Anchor is Image+CommandLine after classic/XML coalesce. Not telemetry_validated."
+    severity = "Medium"
+    rule_id = "DAC-WIN-0339"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1202"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    ($e.target.process.file.full_path = /\\forfiles\.exe$/ nocase or $e.target.process.file.full_path = /\\pcalua\.exe$/ nocase)
+    $e.target.process.command_line = /\/c | -a |cmd.exe|powershell/ nocase
+
+  condition:
+    $e
+}

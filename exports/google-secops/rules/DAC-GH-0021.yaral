@@ -1,0 +1,17 @@
+rule dac_gh_0021 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Org MFA requirement disabled or relaxed - org.disable_two_factor_requirement"
+    severity = "High"
+    rule_id = "DAC-GH-0021"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1556.006"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "org.disable_two_factor_requirement" nocase or $e.metadata.product_event_type = "business.disable_two_factor_requirement" nocase)
+
+  condition:
+    $e
+}

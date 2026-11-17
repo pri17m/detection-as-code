@@ -1,0 +1,20 @@
+rule dac_win_0113 {
+  meta:
+    author = "Detection Engineer"
+    description = "WmiPrvSE / wsmprovhost unusual children - Sysmon 1 Parent WmiPrvSE/wsmprovhost to cmd/powershell/LOLBins"
+    severity = "High"
+    rule_id = "DAC-WIN-0113"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1047"
+    mitre_attack_technique = "T1021.006"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    ($e.principal.process.file.full_path = /\\WmiPrvSE\.exe$/ nocase or $e.principal.process.command_line = /\\WmiPrvSE\.exe$/ nocase or $e.principal.process.file.full_path = /\\wsmprovhost\.exe$/ nocase or $e.principal.process.command_line = /\\wsmprovhost\.exe$/ nocase or $e.principal.process.file.full_path = /\\winrshost\.exe$/ nocase or $e.principal.process.command_line = /\\winrshost\.exe$/ nocase)
+    ($e.target.process.file.full_path = /\\cmd\.exe$/ nocase or $e.target.process.command_line = /\\cmd\.exe$/ nocase or $e.target.process.file.full_path = /\\powershell\.exe$/ nocase or $e.target.process.command_line = /\\powershell\.exe$/ nocase or $e.target.process.file.full_path = /\\pwsh\.exe$/ nocase or $e.target.process.command_line = /\\pwsh\.exe$/ nocase or $e.target.process.file.full_path = /\\certutil\.exe$/ nocase or $e.target.process.command_line = /\\certutil\.exe$/ nocase or $e.target.process.file.full_path = /\\mshta\.exe$/ nocase or $e.target.process.command_line = /\\mshta\.exe$/ nocase or $e.target.process.file.full_path = /\\rundll32\.exe$/ nocase or $e.target.process.command_line = /\\rundll32\.exe$/ nocase or $e.target.process.file.full_path = /\\bitsadmin\.exe$/ nocase or $e.target.process.command_line = /\\bitsadmin\.exe$/ nocase)
+
+  condition:
+    $e
+}

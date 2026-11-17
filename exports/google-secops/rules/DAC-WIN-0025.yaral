@@ -1,0 +1,29 @@
+rule dac_win_0025 {
+  meta:
+    author = "DaC"
+    description = "User added to security group (EventCode 4728) - Detects group membership additions (EventCode 4728). On this event TargetUserName is the GROUP and MemberName/MemberSid identify the member added; SubjectUserName is the actor."
+    severity = "High"
+    rule_id = "DAC-WIN-0025"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1098"
+
+  events:
+    $e.metadata.log_type = "WINEVTLOG"
+    $e.metadata.product_event_type = "4728"
+    ($e.target.user.user_display_name != "" or $e.target.user.windows_sid != "")
+    $user = $e.principal.user.userid
+    $name = $e.principal.hostname
+
+  match:
+    $user, $name over 1h
+
+  outcome:
+    $count = count($e.metadata.id)
+    $members = array_distinct($e.target.user.user_display_name)
+    $member_sids = array_distinct($e.target.user.windows_sid)
+    $groups = array_distinct($e.target.user.userid)
+
+  condition:
+    $e
+}

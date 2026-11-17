@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_gh_0022 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GitHub: Org SAML SSO enforcement disabled - org.disable_saml / sso_policy weaken\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0022\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1556.006\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    (($e.metadata.product_event_type = \"org.disable_saml\" nocase or $e.metadata.product_event_type = \"org.update_saml_provider_settings\" nocase) or $e.metadata.product_event_type = /^business\\.sso_/ nocase)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_gh_0022 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"GitHub: Org SAML SSO enforcement disabled - org.disable_saml / sso_policy weaken\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0022\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1556.006\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    (($e.metadata.product_event_type = \"org.disable_saml\" nocase or $e.metadata.product_event_type = \"org.update_saml_provider_settings\" nocase) or $e.metadata.product_event_type = /^business\\.sso_/ nocase)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

@@ -1,0 +1,19 @@
+rule dac_win_0153 {
+  meta:
+    author = "Detection Engineer"
+    description = "Disable Windows Defender via process - Behavior: Disable Windows Defender via process. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1 Set-MpPreference disable patterns"
+    severity = "High"
+    rule_id = "DAC-WIN-0153"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    ($e.target.process.file.full_path = /\\sc\.exe$/ nocase or $e.target.process.file.full_path = /\\net\.exe$/ nocase or $e.target.process.file.full_path = /\\powershell\.exe$/ nocase)
+    ($e.target.process.command_line = /WinDefend/ nocase or $e.target.process.command_line = /Sense/ nocase or $e.target.process.command_line = /Set-MpPreference/ nocase or $e.target.process.command_line = /DisableRealtimeMonitoring/ nocase)
+
+  condition:
+    $e
+}

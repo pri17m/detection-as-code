@@ -1,0 +1,17 @@
+rule dac_gh_0013 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Org audit log streaming disabled or removed - audit_log_streaming.destroy / update disable"
+    severity = "High"
+    rule_id = "DAC-GH-0013"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685.002"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    (($e.metadata.product_event_type = "audit_log_streaming.destroy" nocase or $e.metadata.product_event_type = "audit_log_streaming.update" nocase) or $e.metadata.product_event_type = /^business\.audit_log_streaming\./ nocase)
+
+  condition:
+    $e
+}

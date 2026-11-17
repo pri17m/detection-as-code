@@ -1,0 +1,17 @@
+rule dac_gh_0020 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Org Actions permissions set to all repositories or write GITHUB_TOKEN - org actions permissions / default workflow permissions write"
+    severity = "High"
+    rule_id = "DAC-GH-0020"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1677"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "org.update_actions_secret" nocase or $e.metadata.product_event_type = "business.update_default_repository_permission" nocase or $e.metadata.product_event_type = "org.update_default_repository_permission" nocase or $e.metadata.product_event_type = "actions_permissions.policy_updated" nocase)
+
+  condition:
+    $e
+}

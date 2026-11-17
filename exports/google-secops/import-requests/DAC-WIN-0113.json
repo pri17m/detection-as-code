@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_win_0113 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"WmiPrvSE / wsmprovhost unusual children - Sysmon 1 Parent WmiPrvSE/wsmprovhost to cmd/powershell/LOLBins\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0113\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1047\"\n    mitre_attack_technique = \"T1021.006\"\n\n  events:\n    $e.metadata.event_type = \"PROCESS_LAUNCH\"\n    $e.metadata.log_type = \"WINDOWS_SYSMON\"\n    ($e.principal.process.file.full_path = /\\\\WmiPrvSE\\.exe$/ nocase or $e.principal.process.command_line = /\\\\WmiPrvSE\\.exe$/ nocase or $e.principal.process.file.full_path = /\\\\wsmprovhost\\.exe$/ nocase or $e.principal.process.command_line = /\\\\wsmprovhost\\.exe$/ nocase or $e.principal.process.file.full_path = /\\\\winrshost\\.exe$/ nocase or $e.principal.process.command_line = /\\\\winrshost\\.exe$/ nocase)\n    ($e.target.process.file.full_path = /\\\\cmd\\.exe$/ nocase or $e.target.process.command_line = /\\\\cmd\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\powershell\\.exe$/ nocase or $e.target.process.command_line = /\\\\powershell\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\pwsh\\.exe$/ nocase or $e.target.process.command_line = /\\\\pwsh\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\certutil\\.exe$/ nocase or $e.target.process.command_line = /\\\\certutil\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\mshta\\.exe$/ nocase or $e.target.process.command_line = /\\\\mshta\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\rundll32\\.exe$/ nocase or $e.target.process.command_line = /\\\\rundll32\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\bitsadmin\\.exe$/ nocase or $e.target.process.command_line = /\\\\bitsadmin\\.exe$/ nocase)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_win_0113 {\n  meta:\n    author = \"Detection Engineer\"\n    description = \"WmiPrvSE / wsmprovhost unusual children - Sysmon 1 Parent WmiPrvSE/wsmprovhost to cmd/powershell/LOLBins\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0113\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1047\"\n    mitre_attack_technique = \"T1021.006\"\n\n  events:\n    $e.metadata.event_type = \"PROCESS_LAUNCH\"\n    $e.metadata.log_type = \"WINDOWS_SYSMON\"\n    ($e.principal.process.file.full_path = /\\\\WmiPrvSE\\.exe$/ nocase or $e.principal.process.command_line = /\\\\WmiPrvSE\\.exe$/ nocase or $e.principal.process.file.full_path = /\\\\wsmprovhost\\.exe$/ nocase or $e.principal.process.command_line = /\\\\wsmprovhost\\.exe$/ nocase or $e.principal.process.file.full_path = /\\\\winrshost\\.exe$/ nocase or $e.principal.process.command_line = /\\\\winrshost\\.exe$/ nocase)\n    ($e.target.process.file.full_path = /\\\\cmd\\.exe$/ nocase or $e.target.process.command_line = /\\\\cmd\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\powershell\\.exe$/ nocase or $e.target.process.command_line = /\\\\powershell\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\pwsh\\.exe$/ nocase or $e.target.process.command_line = /\\\\pwsh\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\certutil\\.exe$/ nocase or $e.target.process.command_line = /\\\\certutil\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\mshta\\.exe$/ nocase or $e.target.process.command_line = /\\\\mshta\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\rundll32\\.exe$/ nocase or $e.target.process.command_line = /\\\\rundll32\\.exe$/ nocase or $e.target.process.file.full_path = /\\\\bitsadmin\\.exe$/ nocase or $e.target.process.command_line = /\\\\bitsadmin\\.exe$/ nocase)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

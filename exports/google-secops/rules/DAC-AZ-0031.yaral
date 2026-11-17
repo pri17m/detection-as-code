@@ -1,0 +1,17 @@
+rule dac_az_0031 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: Image gallery or shared image version published externally - galleries/images/versions write"
+    severity = "High"
+    rule_id = "DAC-AZ-0031"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1537"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    $e.metadata.product_event_type = "Microsoft.Compute/galleries/images/versions/write" nocase
+
+  condition:
+    $e
+}

@@ -1,0 +1,17 @@
+rule dac_az_0021 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: AKS cluster admin credential list or kubeconfig pull - listClusterAdminCredential"
+    severity = "High"
+    rule_id = "DAC-AZ-0021"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1078.004"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    ($e.metadata.product_event_type = "Microsoft.ContainerService/managedClusters/listClusterAdminCredential/action" nocase or $e.metadata.product_event_type = "Microsoft.ContainerService/managedClusters/listClusterUserCredential/action" nocase)
+
+  condition:
+    $e
+}

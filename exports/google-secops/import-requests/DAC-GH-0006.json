@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_gh_0006 {\n  meta:\n    author = \"DaC\"\n    description = \"GitHub: Actions workflow modified - Detects modifications to GitHub Actions workflows which can be used to execute malicious code in CI/CD (supply chain risk).\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0006\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1195\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    ($e.metadata.product_event_type = \"workflows.workflow_file_modified\" nocase or $e.metadata.product_event_type = \"repo.actions_workflow_update\" nocase or $e.metadata.product_event_type = \"repo.create_workflow\" nocase or $e.metadata.product_event_type = \"repo.update_workflow\" nocase)\n    $action = $e.metadata.product_event_type\n\n  match:\n    $action over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $actors = array_distinct($e.principal.user.userid)\n    $repos = array_distinct($e.target.resource.name)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_gh_0006 {\n  meta:\n    author = \"DaC\"\n    description = \"GitHub: Actions workflow modified - Detects modifications to GitHub Actions workflows which can be used to execute malicious code in CI/CD (supply chain risk).\"\n    severity = \"High\"\n    rule_id = \"DAC-GH-0006\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1195\"\n\n  events:\n    $e.metadata.log_type = \"GITHUB\"\n    ($e.metadata.product_event_type = \"workflows.workflow_file_modified\" nocase or $e.metadata.product_event_type = \"repo.actions_workflow_update\" nocase or $e.metadata.product_event_type = \"repo.create_workflow\" nocase or $e.metadata.product_event_type = \"repo.update_workflow\" nocase)\n    $action = $e.metadata.product_event_type\n\n  match:\n    $action over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $actors = array_distinct($e.principal.user.userid)\n    $repos = array_distinct($e.target.resource.name)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

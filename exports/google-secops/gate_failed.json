@@ -1,0 +1,80 @@
+[
+ {
+  "id": "DAC-ENTRA-0006",
+  "title": "Entra: Application password or key credential added to privileged app",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'And' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0014",
+  "title": "Entra: Audit or diagnostic logging configuration deleted or disabled",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0015",
+  "title": "Entra: Directory audit log retention or export weakened",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0017",
+  "title": "Entra: Authentication methods policy weakened (SMS/voice preferred)",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0019",
+  "title": "Entra: Federation settings or domain authentication type changed",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0020",
+  "title": "Entra: New trusted realm or IdP partner configured",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0023",
+  "title": "Entra: Hybrid identity Connect sync or seamless SSO config changed",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0025",
+  "title": "Entra: Cloud sync or provisioning connector credentials rotated oddly",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0029",
+  "title": "Entra: Device registration for privileged user from unusual location",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0032",
+  "title": "Entra: MFA method registered outside change control",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0035",
+  "title": "Entra: Guest user invited with elevated group or role path",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0036",
+  "title": "Entra: B2B guest redeemed then consent to high-scope app",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ },
+ {
+  "id": "DAC-ENTRA-0040",
+  "title": "Entra: Privileged Access Group or access package assignment anomalous",
+  "tier": "exact",
+  "why": "round-trip check could not run: re-parse failed: 'Or' object has no attribute 'field'"
+ }
+]

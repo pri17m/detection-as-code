@@ -1,0 +1,17 @@
+rule dac_az_0036 {
+  meta:
+    author = "Detection Engineer"
+    description = "Azure: Create new subscription or move management group - managementGroups write"
+    severity = "Medium"
+    rule_id = "DAC-AZ-0036"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1484"
+
+  events:
+    $e.metadata.log_type = "AZURE_ACTIVITY"
+    $e.metadata.product_event_type = "Microsoft.Management/managementGroups/write" nocase
+
+  condition:
+    $e
+}

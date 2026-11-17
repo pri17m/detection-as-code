@@ -1,0 +1,23 @@
+{
+ "steps": [
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}:verifyRuleText",
+   "body": {
+    "ruleText": "rule dac_win_0081 {\n  meta:\n    author = \"DaC\"\n    description = \"Sysmon: Registry Run key persistence (CurrentVersion\\\\\\\\Run) - Detects registry value sets in Run/RunOnce keys which can indicate persistence.\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0081\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1547.001\"\n\n  events:\n    ($e.metadata.event_type = \"REGISTRY_MODIFICATION\" or $e.metadata.event_type = \"REGISTRY_CREATION\")\n    $e.metadata.log_type = \"WINDOWS_SYSMON\"\n    $e.metadata.product_event_type = \"13\"\n    $e.target.registry.registry_key = /\\\\software\\\\microsoft\\\\windows\\\\currentversion\\\\run(once)?\\\\/ nocase\n    $name = $e.principal.hostname\n    $name_ = $e.principal.user.userid\n\n  match:\n    $name, $name_ over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $registry_paths = array_distinct($e.target.registry.registry_key)\n    $details = array_distinct($e.target.registry.registry_value_data)\n    $images = array_distinct($e.principal.process.file.full_path)\n\n  condition:\n    $e\n}"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "https://{location}-chronicle.googleapis.com/v1alpha/projects/{project}/locations/{location}/instances/{instance}/rules",
+   "body": {
+    "text": "rule dac_win_0081 {\n  meta:\n    author = \"DaC\"\n    description = \"Sysmon: Registry Run key persistence (CurrentVersion\\\\\\\\Run) - Detects registry value sets in Run/RunOnce keys which can indicate persistence.\"\n    severity = \"High\"\n    rule_id = \"DAC-WIN-0081\"\n    source_language = \"spl\"\n    converted_by = \"rulebridge\"\n    mitre_attack_technique = \"T1547.001\"\n\n  events:\n    ($e.metadata.event_type = \"REGISTRY_MODIFICATION\" or $e.metadata.event_type = \"REGISTRY_CREATION\")\n    $e.metadata.log_type = \"WINDOWS_SYSMON\"\n    $e.metadata.product_event_type = \"13\"\n    $e.target.registry.registry_key = /\\\\software\\\\microsoft\\\\windows\\\\currentversion\\\\run(once)?\\\\/ nocase\n    $name = $e.principal.hostname\n    $name_ = $e.principal.user.userid\n\n  match:\n    $name, $name_ over 1h\n\n  outcome:\n    $count = count($e.metadata.id)\n    $registry_paths = array_distinct($e.target.registry.registry_key)\n    $details = array_distinct($e.target.registry.registry_value_data)\n    $images = array_distinct($e.principal.process.file.full_path)\n\n  condition:\n    $e\n}"
+   }
+  }
+ ],
+ "auth": "OAuth bearer token with chronicle.rules.verifyRuleText / chronicle.rules.create",
+ "docs": [
+  "https://docs.cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances/verifyRuleText",
+  "https://cloud.google.com/chronicle/docs/reference/rest/v1alpha/projects.locations.instances.rules/create"
+ ]
+}

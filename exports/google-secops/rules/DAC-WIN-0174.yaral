@@ -1,0 +1,20 @@
+rule dac_win_0174 {
+  meta:
+    author = "Detection Engineer"
+    description = "Suspicious parent-child of system tools - Behavior: Suspicious parent-child of system tools. Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Sysmon 1 suspicious ParentImage for cmd/powershell"
+    severity = "Medium"
+    rule_id = "DAC-WIN-0174"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1059"
+    mitre_attack_technique = "T1036"
+
+  events:
+    $e.metadata.event_type = "PROCESS_LAUNCH"
+    $e.metadata.log_type = "WINDOWS_SYSMON"
+    ($e.principal.process.file.full_path = /\\svchost\.exe$/ nocase or $e.principal.process.file.full_path = /\\services\.exe$/ nocase or $e.principal.process.file.full_path = /\\wininit\.exe$/ nocase)
+    ($e.target.process.file.full_path = /\\cmd\.exe$/ nocase or $e.target.process.file.full_path = /\\powershell\.exe$/ nocase or $e.target.process.file.full_path = /\\wscript\.exe$/ nocase or $e.target.process.file.full_path = /\\mshta\.exe$/ nocase)
+
+  condition:
+    $e
+}

@@ -6,6 +6,7 @@ author: DaC
 status: experimental
 platforms:
 - splunk
+- google_secops
 sourcetypes:
 - WinEventLog:Security
 mitre:
@@ -33,3 +34,48 @@ query:
     | stats count values(target) as deleted_users by actor, host
 
     '
+  google_secops: |-
+    rule dac_win_0024 {
+      meta:
+        author = "DaC"
+        description = "User account deleted (4726) - Detects deletion of a user account which can be used to hide traces or sabotage access."
+        severity = "High"
+        rule_id = "DAC-WIN-0024"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1531"
+
+      events:
+        $e.metadata.log_type = "WINEVTLOG"
+        $e.metadata.product_event_type = "4726"
+        $user = $e.principal.user.userid
+        $name = $e.principal.hostname
+
+      match:
+        $user, $name over 1h
+
+      outcome:
+        $count = count($e.metadata.id)
+        $deleted_users = array_distinct($e.target.user.userid)
+
+      condition:
+        $e
+    }
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: approximate
+    score: 0.9
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: win.security
+    review: approved in detection-engineering review 2026-11-17
+    caveats:
+    - group-by `actor` is a coalesce of ['SubjectUserName', 'src_user']; first field used per target.
+    - Splunk stats runs over the whole scheduled search range; YARA-L needs a match window, so 1h was used. Set --window to your search schedule.
+    converted_on: '2026-11-17'

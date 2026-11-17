@@ -1,0 +1,17 @@
+rule dac_gcp_0032 {
+  meta:
+    author = "Detection Engineer"
+    description = "GCP: Service account key upload (user-managed) - UploadServiceAccountKey"
+    severity = "High"
+    rule_id = "DAC-GCP-0032"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1098.001"
+
+  events:
+    $e.metadata.log_type = "GCP_CLOUDAUDIT"
+    $e.metadata.product_event_type = /UploadServiceAccountKey/ nocase
+
+  condition:
+    $e
+}

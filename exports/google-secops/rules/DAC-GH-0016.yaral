@@ -1,0 +1,17 @@
+rule dac_gh_0016 {
+  meta:
+    author = "Detection Engineer"
+    description = "GitHub: Required status checks removed from protected branch - protected_branch.update_required_status_checks remove"
+    severity = "High"
+    rule_id = "DAC-GH-0016"
+    source_language = "spl"
+    converted_by = "rulebridge"
+    mitre_attack_technique = "T1685.002"
+
+  events:
+    $e.metadata.log_type = "GITHUB"
+    ($e.metadata.product_event_type = "protected_branch.update_required_status_checks_enforcement_level" nocase or $e.metadata.product_event_type = "protected_branch.rejected_ref_update" nocase)
+
+  condition:
+    $e
+}

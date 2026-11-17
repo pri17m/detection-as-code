@@ -6,6 +6,7 @@ author: Detection Engineer
 status: experimental
 platforms:
 - splunk
+- google_secops
 severity: high
 mitre:
   tactics:
@@ -55,3 +56,37 @@ query:
     | table _time host Account Category Subcategory AuditPolicyChanges
 
     '
+  google_secops: |-
+    rule dac_win_0143 {
+      meta:
+        author = "Detection Engineer"
+        description = "Audit policy changed (4719) - Behavior: Audit policy changed (4719). Anchor is process+flag or event id+field after classic/XML coalesce. Not telemetry_validated. Security 4719"
+        severity = "High"
+        rule_id = "DAC-WIN-0143"
+        source_language = "spl"
+        converted_by = "rulebridge"
+        mitre_attack_technique = "T1685"
+
+      events:
+        $e.metadata.log_type = "WINEVTLOG"
+        $e.metadata.product_event_type = "4719"
+
+      condition:
+        $e
+    }
+conversions:
+  google_secops:
+    converter: rulebridge
+    converter_version: 0.1.0
+    converter_commit: 2ad2aaa
+    source_language: spl
+    source_query: query.splunk
+    target_language: yaral-2.0
+    fidelity: exact
+    score: 1.0
+    roundtrip: agree
+    syntax_check: pass (RuleBridge YARA-L/UDM structural checker, not Google's compiler)
+    mapping_pack: win.security
+    review: approved in detection-engineering review 2026-11-17
+    caveats: []
+    converted_on: '2026-11-17'
