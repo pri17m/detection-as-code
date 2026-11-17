@@ -1,0 +1,25 @@
+{
+  "label": "malicious",
+  "variant": "winpty-agent.exe running from C:\\Windows\\Temp (SYSTEM context) starts cmd.exe; only the child event was collected",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-gitdoor/122004/ ; https://securelist.com/operation-shadowcloud-graphdoor/122005/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": true,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0002",
+      "DeviceName": "ws02.example.invalid",
+      "AccountName": "system",
+      "FileName": "cmd.exe",
+      "FolderPath": "C:\\Windows\\System32\\cmd.exe",
+      "ProcessCommandLine": "cmd.exe",
+      "SHA1": "synthetic-sha1-bbbb",
+      "InitiatingProcessFileName": "winpty-agent.exe",
+      "InitiatingProcessFolderPath": "C:\\Windows\\Temp\\winpty-agent.exe",
+      "InitiatingProcessCommandLine": "C:\\Windows\\Temp\\winpty-agent.exe"
+    }
+  ]
+}
