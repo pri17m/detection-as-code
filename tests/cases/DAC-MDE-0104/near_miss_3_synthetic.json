@@ -1,0 +1,25 @@
+{
+  "label": "near_miss",
+  "variant": "winpty-agent.exe started from a Downloads folder under the user profile (not Temp)",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-gitdoor/122004/ ; https://securelist.com/operation-shadowcloud-graphdoor/122005/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": false,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0004",
+      "DeviceName": "dev02.example.invalid",
+      "AccountName": "dev2",
+      "FileName": "winpty-agent.exe",
+      "FolderPath": "C:\\Users\\dev2\\Downloads\\winpty\\bin\\winpty-agent.exe",
+      "ProcessCommandLine": "C:\\Users\\dev2\\Downloads\\winpty\\bin\\winpty-agent.exe",
+      "SHA1": "synthetic-sha1-dddd",
+      "InitiatingProcessFileName": "explorer.exe",
+      "InitiatingProcessFolderPath": "C:\\Windows\\explorer.exe",
+      "InitiatingProcessCommandLine": "explorer.exe"
+    }
+  ]
+}

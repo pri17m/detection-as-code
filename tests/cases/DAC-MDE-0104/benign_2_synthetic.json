@@ -1,0 +1,25 @@
+{
+  "label": "benign",
+  "variant": "Git for Windows terminal runs its bundled winpty-agent.exe from Program Files",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-gitdoor/122004/ ; https://securelist.com/operation-shadowcloud-graphdoor/122005/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "expect_alert": false,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0003",
+      "DeviceName": "dev01.example.invalid",
+      "AccountName": "dev1",
+      "FileName": "winpty-agent.exe",
+      "FolderPath": "C:\\Program Files\\Git\\usr\\bin\\winpty-agent.exe",
+      "ProcessCommandLine": "C:\\Program Files\\Git\\usr\\bin\\winpty-agent.exe",
+      "SHA1": "synthetic-sha1-cccc",
+      "InitiatingProcessFileName": "mintty.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\Git\\usr\\bin\\mintty.exe",
+      "InitiatingProcessCommandLine": "mintty.exe"
+    }
+  ]
+}

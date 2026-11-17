@@ -1,0 +1,64 @@
+id: DAC-MDE-0104
+title: "winpty-agent.exe runs from a temp folder, or a temp-folder winpty-agent starts a process"
+description: >-
+  DeviceProcessEvents where winpty-agent.exe starts from \AppData\Local\Temp\ or \Windows\Temp\, or where a
+  winpty-agent.exe running from one of those folders starts a child (normally the shell it hosts). Kaspersky's
+  ShadowCloud Part 1 says the WinPTY shell module "drops both files [winpty.dll and winpty-agent.exe] into the
+  %TEMP% directory" to give the operator a fully interactive reverse shell. Legitimate tools that use WinPTY
+  (terminal back-ends in editors and Git for Windows) ship it inside their install folders. telemetry_validated
+  false. Companion rule: DAC-CS-0251.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - execution
+  - command-and-control
+  techniques:
+  - T1059.003
+  - T1105
+severity: high
+false_positives:
+- "A tool that unpacks its WinPTY copy to %TEMP% at run time would match. I didn't find one in public docs, but this is not measured."
+- "Developer machines that run portable builds out of a temp download folder."
+references:
+- "https://securelist.com/operation-shadowcloud-gitdoor/122004/"
+- "https://securelist.com/operation-shadowcloud-graphdoor/122005/"
+- "https://github.com/rprichard/winpty"
+- "https://attack.mitre.org/techniques/T1059/003/"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table"
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "AccountName"
+- "FileName"
+- "FolderPath"
+- "ProcessCommandLine"
+- "SHA1"
+- "InitiatingProcessFileName"
+- "InitiatingProcessFolderPath"
+- "InitiatingProcessCommandLine"
+tags:
+- behavioural
+- reverse-shell
+- shadowcloud
+- needs-review
+query:
+  defender: |
+    let Lookback = 1d;
+    let TempPath = @"(?i)\\(AppData\\Local\\Temp|Windows\\Temp)\\";
+    DeviceProcessEvents
+    | where Timestamp > ago(Lookback)
+    | where FileName =~ "winpty-agent.exe" or InitiatingProcessFileName =~ "winpty-agent.exe"
+    | extend sig = case(
+        FileName =~ "winpty-agent.exe" and FolderPath matches regex TempPath, "winpty_agent_started_from_temp",
+        InitiatingProcessFileName =~ "winpty-agent.exe" and InitiatingProcessFolderPath matches regex TempPath, "temp_winpty_agent_spawned_child",
+        "")
+    | where isnotempty(sig)
+    | project Timestamp, DeviceId, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine, SHA1,
+        InitiatingProcessFileName, InitiatingProcessFolderPath, InitiatingProcessCommandLine, sig
