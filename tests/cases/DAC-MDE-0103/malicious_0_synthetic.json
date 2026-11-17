@@ -1,0 +1,25 @@
+{
+  "label": "malicious",
+  "variant": "Side-load host in ProgramData (PID 6412) creates \\Device\\NamedPipe\\p6412, as Part 2 describes",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://attack.mitre.org/techniques/T1559/",
+  "platform": "defender",
+  "table": "DeviceEvents",
+  "expect_alert": true,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "ws01.example.invalid",
+      "ActionType": "NamedPipeEvent",
+      "AdditionalFields": "{\"PipeName\": \"\\\\Device\\\\NamedPipe\\\\p6412\", \"FileOperation\": \"File created\", \"NamedPipeEnd\": \"Server\"}",
+      "InitiatingProcessId": 6412,
+      "InitiatingProcessFileName": "javaw.exe",
+      "InitiatingProcessFolderPath": "C:\\ProgramData\\Intel_Log\\javaw.exe",
+      "InitiatingProcessCommandLine": "javaw.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-aaaa",
+      "InitiatingProcessAccountName": "system"
+    }
+  ]
+}

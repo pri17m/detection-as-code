@@ -1,0 +1,25 @@
+{
+  "label": "malicious",
+  "variant": "start.exe in System32 (PID 1188) creates a pipe recorded without the device prefix",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://attack.mitre.org/techniques/T1559/",
+  "platform": "defender",
+  "table": "DeviceEvents",
+  "expect_alert": true,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0002",
+      "DeviceName": "ws02.example.invalid",
+      "ActionType": "NamedPipeEvent",
+      "AdditionalFields": "{\"PipeName\": \"\\\\p1188\", \"FileOperation\": \"File created\", \"NamedPipeEnd\": \"Server\"}",
+      "InitiatingProcessId": 1188,
+      "InitiatingProcessFileName": "start.exe",
+      "InitiatingProcessFolderPath": "C:\\Windows\\System32\\start.exe",
+      "InitiatingProcessCommandLine": "start.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-bbbb",
+      "InitiatingProcessAccountName": "system"
+    }
+  ]
+}

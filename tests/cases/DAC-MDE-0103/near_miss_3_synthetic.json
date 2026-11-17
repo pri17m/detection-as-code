@@ -1,0 +1,38 @@
+{
+  "label": "near_miss",
+  "variant": "Pipe \\p5120 created by PID 4120 (not its own PID), and a client opening \\p4120 from PID 4120 (opened, not created)",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://attack.mitre.org/techniques/T1559/",
+  "platform": "defender",
+  "table": "DeviceEvents",
+  "expect_alert": false,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0004",
+      "DeviceName": "ws04.example.invalid",
+      "ActionType": "NamedPipeEvent",
+      "AdditionalFields": "{\"PipeName\": \"\\\\Device\\\\NamedPipe\\\\p5120\", \"FileOperation\": \"File created\", \"NamedPipeEnd\": \"Server\"}",
+      "InitiatingProcessId": 4120,
+      "InitiatingProcessFileName": "tool.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\Tool\\tool.exe",
+      "InitiatingProcessCommandLine": "tool.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-dddd",
+      "InitiatingProcessAccountName": "u1"
+    },
+    {
+      "Timestamp": "2026-11-17T09:01:00Z",
+      "DeviceId": "synthetic-device-0004",
+      "DeviceName": "ws04.example.invalid",
+      "ActionType": "NamedPipeEvent",
+      "AdditionalFields": "{\"PipeName\": \"\\\\Device\\\\NamedPipe\\\\p4120\", \"FileOperation\": \"File opened\", \"NamedPipeEnd\": \"Client\"}",
+      "InitiatingProcessId": 4120,
+      "InitiatingProcessFileName": "tool.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\Tool\\tool.exe",
+      "InitiatingProcessCommandLine": "tool.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-dddd",
+      "InitiatingProcessAccountName": "u1"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "label": "benign",
+  "variant": "Browser creates a mojo IPC pipe; name does not end in \\p<digits>",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://attack.mitre.org/techniques/T1559/",
+  "platform": "defender",
+  "table": "DeviceEvents",
+  "expect_alert": false,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0003",
+      "DeviceName": "ws03.example.invalid",
+      "ActionType": "NamedPipeEvent",
+      "AdditionalFields": "{\"PipeName\": \"\\\\Device\\\\NamedPipe\\\\mojo.5120.7744.123456789\", \"FileOperation\": \"File created\", \"NamedPipeEnd\": \"Server\"}",
+      "InitiatingProcessId": 5120,
+      "InitiatingProcessFileName": "msedge.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+      "InitiatingProcessCommandLine": "msedge.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-cccc",
+      "InitiatingProcessAccountName": "u1"
+    }
+  ]
+}
