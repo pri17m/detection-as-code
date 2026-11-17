@@ -1,0 +1,34 @@
+{
+  "label": "benign",
+  "variant": "svchost.exe in System32 runs cmd.exe; certificate row is trusted and Microsoft-rooted",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://securelist.com/operation-shadowcloud-gitdoor/122004/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents + DeviceFileCertificateInfo",
+  "expect_alert": false,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0003",
+      "DeviceName": "ws03.example.invalid",
+      "FileName": "cmd.exe",
+      "ProcessCommandLine": "cmd.exe /c echo task",
+      "InitiatingProcessFileName": "svchost.exe",
+      "InitiatingProcessFolderPath": "C:\\Windows\\System32\\svchost.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-cccc",
+      "InitiatingProcessVersionInfoCompanyName": "Microsoft Corporation"
+    }
+  ],
+  "lookup_DeviceFileCertificateInfo": [
+    {
+      "Timestamp": "2026-11-17T08:00:00Z",
+      "SHA1": "synthetic-sha1-cccc",
+      "IsSigned": true,
+      "IsTrusted": true,
+      "IsRootSignerMicrosoft": true,
+      "Signer": "Microsoft Windows",
+      "SignatureType": "Catalog"
+    }
+  ]
+}

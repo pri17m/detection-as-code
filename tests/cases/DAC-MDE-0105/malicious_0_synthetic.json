@@ -1,0 +1,24 @@
+{
+  "label": "malicious",
+  "variant": "start.exe in System32 runs cmd.exe /C whoami; no certificate row for its SHA1 and a non-Microsoft company name",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://securelist.com/operation-shadowcloud-gitdoor/122004/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents + DeviceFileCertificateInfo",
+  "expect_alert": true,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "ws01.example.invalid",
+      "FileName": "cmd.exe",
+      "ProcessCommandLine": "cmd.exe /C whoami",
+      "InitiatingProcessFileName": "start.exe",
+      "InitiatingProcessFolderPath": "C:\\Windows\\System32\\start.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-aaaa",
+      "InitiatingProcessVersionInfoCompanyName": "Sandboxie (synthetic)"
+    }
+  ],
+  "lookup_DeviceFileCertificateInfo": []
+}

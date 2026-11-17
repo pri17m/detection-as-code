@@ -1,0 +1,24 @@
+{
+  "label": "near_miss",
+  "variant": "Non-Microsoft vendor tool runs cmd.exe, but it lives in Program Files, not System32",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://securelist.com/operation-shadowcloud-gitdoor/122004/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents + DeviceFileCertificateInfo",
+  "expect_alert": false,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0004",
+      "DeviceName": "ws04.example.invalid",
+      "FileName": "cmd.exe",
+      "ProcessCommandLine": "cmd.exe /c update.bat",
+      "InitiatingProcessFileName": "vendortool.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\Vendor\\vendortool.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-dddd",
+      "InitiatingProcessVersionInfoCompanyName": "Vendor Ltd (synthetic)"
+    }
+  ],
+  "lookup_DeviceFileCertificateInfo": []
+}

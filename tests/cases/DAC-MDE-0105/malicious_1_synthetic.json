@@ -1,0 +1,34 @@
+{
+  "label": "malicious",
+  "variant": "dtsapo4service.exe under System32\\dts\\pc\\apo4x runs cmd.exe; certificate row shows a trusted non-Microsoft signer, and the version-info company has been forged to say Microsoft",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://securelist.com/operation-shadowcloud-gitdoor/122004/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents + DeviceFileCertificateInfo",
+  "expect_alert": true,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0002",
+      "DeviceName": "ws02.example.invalid",
+      "FileName": "cmd.exe",
+      "ProcessCommandLine": "cmd.exe /C ipconfig /all",
+      "InitiatingProcessFileName": "dtsapo4service.exe",
+      "InitiatingProcessFolderPath": "C:\\Windows\\System32\\dts\\pc\\apo4x\\dtsapo4service.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-bbbb",
+      "InitiatingProcessVersionInfoCompanyName": "Microsoft Corporation"
+    }
+  ],
+  "lookup_DeviceFileCertificateInfo": [
+    {
+      "Timestamp": "2026-11-17T08:00:00Z",
+      "SHA1": "synthetic-sha1-bbbb",
+      "IsSigned": true,
+      "IsTrusted": true,
+      "IsRootSignerMicrosoft": false,
+      "Signer": "Python Software Foundation (synthetic)",
+      "SignatureType": "Embedded"
+    }
+  ]
+}
