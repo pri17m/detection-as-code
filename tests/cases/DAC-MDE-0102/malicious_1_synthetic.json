@@ -1,0 +1,54 @@
+{
+  "label": "malicious",
+  "variant": "moveDir-style copy of the kit into a new ProgramData subfolder by the running host process (Part 2 'Move Directory'; ProgramData\\excint\\sg shape from the Part 2 attribution section)",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://securelist.com/operation-shadowcloud-gitdoor/122004/",
+  "platform": "defender",
+  "table": "DeviceFileEvents",
+  "expect_alert": true,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0002",
+      "DeviceName": "ws02.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "zoomit.exe",
+      "FolderPath": "C:\\ProgramData\\excint\\sg\\zoomit.exe",
+      "InitiatingProcessId": 7720,
+      "InitiatingProcessCreationTime": "2026-11-17T07:00:00Z",
+      "InitiatingProcessFileName": "javaw.exe",
+      "InitiatingProcessFolderPath": "C:\\ProgramData\\oldkit\\javaw.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-bbbb",
+      "InitiatingProcessAccountName": "system"
+    },
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0002",
+      "DeviceName": "ws02.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "WINMM.dll",
+      "FolderPath": "C:\\ProgramData\\excint\\sg\\WINMM.dll",
+      "InitiatingProcessId": 7720,
+      "InitiatingProcessCreationTime": "2026-11-17T07:00:00Z",
+      "InitiatingProcessFileName": "javaw.exe",
+      "InitiatingProcessFolderPath": "C:\\ProgramData\\oldkit\\javaw.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-bbbb",
+      "InitiatingProcessAccountName": "system"
+    },
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0002",
+      "DeviceName": "ws02.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "config.ini",
+      "FolderPath": "C:\\ProgramData\\excint\\sg\\config.ini",
+      "InitiatingProcessId": 7720,
+      "InitiatingProcessCreationTime": "2026-11-17T07:00:00Z",
+      "InitiatingProcessFileName": "javaw.exe",
+      "InitiatingProcessFolderPath": "C:\\ProgramData\\oldkit\\javaw.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-bbbb",
+      "InitiatingProcessAccountName": "system"
+    }
+  ]
+}

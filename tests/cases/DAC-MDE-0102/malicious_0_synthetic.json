@@ -1,0 +1,54 @@
+{
+  "label": "malicious",
+  "variant": "MeshCentral agent drops start.exe, sbiedll.dll and config.ini into System32 within two minutes (paths from Part 1 'Initial infection')",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://securelist.com/operation-shadowcloud-gitdoor/122004/",
+  "platform": "defender",
+  "table": "DeviceFileEvents",
+  "expect_alert": true,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "ws01.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "start.exe",
+      "FolderPath": "C:\\Windows\\System32\\start.exe",
+      "InitiatingProcessId": 3312,
+      "InitiatingProcessCreationTime": "2026-11-17T08:30:00Z",
+      "InitiatingProcessFileName": "meshagent.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\Mesh Agent\\meshagent.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-aaaa",
+      "InitiatingProcessAccountName": "system"
+    },
+    {
+      "Timestamp": "2026-11-17T09:01:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "ws01.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "sbiedll.dll",
+      "FolderPath": "C:\\Windows\\System32\\sbiedll.dll",
+      "InitiatingProcessId": 3312,
+      "InitiatingProcessCreationTime": "2026-11-17T08:30:00Z",
+      "InitiatingProcessFileName": "meshagent.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\Mesh Agent\\meshagent.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-aaaa",
+      "InitiatingProcessAccountName": "system"
+    },
+    {
+      "Timestamp": "2026-11-17T09:02:00Z",
+      "DeviceId": "synthetic-device-0001",
+      "DeviceName": "ws01.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "config.ini",
+      "FolderPath": "C:\\Windows\\System32\\config.ini",
+      "InitiatingProcessId": 3312,
+      "InitiatingProcessCreationTime": "2026-11-17T08:30:00Z",
+      "InitiatingProcessFileName": "meshagent.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\Mesh Agent\\meshagent.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-aaaa",
+      "InitiatingProcessAccountName": "system"
+    }
+  ]
+}
