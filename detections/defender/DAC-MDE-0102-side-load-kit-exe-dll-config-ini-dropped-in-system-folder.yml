@@ -1,0 +1,84 @@
+id: DAC-MDE-0102
+title: "Side-load kit: one process writes an EXE, a DLL and config.ini into the same System32, SysWOW64 or ProgramData folder within 10 minutes"
+description: >-
+  DeviceFileEvents where the same initiating process creates (or renames into place) a file named config.ini
+  and, within 10 minutes either side, at least one .exe and one .dll in the same folder under C:\Windows\System32,
+  C:\Windows\SysWOW64 or C:\ProgramData. Kaspersky's ShadowCloud reports describe a MeshCentral agent dropping a
+  legitimate EXE, a malicious loader DLL and an encrypted config.ini straight into System32 (start.exe +
+  sbiedll.dll, and dtsapo4service.exe + python39.dll under System32\dts\pc\apo4x), and GraphDoor's moveDir
+  plug-in copying the same three-file kit to a new folder. The behaviour is the shape of the kit, not any file
+  name or hash. The 10-minute window is an unmeasured starting point. telemetry_validated false.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - stealth
+  - execution
+  - command-and-control
+  techniques:
+  - T1574.001
+  - T1036.005
+  - T1105
+severity: high
+false_positives:
+- "Vendor setup programs (not msiexec) that unpack an application with its own DLLs and a file literally named config.ini into ProgramData. Allowlist by InitiatingProcessSHA1 or signer after a baseline run (not measured)."
+- "Driver or OEM utility installers that write into System32 subfolders through a non-servicing setup EXE (not measured)."
+- "Windows servicing and Defender processes are excluded by name; a renamed or new servicing binary would need adding."
+references:
+- "https://securelist.com/operation-shadowcloud-graphdoor/122005/"
+- "https://securelist.com/operation-shadowcloud-gitdoor/122004/"
+- "https://attack.mitre.org/techniques/T1574/001/"
+- "https://attack.mitre.org/techniques/T1036/005/"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicefileevents-table"
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "ActionType"
+- "FileName"
+- "FolderPath"
+- "InitiatingProcessId"
+- "InitiatingProcessCreationTime"
+- "InitiatingProcessFileName"
+- "InitiatingProcessFolderPath"
+- "InitiatingProcessSHA1"
+- "InitiatingProcessAccountName"
+tags:
+- behavioural
+- sideload
+- shadowcloud
+- graphdoor
+- needs-review
+query:
+  defender: |
+    let Lookback = 1d;
+    let WindowSec = 600;
+    let ServicingProcs = dynamic(["TrustedInstaller.exe","TiWorker.exe","msiexec.exe","drvinst.exe","wuauclt.exe","MoUsoCoreWorker.exe","MsMpEng.exe","DismHost.exe","poqexec.exe"]);
+    let Kit = DeviceFileEvents
+        | where Timestamp > ago(Lookback)
+        | where ActionType in ("FileCreated", "FileRenamed")
+        | where FolderPath startswith @"C:\Windows\System32\" or FolderPath startswith @"C:\Windows\SysWOW64\" or FolderPath startswith @"C:\ProgramData\"
+        | where InitiatingProcessFileName !in~ (ServicingProcs)
+        | extend Kind = case(FileName endswith ".exe", "exe", FileName endswith ".dll", "dll", FileName =~ "config.ini", "ini", "other")
+        | where Kind != "other"
+        // FolderPath normally holds the full file path; strip the file name if present so both forms give the folder
+        | extend Dir = tolower(iff(FolderPath endswith strcat(@"\", FileName), substring(FolderPath, 0, strlen(FolderPath) - strlen(FileName) - 1), FolderPath));
+    Kit
+    | where Kind == "ini"
+    | project DeviceId, DeviceName, InitiatingProcessId, InitiatingProcessCreationTime, InitiatingProcessFileName,
+        InitiatingProcessFolderPath, InitiatingProcessSHA1, InitiatingProcessAccountName, Dir, IniTime = Timestamp, IniPath = FolderPath
+    | join kind=inner (
+        Kit
+        | where Kind in ("exe", "dll")
+        | project DeviceId, InitiatingProcessId, InitiatingProcessCreationTime, Dir, Kind, FileName, Timestamp
+      ) on DeviceId, InitiatingProcessId, InitiatingProcessCreationTime, Dir
+    | where abs(datetime_diff('second', Timestamp, IniTime)) <= WindowSec
+    | summarize Kinds = make_set(Kind), KitFiles = make_set(FileName, 20), FirstSeen = min(Timestamp), LastSeen = max(Timestamp)
+        by DeviceId, DeviceName, InitiatingProcessId, InitiatingProcessFileName, InitiatingProcessFolderPath,
+           InitiatingProcessSHA1, InitiatingProcessAccountName, Dir, IniTime, IniPath
+    | where array_length(Kinds) == 2

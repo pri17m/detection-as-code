@@ -1,0 +1,54 @@
+{
+  "label": "near_miss",
+  "variant": "Same process writes the EXE and DLL, but config.ini lands 45 minutes later; outside the 10-minute window",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://securelist.com/operation-shadowcloud-gitdoor/122004/",
+  "platform": "defender",
+  "table": "DeviceFileEvents",
+  "expect_alert": false,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0004",
+      "DeviceName": "ws04.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "agent.exe",
+      "FolderPath": "C:\\ProgramData\\VendorAgent\\agent.exe",
+      "InitiatingProcessId": 4100,
+      "InitiatingProcessCreationTime": "2026-11-17T08:59:00Z",
+      "InitiatingProcessFileName": "setup.exe",
+      "InitiatingProcessFolderPath": "C:\\Users\\u1\\Downloads\\setup.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-dddd",
+      "InitiatingProcessAccountName": "u1"
+    },
+    {
+      "Timestamp": "2026-11-17T09:01:00Z",
+      "DeviceId": "synthetic-device-0004",
+      "DeviceName": "ws04.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "agentcore.dll",
+      "FolderPath": "C:\\ProgramData\\VendorAgent\\agentcore.dll",
+      "InitiatingProcessId": 4100,
+      "InitiatingProcessCreationTime": "2026-11-17T08:59:00Z",
+      "InitiatingProcessFileName": "setup.exe",
+      "InitiatingProcessFolderPath": "C:\\Users\\u1\\Downloads\\setup.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-dddd",
+      "InitiatingProcessAccountName": "u1"
+    },
+    {
+      "Timestamp": "2026-11-17T09:46:00Z",
+      "DeviceId": "synthetic-device-0004",
+      "DeviceName": "ws04.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "config.ini",
+      "FolderPath": "C:\\ProgramData\\VendorAgent\\config.ini",
+      "InitiatingProcessId": 4100,
+      "InitiatingProcessCreationTime": "2026-11-17T08:59:00Z",
+      "InitiatingProcessFileName": "setup.exe",
+      "InitiatingProcessFolderPath": "C:\\Users\\u1\\Downloads\\setup.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-dddd",
+      "InitiatingProcessAccountName": "u1"
+    }
+  ]
+}

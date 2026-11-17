@@ -1,0 +1,54 @@
+{
+  "label": "benign",
+  "variant": "Windows servicing (TiWorker.exe) writes an EXE, DLL and config.ini into a System32 subfolder; excluded by process name",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-graphdoor/122005/ ; https://securelist.com/operation-shadowcloud-gitdoor/122004/",
+  "platform": "defender",
+  "table": "DeviceFileEvents",
+  "expect_alert": false,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0003",
+      "DeviceName": "ws03.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "feature.exe",
+      "FolderPath": "C:\\Windows\\System32\\feature\\feature.exe",
+      "InitiatingProcessId": 900,
+      "InitiatingProcessCreationTime": "2026-11-17T08:00:00Z",
+      "InitiatingProcessFileName": "TiWorker.exe",
+      "InitiatingProcessFolderPath": "C:\\Windows\\WinSxS\\x\\TiWorker.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-cccc",
+      "InitiatingProcessAccountName": "system"
+    },
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0003",
+      "DeviceName": "ws03.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "feature.dll",
+      "FolderPath": "C:\\Windows\\System32\\feature\\feature.dll",
+      "InitiatingProcessId": 900,
+      "InitiatingProcessCreationTime": "2026-11-17T08:00:00Z",
+      "InitiatingProcessFileName": "TiWorker.exe",
+      "InitiatingProcessFolderPath": "C:\\Windows\\WinSxS\\x\\TiWorker.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-cccc",
+      "InitiatingProcessAccountName": "system"
+    },
+    {
+      "Timestamp": "2026-11-17T09:00:00Z",
+      "DeviceId": "synthetic-device-0003",
+      "DeviceName": "ws03.example.invalid",
+      "ActionType": "FileCreated",
+      "FileName": "config.ini",
+      "FolderPath": "C:\\Windows\\System32\\feature\\config.ini",
+      "InitiatingProcessId": 900,
+      "InitiatingProcessCreationTime": "2026-11-17T08:00:00Z",
+      "InitiatingProcessFileName": "TiWorker.exe",
+      "InitiatingProcessFolderPath": "C:\\Windows\\WinSxS\\x\\TiWorker.exe",
+      "InitiatingProcessSHA1": "synthetic-sha1-cccc",
+      "InitiatingProcessAccountName": "system"
+    }
+  ]
+}
