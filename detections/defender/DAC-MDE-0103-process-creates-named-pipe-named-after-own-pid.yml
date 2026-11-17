@@ -1,0 +1,62 @@
+id: DAC-MDE-0103
+title: "Process creates a named pipe called \\p followed by its own process ID"
+description: >-
+  DeviceEvents NamedPipeEvent where the FileOperation is "File created" and the pipe name ends in \p followed by the
+  creating process's own PID. Kaspersky's GraphDoor report says the backdoor builds its pipe name "from its own PID
+  in the form \\.\pipe\p%lu" and that its plug-ins (process listing, screenshot) write their results back to that
+  pipe. The rule matches the construction (pipe name equals p plus the creator's PID), not a fixed pipe name, so it
+  holds across builds that keep this scheme. Pipe names can carry a \Device\NamedPipe\ prefix, so the match is
+  ends-with. telemetry_validated false.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - execution
+  techniques:
+  - T1559
+severity: high
+false_positives:
+- "No known software names its pipes p plus its own PID, but this has not been measured. Any hit should be checked against the process's signer and path before closing as benign."
+references:
+- "https://securelist.com/operation-shadowcloud-graphdoor/122005/"
+- "https://attack.mitre.org/techniques/T1559/"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceevents-table"
+- "https://github.com/Azure/Azure-Sentinel/blob/863e9128d3fbcda27fc2ce54a9cd00b7c61d155e/Hunting%20Queries/Microsoft%20365%20Defender/Command%20and%20Control/C2-NamedPipe.yaml"
+- "https://github.com/Azure/Azure-Sentinel/blob/863e9128d3fbcda27fc2ce54a9cd00b7c61d155e/Hunting%20Queries/Microsoft%20365%20Defender/Execution/detect-impacket-psexec-module.yaml"
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "ActionType"
+- "AdditionalFields"
+- "InitiatingProcessId"
+- "InitiatingProcessFileName"
+- "InitiatingProcessFolderPath"
+- "InitiatingProcessCommandLine"
+- "InitiatingProcessSHA1"
+- "InitiatingProcessAccountName"
+tags:
+- behavioural
+- named-pipe
+- shadowcloud
+- graphdoor
+- needs-review
+query:
+  defender: |
+    let Lookback = 1d;
+    DeviceEvents
+    | where Timestamp > ago(Lookback)
+    | where ActionType == "NamedPipeEvent"
+    | extend AF = parse_json(AdditionalFields)
+    | extend PipeName = tostring(AF.PipeName), FileOperation = tostring(AF.FileOperation), NamedPipeEnd = tostring(AF.NamedPipeEnd)
+    | where FileOperation == "File created"
+    | where PipeName matches regex @"(?i)\\p[0-9]+$"
+    // name must be \p + the creator's own PID; ends-with copes with a \Device\NamedPipe\ prefix
+    | where PipeName endswith strcat(@"\p", tostring(InitiatingProcessId))
+    | project Timestamp, DeviceId, DeviceName, PipeName, NamedPipeEnd, InitiatingProcessId, InitiatingProcessFileName,
+        InitiatingProcessFolderPath, InitiatingProcessCommandLine, InitiatingProcessSHA1, InitiatingProcessAccountName

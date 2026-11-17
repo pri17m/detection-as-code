@@ -1,12 +1,12 @@
 {
   "summary": {
-    "detections_total": 902,
-    "detections_with_mitre": 902,
+    "detections_total": 903,
+    "detections_with_mitre": 903,
     "detections_with_mitre_percent": 100.0,
-    "unique_techniques": 218,
+    "unique_techniques": 219,
     "platform_counts": {
       "crowdstrike": 167,
-      "defender": 80,
+      "defender": 81,
       "google_secops": 83,
       "splunk": 655
     }
@@ -1362,6 +1362,9 @@
       "DAC-WIN-0103",
       "DAC-WIN-0168",
       "DAC-WIN-0208"
+    ],
+    "T1559": [
+      "DAC-MDE-0103"
     ],
     "T1559.001": [
       "DAC-WIN-0298"
