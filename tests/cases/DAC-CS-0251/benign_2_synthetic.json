@@ -1,0 +1,23 @@
+{
+  "label": "benign",
+  "variant": "Git for Windows bundled winpty-agent.exe in Program Files",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-gitdoor/122004/ ; https://securelist.com/operation-shadowcloud-graphdoor/122005/",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": false,
+  "result": "not run (no LogScale runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "@timestamp": "2026-11-17T09:00:00Z",
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "synthetic-aid-0003",
+      "ComputerName": "dev01",
+      "UserName": "dev1",
+      "ParentBaseFileName": "mintty.exe",
+      "ImageFileName": "\\Device\\HarddiskVolume3\\Program Files\\Git\\usr\\bin\\winpty-agent.exe",
+      "CommandLine": "C:\\Program Files\\Git\\usr\\bin\\winpty-agent.exe"
+    }
+  ]
+}

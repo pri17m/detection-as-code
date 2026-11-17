@@ -1,0 +1,23 @@
+{
+  "label": "malicious",
+  "variant": "winpty-agent.exe started from C:\\Windows\\Temp under SYSTEM",
+  "synthetic": true,
+  "source": "synthetic; https://securelist.com/operation-shadowcloud-gitdoor/122004/ ; https://securelist.com/operation-shadowcloud-graphdoor/122005/",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "expect_alert": true,
+  "result": "not run (no LogScale runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "@timestamp": "2026-11-17T09:00:00Z",
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "aid": "synthetic-aid-0002",
+      "ComputerName": "ws02",
+      "UserName": "SYSTEM",
+      "ParentBaseFileName": "dtsapo4service.exe",
+      "ImageFileName": "\\Device\\HarddiskVolume3\\Windows\\Temp\\winpty-agent.exe",
+      "CommandLine": "C:\\Windows\\Temp\\winpty-agent.exe"
+    }
+  ]
+}
