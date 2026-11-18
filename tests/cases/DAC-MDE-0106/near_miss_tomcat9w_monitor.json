@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://tomcat.apache.org/tomcat-9.0-doc/windows-service-howto.html ; https://community.fortinet.com/fortiedr-20/threat-coverage-how-fortiedr-protects-against-confluence-cve-2022-26134-post-exploitation-activity-109660 ; https://www.vulncheck.com/blog/confluence-dreams-of-shells",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "near_miss",
+  "variant": "tomcat9w.exe GUI monitor as NETWORK SERVICE starts cmd.exe; regex should not treat this as the service",
+  "expect_alert": false,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-19T08:05:00Z",
+      "DeviceId": "synthetic-device-0006",
+      "DeviceName": "wiki03.example.invalid",
+      "FileName": "cmd.exe",
+      "ProcessCommandLine": "cmd.exe /c echo monitor",
+      "AccountName": "NETWORK SERVICE",
+      "AccountSid": "S-1-5-20",
+      "InitiatingProcessFileName": "tomcat9w.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\ExampleApp\\bin",
+      "InitiatingProcessCommandLine": "tomcat9w.exe //MS//ExampleService",
+      "InitiatingProcessAccountName": "NETWORK SERVICE",
+      "InitiatingProcessAccountSid": "S-1-5-20",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    }
+  ]
+}
