@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://tomcat.apache.org/tomcat-9.0-doc/windows-service-howto.html ; https://community.fortinet.com/fortiedr-20/threat-coverage-how-fortiedr-protects-against-confluence-cve-2022-26134-post-exploitation-activity-109660 ; https://www.vulncheck.com/blog/confluence-dreams-of-shells",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "malicious",
+  "variant": "java.exe running as LOCAL SERVICE (SID S-1-5-19) starts powershell.exe",
+  "expect_alert": true,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-19T08:01:00Z",
+      "DeviceId": "synthetic-device-0002",
+      "DeviceName": "app01.example.invalid",
+      "FileName": "powershell.exe",
+      "ProcessCommandLine": "powershell.exe -NoProfile -Command Get-Date",
+      "AccountName": "LOCAL SERVICE",
+      "AccountSid": "S-1-5-19",
+      "InitiatingProcessFileName": "java.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\ExampleJRE\\bin",
+      "InitiatingProcessCommandLine": "java.exe -jar app.jar",
+      "InitiatingProcessAccountName": "LOCAL SERVICE",
+      "InitiatingProcessAccountSid": "S-1-5-19",
+      "InitiatingProcessParentFileName": "services.exe"
+    }
+  ]
+}
