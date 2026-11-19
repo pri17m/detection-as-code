@@ -1,0 +1,40 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Use%20Join%20on%20Two%20Scoped%20Events.md ; https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/ProcessRollup2%20Curation.md ; https://tomcat.apache.org/tomcat-9.0-doc/windows-service-howto.html",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "label": "malicious",
+  "variant": "renamed procrun parent (appservice.exe) with //RS// on the parent command line, UserSid S-1-5-20, child cmd.exe",
+  "expect_alert": true,
+  "result": "not run (no LogScale runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "@timestamp": "2026-11-18T07:00:00Z",
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "ComputerName": "wiki02.example.invalid",
+      "aid": "synthetic-aid-0003",
+      "UserName": "NETWORK SERVICE",
+      "UserSid": "S-1-5-20",
+      "ImageFileName": "\\Device\\HarddiskVolume3\\Program Files\\ExampleApp\\bin\\appservice.exe",
+      "CommandLine": "appservice.exe //RS//ExampleService",
+      "ParentBaseFileName": "services.exe",
+      "TargetProcessId": "1003",
+      "ParentProcessId": "500"
+    },
+    {
+      "@timestamp": "2026-11-19T08:00:00Z",
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "ComputerName": "wiki02.example.invalid",
+      "aid": "synthetic-aid-0003",
+      "UserName": "NETWORK SERVICE",
+      "UserSid": "S-1-5-20",
+      "ImageFileName": "\\Device\\HarddiskVolume3\\Windows\\System32\\cmd.exe",
+      "CommandLine": "cmd.exe /c hostname",
+      "ParentBaseFileName": "appservice.exe",
+      "TargetProcessId": "2003",
+      "ParentProcessId": "1003"
+    }
+  ]
+}

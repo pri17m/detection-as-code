@@ -1,0 +1,26 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Use%20Join%20on%20Two%20Scoped%20Events.md ; https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/ProcessRollup2%20Curation.md ; https://tomcat.apache.org/tomcat-9.0-doc/windows-service-howto.html",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "label": "malicious",
+  "variant": "java.exe parent name on the child event, child UserSid S-1-5-19, no parent ProcessRollup2 in the window (join misses, fallback)",
+  "expect_alert": true,
+  "result": "not run (no LogScale runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "@timestamp": "2026-11-19T08:00:00Z",
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "ComputerName": "app01.example.invalid",
+      "aid": "synthetic-aid-0002",
+      "UserName": "LOCAL SERVICE",
+      "UserSid": "S-1-5-19",
+      "ImageFileName": "\\Device\\HarddiskVolume3\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "powershell.exe -NoProfile -Command Get-Date",
+      "ParentBaseFileName": "java.exe",
+      "TargetProcessId": "2101",
+      "ParentProcessId": "1101"
+    }
+  ]
+}
