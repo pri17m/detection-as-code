@@ -1,0 +1,40 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Use%20Join%20on%20Two%20Scoped%20Events.md ; https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/ProcessRollup2%20Curation.md ; https://tomcat.apache.org/tomcat-9.0-doc/windows-service-howto.html",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "label": "benign",
+  "variant": "interactive user java.exe starts cmd.exe; UserSid is a normal domain account, not a built-in service SID",
+  "expect_alert": false,
+  "result": "not run (no LogScale runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "@timestamp": "2026-11-19T08:00:00Z",
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "ComputerName": "dev01.example.invalid",
+      "aid": "synthetic-aid-0004",
+      "UserName": "alice",
+      "UserSid": "S-1-5-21-1000-2000-3000-1105",
+      "ImageFileName": "\\Device\\HarddiskVolume3\\Program Files\\Java\\bin\\java.exe",
+      "CommandLine": "java.exe -jar tool.jar",
+      "ParentBaseFileName": "explorer.exe",
+      "TargetProcessId": "1004",
+      "ParentProcessId": "800"
+    },
+    {
+      "@timestamp": "2026-11-19T08:00:00Z",
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "ComputerName": "dev01.example.invalid",
+      "aid": "synthetic-aid-0004",
+      "UserName": "alice",
+      "UserSid": "S-1-5-21-1000-2000-3000-1105",
+      "ImageFileName": "\\Device\\HarddiskVolume3\\Windows\\System32\\cmd.exe",
+      "CommandLine": "cmd.exe /c dir",
+      "ParentBaseFileName": "java.exe",
+      "TargetProcessId": "2004",
+      "ParentProcessId": "1004"
+    }
+  ]
+}
