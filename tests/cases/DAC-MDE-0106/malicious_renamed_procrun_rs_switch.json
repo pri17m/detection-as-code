@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://tomcat.apache.org/tomcat-9.0-doc/windows-service-howto.html ; https://community.fortinet.com/fortiedr-20/threat-coverage-how-fortiedr-protects-against-confluence-cve-2022-26134-post-exploitation-activity-109660 ; https://www.vulncheck.com/blog/confluence-dreams-of-shells",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "malicious",
+  "variant": "renamed procrun service binary (not tomcat*.exe) with //RS// in the command line, SID only, starts cmd.exe",
+  "expect_alert": true,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-19T08:02:00Z",
+      "DeviceId": "synthetic-device-0003",
+      "DeviceName": "wiki02.example.invalid",
+      "FileName": "cmd.exe",
+      "ProcessCommandLine": "cmd.exe /c hostname",
+      "AccountName": "",
+      "AccountSid": "S-1-5-20",
+      "InitiatingProcessFileName": "appservice.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\ExampleApp\\bin",
+      "InitiatingProcessCommandLine": "appservice.exe //RS//ExampleService",
+      "InitiatingProcessAccountName": "",
+      "InitiatingProcessAccountSid": "S-1-5-20",
+      "InitiatingProcessParentFileName": "services.exe"
+    }
+  ]
+}
