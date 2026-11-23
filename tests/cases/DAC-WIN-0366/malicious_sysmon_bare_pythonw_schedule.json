@@ -1,0 +1,18 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/ ; https://labs.infoguard.ch/posts/slithering_through_the_noise/ ; https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4688 ; https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon ; https://reinject.vercel.app/en/posts/windows-security/persistence/windows_schedule_task_internal/",
+  "platform": "splunk",
+  "label": "malicious",
+  "variant": "Sysmon 1: bare pythonw.exe from ProgramData, parent svchost -s Schedule",
+  "expect_alert": true,
+  "result": "not run (no Splunk runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "EventCode": 1,
+  "sourcetype": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational",
+  "host": "srv01.example.invalid",
+  "Image": "C:\\ProgramData\\q7rk2m\\pythonw.exe",
+  "OriginalFileName": "pythonw.exe",
+  "CommandLine": "pythonw.exe",
+  "ParentImage": "C:\\Windows\\System32\\svchost.exe",
+  "ParentCommandLine": "svchost.exe -k netsvcs -p -s Schedule",
+  "User": "NT AUTHORITY\\SYSTEM"
+}

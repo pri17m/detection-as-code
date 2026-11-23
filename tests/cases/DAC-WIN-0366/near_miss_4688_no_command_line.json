@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/ ; https://labs.infoguard.ch/posts/slithering_through_the_noise/ ; https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4688 ; https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon ; https://reinject.vercel.app/en/posts/windows-security/persistence/windows_schedule_task_internal/",
+  "platform": "splunk",
+  "label": "near_miss",
+  "variant": "4688 without command-line auditing: CommandLine missing, dropped rather than guessed",
+  "expect_alert": false,
+  "result": "not run (no Splunk runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "EventCode": 4688,
+  "sourcetype": "XmlWinEventLog:Security",
+  "host": "srv07.example.invalid",
+  "NewProcessName": "C:\\ProgramData\\x7\\pythonw.exe",
+  "ParentProcessName": "C:\\Windows\\System32\\svchost.exe",
+  "SubjectUserName": "SRV01$"
+}

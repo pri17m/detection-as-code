@@ -1,0 +1,16 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/ ; https://labs.infoguard.ch/posts/slithering_through_the_noise/ ; https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4688 ; https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon ; https://reinject.vercel.app/en/posts/windows-security/persistence/windows_schedule_task_internal/",
+  "platform": "splunk",
+  "label": "known-gap",
+  "variant": "4688: renamed interpreter svcupd.exe; 4688 has no OriginalFileName",
+  "expect_alert": true,
+  "result": "not run (no Splunk runner). Python mirror of the rule's logic: no alert. Known gap, documented in REVIEW.md",
+  "EventCode": 4688,
+  "sourcetype": "XmlWinEventLog:Security",
+  "host": "srv08.example.invalid",
+  "NewProcessName": "C:\\ProgramData\\x2\\svcupd.exe",
+  "ParentProcessName": "C:\\Windows\\System32\\svchost.exe",
+  "SubjectUserName": "SRV01$",
+  "CommandLine": "svcupd.exe"
+}
