@@ -1,0 +1,69 @@
+id: DAC-CS-0254
+title: "Falcon: SYSTEM scheduled task with an all-digit name runs python.exe or pythonw.exe"
+description: >-
+  ScheduledTaskRegistered or ScheduledTaskModified (Windows) where the task's own name (the last part of
+  TaskName, after any folder) is made only of digits, TaskExecCommand ends in python.exe or pythonw.exe,
+  and the principal UserId in TaskXml is S-1-5-18 (SYSTEM). PowerShell's Get-Random with no arguments
+  returns an integer between 0 and Int32.MaxValue, and S5PIVOT and VIPERTUNNEL tasks used that kind of
+  name with a Python interpreter as the action; Hexastrike's task ran as SYSTEM. The match is digits from
+  start to end, so names that only contain a SID, such as the OneDrive Reporting Task, do not match. The
+  event names, TaskName, TaskExecCommand, TaskExecArguments, TaskXml and the parseXml path
+  Task.Principals.Principal.UserId come from public CrowdStrike logscale-community-content. Companion to
+  DAC-MDE-0108 and DAC-WIN-0367. telemetry_validated false.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- "falcon:process"
+mitre:
+  tactics:
+  - persistence
+  - execution
+  - privilege-escalation
+  techniques:
+  - T1053.005
+  - T1059.006
+severity: high
+false_positives:
+- "Software or admin scripts that register SYSTEM tasks with a bare number as the name and run Python. No public example was found. Allowlist the task name and command after a baseline (not measured)."
+references:
+- "https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/"
+- "https://labs.infoguard.ch/posts/slithering_through_the_noise/"
+- "https://github.com/CrowdStrike/logscale-community-content/blob/main/CrowdStrike-Query-Language-Map/CrowdStrike-Query-Language/parseXml.md"
+- "https://github.com/CrowdStrike/logscale-community-content/blob/main/Log-Sources/CrowdStrike/FLTR/crowdstrike-fltrlolbins/src/queries/LOLBins-Rundll32-ScheduledTasks.yaml"
+- "https://library.humio.com/crowdstrike-query-language/functions-parsexml.html"
+- "https://learn.microsoft.com/en-us/windows/win32/taskschd/taskschedulerschema-userid-principaltype-element"
+- "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-random"
+- "https://learn.microsoft.com/en-us/powershell/module/scheduledtasks/register-scheduledtask"
+- "https://attack.mitre.org/techniques/T1053/005/"
+- "https://attack.mitre.org/techniques/T1059/006/"
+telemetry_validated: false
+required_fields:
+- "#event_simpleName"
+- "event_platform"
+- "aid"
+- "ComputerName"
+- "UserName"
+- "TaskName"
+- "TaskExecCommand"
+- "TaskExecArguments"
+- "TaskXml"
+tags:
+- behavioural
+- python
+- scheduled-task
+- s5pivot
+- vipertunnel
+- needs-review
+- "esn:ScheduledTaskRegistered"
+- "parity:DAC-MDE-0108"
+- "parity:DAC-WIN-0367"
+query:
+  crowdstrike: |
+    #event_simpleName=/^ScheduledTask(Registered|Modified)$/ event_platform=Win
+    | TaskName=/(^|\\)[0-9]+$/
+    | TaskExecCommand=/(^|[\\"])pythonw?\.exe"?\s*$/i
+    | parseXml(field=TaskXml)
+    | Task.Principals.Principal.UserId=/^(S-1-5-18|SYSTEM|NT AUTHORITY\\SYSTEM)$/i
+    | table([@timestamp, aid, ComputerName, #event_simpleName, UserName, TaskName, TaskExecCommand, TaskExecArguments, Task.Principals.Principal.UserId, Task.Principals.Principal.RunLevel])
