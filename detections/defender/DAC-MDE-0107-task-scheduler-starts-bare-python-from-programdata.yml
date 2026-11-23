@@ -1,0 +1,86 @@
+id: DAC-MDE-0107
+title: "Task Scheduler starts python.exe or pythonw.exe from ProgramData or Users\\Public with no script"
+description: >-
+  DeviceProcessEvents where python.exe or pythonw.exe (by file name or by the original file name in the
+  version info) runs from a folder under C:\ProgramData\ or C:\Users\Public\, the parent is the Task
+  Scheduler (svchost.exe hosting the Schedule service, or taskeng.exe on older Windows), and the command
+  line has no script argument: no .py, .pyw, .pyc, .pyz or .zip token and no -c or -m option. A bare
+  interpreter has nothing to run on its own, so a scheduled task that starts one is only useful if code
+  runs from a startup hook such as sitecustomize.py, usercustomize.py or an import line in a .pth file.
+  Hexastrike reported this shape for S5PIVOT in a Qilin intrusion and InfoGuard reported it for
+  VIPERTUNNEL. The rule keys on the launch, not on those tools. telemetry_validated false.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - persistence
+  - execution
+  - privilege-escalation
+  techniques:
+  - T1053.005
+  - T1546.018
+  - T1059.006
+severity: high
+false_positives:
+- "An admin task that starts a bare interpreter by mistake, for example a task whose script argument was dropped. It exits straight away; fix the task (not measured)."
+- "Python-based tools installed under ProgramData that a task starts with only interpreter options (for example -u or -X utf8) and load their code from a .pth or sitecustomize file on purpose. No public example was found; allowlist by FolderPath after a baseline (not measured)."
+references:
+- "https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/"
+- "https://labs.infoguard.ch/posts/slithering_through_the_noise/"
+- "https://docs.python.org/3/library/site.html"
+- "https://docs.python.org/3/using/windows.html"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table"
+- "https://learn.microsoft.com/en-us/windows/application-management/svchost-service-refactoring"
+- "https://reinject.vercel.app/en/posts/windows-security/persistence/windows_schedule_task_internal/"
+- "https://falconforce.nl/falconfriday-malicious-scheduled-tasks-0xff0b/"
+- "https://threathunt.blog/hunting-for-malicious-scheduled-tasks/"
+- "https://www.anaconda.com/docs/getting-started/advanced-install/multi-user"
+- "https://attack.mitre.org/techniques/T1053/005/"
+- "https://attack.mitre.org/techniques/T1546/018/"
+- "https://attack.mitre.org/techniques/T1059/006/"
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "FileName"
+- "FolderPath"
+- "ProcessVersionInfoOriginalFileName"
+- "ProcessCommandLine"
+- "AccountName"
+- "AccountSid"
+- "InitiatingProcessFileName"
+- "InitiatingProcessCommandLine"
+tags:
+- behavioural
+- python
+- scheduled-task
+- s5pivot
+- vipertunnel
+- needs-review
+query:
+  defender: |
+    let Lookback = 1d;
+    DeviceProcessEvents
+    | where Timestamp > ago(Lookback)
+    | where FileName in~ ("python.exe", "pythonw.exe")
+        or ProcessVersionInfoOriginalFileName in~ ("python.exe", "pythonw.exe")
+    | where FolderPath matches regex @"(?i)^[a-z]:\\(programdata|users\\public)\\"
+    | extend ParentName = tolower(InitiatingProcessFileName), ParentCmd = tolower(InitiatingProcessCommandLine)
+    | extend SchedulerMatch = case(
+        ParentName == "taskeng.exe", "taskeng",
+        ParentName == "svchost.exe" and ParentCmd contains "-s schedule", "schedule_service",
+        ParentName == "svchost.exe" and ParentCmd contains "netsvcs" and not(ParentCmd contains " -s "), "netsvcs_shared",
+        "none")
+    | where SchedulerMatch != "none"
+    | where isnotempty(ProcessCommandLine)
+    | extend ScriptArgs = trim(@"\s+", replace_regex(ProcessCommandLine, @'^\s*("[^"]*"|\S+)', ""))
+    | where not(ScriptArgs matches regex @"(?i)\.(py|pyw|pyc|pyz|zip)\b")
+    | where not(ScriptArgs matches regex @"(^|\s)-[A-Za-z]*[cm]")
+    | project Timestamp, DeviceId, DeviceName, SchedulerMatch, FileName, FolderPath,
+        ProcessVersionInfoOriginalFileName, ProcessCommandLine, ScriptArgs, AccountName, AccountSid,
+        InitiatingProcessFileName, InitiatingProcessCommandLine

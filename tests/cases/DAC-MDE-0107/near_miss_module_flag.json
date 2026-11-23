@@ -1,0 +1,25 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/ ; https://labs.infoguard.ch/posts/slithering_through_the_noise/ ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://reinject.vercel.app/en/posts/windows-security/persistence/windows_schedule_task_internal/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "near_miss",
+  "variant": "python.exe -m with a module name from a task (documented as excluded)",
+  "expect_alert": false,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-21T19:07:00Z",
+      "DeviceId": "synthetic-device-0007",
+      "DeviceName": "srv07.example.invalid",
+      "FileName": "python.exe",
+      "FolderPath": "C:\\ProgramData\\Miniconda3\\python.exe",
+      "ProcessVersionInfoOriginalFileName": "python.exe",
+      "ProcessCommandLine": "C:\\ProgramData\\Miniconda3\\python.exe -m exampleagent.run",
+      "AccountName": "SYSTEM",
+      "AccountSid": "S-1-5-18",
+      "InitiatingProcessFileName": "svchost.exe",
+      "InitiatingProcessCommandLine": "svchost.exe -k netsvcs -p -s Schedule"
+    }
+  ]
+}
