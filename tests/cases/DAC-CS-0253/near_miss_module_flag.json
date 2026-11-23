@@ -1,0 +1,40 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/ ; https://labs.infoguard.ch/posts/slithering_through_the_noise/ ; https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Use%20Join%20on%20Two%20Scoped%20Events.md ; https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/ProcessRollup2%20Curation.md ; https://reinject.vercel.app/en/posts/windows-security/persistence/windows_schedule_task_internal/",
+  "platform": "crowdstrike",
+  "table": "ProcessRollup2",
+  "label": "near_miss",
+  "variant": "python.exe -m module from a task",
+  "expect_alert": false,
+  "result": "not run (no LogScale runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "@timestamp": "2026-11-20T06:00:00Z",
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "ComputerName": "srv01.example.invalid",
+      "aid": "synthetic-aid-0005",
+      "UserName": "SYSTEM",
+      "UserSid": "S-1-5-18",
+      "ImageFileName": "\\Device\\HarddiskVolume3\\Windows\\System32\\svchost.exe",
+      "CommandLine": "svchost.exe -k netsvcs -p -s Schedule",
+      "ParentBaseFileName": "services.exe",
+      "TargetProcessId": "900",
+      "ParentProcessId": "600"
+    },
+    {
+      "@timestamp": "2026-11-21T19:05:00Z",
+      "#event_simpleName": "ProcessRollup2",
+      "event_platform": "Win",
+      "ComputerName": "srv01.example.invalid",
+      "aid": "synthetic-aid-0005",
+      "UserName": "SYSTEM",
+      "UserSid": "S-1-5-18",
+      "ImageFileName": "\\Device\\HarddiskVolume3\\ProgramData\\Miniconda3\\python.exe",
+      "CommandLine": "C:\\ProgramData\\Miniconda3\\python.exe -m exampleagent.run",
+      "ParentBaseFileName": "svchost.exe",
+      "TargetProcessId": "2005",
+      "ParentProcessId": "900"
+    }
+  ]
+}
