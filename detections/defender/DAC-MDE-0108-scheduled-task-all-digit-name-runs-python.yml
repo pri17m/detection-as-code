@@ -1,0 +1,73 @@
+id: DAC-MDE-0108
+title: "Scheduled task with an all-digit name runs python.exe or pythonw.exe"
+description: >-
+  DeviceEvents ScheduledTaskCreated or ScheduledTaskUpdated where the task's own name (the last part of
+  TaskName, after any folder) is made only of digits and the task's Exec Command ends in python.exe or
+  pythonw.exe. PowerShell's Get-Random with no arguments returns an integer between 0 and Int32.MaxValue,
+  and S5PIVOT and VIPERTUNNEL tasks used that kind of name with a Python interpreter as the action. The
+  match is digits from start to end, so names that only contain a SID, such as the OneDrive Reporting
+  Task, do not match. Microsoft Learn documents AdditionalFields only as JSON; the TaskName and
+  TaskContent keys and the Actions.Exec.Command path come from public community write-ups. MDE does not
+  put the task principal in this event, so unlike DAC-CS-0254 and DAC-WIN-0367 this rule cannot require
+  a SYSTEM principal. telemetry_validated false.
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- "mde:advanced_hunting"
+mitre:
+  tactics:
+  - persistence
+  - execution
+  techniques:
+  - T1053.005
+  - T1059.006
+severity: high
+false_positives:
+- "Software or admin scripts that name tasks with a bare number and run Python. No public example was found. Allowlist the task name and command after a baseline (not measured)."
+- "Because there is no principal in this event, a numeric task that runs Python as a normal user also alerts. That is intended; check the principal on the host (Get-ScheduledTask) during triage."
+references:
+- "https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/"
+- "https://labs.infoguard.ch/posts/slithering_through_the_noise/"
+- "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceevents-table"
+- "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-random"
+- "https://learn.microsoft.com/en-us/powershell/module/scheduledtasks/register-scheduledtask"
+- "https://falconforce.nl/falconfriday-malicious-scheduled-tasks-0xff0b/"
+- "https://threathunt.blog/hunting-for-malicious-scheduled-tasks/"
+- "https://detection.wiki/defender-deviceevents/"
+- "https://attack.mitre.org/techniques/T1053/005/"
+- "https://attack.mitre.org/techniques/T1059/006/"
+telemetry_validated: false
+required_fields:
+- "Timestamp"
+- "DeviceId"
+- "DeviceName"
+- "ActionType"
+- "AdditionalFields"
+- "InitiatingProcessFileName"
+- "InitiatingProcessCommandLine"
+- "InitiatingProcessAccountName"
+- "InitiatingProcessAccountSid"
+tags:
+- behavioural
+- python
+- scheduled-task
+- s5pivot
+- vipertunnel
+- needs-review
+query:
+  defender: |
+    let Lookback = 1d;
+    DeviceEvents
+    | where Timestamp > ago(Lookback)
+    | where ActionType in ("ScheduledTaskCreated", "ScheduledTaskUpdated")
+    | extend AF = parse_json(AdditionalFields)
+    | extend TaskName = tostring(AF.TaskName), TaskContentRaw = tostring(AF.TaskContent)
+    | where TaskName matches regex @"(^|\\)[0-9]+$"
+    | where TaskContentRaw matches regex @"(?i)""Command""\s*:\s*""(\\""|[^""])*python(w)?\.exe(\\"")?"""
+    | extend TC = parse_json(TaskContentRaw)
+    | extend TaskCommand = tostring(TC.Actions.Exec.Command), TaskArguments = tostring(TC.Actions.Exec.Arguments),
+        SubjectUserName = tostring(AF.SubjectUserName)
+    | project Timestamp, DeviceId, DeviceName, ActionType, TaskName, TaskCommand, TaskArguments, SubjectUserName,
+        InitiatingProcessFileName, InitiatingProcessCommandLine, InitiatingProcessAccountName, InitiatingProcessAccountSid
