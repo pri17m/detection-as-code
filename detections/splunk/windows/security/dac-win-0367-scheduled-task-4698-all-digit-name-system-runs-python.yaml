@@ -1,0 +1,67 @@
+id: DAC-WIN-0367
+title: "Scheduled task created (4698) with an all-digit name, SYSTEM principal and a python.exe or pythonw.exe action"
+description: >-
+  Security 4698 where the task's own name (the last part of TaskName, after any folder) is made only of
+  digits, the TaskContent XML has an Exec Command ending in python.exe or pythonw.exe, and the principal
+  UserId is S-1-5-18, SYSTEM or NT AUTHORITY\SYSTEM. PowerShell's Get-Random with no arguments returns an
+  integer between 0 and Int32.MaxValue, and S5PIVOT and VIPERTUNNEL tasks used that kind of name with a
+  Python interpreter as the action; Hexastrike's task ran as SYSTEM. The match is digits from start to
+  end, so names that only contain a SID, such as the OneDrive Reporting Task, do not match. The XML
+  checks accept both plain and entity-escaped tags because the Windows TA can render TaskContent either
+  way. 4698 needs Audit Other Object Access Events. Companion to DAC-MDE-0108 and DAC-CS-0254.
+  telemetry_validated false.
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - execution
+  - privilege-escalation
+  techniques:
+  - T1053.005
+  - T1059.006
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+required_fields:
+- EventCode
+- TaskName
+- TaskContent
+- SubjectUserName
+- SubjectDomainName
+- SubjectLogonId
+telemetry_validated: false
+false_positives:
+- "Software or admin scripts that register SYSTEM tasks with a bare number as the name and run Python. No public example was found. Allowlist the task name and command after a baseline (not measured)."
+references:
+- "https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/"
+- "https://labs.infoguard.ch/posts/slithering_through_the_noise/"
+- "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4698"
+- "https://learn.microsoft.com/en-us/windows/win32/taskschd/taskschedulerschema-userid-principaltype-element"
+- "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-random"
+- "https://learn.microsoft.com/en-us/powershell/module/scheduledtasks/register-scheduledtask"
+- "https://attack.mitre.org/techniques/T1053/005/"
+- "https://attack.mitre.org/techniques/T1059/006/"
+tags:
+- behavioural
+- python
+- scheduled-task
+- s5pivot
+- vipertunnel
+- needs-review
+- parity:DAC-MDE-0108
+- parity:DAC-CS-0254
+query:
+  splunk: |
+    `windows_security` EventCode=4698
+    | eval task_name=coalesce(TaskName, Task_Name)
+    | eval task_content=coalesce(TaskContent, Task_Content)
+    | where match(task_name, "(^|\\\\)[0-9]+$")
+    | where match(task_content, "(?is)(<|&lt;)Command(>|&gt;)\s*[^<&]*pythonw?\.exe\"?\s*(<|&lt;)/Command")
+    | where match(task_content, "(?is)(<|&lt;)UserId(>|&gt;)\s*(S-1-5-18|SYSTEM|NT AUTHORITY\\\\SYSTEM)\s*(<|&lt;)/UserId")
+    | rex field=task_content "(?is)(<|&lt;)Command(>|&gt;)\s*(?<task_command>[^<&]+?)\s*(<|&lt;)/Command"
+    | rex field=task_content "(?is)(<|&lt;)UserId(>|&gt;)\s*(?<task_userid>[^<&]+?)\s*(<|&lt;)/UserId"
+    | table _time host task_name task_command task_userid SubjectUserName SubjectDomainName SubjectLogonId ClientProcessId ParentProcessId

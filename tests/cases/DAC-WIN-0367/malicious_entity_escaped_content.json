@@ -1,0 +1,17 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/ ; https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4698 ; https://learn.microsoft.com/en-us/windows/win32/taskschd/taskschedulerschema-userid-principaltype-element",
+  "platform": "splunk",
+  "label": "malicious",
+  "variant": "TaskContent rendered with &lt; &gt; entities, full path python.exe, UserId SYSTEM",
+  "expect_alert": true,
+  "result": "not run (no Splunk runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "EventCode": 4698,
+  "host": "srv02.example.invalid",
+  "SubjectUserName": "svc-backup",
+  "SubjectDomainName": "EXAMPLE",
+  "SubjectLogonId": "0x3e7a1",
+  "sourcetype": "XmlWinEventLog:Security",
+  "TaskName": "\\604918273",
+  "TaskContent": "&lt;?xml version=\"1.0\" encoding=\"UTF-16\"?&gt;&lt;Task version=\"1.2\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\"&gt;&lt;Triggers&gt;&lt;TimeTrigger&gt;&lt;Repetition&gt;&lt;Interval&gt;PT1M&lt;/Interval&gt;&lt;/Repetition&gt;&lt;StartBoundary&gt;2026-11-21T19:00:00&lt;/StartBoundary&gt;&lt;Enabled&gt;true&lt;/Enabled&gt;&lt;/TimeTrigger&gt;&lt;/Triggers&gt;&lt;Principals&gt;&lt;Principal id=\"Author\"&gt;&lt;UserId&gt;SYSTEM&lt;/UserId&gt;&lt;RunLevel&gt;LeastPrivilege&lt;/RunLevel&gt;&lt;/Principal&gt;&lt;/Principals&gt;&lt;Settings&gt;&lt;MultipleInstancesPolicy&gt;IgnoreNew&lt;/MultipleInstancesPolicy&gt;&lt;/Settings&gt;&lt;Actions Context=\"Author\"&gt;&lt;Exec&gt;&lt;Command&gt;C:\\ProgramData\\ab12\\python.exe&lt;/Command&gt;&lt;WorkingDirectory&gt;C:\\programdata\\q7rk2m&lt;/WorkingDirectory&gt;&lt;/Exec&gt;&lt;/Actions&gt;&lt;/Task&gt;"
+}
