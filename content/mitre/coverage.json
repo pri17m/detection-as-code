@@ -1,14 +1,14 @@
 {
   "summary": {
-    "detections_total": 909,
-    "detections_with_mitre": 909,
+    "detections_total": 916,
+    "detections_with_mitre": 916,
     "detections_with_mitre_percent": 100.0,
-    "unique_techniques": 219,
+    "unique_techniques": 221,
     "platform_counts": {
-      "crowdstrike": 169,
-      "defender": 85,
+      "crowdstrike": 171,
+      "defender": 88,
       "google_secops": 83,
-      "splunk": 655
+      "splunk": 657
     }
   },
   "techniques": {
@@ -287,8 +287,12 @@
       "DAC-CS-0135",
       "DAC-CS-0202",
       "DAC-CS-0203",
+      "DAC-CS-0253",
+      "DAC-CS-0254",
       "DAC-MDE-0006",
       "DAC-MDE-0025",
+      "DAC-MDE-0107",
+      "DAC-MDE-0108",
       "DAC-WIN-0011",
       "DAC-WIN-0020",
       "DAC-WIN-0021",
@@ -300,7 +304,9 @@
       "DAC-WIN-0205",
       "DAC-WIN-0261",
       "DAC-WIN-0263",
-      "DAC-WIN-0264"
+      "DAC-WIN-0264",
+      "DAC-WIN-0366",
+      "DAC-WIN-0367"
     ],
     "T1055": [
       "DAC-CS-0059",
@@ -450,6 +456,14 @@
     "T1059.005": [
       "DAC-CS-0205",
       "DAC-WIN-0063"
+    ],
+    "T1059.006": [
+      "DAC-CS-0253",
+      "DAC-CS-0254",
+      "DAC-MDE-0107",
+      "DAC-MDE-0108",
+      "DAC-WIN-0366",
+      "DAC-WIN-0367"
     ],
     "T1059.009": [
       "DAC-AWS-0046"
@@ -776,6 +790,7 @@
       "DAC-ENTRA-0033",
       "DAC-ENTRA-0034",
       "DAC-MDE-0053",
+      "DAC-MDE-0109",
       "DAC-WIN-0010",
       "DAC-WIN-0109",
       "DAC-WIN-0132",
@@ -1203,6 +1218,11 @@
     "T1546.012": [
       "DAC-WIN-0060",
       "DAC-WIN-0186"
+    ],
+    "T1546.018": [
+      "DAC-CS-0253",
+      "DAC-MDE-0107",
+      "DAC-WIN-0366"
     ],
     "T1547.001": [
       "DAC-CS-0023",
