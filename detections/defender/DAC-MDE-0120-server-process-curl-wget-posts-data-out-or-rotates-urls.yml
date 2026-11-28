@@ -1,0 +1,94 @@
+id: DAC-MDE-0120
+title: 'MDE: curl or wget sends data out from a web, app or database service, or posts to 10+ rotating URLs on one host'
+description: 'Attack phase: command and control and exfiltration over web requests. DeviceProcessEvents for curl or wget that
+  sends data (curl -d, --data*, --json, -F, -T, -X POST/PUT; wget --post-data, --post-file, --body-data, --body-file, --method
+  POST/PUT), or whose parent shell command line uses command substitution. It alerts when the tool runs under a web server,
+  app runtime or database engine (directly or through a shell), or when one device sends to 10+ distinct URLs on the same
+  host in an hour. Google Threat Intelligence saw ARTEX use native curl on a database server to pull generated PowerShell
+  and batch scripts and post results across 491 rotating webhook.site URLs; ThreatDefence lists curl posting to a request-collection
+  service from a server as a signal. This is the behavioural version: no domain list is matched. A request-bin/OAST category
+  column is added for triage only. Microsoft''s 5 Nov 2026 post is wider ARTEX context. telemetry_validated false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - exfiltration
+  - command-and-control
+  techniques:
+  - T1567.004
+  - T1071.001
+severity: high
+false_positives:
+- Web apps that shell out to curl to call webhooks or APIs (Slack, Teams, payment callbacks). Usually one fixed URL; allowlist
+  the DestHost per device after review.
+- Health-check or deploy scripts started by a service that post status to a CI or monitoring endpoint.
+- REST clients that post to many object paths on one API (for example /items/<id>) can reach the rotating-URL threshold. Volume
+  not measured.
+references:
+- https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table
+- https://curl.se/docs/manpage.html
+- https://www.gnu.org/software/wget/manual/wget.html
+- https://attack.mitre.org/techniques/T1567/004/
+- https://attack.mitre.org/techniques/T1071/001/
+telemetry_validated: false
+required_fields:
+- Timestamp
+- DeviceId
+- DeviceName
+- FileName
+- ProcessCommandLine
+- AccountName
+- InitiatingProcessFileName
+- InitiatingProcessCommandLine
+- InitiatingProcessParentFileName
+tags:
+- behavioural
+- clean-room
+- artex
+- exfiltration
+- webhook
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let Window = 1h;
+    let RotatingUrls = 10;
+    let Services = dynamic(["w3wp.exe", "httpd", "httpd.exe", "apache2", "nginx", "nginx.exe", "php", "php.exe", "php-cgi", "php-cgi.exe",
+        "java", "java.exe", "javaw.exe", "tomcat9.exe", "tomcat10.exe", "node", "node.exe", "sqlservr.exe", "mysqld", "mysqld.exe",
+        "mariadbd", "mariadbd.exe", "postgres", "postgres.exe"]);
+    let Shells = dynamic(["cmd.exe", "powershell.exe", "pwsh.exe", "pwsh", "sh", "bash", "dash", "zsh"]);
+    // curl: -d/--data*, --json, -F/--form, -T/--upload-file (also inside combined short flags such as -sSd), or -X/--request POST|PUT
+    let CurlSend = @"(^|\s)(-[A-Za-z]*[dFT]|--data(-binary|-raw|-urlencode|-ascii)?|--json|--form(-string)?|--upload-file)(\s|=|@|$)|(^|\s)(-X|--request)\s*(POST|PUT)\b";
+    // wget: --post-data, --post-file, --body-data, --body-file, or --method POST|PUT
+    let WgetSend = @"(?i)--(post-data|post-file|body-data|body-file)(\s|=)|--method(\s|=)\s*(POST|PUT)\b";
+    DeviceProcessEvents
+    | where Timestamp > ago(Lookback)
+    | extend Tool = tolower(FileName)
+    | where Tool in ("curl", "curl.exe", "wget", "wget.exe", "wget2")
+    | extend Sends = iff(Tool startswith "curl", ProcessCommandLine matches regex CurlSend, ProcessCommandLine matches regex WgetSend),
+        Parent = tolower(InitiatingProcessFileName), GrandParent = tolower(InitiatingProcessParentFileName)
+    | extend ServiceAncestry = Parent in (Services) or Parent startswith "php-fpm"
+        or (Parent in (Shells) and (GrandParent in (Services) or GrandParent startswith "php-fpm")),
+        SubstitutionInShell = Parent in (Shells) and (InitiatingProcessCommandLine has "$(" or InitiatingProcessCommandLine has "`")
+    | extend Url = extract(@"(https?://[^\s""'<>]+)", 1, ProcessCommandLine)
+    | extend DestHost = tolower(extract(@"https?://([^/\s:""'<>?]+)", 1, Url))
+    // context only, never used to filter: request-bin / OAST style destination
+    | extend DestCategory = iff(DestHost has_any ("webhook.site", "requestbin", "pipedream", "oast", "interact.sh", "burpcollaborator"), "request-bin/OAST", "")
+    | where Sends or SubstitutionInShell
+    | summarize Calls = count(), Urls = dcount(Url), UrlSample = make_set(Url, 15), Cmds = make_set(ProcessCommandLine, 10),
+        ServiceCalls = countif(ServiceAncestry), Parents = make_set(strcat(GrandParent, " > ", Parent), 5),
+        Accounts = make_set(AccountName, 5), Categories = make_set_if(DestCategory, isnotempty(DestCategory), 2),
+        FirstSeen = min(Timestamp), LastSeen = max(Timestamp)
+        by DeviceId, DeviceName, DestHost, bin(Timestamp, Window)
+    | extend Reason = case(ServiceCalls > 0 and Urls >= RotatingUrls, "service-ancestry+rotating-urls",
+        ServiceCalls > 0, "service-ancestry", Urls >= RotatingUrls, "rotating-urls", "")
+    | where isnotempty(Reason)
+    | project FirstSeen, LastSeen, DeviceId, DeviceName, Reason, DestHost, Categories, Calls, Urls, ServiceCalls, Parents, Accounts, UrlSample, Cmds
+    | order by FirstSeen asc
