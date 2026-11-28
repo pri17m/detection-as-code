@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://curl.se/docs/manpage.html ; https://www.gnu.org/software/wget/manual/wget.html",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "benign",
+  "variant": "Admin downloads a file; curl does not send data and the parent is not a service",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-26T03:00:00Z",
+      "DeviceId": "synthetic-ws01",
+      "DeviceName": "ws01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -sSLo C:\\Temp\\tool.zip https://downloads.example.org/tool.zip",
+      "AccountName": "alice",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell.exe",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    }
+  ]
+}

