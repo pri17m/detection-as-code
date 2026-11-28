@@ -1,0 +1,96 @@
+id: DAC-MDE-0118
+title: 'AWS: one identity creates or imports a key pair, launches an instance, and allocates an Elastic IP or creates a volume
+  within an hour, first launch in 14 days'
+description: 'Attack phase: persistence and staging with a stolen AWS key (building an externally reachable jump host). Sentinel
+  AWSCloudTrail EC2 calls grouped by identity (role session issuer, else user ARN) in one-hour bins. Alerts when one identity
+  successfully calls CreateKeyPair or ImportKeyPair, and RunInstances, and at least one of AllocateAddress / AssociateAddress
+  or CreateVolume / AttachVolume in the same hour, and that identity had no successful RunInstances in the previous 14 days.
+  Security-group create or ingress attempts, including failures, are counted as context. Google Threat Intelligence saw ARTEX
+  generate a new SSH key pair, allocate a dedicated Elastic IP, fail to create a security group, launch t3.micro jump hosts
+  and create a 100 GB volume; ThreatDefence Hunt 14 covers the same foothold. The Microsoft 5 Nov 2026 post on agentic secret
+  abuse is cross-cloud context. AWS service-invoked calls are dropped. Source IP is shown, never matched. telemetry_validated
+  false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:AWSCloudTrail
+mitre:
+  tactics:
+  - defense-impairment
+  techniques:
+  - T1578.002
+severity: high
+false_positives:
+- A new IaC pipeline role or a new engineer's first build (Terraform or CloudFormation run under the caller's own identity)
+  that creates a key pair, an instance and an Elastic IP or volume in one apply. Expect one alert per new identity; allowlist
+  the role after review.
+- Sandbox or training accounts where people build instances by hand. Scope by account if needed; volume not measured.
+- Window (1 hour) and baseline (14 days) are unmeasured starting points.
+references:
+- https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/awscloudtrail
+- https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitor-with-cloudtrail.html
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+- https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_Operations.html
+- https://attack.mitre.org/techniques/T1578/002/
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- EventSource
+- EventName
+- ErrorCode
+- UserIdentityInvokedBy
+- SourceIpAddress
+- SessionIssuerArn
+- UserIdentityArn
+- UserIdentityPrincipalid
+- UserIdentityAccessKeyId
+- UserIdentityType
+- RecipientAccountId
+- AWSRegion
+- UserAgent
+tags:
+- behavioural
+- clean-room
+- artex
+- aws
+- cloudtrail
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let Window = 1h;
+    let BaselineDays = 14d;
+    let FootholdEvents = dynamic(["CreateKeyPair", "ImportKeyPair", "AllocateAddress", "AssociateAddress", "RunInstances",
+        "CreateVolume", "AttachVolume", "CreateSecurityGroup", "AuthorizeSecurityGroupIngress"]);
+    let Ec2Calls = (StartTime:datetime, EndTime:datetime) {
+        AWSCloudTrail
+        | where TimeGenerated between (StartTime .. EndTime)
+        | where EventSource == "ec2.amazonaws.com"
+        | where isempty(UserIdentityInvokedBy) and not(SourceIpAddress endswith ".amazonaws.com" or SourceIpAddress startswith "AWS Internal")
+        | extend Actor = coalesce(SessionIssuerArn, UserIdentityArn, UserIdentityPrincipalid, UserIdentityAccessKeyId)
+    };
+    // identities that already launched instances successfully in the baseline period
+    let KnownLaunchers = Ec2Calls(ago(Lookback + BaselineDays), ago(Lookback))
+    | where EventName == "RunInstances" and isempty(ErrorCode)
+    | distinct Actor;
+    Ec2Calls(ago(Lookback), now())
+    | where EventName in (FootholdEvents)
+    | extend Ok = isempty(ErrorCode)
+    | summarize KeyPair = countif(Ok and EventName in ("CreateKeyPair", "ImportKeyPair")),
+        PublicAddress = countif(Ok and EventName in ("AllocateAddress", "AssociateAddress")),
+        Launch = countif(Ok and EventName == "RunInstances"),
+        Volume = countif(Ok and EventName in ("CreateVolume", "AttachVolume")),
+        SecurityGroupTries = countif(EventName in ("CreateSecurityGroup", "AuthorizeSecurityGroupIngress")),
+        SecurityGroupFailures = countif(not(Ok) and EventName in ("CreateSecurityGroup", "AuthorizeSecurityGroupIngress")),
+        Events = make_set(EventName, 20), Errors = make_set_if(ErrorCode, not(Ok), 10), Regions = make_set(AWSRegion, 10),
+        AccessKeys = make_set(UserIdentityAccessKeyId, 5), SourceIps = make_set(SourceIpAddress, 10), Agents = make_set(UserAgent, 5),
+        FirstSeen = min(TimeGenerated), LastSeen = max(TimeGenerated)
+        by Actor, UserIdentityType, RecipientAccountId, bin(TimeGenerated, Window)
+    | where KeyPair > 0 and Launch > 0 and (PublicAddress > 0 or Volume > 0)
+    | join kind=leftanti KnownLaunchers on Actor
+    | order by FirstSeen asc
