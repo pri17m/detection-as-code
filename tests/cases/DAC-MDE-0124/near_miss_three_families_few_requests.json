@@ -1,0 +1,93 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://www.elastic.co/security-labs/threat-command/agentic-offensive-frameworks-detection-artex ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/w3ciislog ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/commonsecuritylog",
+  "platform": "defender",
+  "table": "W3CIISLog",
+  "label": "near-miss",
+  "variant": "Three families but only 9 requests in the minute",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-26T13:05:00Z",
+      "cIP": "203.0.113.94",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item0",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T13:05:02Z",
+      "cIP": "203.0.113.94",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item1",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T13:05:04Z",
+      "cIP": "203.0.113.94",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item2",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T13:05:06Z",
+      "cIP": "203.0.113.94",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item3",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T13:05:08Z",
+      "cIP": "203.0.113.94",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item4",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T13:05:10Z",
+      "cIP": "203.0.113.94",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item5",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T13:05:12Z",
+      "cIP": "203.0.113.94",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item6",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T13:05:14Z",
+      "cIP": "203.0.113.94",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item7",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T13:05:16Z",
+      "cIP": "203.0.113.94",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item8",
+      "scStatus": "404"
+    }
+  ]
+}

@@ -1,0 +1,660 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://www.elastic.co/security-labs/threat-command/agentic-offensive-frameworks-detection-artex ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/w3ciislog ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/commonsecuritylog",
+  "platform": "defender",
+  "table": "W3CIISLog",
+  "label": "benign",
+  "variant": "Office NAT shows the same three families on 2 earlier days (shared egress)",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-20T09:00:00Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item0",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:02Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item1",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:04Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item2",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:06Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item3",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:08Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item4",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:10Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item5",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:12Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item6",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:14Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item7",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:16Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item8",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:18Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item9",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:20Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item10",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:22Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item11",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:24Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item12",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:26Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item13",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:28Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item14",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:30Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item15",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:32Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item16",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:34Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item17",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:36Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item18",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:38Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item19",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:40Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item20",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:42Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item21",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:44Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item22",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-20T09:00:46Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item23",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:00Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item0",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:02Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item1",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:04Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item2",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:06Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item3",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:08Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item4",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:10Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item5",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:12Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item6",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:14Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item7",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:16Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item8",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:18Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item9",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:20Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item10",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:22Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item11",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:24Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item12",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:26Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item13",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:28Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item14",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:30Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item15",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:32Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item16",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:34Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item17",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:36Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item18",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:38Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item19",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:40Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item20",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:42Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item21",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:44Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item22",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-22T09:00:46Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item23",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:00Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item0",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:02Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item1",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:04Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item2",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:06Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item3",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:08Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item4",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:10Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item5",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:12Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item6",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:14Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item7",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:16Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item8",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:18Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item9",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:20Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item10",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:22Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item11",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:24Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item12",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:26Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item13",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:28Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item14",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:30Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item15",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:32Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item16",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:34Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item17",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:36Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item18",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:38Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item19",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:40Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item20",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:42Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item21",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:44Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "python-requests/2.32.3",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item22",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T09:00:46Z",
+      "cIP": "198.51.100.5",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item23",
+      "scStatus": "404"
+    }
+  ]
+}

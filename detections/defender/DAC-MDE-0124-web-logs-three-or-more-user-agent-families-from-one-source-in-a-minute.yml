@@ -1,0 +1,101 @@
+id: DAC-MDE-0124
+title: 'Sentinel: one source uses 3+ user-agent tool families (script, SDK, scanner, browser) in one minute against web servers'
+description: 'Attack phase: reconnaissance by an agent switching tools. W3CIISLog and CommonSecurityLog requests are grouped
+  by source address per minute. User agents are classified into generic families (AWS SDK, Python, curl, Go, scanner, browser)
+  and the rule alerts when one source shows 3 or more families and 20 or more requests in a minute, and that source did not
+  show the same mix on 2 or more days in the previous 14 (shared NAT, proxy and CDN egress). Elastic Security Labs: ''one
+  source address can use curl, a Python client, a browser User-Agent, and an AWS client within the same minute''; ThreatDefence
+  Hunt 17 uses the same shape. Microsoft''s 5 Nov 2026 post is wider ARTEX context. No single user-agent string alerts and
+  no address list is used; source address is the grouping key. telemetry_validated false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:W3CIISLog
+- sentinel:CommonSecurityLog
+mitre:
+  tactics:
+  - reconnaissance
+  techniques:
+  - T1595.002
+  - T1595.003
+severity: medium
+false_positives:
+- A developer machine or office NAT testing an API with curl, Python and a browser in the same minute (Elastic shows exactly
+  this as an example match). Recurring sources drop out through the 2-day baseline; a one-off test still alerts.
+- Authorised vulnerability scans that mix scanner, curl and browser engines. Confirm the engagement window.
+- Load balancer, WAF or CDN addresses logged as the client when X-Forwarded-For is not used. These usually burst every day
+  and fall into the baseline.
+references:
+- https://www.elastic.co/security-labs/threat-command/agentic-offensive-frameworks-detection-artex
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/w3ciislog
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/commonsecuritylog
+- https://learn.microsoft.com/en-us/azure/azure-monitor/agents/data-collection-iis
+- https://attack.mitre.org/techniques/T1595/002/
+- https://attack.mitre.org/techniques/T1595/003/
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- cIP
+- csUserAgent
+- Computer
+- sSiteName
+- csUriStem
+- scStatus
+- SourceIP
+- RequestClientApplication
+- DeviceVendor
+- DeviceProduct
+- RequestURL
+tags:
+- behavioural
+- clean-room
+- artex
+- web
+- user-agent-family
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let Baseline = 14d;
+    let MinFamilies = 3;
+    let MinRequests = 20;
+    // user agents are classified into generic tool families and only the number of families is alerted on; no single UA string alerts
+    let Family = (ua: string) {
+        let u = tolower(replace_string(ua, "+", " "));   // IIS logs write spaces in csUserAgent as '+'
+        case(
+            u startswith "boto3" or u startswith "botocore" or u startswith "aws-cli" or u startswith "aws-sdk", "aws-sdk",
+            u startswith "python" or u has "python-requests" or u has "aiohttp" or u startswith "httpx", "python",
+            u startswith "curl/", "curl",
+            u startswith "go-http-client", "go",
+            u has_any ("nuclei", "sqlmap", "ffuf", "katana", "gobuster", "nikto"), "scanner",
+            u startswith "mozilla/", "browser",
+            "")
+    };
+    let Requests = union isfuzzy=true
+        (W3CIISLog | where TimeGenerated > ago(Lookback + Baseline)
+            | project TimeGenerated, Src = cIP, UA = csUserAgent, Target = strcat(Computer, "/", sSiteName), Path = csUriStem, Status = scStatus),
+        (CommonSecurityLog | where TimeGenerated > ago(Lookback + Baseline) and isnotempty(RequestClientApplication)
+            | project TimeGenerated, Src = SourceIP, UA = RequestClientApplication, Target = strcat(DeviceVendor, "/", DeviceProduct), Path = RequestURL, Status = "")
+    | where isnotempty(Src)
+    | extend Fam = Family(UA);
+    let Minutes = Requests
+    | summarize Requests = count(), Families = dcountif(Fam, isnotempty(Fam)), FamilySet = make_set_if(Fam, isnotempty(Fam), 8),
+        Targets = make_set(Target, 5), Paths = dcount(Path),
+        Statuses = make_set(Status, 8), UaSample = make_set(UA, 8)
+        by Src, Minute = bin(TimeGenerated, 1m)
+    | where Families >= MinFamilies and Requests >= MinRequests;
+    // shared egress (corporate NAT, proxies, CDN front ends, developer offices) shows this mix on many days; a source that did it on 2+ days in the baseline is known
+    let SharedEgress = Minutes | where Minute < ago(Lookback) | summarize Days = dcount(bin(Minute, 1d)) by Src | where Days >= 2;
+    Minutes
+    | where Minute > ago(Lookback)
+    | join kind=leftanti SharedEgress on Src
+    | summarize BurstMinutes = count(), MaxFamilies = max(Families), Families = make_set(FamilySet, 8), Requests = sum(Requests),
+        DistinctPaths = sum(Paths), Targets = make_set(Targets, 5), Statuses = make_set(Statuses, 8), UaSample = make_set(UaSample, 10),
+        FirstSeen = min(Minute), LastSeen = max(Minute)
+        by Src
+    | project FirstSeen, LastSeen, Src, BurstMinutes, MaxFamilies, Families, Requests, DistinctPaths, Targets, Statuses, UaSample
+    | order by FirstSeen asc
