@@ -1,0 +1,85 @@
+id: DAC-MDE-0112
+title: 'AWS: burst of EC2 DryRun permission checks across 5 or more actions by one identity in 5 minutes'
+description: 'Attack phase: discovery right after an AWS key is stolen (mapping what the key may do). Sentinel AWSCloudTrail
+  rows from ec2.amazonaws.com where ErrorCode ends with DryRunOperation (permission check passed, DryRun set) or UnauthorizedOperation,
+  grouped by identity (role session issuer, else user ARN) in 5-minute bins. Alerts on 10 or more such calls over 5 or more
+  EC2 actions, with at least 3 different actions returning DryRunOperation, so a plain run of denials without any dry run
+  does not fire. Google Threat Intelligence saw ARTEX test compromised IAM user permissions with DryRun flags and placeholder
+  IDs across EC2 compute, EBS volume and snapshot actions; ThreatDefence Hunt 14 covers the same burst. The Microsoft 5 Nov
+  2026 agentic secret-abuse post is cross-cloud context. Calls made by AWS services on the caller''s behalf are dropped. Source
+  IP is shown, not matched. Thresholds are unmeasured. telemetry_validated false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:AWSCloudTrail
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1580
+severity: medium
+false_positives:
+- 'Kubernetes node autoscalers and similar controllers dry-run a few EC2 actions on a schedule (Karpenter: CreateFleet, CreateLaunchTemplate,
+  RunInstances). Three actions sit under the 5-action floor; a controller that probes more would need an allowlist entry.'
+- IaC tools and permission checkers that validate many EC2 actions with DryRun before a deploy (for example a pipeline pre-flight).
+  Allowlist the pipeline role after a baseline; volume not measured.
+- Thresholds (10 calls, 5 actions, 3 dry-run actions, 5 minutes) are unmeasured starting points.
+references:
+- https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/awscloudtrail
+- https://docs.aws.amazon.com/AWSEC2/latest/APIReference/errors-overview.html
+- https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitor-with-cloudtrail.html
+- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+- https://github.com/aws/karpenter-provider-aws/issues/8015
+- https://attack.mitre.org/techniques/T1580/
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- EventSource
+- EventName
+- ErrorCode
+- UserIdentityInvokedBy
+- SourceIpAddress
+- SessionIssuerArn
+- UserIdentityArn
+- UserIdentityPrincipalid
+- UserIdentityAccessKeyId
+- UserIdentityType
+- RecipientAccountId
+- AWSRegion
+- UserAgent
+tags:
+- behavioural
+- clean-room
+- artex
+- aws
+- cloudtrail
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let Window = 5m;
+    let MinCalls = 10;
+    let MinActions = 5;
+    let MinDryRunActions = 3;
+    // EC2 returns DryRunOperation when the caller has permission and DryRun was set; CloudTrail records it with the Client. prefix
+    AWSCloudTrail
+    | where TimeGenerated > ago(Lookback)
+    | where EventSource == "ec2.amazonaws.com"
+    | where ErrorCode endswith "DryRunOperation" or ErrorCode endswith "UnauthorizedOperation"
+    // drop calls made by AWS services on the caller's behalf (autoscaling, Lambda VPC setup and similar)
+    | where isempty(UserIdentityInvokedBy) and not(SourceIpAddress endswith ".amazonaws.com" or SourceIpAddress startswith "AWS Internal")
+    // roles: key on the role (session issuer), not the per-session ARN
+    | extend Actor = coalesce(SessionIssuerArn, UserIdentityArn, UserIdentityPrincipalid, UserIdentityAccessKeyId)
+    | extend IsDryRun = ErrorCode endswith "DryRunOperation"
+    | summarize Calls = count(), DryRunAllowed = countif(IsDryRun), Denied = countif(not(IsDryRun)),
+        Actions = dcount(EventName), DryRunActions = dcountif(EventName, IsDryRun), ActionList = make_set(EventName, 40),
+        Regions = make_set(AWSRegion, 10), AccessKeys = make_set(UserIdentityAccessKeyId, 5), SourceIps = make_set(SourceIpAddress, 10),
+        Agents = make_set(UserAgent, 5), FirstSeen = min(TimeGenerated), LastSeen = max(TimeGenerated)
+        by Actor, UserIdentityType, RecipientAccountId, bin(TimeGenerated, Window)
+    | where Calls >= MinCalls and Actions >= MinActions and DryRunActions >= MinDryRunActions
+    | order by Calls desc
