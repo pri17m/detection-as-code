@@ -1,0 +1,364 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/ ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/azkvauditlogs ; https://learn.microsoft.com/en-us/azure/key-vault/general/logging",
+  "platform": "defender",
+  "table": "AZKVAuditLogs",
+  "label": "benign",
+  "variant": "sync tool that listed the vault three days earlier",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-25T07:00:00Z",
+      "OperationName": "SecretList",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:00Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s0/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:01Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s1/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:02Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s2/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:03Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s3/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:04Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s4/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:05Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s5/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:06Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s6/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:07Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s7/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:08Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s8/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:09Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s9/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:10Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s10/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:11Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s11/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:12Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s12/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:13Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s13/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:14Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s14/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:15Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s15/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:16Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s16/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:17Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s17/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:18Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s18/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:19Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/s19/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-22T07:00:00Z",
+      "OperationName": "SecretList",
+      "Identity": {
+        "claim": {
+          "appid": "5e5e5e5e-0000-4000-8000-000000000000",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-5e5e5e5e"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "baseline"
+    }
+  ]
+}

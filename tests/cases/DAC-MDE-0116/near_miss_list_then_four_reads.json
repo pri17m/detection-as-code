@@ -1,0 +1,92 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/ ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/azkvauditlogs ; https://learn.microsoft.com/en-us/azure/key-vault/general/logging",
+  "platform": "defender",
+  "table": "AZKVAuditLogs",
+  "label": "near-miss",
+  "variant": "list then only 4 distinct secrets",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-25T07:00:00Z",
+      "OperationName": "SecretList",
+      "Identity": {
+        "claim": {
+          "appid": "c0ffee00-1111-4222-8333-444455556666",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-c0ffee00"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:05Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "c0ffee00-1111-4222-8333-444455556666",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-c0ffee00"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/secret-0/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:06Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "c0ffee00-1111-4222-8333-444455556666",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-c0ffee00"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/secret-1/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:07Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "c0ffee00-1111-4222-8333-444455556666",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-c0ffee00"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/secret-2/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-25T07:00:08Z",
+      "OperationName": "SecretGet",
+      "Identity": {
+        "claim": {
+          "appid": "c0ffee00-1111-4222-8333-444455556666",
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "sp-object-c0ffee00"
+        }
+      },
+      "_ResourceId": "/subscriptions/00000000-0000-4000-8000-000000000000/resourcegroups/rg-app/providers/microsoft.keyvault/vaults/kv-prod-app",
+      "HttpStatusCode": 200,
+      "Id": "https://kv-prod-app.vault.azure.net/secrets/secret-3/0123abcd",
+      "CallerIpAddress": "203.0.113.90",
+      "ClientInfo": "python-requests/2.31 (synthetic)",
+      "_phase": "recent"
+    }
+  ]
+}
