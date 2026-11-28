@@ -1,0 +1,25 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/ ; https://labs.infoguard.ch/posts/slithering_through_the_noise/ ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://reinject.vercel.app/en/posts/windows-security/persistence/windows_schedule_task_internal/",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "malicious",
+  "variant": "pythonw.exe renamed to svcupd.exe; OriginalFileName still pythonw.exe",
+  "expect_alert": true,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: would alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-21T19:04:00Z",
+      "DeviceId": "synthetic-device-0004",
+      "DeviceName": "srv04.example.invalid",
+      "FileName": "svcupd.exe",
+      "FolderPath": "C:\\ProgramData\\x2\\svcupd.exe",
+      "ProcessVersionInfoOriginalFileName": "pythonw.exe",
+      "ProcessCommandLine": "svcupd.exe",
+      "AccountName": "SYSTEM",
+      "AccountSid": "S-1-5-18",
+      "InitiatingProcessFileName": "svchost.exe",
+      "InitiatingProcessCommandLine": "svchost.exe -k netsvcs -p -s Schedule"
+    }
+  ]
+}
