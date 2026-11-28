@@ -1,0 +1,89 @@
+id: DAC-CS-0253
+title: "Falcon: Task Scheduler starts python.exe or pythonw.exe from ProgramData or Users\\Public with no script"
+description: >-
+  ProcessRollup2 (Windows) where the image is python.exe or pythonw.exe under \ProgramData\ or
+  \Users\Public\, ParentBaseFileName is svchost.exe or taskeng.exe, and the command line has no script
+  argument: no .py, .pyw, .pyc, .pyz or .zip token and no -c or -m option. The parent svchost.exe command
+  line is taken from a left join to the parent's ProcessRollup2 (child ParentProcessId equals parent
+  TargetProcessId on the same aid, 7 days back). If the join finds the parent and its command line names
+  a service other than Schedule, the event is dropped. If the parent is outside the join window, which
+  is normal for a service host started at boot, the event is kept and marked svchost_unconfirmed. A bare
+  interpreter only does something if a startup hook (sitecustomize.py, usercustomize.py, a .pth import
+  line) runs code, which is how S5PIVOT and VIPERTUNNEL were launched. Companion to DAC-MDE-0107. Field
+  names come from public CrowdStrike logscale-community-content and LogScale function docs.
+  telemetry_validated false.
+author: DaC
+status: experimental
+platforms:
+- crowdstrike
+sourcetypes:
+- "falcon:process"
+mitre:
+  tactics:
+  - persistence
+  - execution
+  - privilege-escalation
+  techniques:
+  - T1053.005
+  - T1546.018
+  - T1059.006
+severity: high
+false_positives:
+- "An admin task that starts a bare interpreter by mistake. It exits straight away; fix the task (not measured)."
+- "A python.exe or pythonw.exe child of a non-Schedule svchost.exe whose parent event is outside the 7-day join window, so it shows as svchost_unconfirmed. Check the parent in Process Explorer (not measured)."
+references:
+- "https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/"
+- "https://labs.infoguard.ch/posts/slithering_through_the_noise/"
+- "https://docs.python.org/3/library/site.html"
+- "https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/Use%20Join%20on%20Two%20Scoped%20Events.md"
+- "https://github.com/CrowdStrike/logscale-community-content/blob/main/Queries-Only/Helpful-CQL-Queries/ProcessRollup2%20Curation.md"
+- "https://library.humio.com/crowdstrike-query-language/functions-join.html"
+- "https://library.humio.com/crowdstrike-query-language/functions-replace.html"
+- "https://learn.microsoft.com/en-us/windows/application-management/svchost-service-refactoring"
+- "https://reinject.vercel.app/en/posts/windows-security/persistence/windows_schedule_task_internal/"
+- "https://attack.mitre.org/techniques/T1053/005/"
+- "https://attack.mitre.org/techniques/T1546/018/"
+- "https://attack.mitre.org/techniques/T1059/006/"
+telemetry_validated: false
+required_fields:
+- "#event_simpleName"
+- "event_platform"
+- "aid"
+- "ComputerName"
+- "ImageFileName"
+- "CommandLine"
+- "ParentBaseFileName"
+- "ParentProcessId"
+- "TargetProcessId"
+- "UserSid"
+- "UserName"
+tags:
+- behavioural
+- python
+- scheduled-task
+- s5pivot
+- vipertunnel
+- needs-review
+- "parity:DAC-MDE-0107"
+query:
+  crowdstrike: |
+    #event_simpleName=ProcessRollup2 event_platform=Win
+    | ImageFileName=/^(\\Device\\HarddiskVolume\d+|[A-Za-z]:)\\(ProgramData|Users\\Public)\\(.+\\)?pythonw?\.exe$/i
+    | ParentBaseFileName=/^(svchost|taskeng)\.exe$/i
+    | join({#event_simpleName=ProcessRollup2 event_platform=Win
+        | ImageFileName=/\\(svchost|taskeng)\.exe$/i
+        | ParentCmdLine := CommandLine
+      }, field=[aid, ParentProcessId], key=[aid, TargetProcessId], include=[ParentCmdLine], mode=left, start=7d)
+    | case {
+        ParentBaseFileName=/^taskeng\.exe$/i | SchedulerMatch := "taskeng";
+        ParentCmdLine=/-s\s+Schedule/i | SchedulerMatch := "schedule_service";
+        ParentCmdLine=/netsvcs/i AND !ParentCmdLine=/\s-s\s/i | SchedulerMatch := "netsvcs_shared";
+        (ParentCmdLine="" OR !ParentCmdLine=*) | SchedulerMatch := "svchost_unconfirmed";
+        * | SchedulerMatch := "none";
+      }
+    | SchedulerMatch != "none"
+    | CommandLine=*
+    | replace(regex="^\\s*(\"[^\"]*\"|\\S+)\\s*", with="", field=CommandLine, as=ScriptArgs)
+    | !ScriptArgs=/\.(py|pyw|pyc|pyz|zip)\b/i
+    | !ScriptArgs=/(^|\s)-[A-Za-z]*[cm]/
+    | table([@timestamp, aid, ComputerName, SchedulerMatch, UserName, UserSid, ImageFileName, CommandLine, ScriptArgs, ParentBaseFileName, ParentCmdLine, ParentProcessId, TargetProcessId])
