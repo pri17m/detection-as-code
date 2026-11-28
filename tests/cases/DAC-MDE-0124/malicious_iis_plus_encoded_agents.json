@@ -1,0 +1,201 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://www.elastic.co/security-labs/threat-command/agentic-offensive-frameworks-detection-artex ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/w3ciislog ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/commonsecuritylog",
+  "platform": "defender",
+  "table": "W3CIISLog",
+  "label": "malicious",
+  "variant": "IIS '+' encoded user agents still classify (browser, curl, Go)",
+  "expect_alert": true,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-26T12:10:00Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item0",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:02Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item1",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:04Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Go-http-client/1.1",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item2",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:06Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item3",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:08Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item4",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:10Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Go-http-client/1.1",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item5",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:12Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item6",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:14Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item7",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:16Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Go-http-client/1.1",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item8",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:18Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item9",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:20Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item10",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:22Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Go-http-client/1.1",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item11",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:24Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item12",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:26Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item13",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:28Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Go-http-client/1.1",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item14",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:30Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item15",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:32Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item16",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:34Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Go-http-client/1.1",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item17",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:36Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Mozilla/5.0+(X11;+Linux+x86_64;+rv:128.0)+Gecko/20100101+Firefox/128.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item18",
+      "scStatus": "200"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:38Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "curl/8.5.0",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item19",
+      "scStatus": "404"
+    },
+    {
+      "TimeGenerated": "2026-11-26T12:10:40Z",
+      "cIP": "203.0.113.92",
+      "csUserAgent": "Go-http-client/1.1",
+      "Computer": "web01.corp.example",
+      "sSiteName": "W3SVC1",
+      "csUriStem": "/api/v1/item20",
+      "scStatus": "404"
+    }
+  ]
+}
