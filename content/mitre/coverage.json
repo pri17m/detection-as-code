@@ -1,12 +1,12 @@
 {
   "summary": {
-    "detections_total": 917,
-    "detections_with_mitre": 917,
+    "detections_total": 918,
+    "detections_with_mitre": 918,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 221,
     "platform_counts": {
       "crowdstrike": 171,
-      "defender": 89,
+      "defender": 90,
       "google_secops": 83,
       "splunk": 657
     }
@@ -591,7 +591,8 @@
       "DAC-ENTRA-0039",
       "DAC-GCP-0011",
       "DAC-GCP-0029",
-      "DAC-MDE-0087"
+      "DAC-MDE-0087",
+      "DAC-MDE-0113"
     ],
     "T1082": [
       "DAC-CS-0238",
@@ -1306,7 +1307,8 @@
       "DAC-CS-0232",
       "DAC-GH-0027",
       "DAC-GH-0028",
-      "DAC-GH-0029"
+      "DAC-GH-0029",
+      "DAC-MDE-0113"
     ],
     "T1552.005": [
       "DAC-AWS-0050",
