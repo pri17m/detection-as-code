@@ -1,0 +1,84 @@
+id: DAC-WIN-0366
+title: "Task Scheduler starts python.exe or pythonw.exe from ProgramData or Users\\Public with no script"
+description: >-
+  Security 4688 or Sysmon 1 where the new process is python.exe or pythonw.exe under C:\ProgramData\ or
+  C:\Users\Public\, the parent is svchost.exe or taskeng.exe, and the command line has no script argument:
+  no .py, .pyw, .pyc, .pyz or .zip token and no -c or -m option. Sysmon 1 carries ParentCommandLine, so
+  a svchost.exe parent that names a service other than Schedule is dropped there. 4688 only has the parent
+  image path, so those events are marked svchost_unconfirmed. 4688 needs "Include command line in process
+  creation events"; events with no command line are dropped rather than guessed. A bare interpreter only
+  does something if a startup hook (sitecustomize.py, usercustomize.py, a .pth import line) runs code,
+  which is how S5PIVOT and VIPERTUNNEL were launched. Companion to DAC-MDE-0107 and DAC-CS-0253.
+  telemetry_validated false.
+author: DaC
+status: experimental
+platforms:
+- splunk
+severity: high
+mitre:
+  tactics:
+  - persistence
+  - execution
+  - privilege-escalation
+  techniques:
+  - T1053.005
+  - T1546.018
+  - T1059.006
+sourcetypes:
+- WinEventLog:Security
+- XmlWinEventLog:Security
+- XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
+- WinEventLog:Microsoft-Windows-Sysmon/Operational
+required_fields:
+- EventCode
+- NewProcessName
+- ParentProcessName
+- CommandLine
+- Image
+- OriginalFileName
+- ParentImage
+- ParentCommandLine
+telemetry_validated: false
+false_positives:
+- "An admin task that starts a bare interpreter by mistake. It exits straight away; fix the task (not measured)."
+- "On 4688, any svchost.exe service (not only Schedule) that starts python.exe or pythonw.exe from these folders with no script, because 4688 has no parent command line. Check the parent PID against the Schedule service (not measured)."
+references:
+- "https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/"
+- "https://labs.infoguard.ch/posts/slithering_through_the_noise/"
+- "https://docs.python.org/3/library/site.html"
+- "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4688"
+- "https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon"
+- "https://learn.microsoft.com/en-us/windows/application-management/svchost-service-refactoring"
+- "https://reinject.vercel.app/en/posts/windows-security/persistence/windows_schedule_task_internal/"
+- "https://attack.mitre.org/techniques/T1053/005/"
+- "https://attack.mitre.org/techniques/T1546/018/"
+- "https://attack.mitre.org/techniques/T1059/006/"
+tags:
+- behavioural
+- python
+- scheduled-task
+- s5pivot
+- vipertunnel
+- needs-review
+- parity:DAC-MDE-0107
+- parity:DAC-CS-0253
+query:
+  splunk: |
+    (`windows_security` EventCode=4688) OR (`windows_sysmon` EventCode=1)
+    | eval proc=lower(coalesce(NewProcessName, New_Process_Name, Image))
+    | eval ofn=lower(OriginalFileName)
+    | eval cmd=coalesce(CommandLine, Process_Command_Line)
+    | eval parent=lower(coalesce(ParentProcessName, Creator_Process_Name, ParentImage))
+    | eval parent_cmd=lower(ParentCommandLine)
+    | eval parent_name=replace(parent, "^.*\\\\", "")
+    | where (match(proc, "\\\\pythonw?\.exe$") OR ofn="python.exe" OR ofn="pythonw.exe") AND match(proc, "^[a-z]:\\\\(programdata|users\\\\public)\\\\")
+    | eval sched=case(parent_name="taskeng.exe", "taskeng",
+        parent_name="svchost.exe" AND isnull(parent_cmd), "svchost_unconfirmed",
+        parent_name="svchost.exe" AND like(parent_cmd, "%-s schedule%"), "schedule_service",
+        parent_name="svchost.exe" AND like(parent_cmd, "%netsvcs%") AND NOT like(parent_cmd, "% -s %"), "netsvcs_shared",
+        true(), "none")
+    | where sched!="none" AND isnotnull(cmd) AND cmd!=""
+    | eval script_args=trim(replace(cmd, "^\s*(\"[^\"]*\"|\S+)", ""))
+    | where NOT match(script_args, "(?i)\.(py|pyw|pyc|pyz|zip)\b") AND NOT match(script_args, "(^|\s)-[A-Za-z]*[cm]")
+    | eval user=coalesce(User, SubjectUserName, Account_Name)
+    | table _time host EventCode sched proc ofn cmd script_args parent parent_cmd user
