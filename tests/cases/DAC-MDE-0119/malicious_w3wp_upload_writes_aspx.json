@@ -1,0 +1,24 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicefileevents-table",
+  "platform": "defender",
+  "table": "DeviceFileEvents",
+  "label": "malicious",
+  "variant": "IIS worker writes an .aspx into an uploads folder under wwwroot (upload vulnerability)",
+  "expect_alert": true,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-26T02:10:00Z",
+      "DeviceId": "synthetic-web01",
+      "DeviceName": "web01.corp.example",
+      "ActionType": "FileCreated",
+      "FileName": "thumb.aspx",
+      "FolderPath": "C:\\inetpub\\wwwroot\\portal\\uploads",
+      "InitiatingProcessFileName": "w3wp.exe",
+      "InitiatingProcessParentFileName": "svchost.exe",
+      "InitiatingProcessCommandLine": "c:\\windows\\system32\\inetsrv\\w3wp.exe -ap DefaultAppPool",
+      "InitiatingProcessAccountName": "IIS APPPOOL\\DefaultAppPool"
+    }
+  ]
+}

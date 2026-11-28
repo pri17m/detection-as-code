@@ -1,0 +1,36 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicefileevents-table",
+  "platform": "defender",
+  "table": "DeviceFileEvents",
+  "label": "malicious",
+  "variant": "MySQL general_log_file pointed at a Tomcat web root; mysqld creates then keeps modifying a .jsp (GTIG pattern, synthetic name)",
+  "expect_alert": true,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-26T02:10:00Z",
+      "DeviceId": "synthetic-app02",
+      "DeviceName": "app02.corp.example",
+      "ActionType": "FileCreated",
+      "FileName": "q7731.jsp",
+      "FolderPath": "/opt/tomcat/webapps/ROOT",
+      "InitiatingProcessFileName": "mysqld",
+      "InitiatingProcessParentFileName": "systemd",
+      "InitiatingProcessCommandLine": "/usr/sbin/mysqld",
+      "InitiatingProcessAccountName": "mysql"
+    },
+    {
+      "Timestamp": "2026-11-26T02:10:20Z",
+      "DeviceId": "synthetic-app02",
+      "DeviceName": "app02.corp.example",
+      "ActionType": "FileModified",
+      "FileName": "q7731.jsp",
+      "FolderPath": "/opt/tomcat/webapps/ROOT",
+      "InitiatingProcessFileName": "mysqld",
+      "InitiatingProcessParentFileName": "systemd",
+      "InitiatingProcessCommandLine": "/usr/sbin/mysqld",
+      "InitiatingProcessAccountName": "mysql"
+    }
+  ]
+}

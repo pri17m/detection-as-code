@@ -1,0 +1,87 @@
+id: DAC-MDE-0119
+title: 'MDE: web server, database engine or a shell under them writes a script file (.aspx/.jsp/.php) into a web root'
+description: 'Attack phase: persistence through a web shell. DeviceFileEvents where a .aspx, .ashx, .asmx, .asp, .cshtml,
+  .jsp, .jspx, .php, .phtml, .php5 or .phar file is created, modified or renamed under a web root (inetpub, wwwroot, webapps,
+  htdocs, public_html, /var/www, /srv/www, /usr/share/nginx, Exchange FrontEnd) and the writer is a web server or app runtime
+  (w3wp, httpd, apache2, nginx, php, php-fpm, java, Tomcat, node), a database engine (sqlservr, mysqld, mariadbd, postgres),
+  or a shell whose parent is one of those. Google Threat Intelligence saw ARTEX point MySQL general_log_file at a web-accessible
+  .jsp and keep rewriting it until the shell returned output; ThreatDefence Hunt 13 hunts the same file-drop shape and says
+  a script written by mysqld, sqlservr, java or w3wp deserves attention first. Microsoft''s 5 Nov 2026 post is wider ARTEX
+  context. Matching is on writer process and path class, not file names or hashes. Bulk writes (25+ files in 10 minutes) by
+  a web server are treated as a deploy; database engines and shells are never bulk-exempt. telemetry_validated false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - persistence
+  techniques:
+  - T1505.003
+severity: high
+false_positives:
+- CMS plugin or theme installs (WordPress, Drupal, Joomla) where php-fpm or httpd writes a handful of .php files. Below the
+  bulk threshold these alert; review the WriterCmd and FileSample and allowlist the site path after review.
+- Tomcat hot-deploy of a small WAR, or JSP-based apps that generate .jsp files at run time. Volume not measured.
+- ASP.NET apps that write .cshtml or .aspx (some CMSs such as Umbraco write views from the back office). Allowlist by DeviceName
+  and folder after review.
+- Deployment tools (msdeploy, git, rsync, robocopy, package managers) are not in the writer list, so normal publishing does
+  not alert.
+references:
+- https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicefileevents-table
+- https://attack.mitre.org/techniques/T1505/003/
+telemetry_validated: false
+required_fields:
+- Timestamp
+- DeviceId
+- DeviceName
+- ActionType
+- FileName
+- FolderPath
+- InitiatingProcessFileName
+- InitiatingProcessParentFileName
+- InitiatingProcessCommandLine
+- InitiatingProcessAccountName
+tags:
+- behavioural
+- clean-room
+- artex
+- web-shell
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let Window = 10m;
+    let BulkFiles = 25;   // bulk writes by the same writer look like a deploy, WAR expansion or CMS update
+    let ScriptExt = dynamic([".aspx", ".ashx", ".asmx", ".asp", ".cshtml", ".jsp", ".jspx", ".php", ".phtml", ".php5", ".phar"]);
+    let WebServers = dynamic(["w3wp.exe", "httpd", "httpd.exe", "apache2", "nginx", "nginx.exe", "php", "php.exe", "php-cgi", "php-cgi.exe",
+        "java", "java.exe", "javaw.exe", "tomcat9.exe", "tomcat10.exe", "node", "node.exe"]);
+    let DbEngines = dynamic(["sqlservr.exe", "mysqld", "mysqld.exe", "mariadbd", "mariadbd.exe", "postgres", "postgres.exe"]);
+    let Shells = dynamic(["cmd.exe", "powershell.exe", "pwsh.exe", "pwsh", "sh", "bash", "dash", "zsh"]);
+    DeviceFileEvents
+    | where Timestamp > ago(Lookback)
+    | where ActionType in ("FileCreated", "FileModified", "FileRenamed")
+    | extend Ext = tolower(extract(@"(\.[A-Za-z0-9]+)$", 1, FileName))
+    | where Ext in (ScriptExt)
+    | where FolderPath matches regex @"(?i)([\\/](inetpub|wwwroot|webapps|htdocs|public_html)([\\/]|$)|^/var/www(/|$)|^/srv/www(/|$)|^/usr/share/nginx(/|$)|\\Exchange Server\\.*\\FrontEnd\\)"
+    | extend Writer = tolower(InitiatingProcessFileName), WriterParent = tolower(InitiatingProcessParentFileName)
+    | extend WriterClass = case(
+        Writer in (DbEngines), "database-engine",
+        Writer in (Shells) and (WriterParent in (WebServers) or WriterParent in (DbEngines) or WriterParent startswith "php-fpm"), "shell-under-service",
+        Writer in (WebServers) or Writer startswith "php-fpm", "web-server",
+        "")
+    | where isnotempty(WriterClass)
+    | summarize Files = dcount(strcat(FolderPath, "|", FileName)), FileSample = make_set(strcat(FolderPath, " :: ", FileName), 20),
+        Actions = make_set(ActionType, 3), Exts = make_set(Ext, 10), WriterCmd = take_any(InitiatingProcessCommandLine),
+        WriterAccount = take_any(InitiatingProcessAccountName), FirstSeen = min(Timestamp), LastSeen = max(Timestamp)
+        by DeviceId, DeviceName, Writer, WriterParent, WriterClass, bin(Timestamp, Window)
+    // a web server or app runtime writing dozens of scripts at once is a deploy, WAR expansion or CMS update;
+    // database engines and shells under a service are never treated as bulk deploys
+    | where WriterClass != "web-server" or Files < BulkFiles
+    | project FirstSeen, LastSeen, DeviceId, DeviceName, WriterClass, Writer, WriterParent, WriterAccount, WriterCmd, Files, Exts, Actions, FileSample
+    | order by FirstSeen asc
