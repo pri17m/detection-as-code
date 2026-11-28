@@ -27,11 +27,18 @@ query:
 severity: high
 references:
 - https://attack.mitre.org/techniques/T1555/006/
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://learn.microsoft.com/en-us/azure/azure-monitor/platform/activity-log
+- https://learn.microsoft.com/en-us/azure/key-vault/general/logging
+- https://learn.microsoft.com/en-us/azure/role-based-access-control/permissions/security
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/azkvauditlogs
 platforms:
 - splunk
 tags:
 - wave-c
 - P1
-description: SecretGet SecretList high volume
+- needs-review
+description: 'SecretGet SecretList high volume NEEDS REVIEW (2026-11-28): SecretGet and SecretList are Key Vault data-plane operations. Microsoft Learn says the activity log records control-plane operations and that getting a secret from a key vault is a data-plane operation captured in resource logs (Key Vault AuditEvent / AZKVAuditLogs), so this activity-log search cannot see the secret reads the title describes. Microsoft.KeyVault/vaults/secrets/get/action is not in the Key Vault operation list on Learn (the data action is Microsoft.KeyVault/vaults/secrets/getSecret/action). There is no burst or unusual-principal logic. The behaviour comes from Microsoft''s 5 Nov 2026 agentic-abuse post and ThreatDefence (Key Vault SecretList/SecretGet bursts); the data-plane version is DAC-MDE-0116 (AZKVAuditLogs). A Splunk rewrite needs a Key Vault AuditEvent payload in splunk/attack_data and none exists, so the query is left as-is pending a decision; see reviews/DAC-AZ-0014/REVIEW.md.'
 sourcetypes:
 - azure:monitor:activity
