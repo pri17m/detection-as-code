@@ -1,0 +1,46 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/auditlogs ; https://learn.microsoft.com/en-us/entra/identity/monitoring-health/reference-audit-activities ; https://learn.microsoft.com/en-us/graph/api/resources/appidentity",
+  "platform": "defender",
+  "table": "AuditLogs",
+  "label": "malicious",
+  "variant": "app adds its own service principal to Global Administrator",
+  "expect_alert": true,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-21T03:10:00.000Z",
+      "OperationName": "Add member to role",
+      "Result": "success",
+      "InitiatedBy": {
+        "app": {
+          "appId": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+          "displayName": "build-pipeline-app",
+          "servicePrincipalId": "11111111-2222-4333-8444-555555555555",
+          "servicePrincipalName": null
+        },
+        "user": null
+      },
+      "TargetResources": [
+        {
+          "id": "11111111-2222-4333-8444-555555555555",
+          "displayName": "build-pipeline-app",
+          "type": "ServicePrincipal",
+          "modifiedProperties": [
+            {
+              "displayName": "Role.DisplayName",
+              "oldValue": null,
+              "newValue": "\"Global Administrator\""
+            },
+            {
+              "displayName": "Role.TemplateId",
+              "oldValue": null,
+              "newValue": "\"62e90394-69f5-4237-9190-012177145e10\""
+            }
+          ]
+        }
+      ],
+      "CorrelationId": "00000000-0000-4000-8000-000000000001"
+    }
+  ]
+}

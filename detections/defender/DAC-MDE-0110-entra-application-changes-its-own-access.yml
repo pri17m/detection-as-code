@@ -1,0 +1,87 @@
+id: DAC-MDE-0110
+title: 'Entra: an application changes its own access (self credential add, self role or app-role assignment, self owner add)'
+description: 'Attack phase: persistence and privilege escalation after an application credential has been stolen. AuditLogs
+  rows where InitiatedBy.app is present (an application, not a person, made the change), the operation is a credential add,
+  a directory role or eligible role assignment, an app-role assignment, or an owner add, and the acting service principal''s
+  object ID or appId appears in the change targets. That is the ''application changing its own access'' pattern in ThreatDefence
+  Hunt 5 (Storm-0940 agents adding credentials to applications, and one application assigning itself Global Administrator).
+  The Microsoft 5 Nov 2026 post on agentic abuse of leaked application secrets tells defenders to remove credentials ''including
+  those added by the threat actor'', which is the credential-add case. Graph addKey lets an app roll its own keys with no
+  extra permission, so self credential adds have a documented legitimate use; an allowlist is provided. telemetry_validated
+  false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:AuditLogs
+mitre:
+  tactics:
+  - persistence
+  - privilege-escalation
+  techniques:
+  - T1098.001
+  - T1098.003
+severity: high
+false_positives:
+- 'Applications that roll their own certificate or secret through Graph addKey (documented: ''An application doesn''t need
+  any specific permission to roll its own keys''). Add their AppIds to KnownSelfRotatingAppIds after a baseline; volume not
+  measured.'
+- Automation or provisioning apps that assign roles or app roles and happen to include themselves (for example a bootstrap
+  script run under the app's own identity). Check against a change record.
+- Whether an application-object credential add (Update application - Certificates and secrets management) lists the appId
+  in TargetResources is unverified; if it does not, that case is missed rather than over-alerting.
+references:
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/auditlogs
+- https://learn.microsoft.com/en-us/entra/identity/monitoring-health/reference-audit-activities
+- https://learn.microsoft.com/en-us/graph/api/resources/appidentity
+- https://learn.microsoft.com/en-us/graph/api/resources/targetresource
+- https://learn.microsoft.com/en-us/graph/api/application-addkey
+- https://learn.microsoft.com/en-us/entra/architecture/security-operations-applications
+- https://attack.mitre.org/techniques/T1098/001/
+- https://attack.mitre.org/techniques/T1098/003/
+- https://learn.microsoft.com/en-us/kusto/query/datatypes-string-operators
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- OperationName
+- Result
+- InitiatedBy
+- TargetResources
+- CorrelationId
+tags:
+- behavioural
+- clean-room
+- artex
+- entra
+- workload-identity
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    // AppIds that are known to roll their own certificate or secret (Graph addKey / addPassword self-rotation). Fill after a baseline.
+    let KnownSelfRotatingAppIds = dynamic([]);
+    AuditLogs
+    | where TimeGenerated > ago(Lookback)
+    | where Result =~ "success"
+    | extend ActorSpId = tostring(InitiatedBy.app.servicePrincipalId), ActorAppId = tostring(InitiatedBy.app.appId),
+        ActorApp = tostring(InitiatedBy.app.displayName)
+    | where isnotempty(ActorSpId)
+    | extend ChangeKind = case(
+        OperationName startswith "Add member to role" or OperationName startswith "Add eligible member to role", "directory-role",
+        OperationName == "Add app role assignment to service principal", "app-role",
+        OperationName in ("Add owner to service principal", "Add owner to application"), "owner",
+        OperationName == "Add service principal credentials" or OperationName has "Certificates and secrets management", "credential",
+        "")
+    | where isnotempty(ChangeKind)
+    // Self-change: the acting service principal (or its appId) appears in the change targets, including modifiedProperties
+    | extend TargetsText = tolower(tostring(TargetResources))
+    | where TargetsText contains tolower(ActorSpId) or (isnotempty(ActorAppId) and TargetsText contains tolower(ActorAppId))
+    | where not(ChangeKind == "credential" and ActorAppId in (KnownSelfRotatingAppIds))
+    | extend TargetName = tostring(TargetResources[0].displayName), TargetId = tostring(TargetResources[0].id),
+        TargetType = tostring(TargetResources[0].type)
+    | project TimeGenerated, OperationName, ChangeKind, ActorApp, ActorAppId, ActorSpId, TargetName, TargetId, TargetType,
+        CorrelationId, TargetResources
+    | order by TimeGenerated asc
