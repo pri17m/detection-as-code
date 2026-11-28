@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/ ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceevents-table ; https://falconforce.nl/falconfriday-malicious-scheduled-tasks-0xff0b/ ; https://threathunt.blog/hunting-for-malicious-scheduled-tasks/ ; https://detection.wiki/defender-deviceevents/",
+  "platform": "defender",
+  "table": "DeviceEvents",
+  "label": "benign",
+  "variant": "descriptive task name running python.exe with a script",
+  "expect_alert": false,
+  "result": "not run (no Advanced Hunting runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-21T19:07:00Z",
+      "DeviceId": "synthetic-device-0007",
+      "DeviceName": "srv07.example.invalid",
+      "ActionType": "ScheduledTaskCreated",
+      "AdditionalFields": "{\"TaskName\": \"\\\\Nightly Report\", \"TaskContent\": \"{\\\"Triggers\\\": {\\\"TimeTrigger\\\": {\\\"StartBoundary\\\": \\\"2026-11-21T19:00:00\\\", \\\"Enabled\\\": \\\"true\\\", \\\"Repetition\\\": {\\\"Interval\\\": \\\"PT1M\\\"}}}, \\\"Actions\\\": {\\\"Exec\\\": {\\\"Command\\\": \\\"C:\\\\\\\\ProgramData\\\\\\\\Anaconda3\\\\\\\\python.exe\\\", \\\"Arguments\\\": \\\"C:\\\\\\\\ProgramData\\\\\\\\Reports\\\\\\\\nightly.py\\\"}}}\", \"SubjectUserName\": \"svc-backup\"}",
+      "InitiatingProcessFileName": "svchost.exe",
+      "InitiatingProcessCommandLine": "svchost.exe -k netsvcs -p -s Schedule",
+      "InitiatingProcessAccountName": "system",
+      "InitiatingProcessAccountSid": "S-1-5-18"
+    }
+  ]
+}
