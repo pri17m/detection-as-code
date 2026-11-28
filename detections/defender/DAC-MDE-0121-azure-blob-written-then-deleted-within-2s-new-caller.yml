@@ -1,0 +1,90 @@
+id: DAC-MDE-0121
+title: 'Sentinel: Azure blob written and deleted by the same caller within 2 seconds, caller new to that pattern on the account'
+description: 'Attack phase: discovery (capability check with stolen storage credentials). StorageBlobLogs where the same caller
+  (authentication type plus requester object ID, app ID or authentication hash) writes a blob (PutBlob or PutBlockList, success)
+  and deletes the same object (DeleteBlob, 202) within 2 seconds, on an account where that caller had no such pair in the
+  previous 14 days. Google Threat Intelligence saw ARTEX map the permissions of SAS tokens, service principals and storage
+  account keys by ''writing and immediately deleting a tiny test blob in ~330-400 ms''; ThreatDefence Hunt 15 hunts the same
+  pair and warns that backup and deployment tools also write and delete test blobs, hence the per-caller baseline. Microsoft''s
+  5 Nov 2026 post is wider ARTEX context. Source IP is a grouping column only. telemetry_validated false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:StorageBlobLogs
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1580
+severity: medium
+false_positives:
+- A new backup, sync or data-pipeline tool (or a new service principal for an existing one) running its write-access check
+  for the first time. It drops out after the first day because the baseline then knows it.
+- Developers testing storage code with a personal identity against a shared account.
+- Azure services that probe write access on accounts they are attached to (not measured; review AuthenticationType and AppId).
+references:
+- https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/storagebloblogs
+- https://learn.microsoft.com/en-us/azure/storage/blobs/monitor-blob-storage-reference
+- https://learn.microsoft.com/en-us/rest/api/storageservices/storage-analytics-logged-operations-and-status-messages
+- https://learn.microsoft.com/en-us/rest/api/storageservices/put-blob
+- https://learn.microsoft.com/en-us/rest/api/storageservices/delete-blob
+- https://attack.mitre.org/techniques/T1580/
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- AccountName
+- OperationName
+- StatusCode
+- ObjectKey
+- Uri
+- CallerIpAddress
+- AuthenticationType
+- AuthenticationHash
+- RequesterObjectId
+- RequesterAppId
+- RequesterUpn
+- UserAgentHeader
+- RequestBodySize
+tags:
+- behavioural
+- clean-room
+- artex
+- azure-storage
+- capability-check
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let Baseline = 14d;
+    let MaxGap = 2s;
+    let Ops = StorageBlobLogs
+    | where TimeGenerated > ago(Lookback + Baseline)
+    | where OperationName in ("PutBlob", "PutBlockList", "DeleteBlob")
+    | where StatusCode in ("200", "201", "202")      // StatusCode is a string column
+    // CallerIpAddress carries the client port (address:port); strip it for IPv4 so a new connection does not break the pair
+    | extend CallerIp = iff(CallerIpAddress matches regex @"^\d{1,3}(\.\d{1,3}){3}:\d+$", tostring(split(CallerIpAddress, ":")[0]), CallerIpAddress)
+    | extend Caller = strcat(AuthenticationType, ":", coalesce(RequesterObjectId, RequesterAppId, AuthenticationHash, CallerIp));
+    let Writes = Ops | where OperationName in ("PutBlob", "PutBlockList")
+    | project WriteTime = TimeGenerated, AccountName, ObjectKey, Caller, AuthenticationType, RequesterUpn, RequesterAppId, CallerIp,
+        WriteAgent = UserAgentHeader, WriteBytes = RequestBodySize, Uri;
+    let Deletes = Ops | where OperationName == "DeleteBlob" | project DeleteTime = TimeGenerated, AccountName, ObjectKey, Caller;
+    let Pairs = Writes
+    | join kind=inner Deletes on AccountName, ObjectKey, Caller
+    | where DeleteTime between (WriteTime .. (WriteTime + MaxGap))
+    | extend GapMs = datetime_diff("millisecond", DeleteTime, WriteTime);
+    // callers that already did write-then-delete on this account in the baseline (backup, sync and test tools) are known
+    let Known = Pairs | where WriteTime < ago(Lookback) | distinct AccountName, Caller;
+    Pairs
+    | where WriteTime > ago(Lookback)
+    | join kind=leftanti Known on AccountName, Caller
+    | summarize Tests = count(), Objects = make_set(ObjectKey, 10), MinGapMs = min(GapMs), MaxBytes = max(WriteBytes),
+        Agents = make_set(WriteAgent, 5), Upn = take_any(RequesterUpn), AppId = take_any(RequesterAppId),
+        FirstSeen = min(WriteTime), LastSeen = max(DeleteTime)
+        by AccountName, Caller, AuthenticationType, CallerIp
+    | project FirstSeen, LastSeen, AccountName, AuthenticationType, Caller, Upn, AppId, CallerIp, Tests, MinGapMs, MaxBytes, Objects, Agents
+    | order by FirstSeen asc
