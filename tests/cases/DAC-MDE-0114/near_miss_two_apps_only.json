@@ -1,0 +1,36 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/ ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/aadserviceprincipalsigninlogs ; https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes",
+  "platform": "defender",
+  "table": "AADServicePrincipalSignInLogs",
+  "label": "near-miss",
+  "variant": "only two apps",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-24T06:00:00Z",
+      "AppId": "00000001-0000-4000-8000-000000000001",
+      "ServicePrincipalId": "sp-00000001",
+      "ServicePrincipalName": "app-0000",
+      "ResultType": "7000215",
+      "IPAddress": "203.0.113.90",
+      "UserAgent": "python-requests/2.31 (synthetic)",
+      "ResourceDisplayName": "Microsoft Graph",
+      "ResourceIdentity": "00000003-0000-0000-c000-000000000000",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-24T06:01:00Z",
+      "AppId": "00000002-0000-4000-8000-000000000002",
+      "ServicePrincipalId": "sp-00000002",
+      "ServicePrincipalName": "app-0000",
+      "ResultType": "0",
+      "IPAddress": "203.0.113.90",
+      "UserAgent": "python-requests/2.31 (synthetic)",
+      "ResourceDisplayName": "Microsoft Graph",
+      "ResourceIdentity": "00000003-0000-0000-c000-000000000000",
+      "_phase": "recent"
+    }
+  ]
+}

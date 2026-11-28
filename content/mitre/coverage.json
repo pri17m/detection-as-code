@@ -1,12 +1,12 @@
 {
   "summary": {
-    "detections_total": 918,
-    "detections_with_mitre": 918,
+    "detections_total": 919,
+    "detections_with_mitre": 919,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 221,
     "platform_counts": {
       "crowdstrike": 171,
-      "defender": 90,
+      "defender": 91,
       "google_secops": 83,
       "splunk": 657
     }
@@ -592,7 +592,8 @@
       "DAC-GCP-0011",
       "DAC-GCP-0029",
       "DAC-MDE-0087",
-      "DAC-MDE-0113"
+      "DAC-MDE-0113",
+      "DAC-MDE-0114"
     ],
     "T1082": [
       "DAC-CS-0238",

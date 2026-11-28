@@ -1,0 +1,78 @@
+id: DAC-MDE-0114
+title: 'Entra: one source signs in as 3 or more service principals in an hour with mixed success and failure, 2+ of them new
+  for that source'
+description: 'Attack phase: initial access and credential testing with a batch of leaked application secrets. AADServicePrincipalSignInLogs
+  grouped by IPAddress in one-hour bins. Alerts when one source touches 3 or more distinct AppIds, at least one succeeds and
+  at least one fails, and at least 2 of those AppIds never signed in successfully from that source in the previous 14 days.
+  The Microsoft 5 Nov 2026 post on agentic abuse of exposed secrets lists ''one address authenticating to three or more service
+  principals with mixed success'' as a behaviour to hunt; ThreatDefence Hunts 18 and 19 cover the same family and add the
+  first-seen baseline idea. The address is the grouping key Microsoft names; it is never compared to an indicator list. telemetry_validated
+  false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:AADServicePrincipalSignInLogs
+mitre:
+  tactics:
+  - initial-access
+  techniques:
+  - T1078.004
+severity: high
+false_positives:
+- Shared build or automation hosts (self-hosted CI runners, integration servers) that sign in as several apps, one of which
+  has an expired secret. The 14-day pair baseline removes hosts that already do this; a new runner will fire once.
+- NAT or proxy egress shared by many workloads. Consider grouping by UserAgent in addition after a baseline; volume not measured.
+- Thresholds (3 apps, 2 new, 1 hour) are unmeasured starting points.
+references:
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/aadserviceprincipalsigninlogs
+- https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes
+- https://attack.mitre.org/techniques/T1078/004/
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- AppId
+- ServicePrincipalName
+- ResultType
+- IPAddress
+- UserAgent
+- ResourceDisplayName
+tags:
+- behavioural
+- clean-room
+- artex
+- entra
+- workload-identity
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let Window = 1h;
+    let BaselineDays = 14d;
+    let MinApps = 3;
+    let MinNewApps = 2;
+    // source + app pairs that already signed in successfully in the baseline period; IPAddress is a grouping key only
+    let KnownPairs = AADServicePrincipalSignInLogs
+    | where TimeGenerated between (ago(Lookback + BaselineDays) .. ago(Lookback))
+    | where tostring(ResultType) == "0" and isnotempty(IPAddress)
+    | extend PairKey = strcat(IPAddress, "|", AppId)
+    | distinct PairKey
+    | extend KnownPair = true;
+    AADServicePrincipalSignInLogs
+    | where TimeGenerated > ago(Lookback)
+    | where isnotempty(IPAddress) and isnotempty(AppId)
+    | extend ResultCode = tostring(ResultType)
+    | extend Ok = ResultCode == "0", PairKey = strcat(IPAddress, "|", AppId)
+    | join kind=leftouter KnownPairs on PairKey
+    | extend NewPair = isnull(KnownPair)
+    | summarize Apps = dcount(AppId), OkApps = dcountif(AppId, Ok), FailedApps = dcountif(AppId, not(Ok)),
+        NewApps = dcountif(AppId, NewPair), SecretErrors = countif(ResultCode in ("7000215", "7000222")),
+        AppNames = make_set(ServicePrincipalName, 25), ErrorCodes = make_set_if(ResultCode, not(Ok), 10),
+        Resources = make_set(ResourceDisplayName, 10), Agents = make_set(UserAgent, 10),
+        FirstSeen = min(TimeGenerated), LastSeen = max(TimeGenerated)
+        by IPAddress, bin(TimeGenerated, Window)
+    | where Apps >= MinApps and OkApps >= 1 and FailedApps >= 1 and NewApps >= MinNewApps
+    | order by Apps desc
