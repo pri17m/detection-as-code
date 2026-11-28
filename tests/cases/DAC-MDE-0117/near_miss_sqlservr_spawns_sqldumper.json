@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/xp-cmdshell-transact-sql ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mssql_susp_child_process.yml",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "near-miss",
+  "variant": "engine starts its own dump helper, not a shell",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-26T01:15:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "InitiatingProcessFileName": "sqlservr.exe",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\Binn\\sqlservr.exe",
+      "InitiatingProcessCommandLine": "\"sqlservr.exe\" -sMSSQLSERVER",
+      "InitiatingProcessAccountName": "MSSQLSERVER",
+      "FileName": "SqlDumper.exe",
+      "FolderPath": "C:\\Program Files\\Microsoft SQL Server\\160\\Shared\\SqlDumper.exe",
+      "ProcessCommandLine": "SqlDumper.exe 1234 0 0x0120",
+      "AccountName": "MSSQLSERVER",
+      "AccountDomain": "NT SERVICE",
+      "ReportId": 1001
+    }
+  ]
+}

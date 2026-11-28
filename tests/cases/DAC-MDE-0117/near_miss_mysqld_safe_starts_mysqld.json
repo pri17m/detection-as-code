@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/xp-cmdshell-transact-sql ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mssql_susp_child_process.yml",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "near-miss",
+  "variant": "service wrapper shell starts mysqld (shell is the parent, not the child)",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-26T01:15:00Z",
+      "DeviceId": "synthetic-db02",
+      "DeviceName": "db02.corp.example",
+      "InitiatingProcessFileName": "bash",
+      "InitiatingProcessFolderPath": "/usr/bin/bash",
+      "InitiatingProcessCommandLine": "/bin/sh /usr/bin/mysqld_safe",
+      "InitiatingProcessAccountName": "mysql",
+      "FileName": "mysqld",
+      "FolderPath": "/usr/sbin/mysqld",
+      "ProcessCommandLine": "/usr/sbin/mysqld --basedir=/usr",
+      "AccountName": "mysql",
+      "AccountDomain": "",
+      "ReportId": 1001
+    }
+  ]
+}

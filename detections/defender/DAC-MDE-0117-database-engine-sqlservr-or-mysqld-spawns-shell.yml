@@ -1,0 +1,88 @@
+id: DAC-MDE-0117
+title: 'MDE: SQL Server (sqlservr.exe) or MySQL / MariaDB (mysqld, mariadbd) starts a command shell'
+description: 'Attack phase: execution on a database server, usually right after SQL injection, stolen database credentials
+  or a stored-procedure or UDF abuse. DeviceProcessEvents where the parent is sqlservr.exe, mysqld, mysqld.exe, mysqld-nt.exe
+  or mariadbd and the child is cmd, powershell, pwsh, sh, bash, dash or zsh, on Windows or Linux. Microsoft documents that
+  xp_cmdshell ''spawns a Windows command shell'' running as the SQL Server service account; MySQL has no xp_cmdshell, and
+  attackers load malicious UDF libraries to run commands instead (AhnLab ASEC). ThreatDefence Hunt 11 lists sqlservr and mysqld
+  among the service processes ARTEX operators drove to start shells; the repo already covers PHP, IIS and Java/Tomcat parents
+  (DAC-MDE-0096, DAC-MDE-0106) but not database engines. Microsoft''s 5 Nov 2026 agentic-abuse post is wider ARTEX context.
+  A database engine rarely needs a shell, so one event alerts. telemetry_validated false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - persistence
+  - execution
+  - initial-access
+  techniques:
+  - T1505.001
+  - T1059.003
+  - T1059.001
+  - T1059.004
+  - T1190
+severity: high
+false_positives:
+- DBAs or legacy jobs that use xp_cmdshell on purpose (file moves, backups to shares). Microsoft ships it disabled; where
+  it is enabled, allowlist the instance and command after review. Volume not measured.
+- Vendor database instances that call a shell from the engine as part of the product. SigmaHQ 869b9ca7 lists one optional
+  filter for a DATEV SQL Server instance under C:\Program Files\Microsoft SQL Server\...\DATEV_DBENGINE starting cmd.exe;
+  add similar exclusions only after review.
+- 'Veeam''s bundled SQL instance (VEEAMSQL in the command line) is flagged as a column, not excluded: SigmaHQ d55b793d treats
+  Veeam database children as suspicious (FIN7 targeting).'
+references:
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table
+- https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/xp-cmdshell-transact-sql
+- https://asec.ahnlab.com/en/58878/
+- https://www.levelblue.com/blogs/spiderlabs-blog/honeypot-recon-mysql-malware-infection-via-user-defined-functions-udf/
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mssql_susp_child_process.yml
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mssql_veaam_susp_child_processes.yml
+- https://github.com/SigmaHQ/sigma/blob/master/rules/windows/file/file_event/file_event_win_mysqld_uncommon_file_creation.yml
+- https://attack.mitre.org/techniques/T1505/001/
+- https://attack.mitre.org/techniques/T1059/003/
+- https://attack.mitre.org/techniques/T1059/001/
+- https://attack.mitre.org/techniques/T1059/004/
+- https://attack.mitre.org/techniques/T1190/
+telemetry_validated: false
+required_fields:
+- Timestamp
+- DeviceId
+- DeviceName
+- InitiatingProcessFileName
+- InitiatingProcessFolderPath
+- InitiatingProcessCommandLine
+- InitiatingProcessAccountName
+- FileName
+- FolderPath
+- ProcessCommandLine
+- AccountName
+- AccountDomain
+- ReportId
+tags:
+- behavioural
+- clean-room
+- artex
+- database
+- xp_cmdshell
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let DbEngines = dynamic(["sqlservr.exe", "mysqld.exe", "mysqld-nt.exe", "mysqld", "mariadbd.exe", "mariadbd"]);
+    let Shells = dynamic(["cmd.exe", "powershell.exe", "pwsh.exe", "pwsh", "sh", "bash", "dash", "zsh"]);
+    DeviceProcessEvents
+    | where Timestamp > ago(Lookback)
+    | where InitiatingProcessFileName in~ (DbEngines)
+    | where FileName in~ (Shells)
+    | extend Engine = case(InitiatingProcessFileName =~ "sqlservr.exe", "mssql", "mysql-family"),
+        VeeamInstance = InitiatingProcessCommandLine has "VEEAMSQL"
+    | project Timestamp, DeviceId, DeviceName, Engine, VeeamInstance, InitiatingProcessFileName, InitiatingProcessFolderPath,
+        InitiatingProcessCommandLine, InitiatingProcessAccountName, FileName, FolderPath, ProcessCommandLine, AccountName,
+        AccountDomain, ReportId
+    | order by Timestamp asc

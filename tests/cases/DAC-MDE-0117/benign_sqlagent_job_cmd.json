@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/xp-cmdshell-transact-sql ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table ; https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mssql_susp_child_process.yml",
+  "platform": "defender",
+  "table": "DeviceProcessEvents",
+  "label": "benign",
+  "variant": "SQL Agent job step runs a batch file (parent is SQLAGENT.EXE, not the engine)",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "Timestamp": "2026-11-26T01:15:00Z",
+      "DeviceId": "synthetic-db01",
+      "DeviceName": "db01.corp.example",
+      "InitiatingProcessFileName": "SQLAGENT.EXE",
+      "InitiatingProcessFolderPath": "C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\Binn\\SQLAGENT.EXE",
+      "InitiatingProcessCommandLine": "SQLAGENT.EXE -i MSSQLSERVER",
+      "InitiatingProcessAccountName": "SQLSERVERAGENT",
+      "FileName": "cmd.exe",
+      "FolderPath": "C:\\Windows\\System32\\cmd.exe",
+      "ProcessCommandLine": "cmd.exe /c backup.bat",
+      "AccountName": "SQLSERVERAGENT",
+      "AccountDomain": "NT SERVICE",
+      "ReportId": 1001
+    }
+  ]
+}
