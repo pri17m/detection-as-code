@@ -1,0 +1,46 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/auditlogs ; https://learn.microsoft.com/en-us/entra/identity/monitoring-health/reference-audit-activities ; https://learn.microsoft.com/en-us/graph/api/resources/appidentity",
+  "platform": "defender",
+  "table": "AuditLogs",
+  "label": "malicious",
+  "variant": "app grants itself a Graph app role; its SP object ID is in modifiedProperties",
+  "expect_alert": true,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-21T03:10:00.000Z",
+      "OperationName": "Add app role assignment to service principal",
+      "Result": "success",
+      "InitiatedBy": {
+        "app": {
+          "appId": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+          "displayName": "build-pipeline-app",
+          "servicePrincipalId": "11111111-2222-4333-8444-555555555555",
+          "servicePrincipalName": null
+        },
+        "user": null
+      },
+      "TargetResources": [
+        {
+          "id": "00000000-0000-4000-8000-0000000000a1",
+          "displayName": "Microsoft Graph",
+          "type": "ServicePrincipal",
+          "modifiedProperties": [
+            {
+              "displayName": "AppRole.Value",
+              "oldValue": null,
+              "newValue": "\"RoleManagement.ReadWrite.Directory\""
+            },
+            {
+              "displayName": "ServicePrincipal.ObjectID",
+              "oldValue": null,
+              "newValue": "\"11111111-2222-4333-8444-555555555555\""
+            }
+          ]
+        }
+      ],
+      "CorrelationId": "00000000-0000-4000-8000-000000000001"
+    }
+  ]
+}
