@@ -1,0 +1,1212 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://www.wiz.io/blog/artex-in-the-wild-storm-0940-expands-targeting-of-it-and-software-vendors ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/signinlogs ; https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes",
+  "platform": "defender",
+  "table": "SigninLogs",
+  "label": "benign",
+  "variant": "shared egress: 150 failures across 40 users but irregular human gaps (median well over 2 s)",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-20T02:05:00.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:15.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:24.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:54.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:56.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:00.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng05@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:04.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng06@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:04.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng07@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:08.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng08@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:23.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng09@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:08:23.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng10@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:08:27.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng11@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:09:27.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng12@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:09:36.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng13@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:09:40.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng14@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:09:44.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng15@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:10:14.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng16@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:10:44.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng17@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:10:48.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng18@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:10:57.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng19@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:11:01.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng20@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:12:01.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng21@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:12:31.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng22@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:12:35.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng23@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:13:35.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng24@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:13:39.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng25@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:13:48.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng26@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:13:50.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng27@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:13:52.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng28@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:14:52.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng29@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:14:56.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng30@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:15:56.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng31@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:16:56.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng32@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:17:26.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng33@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:17:30.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng34@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:17:39.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng35@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:17:43.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng36@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:18:43.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng37@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:18:52.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng38@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:19:07.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng39@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:19:37.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:19:46.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:20:46.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:20:50.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:21:50.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:22:05.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng05@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:23:05.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng06@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:23:07.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng07@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:23:16.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng08@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:23:20.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng09@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:24:20.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng10@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:25:20.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng11@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:25:22.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng12@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:25:31.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng13@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:25:46.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng14@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:25:50.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng15@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:26:50.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng16@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:26:52.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng17@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:26:56.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng18@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:27:56.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng19@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:28:00.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng20@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:29:00.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng21@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:29:09.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng22@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:29:39.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng23@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:29:41.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng24@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:30:41.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng25@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:31:11.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng26@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:31:26.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng27@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:31:56.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng28@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:32:56.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng29@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:33:26.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng30@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:33:41.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng31@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:33:56.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng32@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:34:05.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng33@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:34:14.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng34@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:34:16.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng35@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:34:25.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng36@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:34:29.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng37@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:35:29.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng38@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:35:44.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng39@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:36:44.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:37:14.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:37:29.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:37:31.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:38:01.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:38:16.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng05@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:39:16.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng06@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:39:20.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng07@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:39:24.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng08@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:40:24.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng09@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:40:54.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng10@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:41:03.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng11@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:41:18.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng12@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:41:27.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng13@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:41:57.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng14@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:42:27.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng15@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:42:31.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng16@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:42:33.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng17@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:42:37.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng18@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:43:37.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng19@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:44:37.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng20@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:44:52.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng21@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:45:07.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng22@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:45:09.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng23@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:45:24.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng24@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:46:24.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng25@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:46:54.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng26@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:47:54.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng27@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:48:24.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng28@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:48:28.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng29@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:48:32.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng30@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:48:47.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng31@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:49:17.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng32@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:49:19.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng33@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:49:21.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng34@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:49:25.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng35@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:49:29.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng36@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:49:31.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng37@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:49:33.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng38@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:49:48.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng39@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:49:50.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:50:50.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:50:52.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:51:22.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:51:37.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:51:39.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng05@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:52:09.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng06@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:52:11.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng07@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:52:26.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng08@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:52:30.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng09@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:53:00.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng10@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:53:15.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng11@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:53:24.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng12@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:54:24.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng13@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:54:28.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng14@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:54:58.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng15@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:55:02.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng16@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:55:11.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng17@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:55:26.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng18@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:55:35.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng19@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:55:37.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng20@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:55:46.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng21@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:56:16.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng22@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:56:46.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng23@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:57:16.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng24@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:57:20.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng25@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:57:29.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng26@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:57:59.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng27@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:58:29.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng28@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:59:29.000Z",
+      "IPAddress": "198.51.100.10",
+      "UserAgent": "Mozilla/5.0 (corporate browser)",
+      "UserPrincipalName": "eng29@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    }
+  ]
+}
