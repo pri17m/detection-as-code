@@ -1,0 +1,88 @@
+id: DAC-MDE-0123
+title: 'Sentinel: first-seen Kudu or FTP publishing logon to an established App Service app (new identity, or app credential
+  from a new source)'
+description: 'Attack phase: initial access or persistence with stolen App Service publishing credentials. AppServiceAuditLogs
+  (''Logs generated when publishing users successfully log on via one of the App Service publishing protocols''; ''Login activity
+  via FTP and Kudu'') on apps that already had publishing logons in the last 30 days. Alerts when the publishing identity
+  is new to that app, or when an app-scope credential ($app-name or app-name\$app-name) that normally comes from 5 or fewer
+  addresses logs on from an address not seen for it. Google Threat Intelligence saw ARTEX map Kudu credentials and abuse Kudu
+  administrative APIs to run commands and stage scripts; ThreatDefence Hunt 15 hunts first-seen Kudu/FTP sign-ins. Microsoft''s
+  5 Nov 2026 post is wider ARTEX context. Addresses are novelty keys only, never matched against a list. Only successful logons
+  are logged. telemetry_validated false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:AppServiceAuditLogs
+mitre:
+  tactics:
+  - initial-access
+  - persistence
+  techniques:
+  - T1078.004
+severity: high
+false_positives:
+- A new engineer or a new deployment pipeline publishing to an existing app for the first time.
+- A deployment agent moving to new egress (new self-hosted runner, NAT change). Sites whose app credential already comes from
+  more than 5 addresses are excluded from the source branch.
+- Support or incident staff opening the Kudu console on an app they do not normally touch.
+references:
+- https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/appserviceauditlogs
+- https://learn.microsoft.com/en-us/azure/app-service/monitor-app-service-reference
+- https://learn.microsoft.com/en-us/azure/app-service/deploy-configure-credentials
+- https://learn.microsoft.com/en-us/azure/app-service/resources-kudu
+- https://attack.mitre.org/techniques/T1078/004/
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- _ResourceId
+- User
+- UserDisplayName
+- UserAddress
+- Protocol
+- OperationName
+tags:
+- behavioural
+- clean-room
+- artex
+- app-service
+- kudu
+- first-seen
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let Baseline = 30d;
+    let StableEgress = 5;   // app-scope credential source novelty only where deployments come from a few addresses
+    let Logons = AppServiceAuditLogs
+    | where TimeGenerated > ago(Lookback + Baseline)
+    | extend Site = tolower(_ResourceId), Who = tolower(coalesce(UserDisplayName, User))
+    // app-scope publishing user names are "$app-name" (Git/Kudu) or "app-name\$app-name" (FTP/S), per Learn
+    | extend AppScope = User startswith "$" or User contains @"\$";
+    let History = Logons | where TimeGenerated < ago(Lookback);
+    let EstablishedSites = History | distinct Site;
+    let KnownIdentities = History | distinct Site, Who;
+    let KnownSources = History | where AppScope | distinct Site, Who, UserAddress;
+    let StableSites = History | where AppScope | summarize Sources = dcount(UserAddress) by Site, Who | where Sources <= StableEgress;
+    let Recent = Logons
+    | where TimeGenerated > ago(Lookback)
+    | join kind=inner EstablishedSites on Site;
+    let NewIdentity = Recent
+    | join kind=leftanti KnownIdentities on Site, Who
+    | extend Reason = "new-identity-on-site";
+    let NewSourceForAppCred = Recent
+    | where AppScope
+    | join kind=inner KnownIdentities on Site, Who
+    | join kind=inner StableSites on Site, Who
+    | join kind=leftanti KnownSources on Site, Who, UserAddress
+    | extend Reason = "app-credential-from-new-source";
+    union NewIdentity, NewSourceForAppCred
+    | summarize Logons = count(), Protocols = make_set(Protocol, 5), Users = make_set(User, 5), SourceIps = make_set(UserAddress, 10),
+        Operations = make_set(OperationName, 5), FirstSeen = min(TimeGenerated), LastSeen = max(TimeGenerated)
+        by Site, Who, AppScope, Reason
+    | project FirstSeen, LastSeen, Site, Who, AppScope, Reason, Logons, Protocols, Users, SourceIps, Operations
+    | order by FirstSeen asc

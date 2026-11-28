@@ -1,0 +1,21 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/appserviceauditlogs ; https://learn.microsoft.com/en-us/azure/app-service/deploy-configure-credentials",
+  "platform": "defender",
+  "table": "AppServiceAuditLogs",
+  "label": "near-miss",
+  "variant": "First ever publishing logon to a new app (no history, not an established site)",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-26T09:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/new-app",
+      "User": "$new-app",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.30",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    }
+  ]
+}
