@@ -1,12 +1,12 @@
 {
   "summary": {
-    "detections_total": 920,
-    "detections_with_mitre": 920,
+    "detections_total": 921,
+    "detections_with_mitre": 921,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 221,
     "platform_counts": {
       "crowdstrike": 171,
-      "defender": 92,
+      "defender": 93,
       "google_secops": 83,
       "splunk": 657
     }
@@ -1347,7 +1347,8 @@
       "DAC-AZ-0013",
       "DAC-AZ-0014",
       "DAC-GCP-0018",
-      "DAC-GCP-0019"
+      "DAC-GCP-0019",
+      "DAC-MDE-0116"
     ],
     "T1556": [
       "DAC-AZ-0034",
