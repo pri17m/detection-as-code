@@ -1,0 +1,89 @@
+id: DAC-MDE-0115
+title: 'Entra: one app gets tokens for 3 or more of ARM, Key Vault, Storage and Graph within 15 minutes, first time in 14
+  days'
+description: 'Attack phase: discovery and collection right after a leaked application secret works (the agent tries every
+  API the app can reach). Successful AADServicePrincipalSignInLogs rows are classed by resource application ID (Azure Resource
+  Manager 797f4846-..., Azure Key Vault cfa8b339-..., Azure Storage e406a681-..., Microsoft Graph 00000003-..., with display
+  names as fallback). Alerts when one AppId reaches 3 or more of the 4 classes in a 15-minute bin and has never done so in
+  the previous 14 days. The Microsoft 5 Nov 2026 post on agentic abuse of exposed secrets lists ''one app requesting tokens
+  across Azure Resource Manager, Key Vault, Storage and Graph in a short window'' as a behaviour to hunt; ThreatDefence Hunt
+  19 adds the first-seen baseline idea. telemetry_validated false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:AADServicePrincipalSignInLogs
+mitre:
+  tactics:
+  - discovery
+  - credential-access
+  techniques:
+  - T1526
+  - T1528
+severity: high
+false_positives:
+- New multi-service apps (backup, CSPM, migration or deployment tools) in their first days, before they enter the 14-day baseline.
+  Expect one alert per new app; volume not measured.
+- Apps whose usage pattern changes after a release (adds Key Vault or Storage access). Check the change record.
+- Thresholds (3 of 4 classes, 15 minutes, 14 days) are unmeasured starting points.
+references:
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/aadserviceprincipalsigninlogs
+- https://learn.microsoft.com/en-us/connectors/custom-connectors/auth-script
+- https://attack.mitre.org/techniques/T1526/
+- https://attack.mitre.org/techniques/T1528/
+- https://learn.microsoft.com/en-us/kusto/query/functions/user-defined-functions
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- AppId
+- ServicePrincipalId
+- ServicePrincipalName
+- ResultType
+- ResourceIdentity
+- ResourceDisplayName
+- IPAddress
+- UserAgent
+tags:
+- behavioural
+- clean-room
+- artex
+- entra
+- workload-identity
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let Window = 15m;
+    let BaselineDays = 14d;
+    let MinResourceClasses = 3;
+    // Resource application IDs from Microsoft's first-party app list; display names are a fallback
+    let ResourceClassOf = (rid:string, rname:string) {
+        case(
+            rid == "797f4846-ba00-4fd7-ba43-dac1f8f63013" or rname =~ "Windows Azure Service Management API", "ARM",
+            rid == "cfa8b339-82a2-471a-a3c9-0fc0be7a4093" or rname =~ "Azure Key Vault", "KeyVault",
+            rid == "e406a681-f3d4-42a8-90b6-c2b029497af1" or rname =~ "Azure Storage", "Storage",
+            rid == "00000003-0000-0000-c000-000000000000" or rname =~ "Microsoft Graph", "Graph",
+            "")
+    };
+    let KnownSpreaders = AADServicePrincipalSignInLogs
+    | where TimeGenerated between (ago(Lookback + BaselineDays) .. ago(Lookback))
+    | where tostring(ResultType) == "0"
+    | extend ResourceClass = ResourceClassOf(ResourceIdentity, ResourceDisplayName)
+    | where isnotempty(ResourceClass)
+    | summarize Classes = dcount(ResourceClass) by AppId, bin(TimeGenerated, Window)
+    | where Classes >= MinResourceClasses
+    | distinct AppId;
+    AADServicePrincipalSignInLogs
+    | where TimeGenerated > ago(Lookback)
+    | where tostring(ResultType) == "0"
+    | extend ResourceClass = ResourceClassOf(ResourceIdentity, ResourceDisplayName)
+    | where isnotempty(ResourceClass)
+    | summarize Classes = dcount(ResourceClass), ClassList = make_set(ResourceClass), Tokens = count(),
+        SourceIPs = make_set(IPAddress, 10), Agents = make_set(UserAgent, 5), FirstSeen = min(TimeGenerated), LastSeen = max(TimeGenerated)
+        by AppId, ServicePrincipalId, ServicePrincipalName, bin(TimeGenerated, Window)
+    | where Classes >= MinResourceClasses
+    | join kind=leftanti KnownSpreaders on AppId
+    | order by Classes desc, FirstSeen asc
