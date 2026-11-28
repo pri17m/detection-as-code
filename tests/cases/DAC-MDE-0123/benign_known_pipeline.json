@@ -1,0 +1,255 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/appserviceauditlogs ; https://learn.microsoft.com/en-us/azure/app-service/deploy-configure-credentials",
+  "platform": "defender",
+  "table": "AppServiceAuditLogs",
+  "label": "benign",
+  "variant": "Daily pipeline from its usual address",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-01T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-02T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-03T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-04T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-05T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-06T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-07T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-08T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-09T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-10T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-11T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-12T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-13T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-14T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-15T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-16T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-17T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-18T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-19T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-20T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-21T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-22T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-23T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-24T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-25T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-12T10:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "ops-deploy",
+      "UserDisplayName": "ops@corp.example",
+      "UserAddress": "198.51.100.11",
+      "Protocol": "AAD",
+      "OperationName": "Authorization"
+    },
+    {
+      "TimeGenerated": "2026-11-26T08:00:00Z",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourcegroups/rg-web/providers/microsoft.web/sites/shop-api",
+      "User": "$shop-api",
+      "UserDisplayName": "",
+      "UserAddress": "198.51.100.10",
+      "Protocol": "Basic",
+      "OperationName": "Authorization"
+    }
+  ]
+}
