@@ -1,0 +1,83 @@
+id: DAC-MDE-0122
+title: 'Sentinel: one caller runs 5+ ARM deployments/validate dry runs in 2 minutes, with no such burst in the prior 14 days'
+description: 'Attack phase: discovery (what can these Azure credentials create). AzureActivity where OperationNameValue is
+  Microsoft.Resources/deployments/validate/action (documented on Microsoft Learn as ''Validates a deployment''). Alerts when
+  one caller issues 5 or more distinct validations in a 2-minute window and that caller never did so in the previous 14 days.
+  Deployment writes by the same caller in the same hour are shown for triage, not filtered. Google Threat Intelligence saw
+  ARTEX run ''an 8-second ARM deployments/validate dry-run sweep across 11 Azure resource types''; ThreatDefence Hunt 15 hunts
+  the same operation. Microsoft''s 5 Nov 2026 post is wider ARTEX context. Validation is a POST action, which the activity
+  log records. telemetry_validated false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- sentinel:AzureActivity
+mitre:
+  tactics:
+  - discovery
+  techniques:
+  - T1580
+severity: medium
+false_positives:
+- A new CI/CD pipeline or service principal that validates several templates per run (multi-stack repos). It alerts on the
+  first burst and is then in the baseline.
+- Engineers running az deployment validate in a loop while writing templates.
+- Portal template blades that call validate repeatedly while a user edits parameters (not measured).
+references:
+- https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/azureactivity
+- https://learn.microsoft.com/en-us/azure/role-based-access-control/permissions/management-and-governance
+- https://learn.microsoft.com/en-us/rest/api/resources/deployments/validate
+- https://learn.microsoft.com/en-us/azure/azure-monitor/platform/activity-log
+- https://attack.mitre.org/techniques/T1580/
+telemetry_validated: false
+required_fields:
+- TimeGenerated
+- OperationNameValue
+- Caller
+- CallerIpAddress
+- CorrelationId
+- _ResourceId
+- ResourceGroup
+- SubscriptionId
+- ActivityStatusValue
+tags:
+- behavioural
+- clean-room
+- artex
+- azure-arm
+- capability-check
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let Baseline = 14d;
+    let Window = 2m;
+    let MinValidations = 5;
+    let Validate = AzureActivity
+    | where TimeGenerated > ago(Lookback + Baseline)
+    | where OperationNameValue =~ "Microsoft.Resources/deployments/validate/action"
+    | extend Deployment = tolower(_ResourceId);
+    // one validate call writes several status rows (started / succeeded / failed); count calls, not rows
+    let Bursts = Validate
+    | summarize Validations = max_of(dcount(CorrelationId), dcount(Deployment)), Deployments = make_set(Deployment, 15),
+        ResourceGroups = dcount(ResourceGroup), Subscriptions = dcount(SubscriptionId), Statuses = make_set(ActivityStatusValue, 6),
+        SourceIps = make_set(CallerIpAddress, 5), FirstSeen = min(TimeGenerated), LastSeen = max(TimeGenerated)
+        by Caller, bin(TimeGenerated, Window);
+    // callers that already burst validations in the baseline (multi-stack pipelines) are known
+    let KnownBursters = Bursts | where TimeGenerated < ago(Lookback) and Validations >= MinValidations | distinct Caller;
+    let Deploys = AzureActivity
+    | where TimeGenerated > ago(Lookback + 1h)
+    | where OperationNameValue =~ "Microsoft.Resources/deployments/write"
+    | summarize DeployWrites = dcount(CorrelationId) by Caller, Hour = bin(TimeGenerated, 1h);
+    Bursts
+    | where TimeGenerated > ago(Lookback) and Validations >= MinValidations
+    | join kind=leftanti KnownBursters on Caller
+    | extend Hour = bin(FirstSeen, 1h)
+    | join kind=leftouter Deploys on Caller, Hour
+    | extend DeployWritesSameHour = coalesce(DeployWrites, 0)
+    | project FirstSeen, LastSeen, Caller, Validations, ResourceGroups, Subscriptions, DeployWritesSameHour, Statuses, SourceIps, Deployments
+    | order by FirstSeen asc
