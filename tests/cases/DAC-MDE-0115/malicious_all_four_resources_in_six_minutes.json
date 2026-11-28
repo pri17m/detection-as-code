@@ -1,0 +1,60 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/ ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/aadserviceprincipalsigninlogs ; https://learn.microsoft.com/en-us/connectors/custom-connectors/auth-script",
+  "platform": "defender",
+  "table": "AADServicePrincipalSignInLogs",
+  "label": "malicious",
+  "variant": "new app gets Graph, ARM, Key Vault and Storage tokens in 6 minutes",
+  "expect_alert": true,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-24T06:00:00Z",
+      "AppId": "feedface-1234-4abc-8def-0123456789ab",
+      "ServicePrincipalId": "sp-feedface",
+      "ServicePrincipalName": "app-feed",
+      "ResultType": "0",
+      "IPAddress": "203.0.113.90",
+      "UserAgent": "python-requests/2.31 (synthetic)",
+      "ResourceDisplayName": "Microsoft Graph",
+      "ResourceIdentity": "00000003-0000-0000-c000-000000000000",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-24T06:02:00Z",
+      "AppId": "feedface-1234-4abc-8def-0123456789ab",
+      "ServicePrincipalId": "sp-feedface",
+      "ServicePrincipalName": "app-feed",
+      "ResultType": "0",
+      "IPAddress": "203.0.113.90",
+      "UserAgent": "python-requests/2.31 (synthetic)",
+      "ResourceDisplayName": "Windows Azure Service Management API",
+      "ResourceIdentity": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-24T06:04:00Z",
+      "AppId": "feedface-1234-4abc-8def-0123456789ab",
+      "ServicePrincipalId": "sp-feedface",
+      "ServicePrincipalName": "app-feed",
+      "ResultType": "0",
+      "IPAddress": "203.0.113.90",
+      "UserAgent": "python-requests/2.31 (synthetic)",
+      "ResourceDisplayName": "Azure Key Vault",
+      "ResourceIdentity": "cfa8b339-82a2-471a-a3c9-0fc0be7a4093",
+      "_phase": "recent"
+    },
+    {
+      "TimeGenerated": "2026-11-24T06:06:00Z",
+      "AppId": "feedface-1234-4abc-8def-0123456789ab",
+      "ServicePrincipalId": "sp-feedface",
+      "ServicePrincipalName": "app-feed",
+      "ResultType": "0",
+      "IPAddress": "203.0.113.90",
+      "UserAgent": "python-requests/2.31 (synthetic)",
+      "ResourceDisplayName": "Azure Storage",
+      "ResourceIdentity": "e406a681-f3d4-42a8-90b6-c2b029497af1",
+      "_phase": "recent"
+    }
+  ]
+}
