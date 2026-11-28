@@ -1,0 +1,84 @@
+id: DAC-MDE-0111
+title: 'MDE: one device opens WinRM (5985/5986) to 10 or more hosts in 10 minutes, private ranges included, first time in
+  14 days'
+description: 'Attack phase: lateral movement after a foothold. DeviceNetworkEvents ConnectionSuccess to RemotePort 5985 or
+  5986, counted as distinct RemoteIP per device in 10-minute bins. Alerts when one device reaches 10 or more WinRM targets
+  in a bin and that device did not do the same in the previous 14 days. Private (RFC1918) destinations are kept on purpose,
+  because internal WinRM is the lateral-movement case; DAC-CS-0064 drops RFC1918 and has no target count, which is why ThreatDefence
+  Hunt 16c was scored as a gap. ThreatDefence describes ARTEX operators using nmap to find WinRM on 5985/5986 and then Evil-WinRM
+  and similar tools; the Microsoft 5 Nov 2026 agentic-abuse post is wider ARTEX context. RemoteIP is counted, never matched
+  against a list. The 14-day baseline drops management servers that fan out every day. telemetry_validated false.'
+author: DaC
+status: experimental
+platforms:
+- defender
+sourcetypes:
+- mde:advanced_hunting
+mitre:
+  tactics:
+  - lateral-movement
+  techniques:
+  - T1021.006
+severity: medium
+false_positives:
+- New or rebuilt management hosts (Server Manager, configuration management, patching, inventory) that start fanning out over
+  WinRM and have no 14-day history. Add them to an allowlist after review; volume not measured.
+- Admins running Invoke-Command or Enter-PSSession against many servers from a workstation for the first time (one-off maintenance).
+- Threshold (10 targets in 10 minutes) and baseline (14 days) are unmeasured starting points.
+references:
+- https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting
+- https://www.microsoft.com/en-us/security/blog/2026/11/05/threat-actors-use-agentic-ai-tooling-to-find-and-abuse-exposed-secrets/
+- https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicenetworkevents-table
+- https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/devicenetworkevents
+- https://learn.microsoft.com/en-us/defender-endpoint/investigate-behind-proxy
+- https://learn.microsoft.com/en-us/windows/win32/winrm/installation-and-configuration-for-windows-remote-management
+- https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1021.006/T1021.006.md
+- https://attack.mitre.org/techniques/T1021/006/
+telemetry_validated: false
+required_fields:
+- Timestamp
+- DeviceId
+- DeviceName
+- ActionType
+- RemoteIP
+- RemoteIPType
+- RemotePort
+- InitiatingProcessFileName
+- InitiatingProcessCommandLine
+- InitiatingProcessAccountDomain
+- InitiatingProcessAccountName
+tags:
+- behavioural
+- clean-room
+- artex
+- lateral-movement
+- winrm
+- agentic-attack
+query:
+  defender: |
+    let Lookback = 1d;
+    let Window = 10m;
+    let MinTargets = 10;
+    let BaselineDays = 14d;
+    // WinRM default ports: 5985 (HTTP) and 5986 (HTTPS). RFC1918 / Private destinations are deliberately kept.
+    let WinRmConnects = (StartTime:datetime, EndTime:datetime) {
+        DeviceNetworkEvents
+        | where Timestamp between (StartTime .. EndTime)
+        | where ActionType == "ConnectionSuccess"
+        | where RemotePort in (5985, 5986)
+        | where RemoteIPType != "Loopback" and isnotempty(RemoteIP)
+    };
+    let KnownFanoutDevices = WinRmConnects(ago(Lookback + BaselineDays), ago(Lookback))
+    | summarize Targets = dcount(RemoteIP) by DeviceId, bin(Timestamp, Window)
+    | where Targets >= MinTargets
+    | distinct DeviceId;
+    WinRmConnects(ago(Lookback), now())
+    | summarize Targets = dcount(RemoteIP), PrivateTargets = dcountif(RemoteIP, RemoteIPType == "Private"),
+        SampleTargets = make_set(RemoteIP, 25), Processes = make_set(InitiatingProcessFileName, 10),
+        Accounts = make_set(strcat(InitiatingProcessAccountDomain, "\\", InitiatingProcessAccountName), 10),
+        SampleCommandLines = make_set(InitiatingProcessCommandLine, 5), Ports = make_set(RemotePort),
+        FirstSeen = min(Timestamp), LastSeen = max(Timestamp)
+        by DeviceId, DeviceName, Window10m = bin(Timestamp, Window)
+    | where Targets >= MinTargets
+    | join kind=leftanti KnownFanoutDevices on DeviceId
+    | order by Targets desc

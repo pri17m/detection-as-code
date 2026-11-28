@@ -1,12 +1,12 @@
 {
   "summary": {
-    "detections_total": 916,
-    "detections_with_mitre": 916,
+    "detections_total": 917,
+    "detections_with_mitre": 917,
     "detections_with_mitre_percent": 100.0,
     "unique_techniques": 221,
     "platform_counts": {
       "crowdstrike": 171,
-      "defender": 88,
+      "defender": 89,
       "google_secops": 83,
       "splunk": 657
     }
@@ -172,6 +172,7 @@
     "T1021.006": [
       "DAC-CS-0040",
       "DAC-MDE-0039",
+      "DAC-MDE-0111",
       "DAC-WIN-0014",
       "DAC-WIN-0113",
       "DAC-WIN-0133",
