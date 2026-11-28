@@ -1,0 +1,78 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://cloud.google.com/blog/topics/threat-intelligence/artex-and-friends-enter-agentic-offensive-frameworks ; https://threatdefence.com/article/artex-agentic-attack-framework-detection-hunting ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/azureactivity ; https://learn.microsoft.com/en-us/azure/role-based-access-control/permissions/management-and-governance",
+  "platform": "defender",
+  "table": "AzureActivity",
+  "label": "malicious",
+  "variant": "User account validates 6 deployments across 6 resource groups in one minute",
+  "expect_alert": true,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-26T06:00:00Z",
+      "OperationNameValue": "Microsoft.Resources/deployments/validate/action",
+      "Caller": "user7@corp.example",
+      "CallerIpAddress": "203.0.113.77",
+      "CorrelationId": "synthetic-corr-user7@-000",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourceGroups/rg-0/providers/Microsoft.Resources/deployments/probe000",
+      "ResourceGroup": "rg-0",
+      "SubscriptionId": "00000000-0000-0000-0000-00000000000a",
+      "ActivityStatusValue": "Succeeded"
+    },
+    {
+      "TimeGenerated": "2026-11-26T06:00:10Z",
+      "OperationNameValue": "Microsoft.Resources/deployments/validate/action",
+      "Caller": "user7@corp.example",
+      "CallerIpAddress": "203.0.113.77",
+      "CorrelationId": "synthetic-corr-user7@-001",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourceGroups/rg-1/providers/Microsoft.Resources/deployments/probe001",
+      "ResourceGroup": "rg-1",
+      "SubscriptionId": "00000000-0000-0000-0000-00000000000a",
+      "ActivityStatusValue": "Succeeded"
+    },
+    {
+      "TimeGenerated": "2026-11-26T06:00:20Z",
+      "OperationNameValue": "Microsoft.Resources/deployments/validate/action",
+      "Caller": "user7@corp.example",
+      "CallerIpAddress": "203.0.113.77",
+      "CorrelationId": "synthetic-corr-user7@-002",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourceGroups/rg-2/providers/Microsoft.Resources/deployments/probe002",
+      "ResourceGroup": "rg-2",
+      "SubscriptionId": "00000000-0000-0000-0000-00000000000a",
+      "ActivityStatusValue": "Succeeded"
+    },
+    {
+      "TimeGenerated": "2026-11-26T06:00:30Z",
+      "OperationNameValue": "Microsoft.Resources/deployments/validate/action",
+      "Caller": "user7@corp.example",
+      "CallerIpAddress": "203.0.113.77",
+      "CorrelationId": "synthetic-corr-user7@-003",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourceGroups/rg-3/providers/Microsoft.Resources/deployments/probe003",
+      "ResourceGroup": "rg-3",
+      "SubscriptionId": "00000000-0000-0000-0000-00000000000a",
+      "ActivityStatusValue": "Succeeded"
+    },
+    {
+      "TimeGenerated": "2026-11-26T06:00:40Z",
+      "OperationNameValue": "Microsoft.Resources/deployments/validate/action",
+      "Caller": "user7@corp.example",
+      "CallerIpAddress": "203.0.113.77",
+      "CorrelationId": "synthetic-corr-user7@-004",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourceGroups/rg-4/providers/Microsoft.Resources/deployments/probe004",
+      "ResourceGroup": "rg-4",
+      "SubscriptionId": "00000000-0000-0000-0000-00000000000a",
+      "ActivityStatusValue": "Succeeded"
+    },
+    {
+      "TimeGenerated": "2026-11-26T06:00:50Z",
+      "OperationNameValue": "Microsoft.Resources/deployments/validate/action",
+      "Caller": "user7@corp.example",
+      "CallerIpAddress": "203.0.113.77",
+      "CorrelationId": "synthetic-corr-user7@-005",
+      "_ResourceId": "/subscriptions/00000000-0000-0000-0000-00000000000a/resourceGroups/rg-5/providers/Microsoft.Resources/deployments/probe005",
+      "ResourceGroup": "rg-5",
+      "SubscriptionId": "00000000-0000-0000-0000-00000000000a",
+      "ActivityStatusValue": "Succeeded"
+    }
+  ]
+}
