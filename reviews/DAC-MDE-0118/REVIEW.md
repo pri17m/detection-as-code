@@ -54,5 +54,12 @@ CI validate: see PR checks. Not run in Sentinel or Splunk.
 | 4 | Autoscaling and other services launch instances for you | invokedBy autoscaling.amazonaws.com | Drop service-invoked calls |
 | 5 | Baseline and live filters defined twice | drift on edit | One `Ec2Calls` function |
 
+## Tactic mapping check (2026-11-28)
+Checked against the MITRE ATT&CK Enterprise v19.2 STIX bundle (`enterprise-attack-19.2.json`, collection `x_mitre_version` 19.2, from https://github.com/mitre-attack/attack-stix-data/blob/master/enterprise-attack/enterprise-attack-19.2.json). Result: no change to the rule.
+- T1578.002 Create Cloud Instance (attack-pattern, version 2.0, not revoked or deprecated, modified 2026-05-12): `kill_chain_phases` has exactly one entry, `mitre-attack / defense-impairment`. The page agrees: https://attack.mitre.org/techniques/T1578/002/
+- `defense-impairment` is a v19.2 tactic (`x-mitre-tactic` shortname `defense-impairment`, name "Defense Impairment"). It is not a v19.2 alias of Execution. Execution is a separate tactic and T1578.002 is not mapped to it.
+- The rule has one technique (T1098.004 was dropped earlier, see Attribution), so `tactics: [defense-impairment]` is the complete and correct mapping. Adding execution, persistence or initial-access would need a different technique, not a relabel. The stolen-key use is better described by T1078.004 (Valid Accounts: Cloud Accounts, v19.2 tactics stealth, persistence, privilege-escalation, initial-access), which was left out because this rule alerts on the created infrastructure, not the sign-in.
+- The site showing this rule under Execution is not caused by this YAML. detectionatlas `scripts/compile-catalog.py` only knows the pre-v19 tactic names in its ALIAS table, so `defense-impairment` (and `stealth`, used by many rules on main) is not recognised there. Fix belongs in that script, not in this rule.
+
 ## Reviewer status
 - pending human approval
