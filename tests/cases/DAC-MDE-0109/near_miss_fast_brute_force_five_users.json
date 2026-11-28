@@ -1,0 +1,1212 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://www.wiz.io/blog/artex-in-the-wild-storm-0940-expands-targeting-of-it-and-software-vendors ; https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/signinlogs ; https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes",
+  "platform": "defender",
+  "table": "SigninLogs",
+  "label": "near-miss",
+  "variant": "one-second rhythm but only 5 users (brute force, not spray)",
+  "expect_alert": false,
+  "result": "not run (no KQL runner in this repo). Python mirror of the rule logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "TimeGenerated": "2026-11-20T02:05:00.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:01.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:02.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:03.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:04.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:05.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:06.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:07.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:08.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:09.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:10.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:11.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:12.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:13.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:14.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:15.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:16.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:17.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:18.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:19.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:20.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:21.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:22.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:23.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:24.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:25.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:26.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:27.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:28.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:29.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:30.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:31.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:32.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:33.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:34.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:35.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:36.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:37.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:38.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:39.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:40.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:41.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:42.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:43.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:44.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:45.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:46.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:47.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:48.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:49.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:50.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:51.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:52.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:53.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:54.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:55.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:56.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:57.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:58.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:05:59.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:00.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:01.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:02.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:03.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:04.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:05.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:06.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:07.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:08.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:09.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:10.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:11.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:12.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:13.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:14.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:15.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:16.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:17.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:18.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:19.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:20.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:21.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:22.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:23.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:24.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:25.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:26.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:27.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:28.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:29.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:30.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:31.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:32.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:33.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:34.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:35.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:36.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:37.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:38.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:39.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:40.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:41.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:42.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:43.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:44.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:45.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:46.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:47.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:48.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:49.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:50.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:51.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:52.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:53.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:54.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:55.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:56.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:57.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:58.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:06:59.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:00.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:01.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:02.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:03.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:04.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:05.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:06.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:07.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:08.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:09.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:10.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:11.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:12.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:13.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:14.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:15.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:16.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:17.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:18.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:19.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:20.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:21.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:22.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:23.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:24.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:25.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng00@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:26.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng01@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:27.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng02@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:28.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng03@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    },
+    {
+      "TimeGenerated": "2026-11-20T02:07:29.000Z",
+      "IPAddress": "203.0.113.45",
+      "UserAgent": "python-requests/2.31.0 (synthetic burst A)",
+      "UserPrincipalName": "eng04@contoso.example",
+      "ResultType": "50126",
+      "AppDisplayName": "Office 365 Exchange Online"
+    }
+  ]
+}
