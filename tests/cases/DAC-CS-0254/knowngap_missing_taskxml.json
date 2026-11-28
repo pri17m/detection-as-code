@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/ ; https://github.com/CrowdStrike/logscale-community-content/blob/main/CrowdStrike-Query-Language-Map/CrowdStrike-Query-Language/parseXml.md ; https://github.com/CrowdStrike/logscale-community-content/blob/main/Log-Sources/CrowdStrike/FLTR/crowdstrike-fltrlolbins/src/queries/LOLBins-Rundll32-ScheduledTasks.yaml ; https://learn.microsoft.com/en-us/windows/win32/taskschd/taskschedulerschema-userid-principaltype-element",
+  "platform": "crowdstrike",
+  "table": "ScheduledTaskRegistered",
+  "label": "known-gap",
+  "variant": "TaskXml absent from the event: parseXml skips events without the field, so the SYSTEM check cannot run",
+  "expect_alert": true,
+  "result": "not run (no LogScale runner). Python mirror of the rule's logic: no alert. Known gap, documented in REVIEW.md",
+  "events": [
+    {
+      "@timestamp": "2026-11-21T19:07:00Z",
+      "#event_simpleName": "ScheduledTaskRegistered",
+      "event_platform": "Win",
+      "aid": "synthetic-aid-0007",
+      "ComputerName": "srv07.example.invalid",
+      "UserName": "svc-backup",
+      "TaskName": "\\1846203957",
+      "TaskExecCommand": "pythonw.exe",
+      "TaskExecArguments": ""
+    }
+  ]
+}

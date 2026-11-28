@@ -1,0 +1,24 @@
+{
+  "synthetic": true,
+  "source": "synthetic; https://hexastrike.com/resources/blog/threat-intelligence/s5pivot-a-python-backconnect-proxy-hidden-inside-a-qilin-ransomware-intrusion/ ; https://github.com/CrowdStrike/logscale-community-content/blob/main/CrowdStrike-Query-Language-Map/CrowdStrike-Query-Language/parseXml.md ; https://github.com/CrowdStrike/logscale-community-content/blob/main/Log-Sources/CrowdStrike/FLTR/crowdstrike-fltrlolbins/src/queries/LOLBins-Rundll32-ScheduledTasks.yaml ; https://learn.microsoft.com/en-us/windows/win32/taskschd/taskschedulerschema-userid-principaltype-element",
+  "platform": "crowdstrike",
+  "table": "ScheduledTaskRegistered",
+  "label": "near_miss",
+  "variant": "numeric name and pythonw.exe but the principal is a domain user SID",
+  "expect_alert": false,
+  "result": "not run (no LogScale runner). Python mirror of the rule's logic applied to these events: no alert, matches expectation",
+  "events": [
+    {
+      "@timestamp": "2026-11-21T19:03:00Z",
+      "#event_simpleName": "ScheduledTaskRegistered",
+      "event_platform": "Win",
+      "aid": "synthetic-aid-0003",
+      "ComputerName": "srv03.example.invalid",
+      "UserName": "svc-backup",
+      "TaskName": "\\1846203957",
+      "TaskExecCommand": "pythonw.exe",
+      "TaskExecArguments": "",
+      "TaskXml": "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Task version=\"1.2\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\"><Triggers><TimeTrigger><Repetition><Interval>PT1M</Interval></Repetition><StartBoundary>2026-11-21T19:00:00</StartBoundary><Enabled>true</Enabled></TimeTrigger></Triggers><Principals><Principal id=\"Author\"><UserId>S-1-5-21-1000000000-1000000000-1000000000-1001</UserId><RunLevel>LeastPrivilege</RunLevel></Principal></Principals><Settings><MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy></Settings><Actions Context=\"Author\"><Exec><Command>pythonw.exe</Command><WorkingDirectory>C:\\programdata\\q7rk2m</WorkingDirectory></Exec></Actions></Task>"
+    }
+  ]
+}
